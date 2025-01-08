@@ -1,7 +1,7 @@
 ---
 title: "QC with STAR and Qualimap"
-author: "Meeta Mistry, Mary Piper"
-date: Monday September 10, 2018
+author: "Meeta Mistry, Mary Piper, Modified by Sally Chang at NICHD"
+date: January 8th, 2024
 ---
 
 Approximate time: 50 minutes
@@ -13,7 +13,7 @@ Approximate time: 50 minutes
 * Running Qualimap to compute metrics on alignment files
 
 
-## Quality Control for Alignment Data
+## Quality Control for Alignment Data - edit this section so it doesn't mention Salmon
 
 After running Salmon, we now have transcript-level abundance estimates for each of our samples. When Salmon performs the quasi-alignment, internally the algorithm knows the location(s) to which each read is assigned, however this information is not shared with the user. **In order for us to make an assessment on the quality of the mapping we need genomic coordinate information for where each read maps**. Since this is not part of the Salmon output we will need to use a genome alignment tools to **generate a BAM file**. The BAM file will be used as input to a tool called [Qualimap](http://qualimap.bioinfo.cipf.es/doc_html/intro.html) which computes various quality metrics such as DNA or rRNA contamination, 5'-3' biases, and coverage biases. 
 
@@ -67,9 +67,9 @@ To use the STAR aligner, load the module:
 $ module load gcc/6.2.0 star/2.7.0a
 ```
 
-Similar to Salmon, aligning reads using STAR is **a two step process**:   
+Aligning reads using STAR is **a two step process**:   
 
-1. Create a genome index 
+1. Create a genome index (after identifying the appropriate reference for your organism or use case)
 2. Map reads to the genome
 
 > A quick note on shared databases for human and other commonly used model organisms. The O2 cluster has a designated directory at `/n/groups/shared_databases/` in which there are files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you. 
@@ -77,6 +77,10 @@ Similar to Salmon, aligning reads using STAR is **a two step process**:
 >```bash
 > $ ls -l /n/groups/shared_databases/igenome/
 >```
+
+### Finding a reference genome for your organism 
+
+
 
 ### Creating a genome index
 
@@ -93,9 +97,9 @@ The basic options to **generate genome indices** using STAR are as follows:
 
 > *NOTE:* In case of reads of varying length, the ideal value for `--sjdbOverhang` is max(ReadLength)-1. In most cases, the default value of 100 will work similarly to the ideal value.
 
-The final command to create an index can be found in the job submission script we have linked [here](../scripts/star_genome_index.run). We have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices. The index can be found in the `/n/groups/hbctraining/intro_rnaseq_hpc/reference_data_ensembl38/ensembl38_STAR_index/` directory. 
+The final command to create an index can be found in the job submission script we have linked [here](../scripts/star_genome_index.run). We have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices. The index can be found in the `HERE IS WHERE I PUT THE STAR GENOME INDEX` directory. 
 
->**NOTE:** By default the latest human genome build, GRCh38, contains information about alternative alleles for various locations on the genome. If using this version of the GRCh38 genome then it is advisable to use the HISAT2 aligner as it is able to utilize this information during the alignment. There is a version of GRCh38 available that does not have these alleles represented, which is the appropriate version to use with STAR. This is because STAR does not have the functionality to appropriately deal with the presence of alternate alleles.
+### Finding a 
 
 ### Aligning reads
 
