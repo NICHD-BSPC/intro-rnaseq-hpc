@@ -72,15 +72,22 @@ Aligning reads using STAR is **a two step process**:
 1. Create a genome index (after identifying the appropriate reference for your organism or use case)
 2. Map reads to the genome
 
-> A quick note on shared databases for human and other commonly used model organisms. The O2 cluster has a designated directory at `/n/groups/shared_databases/` in which there are files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you. 
+> A quick note on shared databases for human and other commonly used model organisms. Biowulf has a number of [Scientific Reference Databases](Scientific Reference Databases) which contain files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you. 
 >
+> To check out what reference genomes Biowulf has, you can check: 
 >```bash
-> $ ls -l /n/groups/shared_databases/igenome/
+> $ ls -lrt ls /fdb/STAR_indices
 >```
 
 ### Finding a reference genome for your organism 
 
-
+```bash
+$ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh38.primary_assembly.genome.fa.gz
+```
+```bash
+$ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.primary_assembly.annotation.gtf.gz
+```
+It contains the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes. 
 
 ### Creating a genome index
 
@@ -98,8 +105,6 @@ The basic options to **generate genome indices** using STAR are as follows:
 > *NOTE:* In case of reads of varying length, the ideal value for `--sjdbOverhang` is max(ReadLength)-1. In most cases, the default value of 100 will work similarly to the ideal value.
 
 The final command to create an index can be found in the job submission script we have linked [here](../scripts/star_genome_index.run). We have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices. The index can be found in the `HERE IS WHERE I PUT THE STAR GENOME INDEX` directory. 
-
-### Finding a 
 
 ### Aligning reads
 
