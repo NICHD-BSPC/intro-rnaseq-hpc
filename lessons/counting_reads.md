@@ -62,14 +62,11 @@ Rather than using the BAM file we generated in the last lesson, let's copy over 
 
 $ cp /n/groups/hbctraining/intro_rnaseq_hpc/bam_STAR/*bam ~/rnaseq/results/STAR/bams
 ```
-featureCounts is not available as a module on O2, but we have already added the path for it to our `$PATH` variable last time. 
+featureCounts is available as part of the subread module on Biowulf. Load this module using the following:
 
 ``` bash
-$ echo $PATH  # You should see /n/app/bcbio/tools/bin/ among other paths
+$ module load subread
 ```
-
-> ** If you don't see `/n/app/bcbio/tools/bin/` in your `$PATH` variable, add the following `export` command to your `~/.bashrc` file using vim: `export PATH=/n/app/bcbio/tools/bin/:$PATH`.**
-
 
 #### Running featureCounts
 
