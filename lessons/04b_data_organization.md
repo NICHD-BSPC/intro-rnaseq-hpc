@@ -17,47 +17,76 @@ editor_options:
 
 ## What is data management?
 
-In this course we teach you how to independently analyze your own sequencing data, so naturally we should begin with what what to do once you get the raw data back from the sequencing facility. Obviously, we begin with the analysis! Right?
+In this course we teach you how to independently analyze your own sequencing data, so naturally we should begin with what what to do once you get the raw data back from the sequencing facility.
+Obviously, we begin with the analysis!
+Right?
 
-Wrong. 
+Wrong.
 
-One of the most important parts of research that involves large amounts of data is how best to manage it. Once data is generated we tend to prioritize the analysis. **In the excitement to get a first look at new data, there are many important aspects that are often overlooked.**
+One of the most important parts of research that involves large amounts of data is how best to manage it.
+Once data is generated we tend to prioritize the analysis.
+**In the excitement to get a first look at new data, there are many important aspects that are often overlooked.**
 
 Wait, don't leave this page just yet!
 
-We know that data management can be hard to get excited about. However, **ignoring it can be detrimental to your research.** Here are just a few reasons **why data management should matter to you**:
+We know that data management can be hard to get excited about.
+However, **ignoring it can be detrimental to your research.** Here are just a few reasons **why data management should matter to you**:
 
-* It will make your life easier. It's easier to analyze organized, and well documented data.
-* Your future self will thank you. Managing well from the get-go means it's easier to retrieve at a later date.
-* Data is precious. Thinking ahead about things like storage means you reduce risk of losing it.
-* Funding agencies are increasingly mandating that research projects are developed with a data management plan.
+-   It will make your life easier. It's easier to analyze organized, and well documented data.
+-   Your future self will thank you. Managing well from the get-go means it's easier to retrieve at a later date.
+-   Data is precious. Thinking ahead about things like storage means you reduce risk of losing it.
+-   Funding agencies are increasingly mandating that research projects are developed with a data management plan.
 
 ### Data Lifecycle
-The data lifecycle displayed below, courtesy of the [HMS Data Management Working Group](https://datamanagement.hms.harvard.edu/), illustrates some things to consider beyond data creation and analysis. Below, we discuss components of the lifecycle and how they apply to any NGS experiment.
+
+The data lifecycle displayed below, courtesy of the [HMS Data Management Working Group](https://datamanagement.hms.harvard.edu/), illustrates some things to consider beyond data creation and analysis.
+Below, we discuss components of the lifecycle and how they apply to any NGS experiment.
 
 <p align="center">
-<img src="../img/data-lifecycle-base.png" width="600">
+
+<img src="../img/data-lifecycle-base.png" width="600"/>
+
 </p>
 
-_Image acquired from the [Harvard Biomedical Data Management Website](https://datamanagement.hms.harvard.edu/data-lifecycle)_
+*Image acquired from the [Harvard Biomedical Data Management Website](https://datamanagement.hms.harvard.edu/data-lifecycle)*
 
 ### Plan and Design
-You should approach your sequencing project in a very similar way you do with any biological experiment, and ideally, begins with a good **experimental design**. You want to think about experiment at the outset and collect appropriate samples such that you have enough statistical power to make the comparisons you need. In a later lesson, we delve more into the details of planning and the experimental design considerations. Planning for your computational work is just as important as planning when working on the bench. Every computational analysis you do is going to spawn many files and you will want to think about short-term storage options for your data and computational resources for analyzing it. 
+
+You should approach your sequencing project in a very similar way you do with any biological experiment, and ideally, begins with a good **experimental design**.
+You want to think about experiment at the outset and collect appropriate samples such that you have enough statistical power to make the comparisons you need.
+**In a later lesson, we delve more into the details of planning and the experimental design considerations.**
+
+Planning for your computational work is just as important as planning when working on the bench.
+Every computational analysis you do is going to spawn many files and you will want to think about short-term storage options for your data and computational resources for analyzing it.
 
 ### Collect and Create
-The next step is preparing samples as required. During this stage it is important to keep track of how the experiment was performed, making sure to clearly document the source of starting materials and kits used. It is also best practice to include any information about any small variations within the experiment (across the different samples being prepared) or any changes relative to standard experiment protocols. This collection of information serves as the **metadata of the experiment** which will prove to be very useful during the analysis stage. 
 
-### Analyze and Collaborate
-Once you have the sequencing data back from the sequencing facility, it's time to analyze it. The process of data analysis should be well documented to ensure reproducibility and also for ease of collaboration. We will spend some more time on this component of the lifecycle later in class, as it applies to our dataset.
+The next step is preparing samples as required.
+During this stage it is important to keep track of how the experiment was performed, making sure to clearly document the source of starting materials and kits used.
+It is also best practice to include any information about any small variations within the experiment (across the different samples being prepared) or any changes relative to standard experiment protocols.
+This collection of information serves as the **metadata of the experiment** which will prove to be very useful during the analysis stage.
+
+### Analyze and Collaborate - our course will mostly focus on this portion of the life cycle!
+
+Once you have the sequencing data back from the sequencing facility, it's time to analyze it.
+The process of data analysis should be well documented to ensure reproducibility and also for ease of collaboration.
+We will spend some more time on this component of the lifecycle later in class, as it applies to our dataset.
 
 ### Evaluate and Archive
-When the analysis is complete you will want to think about which files are most pertinent to keep. Consider long-term storage options for your data that meet requirements of NIH, other funding agencies, and any guidelines from your institution.
+
+When the analysis is complete you will want to think about which files are most pertinent to keep.
+Consider long-term storage options for your data that meet requirements of NIH, other funding agencies, and any guidelines from your institution.
 
 ### Disseminate and share
-The results of your analysis will hopefully generate some exciting findings that will be beneficial to the scientific community. At this stage in the lifecycle you rely on your previous steps of documentation to turn those notes into a clear and concise methods section of your manuscript. 
+
+The results of your analysis will hopefully generate some exciting findings that will be beneficial to the scientific community.
+At this stage in the lifecycle you rely on your previous steps of documentation to turn those notes into a clear and concise methods section of your manuscript.
 
 ### Access and Reuse
-In addition to sharing information on the analysis, you should plan for sharing the data. It has become increasingly common for researchers to make their data available to others when they complete a study. While a major reason for sharing is compliance (with journals or research funding organizations), there are also important research benefits including reproducibility and data sharing and reuse.
+
+In addition to sharing information on the analysis, you should plan for sharing the data.
+It has become increasingly common for researchers to make their data available to others when they complete a study.
+While a major reason for sharing is compliance (with journals or research funding organizations), there are also important research benefits including reproducibility and data sharing and reuse.
 
 ## The Dataset
 
@@ -78,7 +107,7 @@ We are usually quick to want to begin analysis of the sequence data (FASTQ files
 
 Some relevant metadata for our dataset is provided below:
 
--   The RNA was extracted from **HEK293F cells** that were transfected with a **MOV10 transgene**, **MOV10 siRNA**, or an **irrelevant siRNA**. (*For this workshop we won't be using the MOV10 knock down samples.*)
+-   The RNA was extracted from **HEK293F cells** that were transfected with a **MOV10 transgene**, **MOV10 siRNA**, or an **irrelevant siRNA**. (*For this course we won't be using the MOV10 knock down samples.*)
 -   The libraries for this dataset are **stranded** and were generated using the standard Tru-seq prep kit (using the dUTP method).
 -   Sequencing was carried out on the **Illumina HiSeq-2500** and **100bp single end** reads were generated.
 -   The full dataset was sequenced to **\~40 million reads** per sample, but for this workshop we will be looking at a small subset on chr1 (\~300,000 reads/sample).
