@@ -69,7 +69,7 @@ The authors are investigating interactions between various genes involved in Fra
 
 From this study we are using the [RNA-seq](http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE50499) data which is publicly available in the [Sequence Read Archive (SRA)](https://www.ncbi.nlm.nih.gov/sra/?term=SRP029367).
 
-> **NOTE:** If you are interested in how to obtain publicly available sequence data from the SRA we have some materials on this [linked here](https://hbctraining.github.io/Accessing_public_genomic_data/lessons/downloading_from_SRA.html).
+> **NOTE:** If you are interested in how to obtain publicly available sequence data from the SRA, the Harvard HPC staff have created a lesson about this (note that it is not customized for Biowulf) [linked here](https://hbctraining.github.io/Accessing_public_genomic_data/lessons/downloading_from_SRA.html).
 
 ### Metadata
 
