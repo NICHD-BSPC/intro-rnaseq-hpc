@@ -119,17 +119,14 @@ Some relevant metadata for our dataset is provided below:
 
 </p>
 
-## Implementing data management best practices
+## Exercise: Implementing data management best practices
 
 Here, we implement some of those strategies to get ourselves setup before we begin with any analysis.
 
-<p align="center">
+### Are you logged into Biowulf, on a compute node, and in your course directory?
 
-<img src="../img/data-lifecycle-base.png" width="500"/>
-
-</p>
-
-*Image acquired from the [Harvard Biomedical Data Management Website](https://datamanagement.hms.harvard.edu/data-lifecycle)*
+If not, first do that before proceeding!
+As a reminder, the course directory is: `/data/Bspc-training/$USER`
 
 ### Planning and organization
 
@@ -138,13 +135,10 @@ We will start by creating a directory that we can use for the rest of the worksh
 First, make sure that you are in your home directory.
 
 ``` bash
-$ cd
-$ pwd
+$ cd /data/Bspc-training/$USER
 ```
 
-This should return `/data/$USER/rc_training`.
-Create the directory `rnaseq` and move into it.
-***We will need to edit this directory path based on how Biowulf wants us to organize things.***
+From here, create the directory `rnaseq` and move into it.
 
 ``` bash
 $ mkdir rnaseq
@@ -164,7 +158,7 @@ rnaseq
 
 *This is a generic structure and can be tweaked based on personal preference and the analysis workflow.*
 
--   `logs`: to keep track of the commands run and the specific parameters used, but also to have a record of any standard output that is generated while running the command. ***Not totally sure we need this one if we are keeping a work log***
+-   `logs`: to keep track of the commands run and the specific parameters used, but also to have a record of any standard output that is generated while running the command.
 -   `meta`: for any information that describes the samples you are using, which we refer to as [metadata](https://datamanagement.hms.harvard.edu/metadata-overview).
 -   `raw_data`: for any **unmodified** (raw) data obtained prior to computational analysis here, e.g. FASTQ files from the sequencing center. We strongly recommend leaving this directory unmodified through the analysis.
 -   `results`: for output from the different tools you implement in your workflow. Create sub-folders specific to each tool/step of the workflow within this folder.
@@ -178,7 +172,7 @@ $ mkdir logs meta raw_data results scripts
 >
 > Another aspect of staying organized is making sure that all the directories and filenames for an analysis are as consistent as possible.
 > You want to avoid names like `alignment1.bam`, and rather have names like `20170823_kd_rep1_gmap-1.4.bam` which provide a basic level of information about the file.
-> [This link](https://datamanagement.hms.harvard.edu/file-naming-conventions) and [this slideshow](http://www2.stat.duke.edu/~rcs46/lectures_2015/01-markdown-git/slides/naming-slides/naming-slides.pdf) have some good guidelines for file naming dos and don'ts.
+> [This link](https://datamanagement.hms.harvard.edu/file-naming-conventions) and [this slideshow](http://www2.stat.duke.edu/~rcs46/lectures_2015/01-markdown-git/slides/naming-slides/naming-slides.pdf) provided by Harvard HPC have some good guidelines for file naming dos and don'ts.
 
 ### Documentation: Worklog and README files
 
@@ -255,27 +249,14 @@ results:
 scripts:
 ```
 
-------------------------------------------------------------------------
-
-**Exercise**
-
-1.  Take a moment to create a README for the `rnaseq/` folder (hint: use `vim` to create the file). Give a short description of the project and brief descriptions of the types of files you will be storing within each of the sub-directories.
-2.  Use the same strategy to create a `WORKLOG.rst file` and add your first entry about what you just accomplished.
-
-------------------------------------------------------------------------
-
-### Obtaining data
+### Moving data into our new raw_data folder
 
 Let's populate the `rnaseq/` project with some data.
-Since we are taking this data from an external example, originally hosted at Harvard HPC, so a simple copy command (`cp`) will not suffice.
-To copy it over we are now going to use the `wget` command and a direct link to a zipped file, then unzip this file to get the raw sequencing files from amongst other files included in their lesson.
+We actually have the required files that we were manipulating in our previous few lessons.
+Let's `mv` these files into our raw_data directory.
 
 ``` bash
-$ # This is kind of annoying and unrealistic so let's put this somewhere on Biowulf or something else more realistic!
-$ # Start this in your rnaseq directory.
-$ wget https://www.dropbox.com/s/x66jksdd4jklpdw/unix_lesson.zip
-$ unzip unix_lesson.zip
-$ cp unix_lesson/raw_fastq/*.fq 
+$ mv unix_lesson/raw_fastq/*subset.fq raw_data/
 ```
 
 Now the structure of `rnaseq/` should look like this:
@@ -296,7 +277,12 @@ rnaseq
   └── scripts
 ```
 
-Okay, we are all set to begin the analysis!
+### **Assignment:** 
+
+1.  Take a moment to create a README for the `rnaseq/` folder (hint: use `vim` to create the file). Give a short description of the project and brief descriptions of the types of files you will be storing within each of the sub-directories.
+2.  Use the same strategy to create a `WORKLOG.rst file` and add your first entry about what you just accomplished.
+
+**Note**: I'll be looking into your `/rnaseq` directory to see that you created the assigned directory structure and these two text files!
 
 ------------------------------------------------------------------------
 
