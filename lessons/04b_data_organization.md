@@ -13,7 +13,7 @@ editor_options:
 -   Explain the need for data management.
 -   Describe strategies for managing your own projects.
 -   Describe the example RNA-seq experiment and its objectives.
--   Demonstrate strategies for good data management and project organization.
+-   Build on CLI skills from this week's lessons to set up a organized work directory
 
 ## What is data management?
 
