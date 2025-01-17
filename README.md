@@ -1,4 +1,4 @@
-# NICHD January 2025: Introduction to RNA-seq using high-performance computing (HPC)
+# Introduction to RNA-seq using high-performance computing (January 2025)
 
 ### Description
 
