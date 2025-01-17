@@ -13,17 +13,17 @@ This repository has teaching materials for 9-week Introduction to RNA-sequencing
 
 Note: Links to weekly lessons will be provided approximately one week in advance
 
-|        | Topic |
-|--------|-------|
-| Week 1 |       |
-| Week 2 |       |
-| Week 3 |       |
-| Week 4 |       |
-| Week 5 |       |
-| Week 6 |       |
-| Week 7 |       |
-| Week 8 |       |
-| Week 9 |       |
+| Link to Materials                      | Topic                                                     |
+|-----------------|-------------------------------------------------------|
+| [Week 1](schedule/links-to-lessons.md) | Introduction to the command line and logging into Biowulf |
+| Week 2                                 |                                                           |
+| Week 3                                 |                                                           |
+| Week 4                                 |                                                           |
+| Week 5                                 |                                                           |
+| Week 6                                 |                                                           |
+| Week 7                                 |                                                           |
+| Week 8                                 |                                                           |
+| Week 9                                 |                                                           |
 
 ### Software Requirements
 
