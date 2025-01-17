@@ -1,4 +1,4 @@
-# NICHD: Introduction to RNA-seq using high-performance computing (HPC)
+# NICHD January 2025: Introduction to RNA-seq using high-performance computing (HPC)
 
 ### Description
 
@@ -10,6 +10,8 @@ This repository has teaching materials for 9-week Introduction to RNA-sequencing
 2.  Understand best practices for designing an RNA-seq experiment and analyzing the resulting data.
 
 ### Weekly Schedule
+
+Note: Links to weekly lessons will be provided approximately one week in advance
 
 |        | Topic |
 |--------|-------|
