@@ -156,7 +156,7 @@ To write and edit files, we're going to use a text editor called 'Vim'. Vim is a
 >
 > <p align="center">
 >
-> <img src="../img/vim_cheatsheet.png" width="600"/>
+> <img src="../img/vim_cheatsheet.png" width="600" alt="screenshot of vim cheatsheet table" />
 >
 > </p>
 
@@ -184,7 +184,7 @@ Upon creation of a file, vim is automatically in command mode. Let's *change to 
 
 <p align="center">
 
-<img src="../img/vim_insert.png" width="600"/>
+<img src="../img/vim_insert.png" width="600" alt="screenshot of terminal window with vim in insert mode"/>
 
 </p>
 
@@ -205,7 +205,7 @@ To **"write to file"** or save the modifications made to the file, **type** <kbd
 
 <p align="center">
 
-<img src="../img/vim_save.png" width="600"/>
+<img src="../img/vim_save.png" width="600" alt="terminal window with vim open to save command mode with save command"/>
 
 </p>
 
@@ -213,7 +213,7 @@ After you have saved the file, the total number of lines and characters in the f
 
 <p align="center">
 
-<img src="../img/vim_postsave.png" width="600"/>
+<img src="../img/vim_postsave.png" width="600", alt="terminal with vim open after saving a file reporting total number of lines and characters"/>
 
 </p>
 
@@ -223,7 +223,7 @@ To edit the newly created `draft.txt` file, you can open it again with vim: `vim
 
 <p align="center">
 
-<img src="../img/vim_quit.png" width="600"/>
+<img src="../img/vim_quit.png" width="600" alt="terminal with vim open in command mode with q for quit typed in"/>
 
 </p>
 
@@ -243,7 +243,7 @@ Create a new file called `spider.txt` using `vim`. Go into *insert mode* and ent
 
 <p align="center">
 
-<img src="../img/vim_spider.png" width="600"/>
+<img src="../img/vim_spider.png" width="600" alt="terminal with vim open with the first verse of itsy bitsy spider typed"/>
 
 </p>
 
@@ -251,7 +251,7 @@ Once you have finished typing, you can display line numbers by changing to *comm
 
 <p align="center">
 
-<img src="../img/vim_spider_number.png" width="600"/>
+<img src="../img/vim_spider_number.png" width="600" alt="terminal with vim open to same poem as above but with line numbers enabled"/>
 
 </p>
 
