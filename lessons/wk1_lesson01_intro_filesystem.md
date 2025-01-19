@@ -278,7 +278,9 @@ Do you see the modification in the output?
 
 <summary><i>Explanation</i></summary>
 
-<P>`-l`is the same long-format flag as before. `-r` sorts the contents in reverse order, specifically by time `-t` . </P>
+<P>
+    Notice that the listed directories now have / at the end of their names.
+</P>
 
 </details>
 
@@ -304,7 +306,7 @@ One useful command is `ls -lrt`. Looking at the `ls` `man` page, how does this m
 
 <summary><i>Explanation</i></summary>
 
-<P>Notice that the listed directories now have <code>/</code> at the end of their names.</P>
+<P> `-l`is the same long-format flag as before. `-r` sorts the contents in reverse order, specifically by time `-t` </P>
 
 </details>
 
