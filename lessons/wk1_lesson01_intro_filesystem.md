@@ -77,7 +77,7 @@ You see the "\$" symbol? That is where you write the commands that will be execu
 
 ***Please note that from this point on in the workshop anything we want you to type next to the command prompt will be preceded by the `$` (see below). Please make sure you do not type out (or copy and paste) the `$` at the beginning of a command into the Terminal.***
 
-![](images/default_shell_prompt.png "Default shell prompt with my local username and $ prompt")
+<img src="../img/default_shell_prompt.png" width="500"/>
 
 To connect to the login node on Biowulf:
 
@@ -177,7 +177,7 @@ A few things about this command:
 
 **It will be helpful to start thinking about directories in a hierarchical way**, so here is a diagram of the directories we've mentioned so far:
 
-![](images/biowulf_directory_structure.png){width="187"}
+![](../img/biowulf_directory_structure.png){width="187"}
 
 Note the distinct \$USER directories with the same name but different locations!
 
