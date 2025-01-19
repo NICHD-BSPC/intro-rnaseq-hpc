@@ -288,7 +288,7 @@ Practice some of the editing shortcuts, then **quit the document without saving 
 
 ------------------------------------------------------------------------
 
-**Exercise**
+###**Assignment**
 
 We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let's practice what we just learned in a brief challenge.
 
@@ -301,8 +301,7 @@ We have covered some basic commands in vim, but practice is key for getting comf
 7.  Redo your previous deletion.
 8.  Delete the first and last words from each of the lines.
 9.  Save the file.
-10. Open up the file and copy and paste the contents to a text editor on your local laptop to submit as homework.
-
+10. **Let your instructor now when you have done this and they'll check your work**
 ------------------------------------------------------------------------
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
