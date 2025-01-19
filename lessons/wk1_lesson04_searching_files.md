@@ -1,13 +1,10 @@
 ---
 title: "The Shell: Searching and Redirection"
-author: "Harvard HPC staff, modified by Sally Chang"
-date: "Modified January 2025"
-editor_options: 
-  markdown: 
-    wrap: 72
+author: "Harvard HPC staff, modified by E. Sally Chang at NICHD"
+date: "Last Modified January 2025"
 ---
 
-Approximate time: 60 minutes
+Approximate time: 30 minutes (60 minutes if you do optional exercises)
 
 ## Learning objectives
 
