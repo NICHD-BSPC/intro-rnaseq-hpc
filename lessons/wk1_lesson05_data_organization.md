@@ -1,11 +1,7 @@
 ---
-title: Data Management and Project Organization - In-class
+title: Data Management and Project Organization
 author: Harvard HPC Staff, Modified by E. Sally Chang @ NICHD 
 date: Last edited January 2025
-duration: 
-editor_options: 
-  markdown: 
-    wrap: sentence
 ---
 
 ## Learning Objectives
