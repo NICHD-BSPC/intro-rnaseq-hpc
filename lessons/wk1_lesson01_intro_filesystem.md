@@ -77,7 +77,7 @@ You see the "\$" symbol? That is where you write the commands that will be execu
 
 ***Please note that from this point on in the workshop anything we want you to type next to the command prompt will be preceded by the `$` (see below). Please make sure you do not type out (or copy and paste) the `$` at the beginning of a command into the Terminal.***
 
-<img src="../img/default_shell_prompt.png" width="500"/>
+<img src="../img/default_shell_prompt.png" width="700"/>
 
 To connect to the login node on Biowulf:
 
@@ -120,16 +120,12 @@ In a few seconds you should get back the command prompt `$`. Now the string of c
 Let's consider the difference between the Login node and a compute node:
 
 **The login node**
-
-:   The login node (biowulf.nih.gov) is used to submit jobs to the cluster, and is a single system shared by all users. No compute intensive, data transfer or large file manipulation processes should be run on the login node. *This system is for submitting jobs only*.
+The login node (biowulf.nih.gov) is used to submit jobs to the cluster, and is a single system shared by all users. No compute intensive, data transfer or large file manipulation processes should be run on the login node. *This system is for submitting jobs only*.
 
 **The Biowulf cluster (compute nodes)**
+The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
 
-:   The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences.
-
-    When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
-
-Make sure that your command prompt now contains the word "compute". Once it does, we are ready to copy over some data to work with!
+**Make sure that your command prompt now contains the word "compute". Once it does, we are ready to copy over some data to work with!**
 
 ### Directories on Biowulf and first commands: `pwd and cd`
 
@@ -177,7 +173,7 @@ A few things about this command:
 
 **It will be helpful to start thinking about directories in a hierarchical way**, so here is a diagram of the directories we've mentioned so far:
 
-![](../img/biowulf_directory_structure.png){width="187"}
+<img src="../img/biowulf_directory_structure.png" width="500"/>
 
 Note the distinct \$USER directories with the same name but different locations!
 
