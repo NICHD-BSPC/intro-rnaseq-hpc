@@ -77,7 +77,8 @@ You see the "\$" symbol? That is where you write the commands that will be execu
 
 ***Please note that from this point on in the workshop anything we want you to type next to the command prompt will be preceded by the `$` (see below). Please make sure you do not type out (or copy and paste) the `$` at the beginning of a command into the Terminal.***
 
-<img src="../img/default_shell_prompt.png" width="700"/>
+<img src="../img/default_shell_prompt.png" width="700" alt="typical command shell prompt for a user on a NICHD mac as an example"/>
+
 
 To connect to the login node on Biowulf:
 
