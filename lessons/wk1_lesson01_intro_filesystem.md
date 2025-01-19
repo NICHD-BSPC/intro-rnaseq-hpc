@@ -89,11 +89,7 @@ $ ssh username@biowulf.nih.gov
 
 2.  Press the return/enter key and you should receive a prompt for your password. Type in your password and note that **the cursor will not move as you type** it in! This is normal and know that the computer is receiving and transmitting your typed password to the remote system. When you are done typing your password, press Enter again.
 
-3.  If this is the first time you are connecting to the cluster, **a warning will pop up** and will ask you if you are sure you want to do this; **type `Yes` or `Y`**.
-
-Once logged in, you should see a bunch of somewhat intimidating information:
-
-![](images/biowulf_warning.png){width="200"}
+3.  If this is the first time you are connecting to the cluster, **a warning will pop up** and will ask you if you are sure you want to do this; **type `Yes` or `Y`**. Once logged in, you should see a bunch of somewhat intimidating information.
 
 And our familiar \$ symbol will return, but this time with your Biowulf username before the prompt. *This is a great way to tell that you are NOT working on your local machine anymore.*
 
