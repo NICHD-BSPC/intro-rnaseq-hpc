@@ -127,7 +127,7 @@ The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a num
 
 **Make sure that your command prompt now contains the word "compute". Once it does, we are ready to copy over some data to work with!**
 
-### Directories on Biowulf and first commands: `pwd and cd`
+#### Directories on Biowulf and first commands: `pwd and cd`
 
 Let's see where we've "landed" on Biowulf - That is, figure out what directory we are in. This is important because Bash commands (and indeed, most programming) requires you to know where you are in relation to the files you want to manipulate (more on referring to files later!).
 
@@ -149,9 +149,7 @@ These two directories have distinct limitations and uses. To quote the [Biowulf 
 
 > This storage offers high performance access, and is exported to Biowulf over a dedicated high-speed network. /data is accessible from all computational nodes as well as Biowulf and Helix, and will be the storage of choice for most users to store their large datasets. Biowulf users are assigned an initial quota of 100 GB on /data.
 
-#### Our course directory:
-
-You will be working in those directories extensively for your own research eventually, but for this course Biowulf staff have set up a shared directory, with a directory for each of you, that gives you access to necessary files and allows the instructor to look into your personal directories for troubleshooting purposes.
+**Our course directory**: You will be working in those directories extensively for your own research eventually, but for this course Biowulf staff have set up a shared directory, with a directory for each of you, that gives you access to necessary files and allows the instructor to look into your personal directories for troubleshooting purposes.
 
 For the rest of this lesson, *you will need to be in your personal class directory*: `/data/Bspc-training/$USER`
 
@@ -336,8 +334,8 @@ Great, we have now traversed some sub-directories, but where are we in the conte
 Like on any computer you have used before, the file structure within a Unix/Linux system is hierarchical, like an upside down tree with the "/" directory, called "root" as the starting point of this tree-like structure:
 
 <p align="center">
-
-![](images/biowulf_directory_structure.png){width="222"}
+    
+<img src="../img/biowulf_directory_structure.png" width="500"/>
 
 </p>
 
@@ -717,7 +715,7 @@ rm          # remove/delete
 
 ------------------------------------------------------------------------
 
-*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
+*This lesson was based on materials from the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
 
 -   *The materials used in this lesson were derived from work that is Copyright © Data Carpentry (<http://datacarpentry.org/>). All Data Carpentry instructional material is made available under the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0).*
 -   *Adapted from the lesson by Tracy Teal. Original contributors: Paul Wilson, Milad Fatenejad, Sasha Wood and Radhika Khetani for Software Carpentry (<http://software-carpentry.org/>)*
