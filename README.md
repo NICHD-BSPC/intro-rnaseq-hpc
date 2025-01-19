@@ -2,7 +2,7 @@
 
 ### Description
 
-This repository has teaching materials for 9-week Introduction to RNA-sequencing data analysis workshop held at NICHD in 2025. This workshop focuses on teaching basic computational skills to enable the effective use of an high-performance computing environment to implement an RNA-seq data analysis workflow. It includes an introduction to shell (bash) and shell scripting, running the RNA-seq workflow from FASTQ files to count data and covers best practice guidelines for RNA-seq experimental design and data organization/management.
+This repository has teaching materials for the first four weeks of a 9-week Introduction to RNA-sequencing data analysis workshop held at NICHD in 2025. This workshop focuses on teaching basic computational skills to enable the effective use of an high-performance computing environment to implement an RNA-seq data analysis workflow. It includes an introduction to shell (bash) and shell scripting, running the RNA-seq workflow from FASTQ files to count data and covers best practice guidelines for RNA-seq experimental design and data organization/management.
 
 ### Learning Objectives
 
