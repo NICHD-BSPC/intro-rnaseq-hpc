@@ -41,7 +41,7 @@ Let's take a quick look at the basic architecture of a cluster environment and s
 
 <p align="center">
 
-<img src="../img/compute_cluster.png" width="500"/>
+<img src="../img/compute_cluster.png" width="500" alt="schematic of compute cluster with single login node and many connected compute nodes"/>
 
 </p>
 
@@ -172,7 +172,7 @@ A few things about this command:
 
 **It will be helpful to start thinking about directories in a hierarchical way**, so here is a diagram of the directories we've mentioned so far:
 
-<img src="../img/biowulf_directory_structure.png" width="500"/>
+<img src="../img/biowulf_directory_structure.png" width="500" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course"/>
 
 Note the distinct \$USER directories with the same name but different locations!
 
@@ -336,7 +336,7 @@ Like on any computer you have used before, the file structure within a Unix/Linu
 
 <p align="center">
     
-<img src="../img/biowulf_directory_structure.png" width="500"/>
+<img src="../img/biowulf_directory_structure.png" width="500" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course"/>
 
 </p>
 
