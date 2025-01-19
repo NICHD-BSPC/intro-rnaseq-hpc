@@ -356,7 +356,7 @@ things really efficiently.
 **To be able to use the shell effectively, becoming proficient in the
 use of the pipe and redirection operators is essential.**
 
-## Optional: Practice with searching and piping/redirection
+## Optional: Practice with searching and piping/redirection and GTF files
 
 Let's use the new commands in our toolkit and a few new ones to examine
 the "gene annotation" file, **chr1-hg19_genes.gtf**. We will be using
