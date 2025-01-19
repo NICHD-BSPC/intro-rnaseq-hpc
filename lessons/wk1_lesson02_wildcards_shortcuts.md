@@ -181,17 +181,9 @@ $ # Type some random words into the command prompt, then hit "Ctrl + C". Observe
 
 **Other handy command-related shortcuts**
 
--   <button>Ctrl</button>
+-   <button>Ctrl</button><button>A</button> will bring you to the start of the command you are writing.
 
-    -   <button>A</button>
-
-        will bring you to the start of the command you are writing.
-
--   <button>Ctrl</button>
-
-    -   <button>E</button>
-
-        will bring you to the end of the command.
+-   <button>Ctrl</button><button>E</button> will bring you to the end of the command.
 
 ------------------------------------------------------------------------
 
