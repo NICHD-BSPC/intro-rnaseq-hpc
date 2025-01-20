@@ -6,24 +6,37 @@ This repository has teaching materials for the first four weeks of a 9-week Intr
 
 ### Learning Objectives
 
-1.  Understand the necessity for, and use of, the command line interface (bash) and HPC for analyzing high-throughput sequencing data.
-2.  Understand best practices for designing an RNA-seq experiment and analyzing the resulting data.
+* Gain practical knowledge about analyzing RNAseq from experimental design through functional enrichment analysis
+* Learn broadly applicable bioinformatics skills such as command line and R programming
+* Work with real data sets and real bioinformatics environments on NIH’s high-performance compute cluster (Biowulf)
+* Apply what you learn to your own bulk RNAseq data
 
-### Weekly Schedule
+### Weekly Course Components
 
-Note: Links to weekly lessons will be provided approximately one week in advance
+*	**In-person lecture and hands on demonstrations**: Tuesdays, 10am-12pm starting January 28th
+*	**In-person practice sessions**: Fridays at 10am-12pm starting on January 31st
+    - This is a chance to review material from Tuesday and work on the weekly assignments (see below) with help from Dr. Chang, BSPC staff as well as fellow students. You are strongly encouraged to attend these sessions to get the most out of this course.
+* **Asynchronous Practice**: 3-4 hours of asynchronous practice and reading. This will prepare you for the following week and allow you to apply knowledge to new examples. You will submit small weekly assignment to me so I can check your progress and adjust content if needed. 
+
+
+### Topics and Links to weekly materials
+
+Note: Links to weekly lessons will be provided approximately one week in advance in the table below. All course materials are living documents - some changes may be made after publishing to reflect our progress through the material. 
+
 
 | Link to Materials                      | Topic                                                     |
 |-----------------|-------------------------------------------------------|
 | [Week 1](schedule/links-to-lessons.md#week-1) | Introduction to the command line and logging into Biowulf |
-| Week 2                                 |                                                           |
-| Week 3                                 |                                                           |
-| Week 4                                 |                                                           |
-| Week 5                                 |                                                           |
-| Week 6                                 |                                                           |
-| Week 7                                 |                                                           |
-| Week 8                                 |                                                           |
-| Week 9                                 |                                                           |
+| Week 2                                 | Biowulf best practices, experimental design, quality control of sequence data|
+| Week 3                                 | Reference genomes, theory and practice of mapping RNAseq reads to a reference|
+| Week 4                                 | QC of mapping, quantifying expression, automating workflows|
+
+The material for Weeks 5-9, covering downstream analyses once you have read counts, will be contained in a separate course website. 
+
+### Course communication: 
+* For any content questions: We will be using the `rnaseq_jan2025` Slack channel under the Bioinformatics @NICHD workspace. Posting your questions in this channel is great, as multiple staff and fellow students will be able to respond. Also, you probably aren't the only one with that question!
+* For scheduling/personal concerns: Contact Dr. Chang by e-mail. 
+
 
 ### Software Requirements
 
