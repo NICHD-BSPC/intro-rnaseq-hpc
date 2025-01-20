@@ -116,7 +116,7 @@ salloc: Granted job allocation 44889555
 salloc: Nodes cn0011 are ready for job
 ```
 
-In a few seconds you should get back the command prompt `$`. Now the string of characters before the command prompt will be different. They should say something like `[changes@cn0011:~]`. This is telling you that you are using one of the compute nodes/computer on the cluster now and it is specifying the name of that compute node.
+In a few seconds you should get back the command prompt `$`. Now the string of characters before the command prompt will be different. They should say something like `[changes@cn0011:~]`. This is telling you that you are using one of the compute nodes/computer on the cluster now and it is specifying the name of that compute node (`cn` = compute node).
 
 Let's consider the difference between the Login node and a compute node:
 
@@ -126,7 +126,7 @@ The login node (biowulf.nih.gov) is used to submit jobs to the cluster, and is a
 **The Biowulf cluster (compute nodes)**
 The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
 
-**Make sure that your command prompt now contains the word "compute". Once it does, we are ready to copy over some data to work with!**
+**Make sure that your command prompt now contains "cn" followed by some numbers. Once it does, we are ready to copy over some data to work with!**
 
 #### Directories on Biowulf and first commands: `pwd and cd`
 
@@ -166,7 +166,7 @@ A few things about this command:
 
 -   Directory names are case sensitive, so make sure "B" is capitalized
 
--   `$USER` is a built-in variable on Biowulf that will automatically be interpreted as your username!
+-   `$USER` is a built-in variable in bash that will automatically be interpreted as the currently logged in user (i.e. your username)!
 
 -   To check if you successfully moved into the intended directory, you should run `pwd` again.
 
@@ -208,7 +208,7 @@ Now let's see if we can see this data folder we brought in and if it can be "lis
 ls
 ```
 
-You should see the string of characters "unix_lesson" show up as the output of `ls`. This is a folder we should all have duplicates of.
+You should see "unix_lesson" show up as the output of `ls`, which is a *copy* of the directory, in your own space, that you can modify without affecting the original version.
 
 ## Starting with the shell
 
@@ -448,7 +448,7 @@ $ cd /data/Bspc-training/$USER/unix_lesson/
 
 #### Tab completion
 
-Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use **tab completion**. The `tab` key is located on the left side of your keyboard, right above the `caps lock` key. When you start typing out the first few characters of a directory name, then hit the `tab` key, Shell will try to fill in the rest of the directory name.
+Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use **tab completion**. The `tab` key is located on the left side of your keyboard, right above the `caps lock` key. When you start typing out the first few characters of a directory name, then hit the `tab` key, bash will try to fill in the rest of the directory name.
 
 For example, first type `cd` to get back to your home directly, then type `cd uni`, followed by pressing the `tab` key:
 
@@ -474,7 +474,7 @@ The reason is that there are multiple files in the `raw_fastq` directory that st
 $ ls Mov10_oe_<tab><tab>
 ```
 
-Now you can select the one you are interested in listed, and enter the number and hit tab again to fill in the complete name of the file.
+Now you can select the one you are interested in listed, and enter additional characters to give it a hint (here, a number) and hit tab again to fill in the complete name of the file.
 
 ``` bash
 $ ls Mov10_oe_1<tab>
