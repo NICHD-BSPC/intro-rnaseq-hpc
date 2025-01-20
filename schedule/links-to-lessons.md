@@ -1,7 +1,6 @@
 # Links to weekly class materials
 
-## Week 1
-
+## Week 1 {: #Week1 }
 **In-Class:**
 
 -    [Introduction to Shell and the File System](../lessons/wk1_lesson01_intro_filesystem.md)
