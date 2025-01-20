@@ -15,7 +15,7 @@ Note: Links to weekly lessons will be provided approximately one week in advance
 
 | Link to Materials                      | Topic                                                     |
 |-----------------|-------------------------------------------------------|
-| [Week 1](schedule/links-to-lessons.md) | Introduction to the command line and logging into Biowulf |
+| [Week 1](schedule/links-to-lessons.md#week-1) | Introduction to the command line and logging into Biowulf |
 | Week 2                                 |                                                           |
 | Week 3                                 |                                                           |
 | Week 4                                 |                                                           |
