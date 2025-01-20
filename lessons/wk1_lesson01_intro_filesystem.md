@@ -82,7 +82,7 @@ You see the "\$" symbol? That is where you write the commands that will be execu
 
 To connect to the login node on Biowulf:
 
-1.  Type in the `ssh` command at the command prompt followed by a space, and then type your username (usually some combo of surname and first name - mine is `changes`) plus the address of the cluster `@biowulf.nih.gov`. There is no space between the username and the "\@" symbol (see below).
+1.  Type in the `ssh` command at the command prompt followed by a space, and then type your username (usually some combo of surname and first name - mine is `changes`) plus the address of the cluster `@biowulf.nih.gov`. There is no space between the username and the `@` symbol (see below).
 
 ``` bash
 $ ssh username@biowulf.nih.gov
@@ -287,7 +287,15 @@ Most commands will take additional arguments that control their behavior, some o
 $ man ls
 ```
 
-This will open the manual page for `ls` and you will lose the command prompt. It will bring you to a so-called "buffer" page, a page you can navigate with your mouse or if you want to use your keyboard we have listed some basic key strokes: \* 'spacebar' to go forward \* 'b' to go backward \* Up or down arrows to go forward or backward, respectively
+This will open the manual page for `ls` and you will lose the command prompt. It will bring you to a so-called "buffer" page, a page you can navigate with your mouse or if you want to use your keyboard we have listed some basic key strokes:
+
+* *spacebar* to go forward a page
+* *b* to go backward a page
+* Up or down arrows to go forward or backward, respectively
+* *q* to quit
+
+<!-- * */* to get a prompt at the bottom to search. Type a search term, and hit *Enter* -->
+<!-- * *n* to go to the next search hit, or *N* for the previous hit -->
 
 **To get out of the `man` "buffer" page and to be able to type commands again on the command prompt, press the `q` key!**
 
@@ -628,7 +636,10 @@ $ ls
 
 > **Tip** - You can use move to move a file and rename it at the same time!
 
-**Important notes about `mv`**: \* When using `mv`, shell will **not** ask if you are sure that you want to "replace existing file" or similar unless you use the -i option. \* Once replaced, it is not possible to get the replaced file back!
+**Important notes about `mv`**:
+
+* When using `mv`, shell will **not** ask if you are sure that you want to "replace existing file" or similar unless you use the -i option.
+* Once replaced, it is not possible to get the replaced file back!
 
 ### Removing
 
@@ -638,7 +649,12 @@ We find out that we did not need to create backups of our fastq files manually a
 $ rm  Mov10_oe_1.subset-backup.fq
 ```
 
-Important notes about `rm` \* `rm` permanently removes/deletes the file/folder. \* There is no concept of "Trash" or "Recycle Bin" on the command-line. When you use `rm` to remove/delete they're really gone. \* **Be careful with this command!** \* You can use the `-i` argument if you want it to ask before removing, `rm -i file-name`.
+Important notes about `rm`:
+
+* `rm` permanently removes/deletes the file/folder.
+* There is no concept of "Trash" or "Recycle Bin" on the command-line. When you use `rm` to remove/delete they're really gone. 
+* **Be careful with this command!**
+* You can use the `-i` argument if you want it to ask before removing, `rm -i file-name`.
 
 Let's delete the fastq_backup folder too. First, we'll have to navigate our way to the parent directory (we can't delete the folder we are currently in/using).
 
