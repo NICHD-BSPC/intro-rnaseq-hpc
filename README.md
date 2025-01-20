@@ -6,17 +6,17 @@ This repository has teaching materials for the first four weeks of a 9-week Intr
 
 ### Learning Objectives
 
-•	Gain practical knowledge about analyzing RNAseq from experimental design through functional enrichment analysis
-•	Learn broadly applicable bioinformatics skills such as command line and R programming
-•	Work with real data sets and real bioinformatics environments on NIH’s high-performance compute cluster (Biowulf)
-•	Apply what you learn to your own bulk RNAseq data
+* Gain practical knowledge about analyzing RNAseq from experimental design through functional enrichment analysis
+* Learn broadly applicable bioinformatics skills such as command line and R programming
+* Work with real data sets and real bioinformatics environments on NIH’s high-performance compute cluster (Biowulf)
+* Apply what you learn to your own bulk RNAseq data
 
 ### Weekly Course Components
 
-•	**In-person lecture and hands on demonstrations**: Tuesdays, 10am-12pm starting January 28th 
-•	**In-person practice sessions**: Fridays at 10am-12pm starting on January 31st
-This is a chance to review material from Tuesday and work on the weekly assignments (see below) with help from Dr. Chang, BSPC staff as well as fellow students. You are strongly encouraged to attend these sessions to get the most out of this course. 
-•	**Asynchronous Practice**: 3-4 hours of asynchronous practice and reading. This will prepare you for the following week and allow you to apply knowledge to new examples. You will submit small weekly assignment to me so I can check your progress and adjust content if needed. 
+*	**In-person lecture and hands on demonstrations**: Tuesdays, 10am-12pm starting January 28th
+*	**In-person practice sessions**: Fridays at 10am-12pm starting on January 31st
+    - This is a chance to review material from Tuesday and work on the weekly assignments (see below) with help from Dr. Chang, BSPC staff as well as fellow students. You are strongly encouraged to attend these sessions to get the most out of this course.
+* **Asynchronous Practice**: 3-4 hours of asynchronous practice and reading. This will prepare you for the following week and allow you to apply knowledge to new examples. You will submit small weekly assignment to me so I can check your progress and adjust content if needed. 
 
 
 ### Topics and Links to weekly materials
@@ -34,8 +34,8 @@ Note: Links to weekly lessons will be provided approximately one week in advance
 The material for Weeks 5-9, covering downstream analyses once you have read counts, will be contained in a separate course website. 
 
 ### Course communication: 
-•	For any content questions: We will be using the `rnaseq_jan2025` Slack channel under the Bioinformatics @NICHD workspace. Posting your questions in this channel is great, as multiple staff and fellow students will be able to respond. Also, you probably aren't the only one with that question!
-•	For scheduling/personal concerns: Contact Dr. Chang by e-mail. 
+* For any content questions: We will be using the `rnaseq_jan2025` Slack channel under the Bioinformatics @NICHD workspace. Posting your questions in this channel is great, as multiple staff and fellow students will be able to respond. Also, you probably aren't the only one with that question!
+* For scheduling/personal concerns: Contact Dr. Chang by e-mail. 
 
 
 ### Software Requirements
