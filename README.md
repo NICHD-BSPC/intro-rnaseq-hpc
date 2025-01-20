@@ -21,7 +21,7 @@ This repository has teaching materials for the first four weeks of a 9-week Intr
 
 ### Topics and Links to weekly materials
 
-Note: Links to weekly lessons will be provided approximately one week in advance in the table below. All course materials are living documents - some changes may be made after publishing to reflect our progress through the material. 
+Note: Links to weekly lessons will be provided several days in advance in the table below. All course materials are living documents - some changes may be made after publishing to reflect our progress through the material. 
 
 
 | Link to Materials                      | Topic                                                     |
