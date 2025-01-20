@@ -59,7 +59,7 @@ For this workshop we will be using your personal Biowulf accounts, which you can
 
 **With Mac OS**
 
-Macs have a utility application called "**Terminal**" for performing tasks on the command line (shell), both locally and on remote machines. We will be using it to log into O2.
+Macs have a utility application called "**Terminal**" for performing tasks on the command line (shell), both locally and on remote machines. We will be using it to log into Biowulf.
 
 Please find and open the Terminal utility on your computers using the *Spotlight Search* at the top right hand corner of your screen.
 
