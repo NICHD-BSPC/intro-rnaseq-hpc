@@ -1,7 +1,7 @@
 ---
 title: Working on HPC
-author: Radhika Khetani, Meeta Mistry, Mary Piper, Jihe Liu
-date: November 16, 2020
+author: Harvard HPC Staff, Modified by E. Sally Chang @ NICHD
+date: Last Edited January 2025
 duration: 35
 ---
 
