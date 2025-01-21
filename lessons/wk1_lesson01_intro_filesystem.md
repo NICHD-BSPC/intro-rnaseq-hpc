@@ -59,7 +59,7 @@ For this workshop we will be using your personal Biowulf accounts, which you can
 
 **With Mac OS**
 
-Macs have a utility application called "**Terminal**" for performing tasks on the command line (shell), both locally and on remote machines. We will be using it to log into O2.
+Macs have a utility application called "**Terminal**" for performing tasks on the command line (shell), both locally and on remote machines. We will be using it to log into Biowulf.
 
 Please find and open the Terminal utility on your computers using the *Spotlight Search* at the top right hand corner of your screen.
 
@@ -82,7 +82,7 @@ You see the "\$" symbol? That is where you write the commands that will be execu
 
 To connect to the login node on Biowulf:
 
-1.  Type in the `ssh` command at the command prompt followed by a space, and then type your username (usually some combo of surname and first name - mine is `changes`) plus the address of the cluster `@biowulf.nih.gov`. There is no space between the username and the "\@" symbol (see below).
+1.  Type in the `ssh` command at the command prompt followed by a space, and then type your username (usually some combo of surname and first name - mine is `changes`) plus the address of the cluster `@biowulf.nih.gov`. There is no space between the username and the `@` symbol (see below).
 
 ``` bash
 $ ssh username@biowulf.nih.gov
@@ -116,7 +116,7 @@ salloc: Granted job allocation 44889555
 salloc: Nodes cn0011 are ready for job
 ```
 
-In a few seconds you should get back the command prompt `$`. Now the string of characters before the command prompt will be different. They should say something like `[changes@cn0011:~]`. This is telling you that you are using one of the compute nodes/computer on the cluster now and it is specifying the name of that compute node.
+In a few seconds you should get back the command prompt `$`. Now the string of characters before the command prompt will be different. They should say something like `[changes@cn0011:~]`. This is telling you that you are using one of the compute nodes/computer on the cluster now and it is specifying the name of that compute node (`cn` = compute node).
 
 Let's consider the difference between the Login node and a compute node:
 
@@ -126,7 +126,7 @@ The login node (biowulf.nih.gov) is used to submit jobs to the cluster, and is a
 **The Biowulf cluster (compute nodes)**
 The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
 
-**Make sure that your command prompt now contains the word "compute". Once it does, we are ready to copy over some data to work with!**
+**Make sure that your command prompt now contains "cn" followed by some numbers. Once it does, we are ready to copy over some data to work with!**
 
 #### Directories on Biowulf and first commands: `pwd and cd`
 
@@ -166,7 +166,7 @@ A few things about this command:
 
 -   Directory names are case sensitive, so make sure "B" is capitalized
 
--   `$USER` is a built-in variable on Biowulf that will automatically be interpreted as your username!
+-   `$USER` is a built-in variable in bash that will automatically be interpreted as the currently logged in user (i.e. your username)!
 
 -   To check if you successfully moved into the intended directory, you should run `pwd` again.
 
@@ -208,7 +208,7 @@ Now let's see if we can see this data folder we brought in and if it can be "lis
 ls
 ```
 
-You should see the string of characters "unix_lesson" show up as the output of `ls`. This is a folder we should all have duplicates of.
+You should see "unix_lesson" show up as the output of `ls`, which is a *copy* of the directory, in your own space, that you can modify without affecting the original version.
 
 ## Starting with the shell
 
@@ -287,7 +287,15 @@ Most commands will take additional arguments that control their behavior, some o
 $ man ls
 ```
 
-This will open the manual page for `ls` and you will lose the command prompt. It will bring you to a so-called "buffer" page, a page you can navigate with your mouse or if you want to use your keyboard we have listed some basic key strokes: \* 'spacebar' to go forward \* 'b' to go backward \* Up or down arrows to go forward or backward, respectively
+This will open the manual page for `ls` and you will lose the command prompt. It will bring you to a so-called "buffer" page, a page you can navigate with your mouse or if you want to use your keyboard we have listed some basic key strokes:
+
+* *spacebar* to go forward a page
+* *b* to go backward a page
+* Up or down arrows to go forward or backward, respectively
+* *q* to quit
+
+<!-- * */* to get a prompt at the bottom to search. Type a search term, and hit *Enter* -->
+<!-- * *n* to go to the next search hit, or *N* for the previous hit -->
 
 **To get out of the `man` "buffer" page and to be able to type commands again on the command prompt, press the `q` key!**
 
@@ -440,7 +448,7 @@ $ cd /data/Bspc-training/$USER/unix_lesson/
 
 #### Tab completion
 
-Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use **tab completion**. The `tab` key is located on the left side of your keyboard, right above the `caps lock` key. When you start typing out the first few characters of a directory name, then hit the `tab` key, Shell will try to fill in the rest of the directory name.
+Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use **tab completion**. The `tab` key is located on the left side of your keyboard, right above the `caps lock` key. When you start typing out the first few characters of a directory name, then hit the `tab` key, bash will try to fill in the rest of the directory name.
 
 For example, first type `cd` to get back to your home directly, then type `cd uni`, followed by pressing the `tab` key:
 
@@ -466,7 +474,7 @@ The reason is that there are multiple files in the `raw_fastq` directory that st
 $ ls Mov10_oe_<tab><tab>
 ```
 
-Now you can select the one you are interested in listed, and enter the number and hit tab again to fill in the complete name of the file.
+Now you can select the one you are interested in listed, and enter additional characters to give it a hint (here, a number) and hit tab again to fill in the complete name of the file.
 
 ``` bash
 $ ls Mov10_oe_1<tab>
@@ -628,7 +636,10 @@ $ ls
 
 > **Tip** - You can use move to move a file and rename it at the same time!
 
-**Important notes about `mv`**: \* When using `mv`, shell will **not** ask if you are sure that you want to "replace existing file" or similar unless you use the -i option. \* Once replaced, it is not possible to get the replaced file back!
+**Important notes about `mv`**:
+
+* When using `mv`, shell will **not** ask if you are sure that you want to "replace existing file" or similar unless you use the -i option.
+* Once replaced, it is not possible to get the replaced file back!
 
 ### Removing
 
@@ -638,7 +649,12 @@ We find out that we did not need to create backups of our fastq files manually a
 $ rm  Mov10_oe_1.subset-backup.fq
 ```
 
-Important notes about `rm` \* `rm` permanently removes/deletes the file/folder. \* There is no concept of "Trash" or "Recycle Bin" on the command-line. When you use `rm` to remove/delete they're really gone. \* **Be careful with this command!** \* You can use the `-i` argument if you want it to ask before removing, `rm -i file-name`.
+Important notes about `rm`:
+
+* `rm` permanently removes/deletes the file/folder.
+* There is no concept of "Trash" or "Recycle Bin" on the command-line. When you use `rm` to remove/delete they're really gone. 
+* **Be careful with this command!**
+* You can use the `-i` argument if you want it to ask before removing, `rm -i file-name`.
 
 Let's delete the fastq_backup folder too. First, we'll have to navigate our way to the parent directory (we can't delete the folder we are currently in/using).
 
