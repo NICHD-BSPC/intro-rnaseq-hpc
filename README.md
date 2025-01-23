@@ -42,12 +42,22 @@ The material for Weeks 5-9, covering downstream analyses once you have read coun
 
 ***Mac users:***
 
--   Plain text editor
+-   Plain text editor: TextEdit should be installed by default on Macs. 
 
 ***Windows users:***
 
 -   [GitBash](https://git-scm.com/download/win)
--   Plain text editor
+-   Plain text editor: Microsoft Notepad should be installed by default on Windows.
+
+**Note about text plain text editors:** A plain text editor is a program to edit text files such as a script that doesn’t interfere with formatting like a full word processor (like Word) would. The built-in text editors for each operating system are listed above. 
+ 
+As we progress in the course and your research, you may find that you want a "fancier" text editor that has more features for coding efficiently. 
+
+The following options are approved by NICHD IT but may need a license after a trial period: 
+* For Macs: [BBEdit](https://www.barebones.com/products/bbedit/index.html), which has a lot more features for coding but needs a license to keep using all of those features after the trial period.
+* For PCs: [NotePad++](https://notepad-plus-plus.org/), which likewise has many more features and is FREE!
+
+  
 
 ------------------------------------------------------------------------
 
