@@ -7,6 +7,7 @@ duration: 45 minutes
 
 ## Learning Objectives:
 
+-   Practice using more features of Biowulf (loading modules, running software, parallelization)
 -   Describe the contents and format of a FASTQ file
 -   Create a quality report using FASTQC
 
@@ -71,22 +72,31 @@ Now that we understand what information is stored in a FASTQ file, the next step
 
 [FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) provides a simple way to do some quality checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses, which you can use to obtain an impression of whether your data has any problems that you should be aware of before moving on to the next analysis.
 
-FastQC does the following: \* accepts FASTQ files (or BAM files) as input \* generates summary graphs and tables to help assess your data \* generates an easy-to-view HTML-based report with the graphs and tables
+FastQC does the following:
+
+-    accepts FASTQ files (or BAM files) as input
+
+-   generates summary graphs and tables to help assess your data
+
+-   generates an easy-to-view HTML-based report with the graphs and tables
 
 ------------------------------------------------------------------------
 
-> NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. Please run the following `srun` command if you are not on a compute node. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (1.5 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
+> NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (1.5 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
 >
 > ``` bash
-> $ #srun --pty -p interactive -t 0-3:00 --mem 1G --reservation=HBC1 /bin/bash
 > $ sinteractive 
 > ```
 >
-> ***An interactive session is very useful to test tools and workflows.***
+> ***And we should be in our student directories:***
+>
+> ``` bash
+> $ cd /data/Bspc-training/$USER
+> ```
 
-### Run FastQC
+### Load the FastQC module
 
-Before we start using software, we have to load the module for each tool. On Biowulf, this is done using an **LMOD** system.
+Before we start using software, we have to load the module for each tool. On Biowulf, this is done using an **LMOD** system. It enables users to access software installed on Biwoulf easily, and manages every software's dependencies. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
 If we check which modules we currently have loaded, we should not see FastQC.
 
@@ -119,6 +129,21 @@ $ module list
 
 $ echo $PATH
 ```
+
+**Some key LMOD commands are listed below**
+
+|            LMOD command            |                                    description                                    |
+|:----------------------------------:|:----------------------------------:|
+|          `module spider`           |                     List all possible modules on the cluster                      |
+|     `module spider modulename`     |                     List all possible versions of that module                     |
+|           `module avail`           |                  List available modules available on the cluster                  |
+|       `module avail string`        |                   List available modules containing that string                   |
+|  `module load modulename/version`  | Add the full path to the tool to `$PATH` (and modify other environment variables) |
+|           `module list`            |                                List loaded modules                                |
+| `module unload modulename/version` |                             Unload a specific module                              |
+|           `module purge`           |                             Unload all loaded modules                             |
+
+### **Running FASTQC**
 
 Now, let's create a directory to store the output of FastQC:
 
