@@ -91,14 +91,14 @@ In the above command the parameters we are using are requesting specific resourc
 
 `--time=02:00:00` - time needed for this work: 0 days, 2 hours, 0 minutes.
 
-`--mem 1G` - memory needed - 1 gibibyte (GiB)
+`--mem 1G` - memory needed - 1 gigibyte (GiB)
 
 > These parameters are used for `sbatch` as well, but they are listed differently within the script used to submit a batch job. We will be reviewing this later in this lesson.
 
 Let's check how many jobs we have running currently, and what resources they are using.
 
 ``` bash
-$ O2squeue
+$ squeue
 ```
 
 ## More about Slurm
@@ -150,11 +150,13 @@ module load fastqc/0.11.5
 fastqc -t 4 file1_1.fq file1_2.fq file2_1.fq file2_2.fq
 ```
 
-## Using software on O2
+## Using software on Biowulf
+
+### The \$PATH Variable 
 
 ### LMOD system
 
-In the above example we want to run the FastQC tool on four files. However, before we use the `fastqc` command, we've used the command `module load fastqc/0.11.5`. This `module load` command is part of the LMOD system available on O2. It enables users to access software installed on O2 easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
+In the above example we want to run the FastQC tool on four files. However, before we use the `fastqc` command, we've used the command `module load fastqc/0.11.5`. This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on O2 easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
 So, instead of using `/n/app/fastqc/0.11.5/bin/fastqc` as our command, we can load the module and use `fastqc` as the command.
 
@@ -171,8 +173,6 @@ Some key LMOD commands are listed below:
 | `module unload modulename/version` |                             Unload a specific module                              |
 |           `module purge`           |                             Unload all loaded modules                             |
 
-> Note: On O2, a lot of tools used for analysis of sequencing data need to have the `gcc` compiler module loaded (`module load gcc/6.2.0`) prior to loading the tool of interest.
-
 ------------------------------------------------------------------------
 
 #### Exercises
@@ -188,13 +188,7 @@ Some key LMOD commands are listed below:
 
 ------------------------------------------------------------------------
 
-## Filesystems on O2
-
-<p align="center">
-
-<img src="../img/O2_primary-storage.png" width="600"/>
-
-</p>
+## Filesystems on Biowulf
 
 -   Storage on HPC systems is organized differently than on your personal machine.
 -   Each node on the cluster does not have storage; instead, it is on disks bundled together externally.
@@ -214,6 +208,8 @@ Some key LMOD commands are listed below:
 -   Files not accessed for 30 days are automatically deleted.
 -   **No backups!**
 -   You can create your own folder using this command `/n/cluster/bin/scratch_create_directory.sh`
+
+### Many More Biowulf Resources: 
 
 ------------------------------------------------------------------------
 
