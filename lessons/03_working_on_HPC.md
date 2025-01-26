@@ -112,17 +112,27 @@ $ squeue
 
 Below is table with some of the arguments you can specify when requesting resources from Slurm for both `srun` and `sbatch`:
 
-|   Argument    |                Description / Input                |                        Examples                        |                                                                   Links                                                                    |
-|:-----------------:|:----------------:|:----------------:|:----------------:|
-|     `-p`      |             name of compute partition             |               short, medium, interactive               |        [O2 Wiki - Guidelines for choosing a partition](https://wiki.rc.hms.harvard.edu/display/O2/How+to+choose+a+partition+in+O2)         |
-|     `-t`      |         how much time to allocate to job          |                    0-03:00, 5:00:00                    | [O2 Wiki - Time limits for each partition](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#Time-limits) |
-|     `-c`      |                     max cores                     |                          4, 8                          |      [O2 Wiki - How many cores?](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#How-many-cores?)       |
-|    `--mem`    |                    max memory                     |                        8G, 8000                        |  [O2 Wiki - Memory requirements](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#Memory-requirements)   |
-|     `-o`      |    name of file to create with standard output    |                         %j.out                         |            [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)             |
-|     `-e`      |    name of file to create with standard error     |                         %j.err                         |            [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)             |
-|     `-J`      |                  name of the job                  |           Fastqc_run, rnaseq_workflow_mov10            |            [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)             |
-| `--mail-type` | send an email when job starts, ends or errors out |                        END, ALL                        |            [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)             |
-| `--mail-user` |            send email to this address             | [xyz10\@harvard.edu](mailto:xyz10@harvard.edu){.email} |            [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)             |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| Argument         | Description / Input                               | Examples                                               | Links                                                                                                                                      |
++:================:+:=================================================:+:======================================================:+:==========================================================================================================================================:+
+| `-p`             | name of compute partition                         | short, medium, interactive                             | [O2 Wiki - Guidelines for choosing a partition](https://wiki.rc.hms.harvard.edu/display/O2/How+to+choose+a+partition+in+O2)                |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| `-t`             | how much time to allocate to job                  | 0-03:00, 5:00:00                                       | [O2 Wiki - Time limits for each partition](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#Time-limits) |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| `-c`             | max cores                                         | 4, 8                                                   | [O2 Wiki - How many cores?](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#How-many-cores?)            |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| `--mem`          | max memory                                        | 8G, 8000                                               | [O2 Wiki - Memory requirements](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#Memory-requirements)    |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| `-o`             | name of file to create with standard output       | %j.out                                                 | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| `-e`             | name of file to create with standard error        | %j.err                                                 | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| `-J`             | name of the job                                   | Fastqc_run, rnaseq_workflow_mov10                      | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| `--mail-type`    | send an email when job starts, ends or errors out | END, ALL                                               | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
+| `--mail-user`    | send email to this address                        | [xyz10\@harvard.edu](mailto:xyz10@harvard.edu){.email} | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
++------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
 
 ### `sbatch` job submission script: Example
 
@@ -152,7 +162,15 @@ fastqc -t 4 file1_1.fq file1_2.fq file2_1.fq file2_2.fq
 
 ## Using software on Biowulf
 
-### The \$PATH Variable 
+### Brief Intro to \$PATH and other Environmental Variables
+
+Environment variables are, in short, variables that describe the environment in which programs run, and they are predefined for a given computer or cluster that you are on. You can reset them to customize the environment.
+
+In this lesson, we are going to focus on two most commonly encountered environment variables: `$HOME` and `$PATH`.
+
+-   `$HOME` defines the full path for the home directory of a given user.
+
+-   `$PATH` defines a list of directories to search in when looking for a command/program to execute.
 
 ### LMOD system
 
@@ -162,18 +180,29 @@ So, instead of using `/n/app/fastqc/0.11.5/bin/fastqc` as our command, we can lo
 
 Some key LMOD commands are listed below:
 
-|            LMOD command            |                                    description                                    |
-|:----------------------------------:|:----------------------------------:|
-|          `module spider`           |                     List all possible modules on the cluster                      |
-|     `module spider modulename`     |                     List all possible versions of that module                     |
-|           `module avail`           |                  List available modules available on the cluster                  |
-|       `module avail string`        |                   List available modules containing that string                   |
-|  `module load modulename/version`  | Add the full path to the tool to `$PATH` (and modify other environment variables) |
-|           `module list`            |                                List loaded modules                                |
-| `module unload modulename/version` |                             Unload a specific module                              |
-|           `module purge`           |                             Unload all loaded modules                             |
++------------------------------------+-----------------------------------------------------------------------------------+
+| LMOD command                       | description                                                                       |
++:==================================:+:=================================================================================:+
+| `module spider`                    | List all possible modules on the cluster                                          |
++------------------------------------+-----------------------------------------------------------------------------------+
+| `module spider modulename`         | List all possible versions of that module                                         |
++------------------------------------+-----------------------------------------------------------------------------------+
+| `module avail`                     | List available modules available on the cluster                                   |
++------------------------------------+-----------------------------------------------------------------------------------+
+| `module avail string`              | List available modules containing that string                                     |
++------------------------------------+-----------------------------------------------------------------------------------+
+| `module load modulename/version`   | Add the full path to the tool to `$PATH` (and modify other environment variables) |
++------------------------------------+-----------------------------------------------------------------------------------+
+| `module list`                      | List loaded modules                                                               |
++------------------------------------+-----------------------------------------------------------------------------------+
+| `module unload modulename/version` | Unload a specific module                                                          |
++------------------------------------+-----------------------------------------------------------------------------------+
+| `module purge`                     | Unload all loaded modules                                                         |
++------------------------------------+-----------------------------------------------------------------------------------+
 
 ------------------------------------------------------------------------
+
+### Finding Out More About Software on Biowulf: 
 
 #### Exercises
 
