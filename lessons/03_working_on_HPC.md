@@ -164,19 +164,58 @@ fastqc -t 4 file1_1.fq file1_2.fq file2_1.fq file2_2.fq
 
 ### Brief Intro to \$PATH and other Environmental Variables
 
-Environment variables are, in short, variables that describe the environment in which programs run, and they are predefined for a given computer or cluster that you are on. You can reset them to customize the environment.
+Environment variables are, in short, variables that describe the environment in which programs run, and they are predefined for a given computer or cluster that you are on.
 
-In this lesson, we are going to focus on two most commonly encountered environment variables: `$HOME` and `$PATH`.
+Here are some of the most
 
--   `$HOME` defines the full path for the home directory of a given user.
+-   `$USER` Recall how that we can use `$USER` as a variable instead of actually writing out our username every time? That's because this is a built-in environmental variable on
+
+-   \$HOME defines the full path for the home directory of a given user. Try typing `echo $HOME` to confirm!
 
 -   `$PATH` defines a list of directories to search in when looking for a command/program to execute.
 
+In this lesson, we are going to focus on \$PATH. If you want to see what is on your \$PATH, you can use the echo command again. As a beginning Biowulf user, you probably don't have as many entries as I do!
+
+``` bash
+$ echo $PATH
+
+/gpfs/gsfs11/users/changes/mambaforge/condabin:/usr/local/slurm/bin:/usr/local/bin:/usr/X11R6/bin:/usr/local/jdk/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/mysql/bin:/home/changes/opt/bin:/data/changes/mambaforge/condabin:/data/NICHD-core1/bin
+```
+
+This output is a lot more complex! Let's break it down. When you look closely at the output of `echo $PATH`, you should a list of full paths separated from each other by a ":".
+
+### What are all these paths? And what do they represent?
+
+These are the directories that the shell will look through (in the same order as they are listed) for any given command or executable file that you type on the command prompt.
+
+For example, we have been using the `ls` command to list contents in a directory. When we type `ls` at the command prompt, the shell searches through each path in `$PATH` until it finds an executable file called `ls`. So which of those paths contain that executable file?
+
+For any command you execute on the command prompt, you can find out where the executable file is located using the `which` command.
+
+What path was returned to you? Does it match with any of the paths stored in `$PATH`?
+
+Try it on a few of the basic commands we have learned so far:
+
+```         
+$ which <your favorite command>
+$ which <your favorite command>
+```
+
+Check the path `/usr/bin/` and see what other executable files you recognize. (Note that executable files will be listed as green text or have the `*` after their name).
+
+```         
+$ ls -lF /usr/bin/
+```
+
+The path `/usr/bin` is usually where executables for commonly used commands are stored.
+
+> As pointed out earlier, a lot of the folders listed in the `$PATH` variable are called `bin`. This is because of a convention in Unix to call directories that contain all the commands (in ***binary*** format) **`bin`**.
+
 ### LMOD system
 
-In the above example we want to run the FastQC tool on four files. However, before we use the `fastqc` command, we've used the command `module load fastqc/0.11.5`. This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on O2 easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
+In the next example, we want to run the FastQC tool to look at sequence quality. However, before we use the `fastqc` command, we have to make sure it is in our `$PATH` - luckily there is an easy way of doing this on Biowulf!
 
-So, instead of using `/n/app/fastqc/0.11.5/bin/fastqc` as our command, we can load the module and use `fastqc` as the command.
+This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on Biowulf easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
 Some key LMOD commands are listed below:
 
