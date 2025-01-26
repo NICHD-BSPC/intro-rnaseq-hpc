@@ -74,19 +74,26 @@ A warning might pop up the first time you try to connect to a remote machine, ty
 
 ## Specify options for a *compute* node on Biowulf
 
-You can access compute nodes in 2 ways using a job scheduler or resource manager like Slurm. 1. Directly using an interactive session (Slurm's `srun` command): \* The `srun` command with a few mandatory parameters will create an "interactive session" on O2. \* This is essentially a way for us to do work on the compute node directly from the terminal. \* If the connectivity to the cluster is lost in the middle of a command being run that work will be lost in an interactive session. 1. By starting a "batch" job (Slurm's `sbatch` command): \* The `sbatch` command with a few mandatory parameters + a specialized shell script will result in the script being run on a compute node. \* This "job" will not be accessible directly from the Terminal and will run in the background. \* Users do not need to remain connected to the cluster when such a "batch job" is running.
+You can access compute nodes in 2 ways.
 
-For now let's start an interactive session on O2 using `srun`.
+1\. Directly using an interactive session (`sinteractive` command): This is essentially a way for us to do work on the compute node directly from the terminal. **If the connectivity to the cluster is lost in the middle of a command being run that work will be lost in an interactive session.**
+
+2\. By starting a "batch" job (Slurm's `sbatch` command): The `sbatch` command with a few mandatory parameters + a specialized shell script will result in the script being run on a compute node. This "job" will not be accessible directly from the Terminal and will run in the background. **Users do not need to remain connected to the cluster when such a "batch job" is running.**
+
+For now let's start an interactive session, but specify more more particulars:
 
 ``` bash
-$ srun --pty -p interactive -t 0-3:00 --mem 1G --reservation=HBC1 /bin/bash
+# This is an example, you don't need to run this
+$ sinteractive --time=02:00:00 --mem==1G 
 ```
 
-In the above command the parameters we are using are requesting specific resources: \* `--pty` - Start an interactive session \* `-p interactive` - on the "partition" called "interactive" (a partition is a group of computers dedicated to certain types of jobs, interactive, long, short, high-memory, etc.) \* `-t 0-8:00` - time needed for this work: 0 days, 8 hours, 0 minutes. \* `--mem 1G` - memory needed - 1 gibibyte (GiB) \* `--reservation=HBC1` - *this is only for **in class** portions of this workshop, make sure you don't use it for self-learning or when you have your own accounts.* \* `/bin/bash` - You want to interact with the compute node using the *bash* shell
+In the above command the parameters we are using are requesting specific resources:
+
+`--time=02:00:00` - time needed for this work: 0 days, 2 hours, 0 minutes.
+
+`--mem 1G` - memory needed - 1 gibibyte (GiB)
 
 > These parameters are used for `sbatch` as well, but they are listed differently within the script used to submit a batch job. We will be reviewing this later in this lesson.
-
-**Make sure that your command prompt now contains the word "compute", *e.g. `[rc_training10@compute-a-16-163 ~]$`*.** You are now working on a compute node directly in an "interactive" session!
 
 Let's check how many jobs we have running currently, and what resources they are using.
 
