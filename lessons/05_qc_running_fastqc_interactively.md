@@ -143,8 +143,6 @@ $ echo $PATH
 | `module unload modulename/version` |                             Unload a specific module                              |
 |           `module purge`           |                             Unload all loaded modules                             |
 
-: Finding Information about
-
 ### **Running FASTQC**
 
 Now, let's create a directory to store the output of FastQC inside of the `results` directory you set up last week:
@@ -159,7 +157,9 @@ We will need to specify this directory in the command to run FastQC. How do we k
 $ fastqc --help
 ```
 
-> **NOTE:** From the help manual, we know that `-o` (or `--outdir`) will create all output files in the specified output directory.
+From the help manual, we know that `-o` (or `--outdir`) will create all output files in the specified output directory.
+
+> **Remember you can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster!**
 
 FastQC will accept multiple file names as input, so we can use the `*.fq` wildcard.
 
