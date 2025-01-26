@@ -215,6 +215,10 @@ The path `/usr/bin` is usually where executables for commonly used commands are 
 
 In the next example, we want to run the FastQC tool to look at sequence quality. However, before we use the `fastqc` command, we have to make sure it is in our `$PATH` - luckily there is an easy way of doing this on Biowulf!
 
+``` bash
+$ module load fastqc 
+```
+
 This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on Biowulf easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
 Some key LMOD commands are listed below:
@@ -241,8 +245,6 @@ Some key LMOD commands are listed below:
 
 ------------------------------------------------------------------------
 
-### Finding Out More About Software on Biowulf: 
-
 #### Exercises
 
 1.  What are the contents of the `$PATH` environment variable?
@@ -262,23 +264,22 @@ Some key LMOD commands are listed below:
 -   Each node on the cluster does not have storage; instead, it is on disks bundled together externally.
 -   Storage filesystems can be quite complex, with large spaces dedicated to a pre-defined purpose.
 -   Filesystems are accessed over the internal network by all the nodes on the cluster.
--   There are 3 major groups on the O2 cluster, each with their features and constraints:
-    1.  `/n/data1`, `/n/data2`, `/n/groups` - Large datasets are stored in these parent directories (see features/constraints in the image above).
-    2.  `/home` - the home directories of all users are under this parent directory (see features/constraints in the image above).
-    3.  `/n/scratch` - scratch space for temporary storage.
 
-[**Please find more information about storage on O2 by clicking here.**](https://it.hms.harvard.edu/our-services/research-computing/services/storage)
+**Summary of file storage options on Biowulf:**
 
-### More about `/n/scratch`
-
--   It is for data only needed temporarily during analyses.
--   Each user can use up to 10 TB and 1 million files/directories.
--   Files not accessed for 30 days are automatically deleted.
--   **No backups!**
--   You can create your own folder using this command `/n/cluster/bin/scratch_create_directory.sh`
-
-### Many More Biowulf Resources: 
-
-------------------------------------------------------------------------
-
-*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
+|                                                                      | **Location**       | **Creation**               | **Backups** | **Space**            | **Available from**         |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
+| [/home](https://hpc.nih.gov/storage/index.html#home)                 | network (NFS)      | with Biowulf/Helix account | yes         | 16 GB quota          | Biowulf login node\        |
+|                                                                      |                    |                            |             |                      | Biowulf compute nodes\     |
+|                                                                      |                    |                            |             |                      | Helix                      |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
+| [/lscratch (nodes)](https://hpc.nih.gov/storage/index.html#lscratch) | local              | created by user job        | no          | up to \~3,200 GB\    | Biowulf compute nodes only |
+|                                                                      |                    |                            |             | as requested by job  |                            |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
+| [/scratch](https://hpc.nih.gov/storage/index.html#scratch)           | network (NFS)      | created by user            | no          | 100 TB shared        | Biowulf login node\        |
+|                                                                      |                    |                            |             |                      | Helix                      |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
+| [/data](https://hpc.nih.gov/storage/index.html#data)                 | network (GPFS/NFS) | with Biowulf/Helix account | no          | 100 GB default quota | Biowulf login node\        |
+|                                                                      |                    |                            |             |                      | Biowulf compute no         |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
