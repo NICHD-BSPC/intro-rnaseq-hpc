@@ -264,22 +264,44 @@ Some key LMOD commands are listed below:
 -   Each node on the cluster does not have storage; instead, it is on disks bundled together externally.
 -   Storage filesystems can be quite complex, with large spaces dedicated to a pre-defined purpose.
 -   Filesystems are accessed over the internal network by all the nodes on the cluster.
+-   It is often best practice to use temporary storage spaces (called "scratch" spaces, see below) while running analyses. We'll use scratch space in a few exercises during this course.
+-   **Most importantly: Disk space on the NIH HPC should never be used as archival storage. *Before you even get your project data in the first place, think about where you'll store it after the project is done.***
+-   So much more information about storage best practices can be found on the [Biowulf Storage page](https://hpc.nih.gov/storage/index.html).
 
 **Summary of file storage options on Biowulf:**
 
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
-|                                                                      | **Location**       | **Creation**               | **Backups** | **Space**            | **Available from**         |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
-| [/home](https://hpc.nih.gov/storage/index.html#home)                 | network (NFS)      | with Biowulf/Helix account | yes         | 16 GB quota          | Biowulf login node\        |
-|                                                                      |                    |                            |             |                      | Biowulf compute nodes\     |
-|                                                                      |                    |                            |             |                      | Helix                      |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
-| [/lscratch (nodes)](https://hpc.nih.gov/storage/index.html#lscratch) | local              | created by user job        | no          | up to \~3,200 GB\    | Biowulf compute nodes only |
-|                                                                      |                    |                            |             | as requested by job  |                            |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
-| [/scratch](https://hpc.nih.gov/storage/index.html#scratch)           | network (NFS)      | created by user            | no          | 100 TB shared        | Biowulf login node\        |
-|                                                                      |                    |                            |             |                      | Helix                      |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
-| [/data](https://hpc.nih.gov/storage/index.html#data)                 | network (GPFS/NFS) | with Biowulf/Helix account | no          | 100 GB default quota | Biowulf login node\        |
-|                                                                      |                    |                            |             |                      | Biowulf compute no         |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+----------------------+----------------------------+
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
+|                                                                      | **Location**       | **Creation**               | **Backups** | **Space**                                             | **Available from**         |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
+| [/home](https://hpc.nih.gov/storage/index.html#home)                 | network (NFS)      | with Biowulf/Helix account | yes         | 16 GB quota (don't use this as a place to do work!)   | Biowulf login node\        |
+|                                                                      |                    |                            |             |                                                       | Biowulf compute nodes\     |
+|                                                                      |                    |                            |             |                                                       | Helix                      |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
+| [/lscratch (nodes)](https://hpc.nih.gov/storage/index.html#lscratch) | local              | created by user job        | no          | up to \~3,200 GB\                                     | Biowulf compute nodes only |
+|                                                                      |                    |                            |             | as requested by job                                   |                            |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
+| [/scratch](https://hpc.nih.gov/storage/index.html#scratch)           | network (NFS)      | created by user            | no          | 100 TB shared                                         | Biowulf login node\        |
+|                                                                      |                    |                            |             |                                                       | Helix                      |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
+| [/data](https://hpc.nih.gov/storage/index.html#data)                 | network (GPFS/NFS) | with Biowulf/Helix account | no          | 100 GB default quota (this is what you started with)  | Biowulf login node\        |
+|                                                                      |                    |                            |             |                                                       | Biowulf compute no         |
++----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
+
+### Data Management and Checking your Quota
+
+Use the `checkquota` command to determine how much disk space you are using.
+
+``` bash
+$ checkquota
+
+Mount                   Used      Quota  Percent    Files    Limit  Percent
+/data:                5.2 GB   500.0 GB    1.04%       23 31457280    0.00%
+/data(SharedDir):     4.1 TB    10.5 TB   38.67%   103357 31876696    0.32%
+/home:               10.3 GB    16.0 GB   64.62%       73      n/a    0.00%
+```
+
+You can also see your usage history in the [User Dashboard](https://hpcnihapps.cit.nih.gov/auth/dashboard), under the Disk Usage tab. In fact, I would recommend getting used to looking at what is available in your user dashboard!
+
+**Data Management**
+
+Biowulf disk storage is intended for active data and cannot be used for longterm archiving. To help users and groups manage their data on Biowulf, the [HPC User Dashboard](https://hpc.nih.gov/dashboard) provides [Krona](https://github.com/marbl/Krona/wiki/KronaTools)-based visualizations of their data directories that show the distribution and age of data. These interactive hierarchical maps of data and shared directories will assist users in finding unused or infrequently accessed old data that could be archived.
