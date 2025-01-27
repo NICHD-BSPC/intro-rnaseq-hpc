@@ -10,6 +10,7 @@ duration: 45 minutes
 -   Practice using more features of Biowulf (loading modules, running software, parallelization)
 -   Describe the contents and format of a FASTQ file
 -   Create a quality report using FASTQC
+-   Open and look at the report(s) you generated
 
 ## Quality Control of FASTQ files
 
@@ -55,7 +56,7 @@ Each quality score represents the probability that the corresponding nucleotide 
 Q = -10 x log10(P), where P is the probability that a base call is erroneous
 ```
 
-These probabaility values are the results from the base calling algorithm and dependent on how much signal was captured for the base incorporation. The score values can be interpreted as follows:
+These probability values are the results from the base calling algorithm and dependent on how much signal was captured for the base incorporation. The score values can be interpreted as follows:
 
 | Phred Quality Score | Probability of incorrect base call | Base call accuracy |
 |:------------------:|:-------------------------------:|:-----------------:|
@@ -88,10 +89,10 @@ FastQC does the following:
 > $ sinteractive 
 > ```
 >
-> ***And we should be in our student directories:***
+> ***And we should be in our rnaseq/ directory from within student directories:***
 >
 > ``` bash
-> $ cd /data/Bspc-training/$USER
+> $ cd /data/Bspc-training/$USER/rnaseq
 > ```
 
 ### Load the FastQC module
@@ -106,31 +107,27 @@ $ module list
 
 This is because the FastQC program is not in our \$PATH (i.e. it's not in a directory that shell will automatically check to run commands/programs).
 
-``` bash
-$ echo $PATH
-```
-
 To run the FastQC program, we first need to load the appropriate module, so it puts the program into our path. To find the FastQC module to load we need to search the versions available:
 
 ``` bash
 $ module spider fastqc
 ```
 
-Once we know which version we want to use (often the most recent version), we can load the FastQC module. **Discussion point**: What are some reasons we might NOT want to use the most updated version of a tool in certain cases?
+Once we know which version we want to use (often the most recent version), we can load the FastQC module.
+
+> **Discussion point**: What are some reasons we might NOT want to use the most updated version of a tool in certain cases?
 
 ``` bash
 $ module load fastqc/0.12.1
 ```
 
-Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, `ls`)
+Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, `ls`). Now what happens when you run FASTQC
 
 ``` bash
 $ module list
-
-$ echo $PATH
 ```
 
-**Some key LMOD commands are listed below**
+**As a reminder - some LMOD commands are listed below**
 
 |            LMOD command            |                                    description                                    |
 |:----------------------------------:|:----------------------------------:|
@@ -143,7 +140,7 @@ $ echo $PATH
 | `module unload modulename/version` |                             Unload a specific module                              |
 |           `module purge`           |                             Unload all loaded modules                             |
 
-### **Running FASTQC**
+### **Running FASTQC on one or more samples**
 
 Now, let's create a directory to store the output of FastQC inside of the `results` directory you set up last week:
 
@@ -159,9 +156,22 @@ $ fastqc --help
 
 From the help manual, we know that `-o` (or `--outdir`) will create all output files in the specified output directory.
 
-> **Remember you can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster!**
+> **You can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster! See the** [fastqc page](https://hpc.nih.gov/apps/fastqc.html) **as an example.**
 
-FastQC will accept multiple file names as input, so we can use the `*.fq` wildcard.
+#### Specifying Input and Output Options:
+
+To make things simpler, let's navigate to the directory where our input data is first so we don't need to use full path names for each of the input files using `cd raw_data`.
+
+**From this directory, how would we specify that we want our output data to end up in the directory we just created?**
+
+FastQC will accept multiple file names as input, and we could simply list them individually like so.
+
+``` bash
+$ cd raw_data
+$ fastqc -o  file1_1.fq file1_2.fq file2_1.fq file2_2.fq
+```
+
+so we can use the `*.fq` wildcard.
 
 ``` bash
 $ cd raw_data
@@ -170,15 +180,19 @@ $ fastqc -o ~/rnaseq/results/fastqc/ *.fq
 
 *Did you notice how each file was processed pretty much one at a time?*
 
-**Using Parallelization**
+### **Using Parallelization** 
 
-FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to specify an additional argument `-t` indicating number of cores. We will also need to exit the current interactive session, since we started this interactive session with only the default 2 cores (CPUs). We cannot have a tool to use more cores than requested on a compute node. Note that another argument, `-t`, specifies the number of files which can be processed simultaneously. We will use `-t` argument later. You may explore other arguments as well based on your needs.
+FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to:
+
+-   Exit the current interactive session and start another with more additional CPUs , since we started this interactive session with only the default 2 cores. We cannot have a tool to use more cores than requested on a compute node.
+
+-   Specify an argument in FASTQC itself (-t) to process more than one input file at once
 
 Exit the interactive session and start a new one with 6 cores:
 
 ``` bash
 $ exit  #exit the current interactive session (you will be back on a login node)
-$ sinteractive --cpus-per-task 6 --mem=2G
+$ sinteractive --cpus-per-task=6 --mem=2G
 $ #srun --pty -c 6 -p interactive -t 0-3:00 --mem 2G --reservation=HBC1 /bin/bash  #start a new one with 6 cores (-c 6) and 2GB RAM (--mem 2G)
 $ # Could also be a good opportunity to use tmux to keep our interactive session alive
 ```
@@ -207,7 +221,32 @@ Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at 
 $ fastqc -o ~/rnaseq/results/fastqc/ -t 6 *.fq  #note the extra parameter we specified for 6 threads
 ```
 
+**Discussion Points:**
+
 *Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?*
+
+### Viewing results from FastQC
+
+For each individual FASTQ file that is input to FastQC, there are **two output files that are generated**.
+
+``` bash
+$ ls -lh ~/rnaseq/results/fastqc/
+```
+
+1.  The first is **an HTML file** which is a self-contained document with various graphs embedded into it. Each of the graphs evaluate different quality aspects of our data, we will discuss in more detail in this lesson.
+2.  Alongside the HTML file is **a zip file** (with the same name as the HTML file, but with .zip added to the end). This file contains the different plots from the report as separate image files but also contains data files which are designed to be easily parsed to allow for a more detailed and automated evaluation of the raw data on which the QC report is built.
+
+## Viewing the HTML report
+
+We will only need to look at the HTML report for a given input file. It is not possible to view HTML files directly on the cluster from the command line. We will view the HTML result for `Mov10_oe_1.subset.fq` by [locally mounting an HPC System Directory](https://hpc.nih.gov/docs/hpcdrive.html) so you can access the HTMLs locally.
+
+> ### What does this do?
+>
+> The [HPC System Directories](https://hpc.nih.gov/storage), which include /home, /data, and /scratch, can be mounted to your local workstation if you are on the NIH network or VPN, allowing you to easily drag and drop files between the two places. Note that this is most suitable for transferring small file. Users transferring large amounts of data to and from the HPC systems should continue to use scp/sftp/globus.
+>
+> Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system's web browser.
+
+Follow the instructions on this Biowulf page for your operating system, and navigate to the `results/fastqc` directory.
 
 ------------------------------------------------------------------------
 
