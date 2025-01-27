@@ -16,22 +16,16 @@ date: "Last modified January 2025"
 ### Links to sections of this lesson: 
 
 -   [Why the Command Line?](#why-the-command-line)
-
 -   [Logging Into Biowulf](#setting-up-and-logging-into-biowulf)
-
--   [Moving to a Biowulf compute node]
-
--   [Directories on Biowulf and first commands: pwd and cd]
-
--   [Starting with the Shell: Getting data for this lesson]
-
--   [Arguments]
-
--   [Paths]
-
--   [Copying, creating, moving and removing data]
-
--   [Exiting from the cluster]
+-   [Moving to a compute node](#moving-to-a-biowulf-compute-node)
+-   [Directories on Biowulf and first commands: pwd and cd](#working-with-directories-on-biwoulf)
+-   [Looking into and moving into Directories](#looking-into-and-moving-into-directories)
+-   [Command line arguments](#command-line-arguments)
+-   [Unix directory structure](#unix-directory-file-structure)
+-   [Full Paths](#working-with-full-paths)
+-   [Tab completion](#tab-completion)
+-   [Copying, creating, moving and removing data](#copying-creating-moving-and-removing-data)
+-   [Exiting from the cluster](#exiting-from-the-cluster) 
 
 ## **Why the Command Line?**
 
