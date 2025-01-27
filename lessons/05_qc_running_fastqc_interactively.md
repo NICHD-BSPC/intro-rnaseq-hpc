@@ -167,7 +167,7 @@ $ fastqc -o ~/rnaseq/results/fastqc/ *.fq
 
 *Did you notice how each file was processed pretty much one at a time?*
 
-**Using Parallelization**
+### **Using Parallelization** 
 
 FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to specify an additional argument `-t` indicating number of cores. We will also need to exit the current interactive session, since we started this interactive session with only the default 2 cores (CPUs). We cannot have a tool to use more cores than requested on a compute node. Note that another argument, `-t`, specifies the number of files which can be processed simultaneously. We will use `-t` argument later. You may explore other arguments as well based on your needs.
 
@@ -175,7 +175,7 @@ Exit the interactive session and start a new one with 6 cores:
 
 ``` bash
 $ exit  #exit the current interactive session (you will be back on a login node)
-$ sinteractive --cpus-per-task 6 --mem=2G
+$ sinteractive --cpus-per-task=6 --mem=2G
 $ #srun --pty -c 6 -p interactive -t 0-3:00 --mem 2G --reservation=HBC1 /bin/bash  #start a new one with 6 cores (-c 6) and 2GB RAM (--mem 2G)
 $ # Could also be a good opportunity to use tmux to keep our interactive session alive
 ```
@@ -205,6 +205,29 @@ $ fastqc -o ~/rnaseq/results/fastqc/ -t 6 *.fq  #note the extra parameter we spe
 ```
 
 *Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?*
+
+### Viewing results from FastQC
+
+For each individual FASTQ file that is input to FastQC, there are **two output files that are generated**.
+
+``` bash
+$ ls -lh ~/rnaseq/results/fastqc/
+```
+
+1.  The first is **an HTML file** which is a self-contained document with various graphs embedded into it. Each of the graphs evaluate different quality aspects of our data, we will discuss in more detail in this lesson.
+2.  Alongside the HTML file is **a zip file** (with the same name as the HTML file, but with .zip added to the end). This file contains the different plots from the report as separate image files but also contains data files which are designed to be easily parsed to allow for a more detailed and automated evaluation of the raw data on which the QC report is built.
+
+## Viewing the HTML report
+
+We will only need to look at the HTML report for a given input file. It is not possible to view HTML files directly on the cluster from the command line. We will view the HTML result for `Mov10_oe_1.subset.fq` by [locally mounting an HPC System Directory](https://hpc.nih.gov/docs/hpcdrive.html) so you can access the HTMLs locally.
+
+> ### What does this do?
+>
+> The [HPC System Directories](https://hpc.nih.gov/storage), which include /home, /data, and /scratch, can be mounted to your local workstation if you are on the NIH network or VPN, allowing you to easily drag and drop files between the two places. Note that this is most suitable for transferring small file. Users transferring large amounts of data to and from the HPC systems should continue to use scp/sftp/globus.
+>
+> Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system's web browser.
+
+Follow the instructions on this Biowulf page for your operating system, and navigate to the `results/fastqc` directory.
 
 ------------------------------------------------------------------------
 
