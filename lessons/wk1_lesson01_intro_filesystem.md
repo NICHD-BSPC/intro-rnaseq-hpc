@@ -27,6 +27,8 @@ date: "Last modified January 2025"
 -   [Copying, creating, moving and removing data](#copying-creating-moving-and-removing-data)
 -   [Exiting from the cluster](#exiting-from-the-cluster) 
 
+<hr> 
+
 ## **Why the Command Line?**
 
 ### What is the command line, anyway?
@@ -46,6 +48,8 @@ To put it simply, the command line interface (CLI), is a text-based way of inter
 -   More opportunities in general for batch processing and automations
 
 **Side note:** There are technically mutiple languages with which one could "talk" to their computer on the command line. We are going to use the **Bash** scripting language today, which is extremely common, comes default on most computing systems, and relies on the same principles and highly similar command structure to other command line languages you might encounter. Just an FYI in case I mention "Bash" or if you have heard this term before.
+<hr> 
+
 
 ## **Setting up and logging into Biowulf**
 
@@ -108,8 +112,10 @@ And our familiar \$ symbol will return, but this time with your Biowulf username
 ``` bash
 username@biowulf:~$ 
 ```
+<hr>
 
-## Moving to a Biowulf compute node
+
+## **Moving to a Biowulf compute node**
 
 The first command we will run on Biowulf will start a "interactive session". This command will connect us to a compute node, so that all of the commands we run will be processed by a computer designated to do analysis (and not designated to log in users). **Copy and paste the command below.**
 
@@ -136,6 +142,7 @@ Let's consider the difference between the Login node and a compute node:
 **The Biowulf cluster (compute nodes)** The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
 
 **Make sure that your command prompt now contains "cn" followed by some numbers. Once it does, we are ready to copy over some data to work with!**
+<hr> 
 
 ## **Working with Directories on Biwoulf**
 
@@ -184,6 +191,8 @@ A few things about this command:
 <img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500"/>
 
 Note the distinct \$USER directories with the same name but different locations!
+
+<hr> 
 
 ## **Looking into and moving into directories**
 
@@ -240,6 +249,7 @@ You should see:
 ```         
 genomics_data  other  raw_fastq  README.txt  reference_data
 ```
+<hr> 
 
 ## **Command Line Arguments**
 
@@ -365,6 +375,7 @@ When you log in to a remote computer you land on one of the branches of that tre
 > **Tip** - On mac OS, which is a UNIX-based OS, the root level is also "/".
 >
 > **Tip** - On a windows OS, it is drive specific; "C:" is considered the default root, but it changes to "D:/", if you are on that drive.
+<hr> 
 
 ## **Working with Full Paths**
 
@@ -394,7 +405,7 @@ $ pwd
 
 This should now display a shorter string of directories starting with root. This is the full address to your home directory, also referred to as "**full path**". **The "full" here refers to the fact that the path starts with the root, which means you know which branch of the tree you are on in reference to the root.**
 
-#### A note about your /home directory
+### A note about your /home directory
 
 Since we are NOT working from your /home directory, this is not relevant at the moment, but still very useful to know. Take a look at your command prompt now, does it show you the name of this directory (your username?)?
 
@@ -408,7 +419,7 @@ Can we just type `~` instead of `/home/username`?
 
 *Yes, we can!*
 
-#### Using full paths with commands
+### Using full paths with commands
 
 You can do a lot more with the idea of stringing together *parent/child* directories. Let's say we want to look at the contents of the `raw_fastq` folder, but do it from our main course directory (`/data/Bspc-training/$USER` ). We can use the list command and follow it up with the path to the folder we want to list!
 
@@ -491,8 +502,9 @@ $ ls Mov10_oe_1<tab>
 > **NOTE:** Tab completion can also fill in the names of commands. For example, enter `e<tab><tab>`. You will see the name of every command that starts with an `e`. One of those is `echo`. If you enter `ech<tab>`, you will see that tab completion works.
 
 **Tab completion is your friend!** It helps prevent spelling mistakes, and speeds up the process of typing in the full command. We encourage you to use this when working on the command line.
+<hr> 
 
-## Relative paths
+## **Relative paths**
 
 We have talked about **full** paths so far, but there is a way to specify paths to folders and files without having to worry about the root directory. And you have used this before when we were learning about the `cd` command.
 
@@ -567,6 +579,7 @@ A relative path is like getting directions from someone on the street. They tell
 You can usually use either a full path or a relative path depending on what is most convenient. If we are in the home directory, it is more convenient to just enter the relative path since it involves less typing.
 
 Over time, it will become easier for you to keep a mental note of the structure of the directories that you are using and how to quickly navigate among them.
+<hr> 
 
 ## **Copying, creating, moving and removing data**
 
