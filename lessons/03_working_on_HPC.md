@@ -20,11 +20,11 @@ CPUs (Central Processing Units) are composed of a single or multiple cores. If I
 
 ### Data Storage
 
-Data storage is measured in bytes, usually Gigabytes (GB), Terabytes (TB), Petabytes (PB). My laptop has 1 TB of storage, which is pretty standard for laptops.
+Data storage is measured in bytes, usually Gigabytes (GB), Terabytes (TB), Petabytes (PB).
 
 ### Memory
 
-Memory is a small amount of volatile or temporary information storage. This is distinct from data storage we discussed in the previous point. It is an essential component of any computer, as this is where data is stored *when some computation is being performed* on it. If you have ever used R, all the objects in your environment are usually stored in memory until you save your environment. My laptop has 16 GB of memory, which is a little higher than average.
+Memory, in an HPC setting, refers to volatile or temporary information used by running processes - typically this refers to RAM (random access memory). This is distinct from data storage we discussed in the previous point. It is an essential component of any computer, as this is where data is stored *when some computation is being performed* on it. If you have ever used R, all the objects in your environment are usually stored in memory until you save your environment. My laptop has 16 GB of memory available to it, for example.
 
 ## Why use the cluster or an HPC environment?
 
@@ -35,10 +35,12 @@ Memory is a small amount of volatile or temporary information storage. This is d
 </p>
 
 1.  A lot of software is designed to work with the resources on an HPC environment and is either unavailable for, or unusable on, a personal computer.
-2.  If you are performing analysis on large data files (e.g. high-throughput sequencing data), you should work on the cluster to avoid issues with memory and to get the analysis done a lot faster with the superior processing capacity. Essentially, a cluster has:
-    -   100s of cores for processing!
-    -   100s of Gigabytes or Petabytes of storage!
-    -   100s of Gigabytes of memory!
+2.  If you are performing analysis on large data files (e.g. high-throughput sequencing data), you should work on the cluster to avoid issues with memory and to get the analysis done a lot faster with the superior processing capacity. Essentially, Biowulf has:
+    -   96,000 processor cores
+    -   40+ Petabytes of storage!
+    -   Anywhere from 128 GB - 3TB of memory depending on the node!
+
+Check out
 
 ### Parallelization
 
@@ -84,21 +86,21 @@ For now let's start an interactive session, but specify more more particulars:
 
 ``` bash
 # This is an example, you don't need to run this
-$ sinteractive --time=02:00:00 --mem==1G 
+$ sinteractive --time=02:00:00 --mem==1g 
 ```
 
 In the above command the parameters we are using are requesting specific resources:
 
 `--time=02:00:00` - time needed for this work: 0 days, 2 hours, 0 minutes.
 
-`--mem 1G` - memory needed - 1 gigibyte (GiB)
+`--mem=1G` - memory needed - 1 gigibyte (GiB)
 
 > These parameters are used for `sbatch` as well, but they are listed differently within the script used to submit a batch job. We will be reviewing this later in this lesson.
 
 Let's check how many jobs we have running currently, and what resources they are using.
 
 ``` bash
-$ squeue
+$ squeue -u $USER
 ```
 
 ## More about Slurm
@@ -151,14 +153,14 @@ An `sbatch` job submission script is essentially a normal shell script with the 
 #! /bin/sh
 
 #SBATCH --partition=quick
-#SBATCH –t 0-02:00
-#SBATCH –c 4
+#SBATCH –-time=02:00:00
+#SBATCH –-cpus-per-task=4
 #SBATCH --mem=400M
-#SBATCH –o %j.out
-#SBATCH –e %j.err
-#SBATCH -J fastqc_run
+#SBATCH –o %j.out #where to send output messages
+#SBATCH –e %j.err #where to send error messages
+#SBATCH -J fastqc_run 
 #SBATCH --mail-type=ALL
-#SBATCH –-mail-user=xyz10@med.harvard.edu
+#SBATCH –-mail-user=user@nih.gov
 
 ## Load the fastqc module
 module load fastqc/0.11.5
@@ -189,7 +191,7 @@ $ echo $PATH
 /gpfs/gsfs11/users/changes/mambaforge/condabin:/usr/local/slurm/bin:/usr/local/bin:/usr/X11R6/bin:/usr/local/jdk/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/mysql/bin:/home/changes/opt/bin:/data/changes/mambaforge/condabin:/data/NICHD-core1/bin
 ```
 
-This output is a lot more complex! Let's break it down. When you look closely at the output of `echo $PATH`, you should a list of full paths separated from each other by a ":".
+This output is a lot more complex than the output from \$HOME! When you look closely at the output of `echo $PATH`, you should a list of full paths separated from each other by a ":".
 
 ### What are all these paths? And what do they represent?
 
@@ -214,7 +216,7 @@ Check the path `/usr/bin/` and see what other executable files you recognize. (N
 $ ls -lF /usr/bin/
 ```
 
-The path `/usr/bin` is usually where executables for commonly used commands are stored.
+The path `/usr/bin` is often where executables for commonly used commands are stored, but things get a little more complicated when you start working with things like Conda environments.
 
 > As pointed out earlier, a lot of the folders listed in the `$PATH` variable are called `bin`. This is because of a convention in Unix to call directories that contain all the commands (in ***binary*** format) **`bin`**.
 
