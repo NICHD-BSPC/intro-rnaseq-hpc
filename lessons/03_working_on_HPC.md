@@ -112,38 +112,45 @@ $ squeue
 
 Below is table with some of the arguments you can specify when requesting resources from Slurm for both `srun` and `sbatch`:
 
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| Argument         | Description / Input                               | Examples                                               | Links                                                                                                                                      |
-+:================:+:=================================================:+:======================================================:+:==========================================================================================================================================:+
-| `-p`             | name of compute partition                         | short, medium, interactive                             | [O2 Wiki - Guidelines for choosing a partition](https://wiki.rc.hms.harvard.edu/display/O2/How+to+choose+a+partition+in+O2)                |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| `-t`             | how much time to allocate to job                  | 0-03:00, 5:00:00                                       | [O2 Wiki - Time limits for each partition](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#Time-limits) |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| `-c`             | max cores                                         | 4, 8                                                   | [O2 Wiki - How many cores?](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#How-many-cores?)            |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| `--mem`          | max memory                                        | 8G, 8000                                               | [O2 Wiki - Memory requirements](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/1586793632/Using+Slurm+Basic#Memory-requirements)    |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| `-o`             | name of file to create with standard output       | %j.out                                                 | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| `-e`             | name of file to create with standard error        | %j.err                                                 | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| `-J`             | name of the job                                   | Fastqc_run, rnaseq_workflow_mov10                      | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| `--mail-type`    | send an email when job starts, ends or errors out | END, ALL                                               | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
-| `--mail-user`    | send email to this address                        | [xyz10\@harvard.edu](mailto:xyz10@harvard.edu){.email} | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference)                        |
-+------------------+---------------------------------------------------+--------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------+
++------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
+| Argument         | Description / Input                               | Examples                                               | Links                                                                                                               |
++:================:+:=================================================:+:======================================================:+:===================================================================================================================:+
+| `--partion`      | name of compute partition                         | norm (default) largemem, quick                         | [Biowulf partitions](https://hpc.nih.gov/docs/userguide.html#partitions)                                            |
++------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
+| `--time`         | how much time to allocate to job                  | 08:00:00 (for 8 hours)                                 | [Walltime limits for partitions](https://hpc.nih.gov/docs/userguide.html#wall)                                      |
++------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
+| --cpus-per-task  | Number of CPUs required                           | '8' for an 8-way multithreaded job                     |                                                                                                                     |
++------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
+| `--mem`          | max memory                                        | 8G (8 gigabytes)                                       |                                                                                                                     |
++------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
+| `-J`             | name of the job                                   | Fastqc_run, rnaseq_workflow_mov10                      | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference) |
++------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
+| `--mail-type`    | send an email when job starts, ends or errors out | END, ALL                                               | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference) |
++------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
+| `--mail-user`    | send email to this address                        | [xyz10\@harvard.edu](mailto:xyz10@harvard.edu){.email} | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference) |
++------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
 
 ### `sbatch` job submission script: Example
 
-An `sbatch` job submission script is essentially a normal shell script with the Slurm resource request specified at the top (Slurm directives) preceded by `#SBATCH`. Below is an example of an sbatch shell script that is requesting the following: \* the "short" partition for 2 hours \* on 4 cores (30 minutes for each core) \* using 400MiB (100MiB for each core)
+An `sbatch` job submission script is essentially a normal shell script with the Slurm resource request specified at the top (Slurm directives) preceded by `#SBATCH`. Below is an example of an sbatch shell script that is requesting the following:
 
-***DO NOT RUN***
+-   The "quick" partition: For jobs \<4 hours, which are scheduled at higher priority.
+
+```{=html}
+<!-- -->
+```
+-   2 hours
+
+-   4 CPUS
+
+-   Using 400 megabytes (100MiB for each core)
+
+***DO NOT RUN - you'll practice writing one of these yourself soon.***
 
 ```         
 #! /bin/sh
 
-#SBATCH -p short
+#SBATCH --partition=quick
 #SBATCH –t 0-02:00
 #SBATCH –c 4
 #SBATCH --mem=400M
