@@ -33,7 +33,7 @@ To put it simply, the command line interface (CLI), is a text-based way of inter
 
 **Side note:** There are technically mutiple languages with which one could "talk" to their computer on the command line. We are going to use the **Bash** scripting language today, which is extremely common, comes default on most computing systems, and relies on the same principles and highly similar command structure to other command line languages you might encounter. Just an FYI in case I mention "Bash" or if you have heard this term before.
 
-## Setting up
+## Setting up and logging into Biowulf
 
 We will spend most of our time learning about the basics of the shell command-line interface (CLI) by exploring experimental data on the **NIH's Biowulf** cluster. So, we will need to log in to this remote compute cluster first before we can start with the basics.
 
@@ -98,7 +98,7 @@ And our familiar \$ symbol will return, but this time with your Biowulf username
 username@biowulf:~$ 
 ```
 
-#### Let's move from the login node to a compute node!
+## Moving to a Biowulf compute node
 
 The first command we will run on Biowulf will start a "interactive session". This command will connect us to a compute node, so that all of the commands we run will be processed by a computer designated to do analysis (and not designated to log in users). **Copy and paste the command below.**
 
@@ -128,7 +128,7 @@ The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a num
 
 **Make sure that your command prompt now contains "cn" followed by some numbers. Once it does, we are ready to copy over some data to work with!**
 
-#### Directories on Biowulf and first commands: `pwd and cd`
+## Directories on Biowulf and first commands: `pwd and cd`
 
 Let's see where we've "landed" on Biowulf - That is, figure out what directory we are in. This is important because Bash commands (and indeed, most programming) requires you to know where you are in relation to the files you want to manipulate (more on referring to files later!).
 
@@ -176,7 +176,7 @@ A few things about this command:
 
 Note the distinct \$USER directories with the same name but different locations!
 
-### Setting up data for this lesson:
+## Starting with the Shell: Getting data for this lesson
 
 The first thing to do is to check if there are any files in the data folder we are currently in.
 
@@ -210,7 +210,7 @@ ls
 
 You should see "unix_lesson" show up as the output of `ls`, which is a *copy* of the directory, in your own space, that you can modify without affecting the original version.
 
-## Starting with the shell
+### Starting with the shell
 
 Let's look at what is inside the data folder and explore further. First, instead of clicking on the folder name to open it and look at its contents, we have to change the folder we are in. When working with any programming tools, **folders are called directories**. We will be using folder and directory interchangeably moving forward.
 
@@ -232,7 +232,7 @@ You should see:
 genomics_data  other  raw_fastq  README.txt  reference_data
 ```
 
-### Arguments
+## Arguments
 
 There are five items listed when you run `ls`, but what types of files are they, or are they directories or files?
 
@@ -326,7 +326,7 @@ One useful command is `ls -lrt`. Looking at the `ls` `man` page, how does this m
 
 ------------------------------------------------------------------------
 
-## The Unix directory file structure (a.k.a. where am I?)
+## The Unix directory file structure
 
 Let's practice moving around a bit. Let's go into the raw_fastq directory and see what is in there.
 
@@ -446,7 +446,7 @@ $ cd /data/Bspc-training/$USER/unix_lesson/
 
 ------------------------------------------------------------------------
 
-#### Tab completion
+## Tab completion
 
 Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use **tab completion**. The `tab` key is located on the left side of your keyboard, right above the `caps lock` key. When you start typing out the first few characters of a directory name, then hit the `tab` key, bash will try to fill in the rest of the directory name.
 
@@ -484,7 +484,7 @@ $ ls Mov10_oe_1<tab>
 
 **Tab completion is your friend!** It helps prevent spelling mistakes, and speeds up the process of typing in the full command. We encourage you to use this when working on the command line.
 
-#### Relative paths
+## Relative paths
 
 We have talked about **full** paths so far, but there is a way to specify paths to folders and files without having to worry about the root directory. And you have used this before when we were learning about the `cd` command.
 
@@ -550,7 +550,7 @@ For example, the output of `tree` from within `unix data` looks like this:
 
 If you are aware of the directory structure, you can string together as long a list of directories as you like using either **relative** or **full** paths.
 
-#### Synopsis of Full versus Relative paths
+### Synopsis of Full versus Relative paths
 
 **A full path always starts with a `/`, a relative path does not.**
 
@@ -707,7 +707,7 @@ Connection to biowulf.nih.gov closed.
 changes@nichdm02272470:~$
 ```
 
-## Commands
+## Command List
 
 ```         
 cd          # change directory
@@ -721,7 +721,7 @@ mv          # move or rename
 rm          # remove/delete
 ```
 
-## Shortcuts
+## Shortcut List
 
 ```         
 ~           # home directory
