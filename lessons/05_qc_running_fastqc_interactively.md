@@ -10,6 +10,7 @@ duration: 45 minutes
 -   Practice using more features of Biowulf (loading modules, running software, parallelization)
 -   Describe the contents and format of a FASTQ file
 -   Create a quality report using FASTQC
+-   Open and look at the report(s) you generated
 
 ## Quality Control of FASTQ files
 
@@ -55,7 +56,7 @@ Each quality score represents the probability that the corresponding nucleotide 
 Q = -10 x log10(P), where P is the probability that a base call is erroneous
 ```
 
-These probabaility values are the results from the base calling algorithm and dependent on how much signal was captured for the base incorporation. The score values can be interpreted as follows:
+These probability values are the results from the base calling algorithm and dependent on how much signal was captured for the base incorporation. The score values can be interpreted as follows:
 
 | Phred Quality Score | Probability of incorrect base call | Base call accuracy |
 |:------------------:|:-------------------------------:|:-----------------:|
@@ -106,31 +107,27 @@ $ module list
 
 This is because the FastQC program is not in our \$PATH (i.e. it's not in a directory that shell will automatically check to run commands/programs).
 
-``` bash
-$ echo $PATH
-```
-
 To run the FastQC program, we first need to load the appropriate module, so it puts the program into our path. To find the FastQC module to load we need to search the versions available:
 
 ``` bash
 $ module spider fastqc
 ```
 
-Once we know which version we want to use (often the most recent version), we can load the FastQC module. **Discussion point**: What are some reasons we might NOT want to use the most updated version of a tool in certain cases?
+Once we know which version we want to use (often the most recent version), we can load the FastQC module.
+
+> **Discussion point**: What are some reasons we might NOT want to use the most updated version of a tool in certain cases?
 
 ``` bash
 $ module load fastqc/0.12.1
 ```
 
-Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, `ls`)
+Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, `ls`). Now what happens when you run FASTQC
 
 ``` bash
 $ module list
-
-$ echo $PATH
 ```
 
-**Some key LMOD commands are listed below**
+**As a reminder - some LMOD commands are listed below**
 
 |            LMOD command            |                                    description                                    |
 |:----------------------------------:|:----------------------------------:|
@@ -143,7 +140,7 @@ $ echo $PATH
 | `module unload modulename/version` |                             Unload a specific module                              |
 |           `module purge`           |                             Unload all loaded modules                             |
 
-### **Running FASTQC**
+### **Running FASTQC on one or more samples**
 
 Now, let's create a directory to store the output of FastQC inside of the `results` directory you set up last week:
 
@@ -159,7 +156,7 @@ $ fastqc --help
 
 From the help manual, we know that `-o` (or `--outdir`) will create all output files in the specified output directory.
 
-> **Remember you can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster!**
+> **You can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster! See the** [fastqc page](https://hpc.nih.gov/apps/fastqc.html) **as an example.**
 
 FastQC will accept multiple file names as input, so we can use the `*.fq` wildcard.
 
