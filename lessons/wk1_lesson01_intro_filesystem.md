@@ -15,9 +15,9 @@ date: "Last modified January 2025"
 
 ### Links to sections of this lesson: 
 
--   [Why the Command Line?]
+-   [Why the Command Line?](#why-the-command-line)
 
--   [Setting up and logging into Biowulf]
+-   [Logging Into Biowulf](#setting-up-and-logging-into-biowulf)
 
 -   [Moving to a Biowulf compute node]
 
