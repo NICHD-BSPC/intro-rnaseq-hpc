@@ -4,7 +4,7 @@ author: "Harvard HPC Staff, Modified by Sally Chang at NICHD"
 date: "Last modified January 2025"
 ---
 
-## Learning Objectives
+### Learning Objectives
 
 -   Understand why we need to use the command line
 -   Log in to a high-performance computing cluster
@@ -13,7 +13,27 @@ date: "Last modified January 2025"
 -   List files in a directory
 -   Copy, remove and move files
 
-## **What and Why of the Command Line?**
+### Links to sections of this lesson: 
+
+-   [Why the Command Line?]
+
+-   [Setting up and logging into Biowulf]
+
+-   [Moving to a Biowulf compute node]
+
+-   [Directories on Biowulf and first commands: pwd and cd]
+
+-   [Starting with the Shell: Getting data for this lesson]
+
+-   [Arguments]
+
+-   [Paths]
+
+-   [Copying, creating, moving and removing data]
+
+-   [Exiting from the cluster]
+
+## **Why the Command Line?**
 
 #### What is the command line, anyway?
 
@@ -41,7 +61,7 @@ Let's take a quick look at the basic architecture of a cluster environment and s
 
 <p align="center">
 
-<img src="../img/compute_cluster.png" width="500" alt="schematic of compute cluster with single login node and many connected compute nodes"/>
+<img src="../img/compute_cluster.png" alt="schematic of compute cluster with single login node and many connected compute nodes" width="500"/>
 
 </p>
 
@@ -77,8 +97,7 @@ You see the "\$" symbol? That is where you write the commands that will be execu
 
 ***Please note that from this point on in the workshop anything we want you to type next to the command prompt will be preceded by the `$` (see below). Please make sure you do not type out (or copy and paste) the `$` at the beginning of a command into the Terminal.***
 
-<img src="../img/default_shell_prompt.png" width="700" alt="typical command shell prompt for a user on a NICHD mac as an example"/>
-
+<img src="../img/default_shell_prompt.png" alt="typical command shell prompt for a user on a NICHD mac as an example" width="700"/>
 
 To connect to the login node on Biowulf:
 
@@ -120,11 +139,9 @@ In a few seconds you should get back the command prompt `$`. Now the string of c
 
 Let's consider the difference between the Login node and a compute node:
 
-**The login node**
-The login node (biowulf.nih.gov) is used to submit jobs to the cluster, and is a single system shared by all users. No compute intensive, data transfer or large file manipulation processes should be run on the login node. *This system is for submitting jobs only*.
+**The login node** The login node (biowulf.nih.gov) is used to submit jobs to the cluster, and is a single system shared by all users. No compute intensive, data transfer or large file manipulation processes should be run on the login node. *This system is for submitting jobs only*.
 
-**The Biowulf cluster (compute nodes)**
-The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
+**The Biowulf cluster (compute nodes)** The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
 
 **Make sure that your command prompt now contains "cn" followed by some numbers. Once it does, we are ready to copy over some data to work with!**
 
@@ -172,7 +189,7 @@ A few things about this command:
 
 **It will be helpful to start thinking about directories in a hierarchical way**, so here is a diagram of the directories we've mentioned so far:
 
-<img src="../img/biowulf_directory_structure.png" width="500" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course"/>
+<img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500"/>
 
 Note the distinct \$USER directories with the same name but different locations!
 
@@ -273,9 +290,7 @@ Do you see the modification in the output?
 
 <summary><i>Explanation</i></summary>
 
-<P>
-    Notice that the listed directories now have / at the end of their names.
-</P>
+<P>Notice that the listed directories now have / at the end of their names.</P>
 
 </details>
 
@@ -289,12 +304,13 @@ $ man ls
 
 This will open the manual page for `ls` and you will lose the command prompt. It will bring you to a so-called "buffer" page, a page you can navigate with your mouse or if you want to use your keyboard we have listed some basic key strokes:
 
-* *spacebar* to go forward a page
-* *b* to go backward a page
-* Up or down arrows to go forward or backward, respectively
-* *q* to quit
+-   *spacebar* to go forward a page
+-   *b* to go backward a page
+-   Up or down arrows to go forward or backward, respectively
+-   *q* to quit
 
 <!-- * */* to get a prompt at the bottom to search. Type a search term, and hit *Enter* -->
+
 <!-- * *n* to go to the next search hit, or *N* for the previous hit -->
 
 **To get out of the `man` "buffer" page and to be able to type commands again on the command prompt, press the `q` key!**
@@ -309,7 +325,7 @@ One useful command is `ls -lrt`. Looking at the `ls` `man` page, how does this m
 
 <summary><i>Explanation</i></summary>
 
-<P> `-l`is the same long-format flag as before. `-r` sorts the contents in reverse order, specifically by time `-t` </P>
+<P>`-l`is the same long-format flag as before. `-r` sorts the contents in reverse order, specifically by time `-t`</P>
 
 </details>
 
@@ -343,8 +359,8 @@ Great, we have now traversed some sub-directories, but where are we in the conte
 Like on any computer you have used before, the file structure within a Unix/Linux system is hierarchical, like an upside down tree with the "/" directory, called "root" as the starting point of this tree-like structure:
 
 <p align="center">
-    
-<img src="../img/biowulf_directory_structure.png" width="500" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course"/>
+
+<img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500"/>
 
 </p>
 
@@ -386,7 +402,7 @@ $ pwd
 
 This should now display a shorter string of directories starting with root. This is the full address to your home directory, also referred to as "**full path**". **The "full" here refers to the fact that the path starts with the root, which means you know which branch of the tree you are on in reference to the root.**
 
-#### A note about your /home directory 
+#### A note about your /home directory
 
 Since we are NOT working from your /home directory, this is not relevant at the moment, but still very useful to know. Take a look at your command prompt now, does it show you the name of this directory (your username?)?
 
@@ -638,8 +654,8 @@ $ ls
 
 **Important notes about `mv`**:
 
-* When using `mv`, shell will **not** ask if you are sure that you want to "replace existing file" or similar unless you use the -i option.
-* Once replaced, it is not possible to get the replaced file back!
+-   When using `mv`, shell will **not** ask if you are sure that you want to "replace existing file" or similar unless you use the -i option.
+-   Once replaced, it is not possible to get the replaced file back!
 
 ### Removing
 
@@ -651,10 +667,10 @@ $ rm  Mov10_oe_1.subset-backup.fq
 
 Important notes about `rm`:
 
-* `rm` permanently removes/deletes the file/folder.
-* There is no concept of "Trash" or "Recycle Bin" on the command-line. When you use `rm` to remove/delete they're really gone. 
-* **Be careful with this command!**
-* You can use the `-i` argument if you want it to ask before removing, `rm -i file-name`.
+-   `rm` permanently removes/deletes the file/folder.
+-   There is no concept of "Trash" or "Recycle Bin" on the command-line. When you use `rm` to remove/delete they're really gone.
+-   **Be careful with this command!**
+-   You can use the `-i` argument if you want it to ask before removing, `rm -i file-name`.
 
 Let's delete the fastq_backup folder too. First, we'll have to navigate our way to the parent directory (we can't delete the folder we are currently in/using).
 
