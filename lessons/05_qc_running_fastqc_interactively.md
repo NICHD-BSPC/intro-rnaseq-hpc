@@ -89,10 +89,10 @@ FastQC does the following:
 > $ sinteractive 
 > ```
 >
-> ***And we should be in our student directories:***
+> ***And we should be in our rnaseq/ directory from within student directories:***
 >
 > ``` bash
-> $ cd /data/Bspc-training/$USER
+> $ cd /data/Bspc-training/$USER/rnaseq
 > ```
 
 ### Load the FastQC module
@@ -158,7 +158,20 @@ From the help manual, we know that `-o` (or `--outdir`) will create all output f
 
 > **You can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster! See the** [fastqc page](https://hpc.nih.gov/apps/fastqc.html) **as an example.**
 
-FastQC will accept multiple file names as input, so we can use the `*.fq` wildcard.
+#### Specifying Input and Output Options:
+
+To make things simpler, let's navigate to the directory where our input data is first so we don't need to use full path names for each of the input files using `cd raw_data`.
+
+**From this directory, how would we specify that we want our output data to end up in the directory we just created?**
+
+FastQC will accept multiple file names as input, and we could simply list them individually like so.
+
+``` bash
+$ cd raw_data
+$ fastqc -o  file1_1.fq file1_2.fq file2_1.fq file2_2.fq
+```
+
+so we can use the `*.fq` wildcard.
 
 ``` bash
 $ cd raw_data
@@ -169,7 +182,11 @@ $ fastqc -o ~/rnaseq/results/fastqc/ *.fq
 
 ### **Using Parallelization** 
 
-FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to specify an additional argument `-t` indicating number of cores. We will also need to exit the current interactive session, since we started this interactive session with only the default 2 cores (CPUs). We cannot have a tool to use more cores than requested on a compute node. Note that another argument, `-t`, specifies the number of files which can be processed simultaneously. We will use `-t` argument later. You may explore other arguments as well based on your needs.
+FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to:
+
+-   Exit the current interactive session and start another with more additional CPUs , since we started this interactive session with only the default 2 cores. We cannot have a tool to use more cores than requested on a compute node.
+
+-   Specify an argument in FASTQC itself (-t) to process more than one input file at once
 
 Exit the interactive session and start a new one with 6 cores:
 
@@ -203,6 +220,8 @@ Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at 
 ``` bash
 $ fastqc -o ~/rnaseq/results/fastqc/ -t 6 *.fq  #note the extra parameter we specified for 6 threads
 ```
+
+**Discussion Points:**
 
 *Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?*
 
