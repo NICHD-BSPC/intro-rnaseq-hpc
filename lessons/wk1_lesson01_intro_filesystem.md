@@ -469,10 +469,10 @@ $ cd /data/Bspc-training/$USER/unix_lesson/
 
 Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use **tab completion**. The `tab` key is located on the left side of your keyboard, right above the `caps lock` key. When you start typing out the first few characters of a directory name, then hit the `tab` key, bash will try to fill in the rest of the directory name.
 
-For example, first type `cd` to get back to your home directly, then type `cd uni`, followed by pressing the `tab` key:
+For example, change directories to get back to your home directly, then type `cd uni`, followed by pressing the `tab` key:
 
 ``` bash
-$ cd
+$ cd /data/Bspc-training/$USER/
 $ cd uni<tab>
 ```
 
