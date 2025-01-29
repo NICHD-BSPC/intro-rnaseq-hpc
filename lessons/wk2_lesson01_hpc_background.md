@@ -129,14 +129,8 @@ More about these options and many others can found in the [Biowulf User Guide](h
 An `sbatch` job submission script is essentially a normal shell script with the Slurm resource request specified at the top (Slurm directives) preceded by `#SBATCH`. Below is an example of an sbatch shell script that is requesting the following:
 
 -   The "quick" partition: For jobs \<4 hours, which are scheduled at higher priority.
-
-```{=html}
-<!-- -->
-```
 -   2 hours
-
 -   4 CPUS
-
 -   Using 400 megabytes (100MiB for each core)
 
 ***DO NOT RUN - you'll practice writing one of these yourself soon.***
@@ -258,20 +252,6 @@ Some key LMOD commands are listed below:
 -   It is often best practice to use temporary storage spaces (called "scratch" spaces, see below) while running analyses. We'll use scratch space in a few exercises during this course.
 -   **Most importantly: Disk space on the NIH HPC should never be used as archival storage. *Before you even get your project data in the first place, think about where you'll store it after the project is done.***
 -   So much more information about storage best practices can be found on the [Biowulf Storage page](https://hpc.nih.gov/storage/index.html).
-
-**Summary of file storage options on Biowulf:**
-|                                                                      | **Location**       | **Creation**               | **Backups** | **Space**                                             | **Available from**         |
-| [/home](https://hpc.nih.gov/storage/index.html#home)                 | network (NFS)      | with Biowulf/Helix account | yes         | 16 GB quota (don't use this as a place to do work!)   | Biowulf login node\        |
-|                                                                      |                    |                            |             |                                                       | Biowulf compute nodes\     |
-|                                                                      |                    |                            |             |                                                       | Helix                      |
-| [/lscratch (nodes)](https://hpc.nih.gov/storage/index.html#lscratch) | local              | created by user job        | no          | up to \~3,200 GB\                                     | Biowulf compute nodes only |
-|                                                                      |                    |                            |             | as requested by job                                   |                            |
-
-| [/scratch](https://hpc.nih.gov/storage/index.html#scratch)           | network (NFS)      | created by user            | no          | 100 TB shared                                         | Biowulf login node\        |
-|                                                                      |                    |                            |             |                                                       | Helix                      |
-
-| [/data](https://hpc.nih.gov/storage/index.html#data)                 | network (GPFS/NFS) | with Biowulf/Helix account | no          | 100 GB default quota (this is what you started with)  | Biowulf login node\        |
-|                                                                      |                    |                            |             |                                                       | Biowulf compute no         |
 
 ### Data Management and Checking your Quota
 
