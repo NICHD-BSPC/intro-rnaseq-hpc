@@ -27,7 +27,7 @@ The first step in the RNA-Seq workflow is to take the FASTQ files received from 
 The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the defacto file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
 
 | Line | Description                                                                                               |
-|------------|------------------------------------------------------------|
+|----------------|--------------------------------------------------------|
 | 1    | Always begins with '\@', followed by information about the read                                           |
 | 2    | The actual DNA sequence                                                                                   |
 | 3    | Always begins with a '+', and sometimes the same info as in line 1                                        |
@@ -75,7 +75,7 @@ Now that we understand what information is stored in a FASTQ file, the next step
 
 FastQC does the following:
 
--    accepts FASTQ files (or BAM files) as input
+-   accepts FASTQ files (or BAM files) as input
 
 -   generates summary graphs and tables to help assess your data
 
@@ -162,13 +162,13 @@ From the help manual, we know that `-o` (or `--outdir`) will create all output f
 
 **Navigating to where we want to run the program**: To make things simpler, let's navigate to the directory where our input data is so we don't need to use full path names for each of the input files.
 
-```bash
+``` bash
 cd raw_data
 ```
 
-**Specifying output location**: From this directory, how would we specify that we want our output data to end up in the directory we just created? There are a few options based on what we know about full and relative paths. For example: 
+**Specifying output location**: From this directory, how would we specify that we want our output data to end up in the directory we just created? There are a few options based on what we know about full and relative paths. For example:
 
-```bash
+``` bash
 # don't run these, these are just options
 fastqc -o ../results/fastqc
 fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc
@@ -181,7 +181,7 @@ $ cd raw_data
 $ fastqc -o ../results/fastqc file1_1.fq file1_2.fq file2_1.fq file2_2.fq
 ```
 
- But we could also use our fancy, space-saving `*.fq` wildcard instead. 
+But we could also use our fancy, space-saving `*.fq` wildcard instead.
 
 ``` bash
 $ cd raw_data
@@ -190,7 +190,7 @@ $ fastqc -o ../results/fastqc *.fq
 
 *Did you notice how each file was processed pretty much one at a time?*
 
-## **Using Parallelization** 
+## **Using Parallelization**
 
 FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to:
 
@@ -223,7 +223,7 @@ Because we are on a new compute node, `raw_data` directory (remember we are on a
 $ cd /data/Bspc-training/rnaseq/changes/raw_data
 ```
 
-Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at once (with an additional argument `-t`): 
+Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at once (with an additional argument `-t`):
 
 ``` bash
 $ fastqc -o ../results/fastqc -t 6 *.fq
@@ -232,8 +232,7 @@ $ fastqc -o ../results/fastqc -t 6 *.fq
 
 **Discussion Points:**
 
-*Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?*
-*This overwrote our results. What is a way that we could prevent this from happening?*
+*Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?* *This overwrote our results. What is a way that we could prevent this from happening?*
 
 ## **Viewing results from FastQC**
 
@@ -256,7 +255,10 @@ We will only need to look at the HTML report for a given input file. It is not p
 >
 > Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system's web browser.
 
-Follow the instructions on this Biowulf page for your operating system, and navigate to the `smb://hpcdrive.nih.gov/Bspc-training/username` directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`. In another lesson this week you will learn more about interpreting this result! 
+Right now, this capability only works from your `/data/$USER` directory:
+
+1.   Copy your `results/fastqc` directory to `/data/$USER` using `copy -r`
+2.  Follow the instructions on the Biowulf page above for your operating system, and navigate to the `smb://hpcdrive.nih.gov/data/username` directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`. In another lesson this week you will learn more about interpreting this result!
 
 ------------------------------------------------------------------------
 
