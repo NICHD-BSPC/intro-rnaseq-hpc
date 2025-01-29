@@ -68,15 +68,16 @@ More about these options and many others can found in the [Biowulf User Guide](h
 Use Vim in insert mode (`i`) to modify your copied file to use 1 task that makes use of 6 CPUs, which will run on the `quick` partition for one hour and use 6 gigabytes of memory. Make sure to also give your job and output/error logs informative names!
 
 ``` bash
-#SBATCH --job-name=mov
-#SBATCH --partition=
-#SBATCH --mail-type=                # Mail events 
-#SBATCH --ntasks=                  # Run a single task     
-#SBATCH --cpus-per-task=            # Number of CPU cores per task
-#SBATCH --mem=                    # Job memory request
-#SBATCH --time=            # Time limit hrs:min:sec
-#SBATCH --output=          # Standard output log
-#SBATCH --error=           #error log
+#!/bin/bash
+#SBATCH --job-name=mov10_oe1_full_fastqc
+#SBATCH --partition=quick
+#SBATCH --mail-type=ALL                # Mail events 
+#SBATCH --ntasks=1                  # Run a single task     
+#SBATCH --cpus-per-task=6           # Number of CPU cores per task
+#SBATCH --mem=6g                    # Job memory request
+#SBATCH --time=01:00:00            # Time limit hrs:min:sec
+#SBATCH --output=%j.out          # Use job name as a variable
+#SBATCH --error=%j.err           # Use job name as a variable
 ```
 
 ## Modify the body of the script
@@ -87,13 +88,15 @@ Now in the body of the script, we can include any commands we want to run, speci
 ## Load modules required for script commands
 module load fastqc/0.12.1
 
-## Run FASTQC
+## Run FASTQC on a full-sized file in the class shared directory
 fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq
 ```
 
 > **NOTE:** These are the same commands we used when running FASTQC in the interactive session. Since we are writing them in a script, the `tab` completion function will **not work**, so please make sure you don't have any typos when writing the script!
 
 Once done with your script, click `esc` to exit the INSERT mode. Then save and quit the script by typing `:wq`. You may double check your script by typing `less mov10_fastqc.run`.
+
+## Submit the job script
 
 Now, if everything looks good submit the job!
 
@@ -128,7 +131,11 @@ $ mv *.out ../logs/fastqc.out
 
 ------------------------------------------------------------------------
 
-**Exercise** 1. Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session? 2. How would you change the `mov10_fastqc.run` script if you had 9 fastq files you wanted to run in parallel?
+**Exercise**
+
+1\. Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session?
+
+2\. How would you change your script to analyze the 6 files we used in the last episode?
 
 ------------------------------------------------------------------------
 
