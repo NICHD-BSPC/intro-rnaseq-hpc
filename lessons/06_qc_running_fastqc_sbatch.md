@@ -10,7 +10,7 @@ duration: 45 minutes
 -   Modify a template SLURM job submission script
 -   Run a SLURM job submission script to perform quality assessment for a full-sized FASTQ file
 
-## Quality Control of FASTQ files
+## Preparing SLURM Directives
 
 ### Performing quality assessment using job submission scripts
 
@@ -22,9 +22,9 @@ Submission of the script using the `sbatch` command allows Slurm to run your job
 
 Our script will do the following:
 
-1.  Specify important details about our
+1.  Specify important details to the SLURM scheduler
 2.  Load the FastQC module
-3.  Run FastQC on the full-sized Mov10_1_oe FASTQ file
+3.  Run FastQC on the full-sized `Mov10_oe_1` FASTQ file
 
 Let's first change the directory to `/rnaseq/scripts`, and copy a template that already has some SLURM parameters listed and re-name this file something informative:
 
@@ -40,43 +40,60 @@ Open the renamed file with Vim and take a look at the components.The first thing
 #!/bin/bash
 ```
 
-Following the shebang line are the Slurm directives. For the script to run, we need to include options for **queue/partition (--partition) and runtime limit (--time)**. To specify our options, we precede the option with `#SBATCH`. Some key resources to specify are:
-
-| Resource  |      Flag      |                                                        Description                                                         |
-|:----------------------:|:----------------------:|:----------------------:|
-| partition |  --partition   |                                                       partition name                                                       |
-|   time    |     --time     |                                hours:minutes run limit, after which the job will be killed                                 |
-|   core    | -cpus-per-task | number of cores requested -- this needs to be greater than or equal to the number of cores you plan to use to run your job |
-|  memory   |     --mem      |                                         memory limit per compute node for the job                                          |
-
-Let's specify those options as follows:
+Following the shebang line are the Slurm directives. These are directives that your instructor finds particularly informative. If you are using these instructions without access to the course directory, you could also copy and paste this into a text editor :
 
 ``` bash
-#SBATCH --partition=quick        # Based on running these analyses before, we can get away with running this on a quick (priority!) node
-#SBATCH --time=02:00:00       # time limit
-#SBATCH --cpus-per-task=6        # number of cores
-#SBATCH --mem=6g   # requested memory
-#SBATCH --job-name rnaseq_mov10_fastqc      # Job name
-#SBATCH -o %j.out           # File to which standard output will be written
-#SBATCH -e %j.err       # File to which standard error will be written
+#SBATCH --job-name=
+#SBATCH --partition=
+#SBATCH --mail-type=                # Mail events 
+#SBATCH --ntasks=                  # Run a single task     
+#SBATCH --cpus-per-task=            # Number of CPU cores per task
+#SBATCH --mem=                    # Job memory request
+#SBATCH --time=            # Time limit hrs:min:sec
+#SBATCH --output=          # Standard output log
+#SBATCH --error=           #error log
 ```
 
-Now in the body of the script, we can include any commands we want to run. In this case, it will be the following:
+-   `--job-name=` name of the job (ex. mov10_fastqc_full)
+-   `--partition=` : name of compute partition (ex. norm, largemem, quick) [Biowulf partitions](https://hpc.nih.gov/docs/userguide.html#partitions)
+-   `--time=` : how much time to allocate to job (ex. 08:00:00 for 8 hours) [Walltime limits for partitions](https://hpc.nih.gov/docs/userguide.html#wall)
+-   `--cpus-per-task=`: Number of CPUs required (ex. '8' for 8 CPUS that can be used for multithreading.
+-   `--mem=`: maximum memory, i.e. 8g (8 gigabytes - note the `g`)
+-   `--mail-type=`: send an email to your NIH account when job starts, ends or quits with an error (ex. END, ALL)
+-   `--output=`: The name of a log file to send output that would normally be printed to screen (ex. mov10_fastqc.log)
+-   `--error=`: The name of a log file specifically to capture error messages
+
+More about these options and many others can found in the [Biowulf User Guide](https://hpc.nih.gov/docs/userguide.html).
+
+Use Vim in insert mode (`i`) to modify your copied file to use 1 task that makes use of 6 CPUs, which will run on the `quick` partition for one hour and use 6 gigabytes of memory. Make sure to also give your job and output/error logs informative names!
 
 ``` bash
-## Change directories to where the fastq files are located. For now I will use absolute paths until we find a good solution for a prefix. 
-cd /data/NICHD-core0/test/changes/rc_training/rnaseq/raw_data
+#SBATCH --job-name=mov
+#SBATCH --partition=
+#SBATCH --mail-type=                # Mail events 
+#SBATCH --ntasks=                  # Run a single task     
+#SBATCH --cpus-per-task=            # Number of CPU cores per task
+#SBATCH --mem=                    # Job memory request
+#SBATCH --time=            # Time limit hrs:min:sec
+#SBATCH --output=          # Standard output log
+#SBATCH --error=           #error log
+```
 
+Now in the body of the script, we can include any commands we want to run, specifying that our input file is now a file in the shared class directory. In this case, it will be the following:
+
+``` bash
 ## Load modules required for script commands
 module load fastqc/0.12.1
 
 ## Run FASTQC
-fastqc -o /data/NICHD-core0/test/changes/rc_training/rnaseq/fastqc/ -t 6 *.fq
+fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq
 ```
 
 > **NOTE:** These are the same commands we used when running FASTQC in the interactive session. Since we are writing them in a script, the `tab` completion function will **not work**, so please make sure you don't have any typos when writing the script!
 
-Once done with your script, click `esc` to exit the INSERT mode. Then save and quit the script by typing `:wq`. You may double check your script by typing `less mov10_fastqc.run`. If everything looks good submit the job!
+Once done with your script, click `esc` to exit the INSERT mode. Then save and quit the script by typing `:wq`. You may double check your script by typing `less mov10_fastqc.run`.
+
+Now, if everything looks good submit the job!
 
 ``` bash
 $ sbatch mov10_fastqc.run
@@ -85,7 +102,7 @@ $ sbatch mov10_fastqc.run
 You should immediately see a prompt saying `Submitted batch job JobID`. Your job is assigned with that unique identifier `JobID`. You can check on the status of your job with:
 
 ``` bash
-$ squeue -u changes
+$ squeue -u $USER
 ```
 
 Look for the row that corresponds to your `JobID`. The third column indicates the state of your job. Possible states include `PENDING (PD)`, `RUNNING (R)`, `COMPLETING (CG)`. For this example, once your job is `RUNNING`, you should expect it to finish in less than two minutes (although of course this will not always be the case for longer analyses).
