@@ -27,7 +27,7 @@ The first step in the RNA-Seq workflow is to take the FASTQ files received from 
 The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the defacto file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
 
 | Line | Description                                                                                               |
-|------------|------------------------------------------------------------|
+|----------------|--------------------------------------------------------|
 | 1    | Always begins with '\@', followed by information about the read                                           |
 | 2    | The actual DNA sequence                                                                                   |
 | 3    | Always begins with a '+', and sometimes the same info as in line 1                                        |
@@ -67,7 +67,7 @@ These probability values are the results from the base calling algorithm and dep
 
 Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.
 
-## Assessing quality with FastQC
+## **Loading the FASTQC module**
 
 Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data.
 
@@ -75,7 +75,7 @@ Now that we understand what information is stored in a FASTQ file, the next step
 
 FastQC does the following:
 
--    accepts FASTQ files (or BAM files) as input
+-   accepts FASTQ files (or BAM files) as input
 
 -   generates summary graphs and tables to help assess your data
 
@@ -121,7 +121,7 @@ Once we know which version we want to use (often the most recent version), we ca
 $ module load fastqc/0.12.1
 ```
 
-Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, `ls`). Now what happens when you run FASTQC
+Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, `ls`). Now what happens when you list the modules?
 
 ``` bash
 $ module list
@@ -140,7 +140,7 @@ $ module list
 | `module unload modulename/version` |                             Unload a specific module                              |
 |           `module purge`           |                             Unload all loaded modules                             |
 
-### **Running FASTQC on one or more samples**
+## **Running FASTQC on our samples**
 
 Now, let's create a directory to store the output of FastQC inside of the `results` directory you set up last week:
 
@@ -158,29 +158,39 @@ From the help manual, we know that `-o` (or `--outdir`) will create all output f
 
 > **You can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster! See the** [fastqc page](https://hpc.nih.gov/apps/fastqc.html) **as an example.**
 
-#### Specifying Input and Output Options:
+### **Specifying Input and Output Options**:
 
-To make things simpler, let's navigate to the directory where our input data is first so we don't need to use full path names for each of the input files using `cd raw_data`.
-
-**From this directory, how would we specify that we want our output data to end up in the directory we just created?**
-
-FastQC will accept multiple file names as input, and we could simply list them individually like so.
+**Navigating to where we want to run the program**: To make things simpler, let's navigate to the directory where our input data is so we don't need to use full path names for each of the input files.
 
 ``` bash
-$ cd raw_data
-$ fastqc -o  file1_1.fq file1_2.fq file2_1.fq file2_2.fq
+cd raw_data
 ```
 
-so we can use the `*.fq` wildcard.
+**Specifying output location**: From this directory, how would we specify that we want our output data to end up in the directory we just created? There are a few options based on what we know about full and relative paths. For example:
+
+``` bash
+# don't run these, these are just options
+fastqc -o ../results/fastqc
+fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc
+```
+
+**Specifying input files**: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FASTQC you don't need to specify an argument before listing input files like we did before specifying the output location.
 
 ``` bash
 $ cd raw_data
-$ fastqc -o ~/rnaseq/results/fastqc/ *.fq
+$ fastqc -o ../results/fastqc file1_1.fq file1_2.fq file2_1.fq file2_2.fq
+```
+
+But we could also use our fancy, space-saving `*.fq` wildcard instead.
+
+``` bash
+$ cd raw_data
+$ fastqc -o ../results/fastqc *.fq
 ```
 
 *Did you notice how each file was processed pretty much one at a time?*
 
-### **Using Parallelization** 
+## **Using Parallelization**
 
 FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to:
 
@@ -193,8 +203,6 @@ Exit the interactive session and start a new one with 6 cores:
 ``` bash
 $ exit  #exit the current interactive session (you will be back on a login node)
 $ sinteractive --cpus-per-task=6 --mem=2G
-$ #srun --pty -c 6 -p interactive -t 0-3:00 --mem 2G --reservation=HBC1 /bin/bash  #start a new one with 6 cores (-c 6) and 2GB RAM (--mem 2G)
-$ # Could also be a good opportunity to use tmux to keep our interactive session alive
 ```
 
 Once you are on the compute node, check what job(s) you have running and what resources you are using.
@@ -209,28 +217,29 @@ Now that we are in a new interactive session with the appropriate resources, we 
 $ module load fastqc/0.12.1  #reload the module for the new (6-core) interactive session
 ```
 
-We will also move into the `raw_data` directory (remember we are on a new compute node now):
+Because we are on a new compute node, `raw_data` directory (remember we are on a new compute node now):
 
 ``` bash
-$ cd raw_data/
+$ cd /data/Bspc-training/rnaseq/changes/raw_data
 ```
 
-Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at once (with an additional argument `-t`).
+Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at once (with an additional argument `-t`):
 
 ``` bash
-$ fastqc -o ~/rnaseq/results/fastqc/ -t 6 *.fq  #note the extra parameter we specified for 6 threads
+$ fastqc -o ../results/fastqc -t 6 *.fq
+# note the extra parameter we specified for 6 threads
 ```
 
 **Discussion Points:**
 
-*Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?*
+*Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?* *This overwrote our results. What is a way that we could prevent this from happening?*
 
-### Viewing results from FastQC
+## **Viewing results from FastQC**
 
 For each individual FASTQ file that is input to FastQC, there are **two output files that are generated**.
 
 ``` bash
-$ ls -lh ~/rnaseq/results/fastqc/
+$ ls -lh ../results/fastqc/
 ```
 
 1.  The first is **an HTML file** which is a self-contained document with various graphs embedded into it. Each of the graphs evaluate different quality aspects of our data, we will discuss in more detail in this lesson.
@@ -246,7 +255,10 @@ We will only need to look at the HTML report for a given input file. It is not p
 >
 > Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system's web browser.
 
-Follow the instructions on this Biowulf page for your operating system, and navigate to the `results/fastqc` directory.
+Right now, this capability only works from your `/data/$USER` directory:
+
+1.   Copy your `results/fastqc` directory to `/data/$USER` using `copy -r`
+2.  Follow the instructions on the Biowulf page above for your operating system, and navigate to the `smb://hpcdrive.nih.gov/data/username` directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`. In another lesson this week you will learn more about interpreting this result!
 
 ------------------------------------------------------------------------
 
