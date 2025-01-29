@@ -256,7 +256,7 @@ We will only need to look at the HTML report for a given input file. It is not p
 >
 > Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system's web browser.
 
-Follow the instructions on this Biowulf page for your operating system, and navigate to the `/data/changes/rnaresults/fastqc` directory.
+Follow the instructions on this Biowulf page for your operating system, and navigate to the `smb://hpcdrive.nih.gov/Bspc-training/username` directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`. In another lesson this week you will learn more about interpreting this result! 
 
 ------------------------------------------------------------------------
 
