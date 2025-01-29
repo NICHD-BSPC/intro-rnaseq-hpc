@@ -67,7 +67,7 @@ These probability values are the results from the base calling algorithm and dep
 
 Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.
 
-## Assessing quality with FastQC
+## **Loading the FASTQC module**
 
 Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data.
 
@@ -121,7 +121,7 @@ Once we know which version we want to use (often the most recent version), we ca
 $ module load fastqc/0.12.1
 ```
 
-Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, `ls`). Now what happens when you run FASTQC
+Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, `ls`). Now what happens when you list the modules?
 
 ``` bash
 $ module list
@@ -140,7 +140,7 @@ $ module list
 | `module unload modulename/version` |                             Unload a specific module                              |
 |           `module purge`           |                             Unload all loaded modules                             |
 
-### **Running FASTQC on one or more samples**
+## **Running FASTQC on our samples**
 
 Now, let's create a directory to store the output of FastQC inside of the `results` directory you set up last week:
 
@@ -158,29 +158,39 @@ From the help manual, we know that `-o` (or `--outdir`) will create all output f
 
 > **You can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster! See the** [fastqc page](https://hpc.nih.gov/apps/fastqc.html) **as an example.**
 
-#### Specifying Input and Output Options:
+### **Specifying Input and Output Options**:
 
-To make things simpler, let's navigate to the directory where our input data is first so we don't need to use full path names for each of the input files using `cd raw_data`.
+**Navigating to where we want to run the program**: To make things simpler, let's navigate to the directory where our input data is so we don't need to use full path names for each of the input files.
 
-**From this directory, how would we specify that we want our output data to end up in the directory we just created?**
-
-FastQC will accept multiple file names as input, and we could simply list them individually like so.
-
-``` bash
-$ cd raw_data
-$ fastqc -o  file1_1.fq file1_2.fq file2_1.fq file2_2.fq
+```bash
+cd raw_data
 ```
 
-so we can use the `*.fq` wildcard.
+**Specifying output location**: From this directory, how would we specify that we want our output data to end up in the directory we just created? There are a few options based on what we know about full and relative paths. For example: 
+
+```bash
+# don't run these, these are just options
+fastqc -o ../results/fastqc
+fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc
+```
+
+**Specifying input files**: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FASTQC you don't need to specify an argument before listing input files like we did before specifying the output location.
 
 ``` bash
 $ cd raw_data
-$ fastqc -o ~/rnaseq/results/fastqc/ *.fq
+$ fastqc -o ../results/fastqc file1_1.fq file1_2.fq file2_1.fq file2_2.fq
+```
+
+ But we could also use our fancy, space-saving `*.fq` wildcard instead. 
+
+``` bash
+$ cd raw_data
+$ fastqc -o ../results/fastqc *.fq
 ```
 
 *Did you notice how each file was processed pretty much one at a time?*
 
-### **Using Parallelization** 
+## **Using Parallelization** 
 
 FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to:
 
