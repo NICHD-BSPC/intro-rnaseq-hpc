@@ -76,8 +76,8 @@ Use Vim in insert mode (`i`) to modify your copied file to use 1 task that makes
 #SBATCH --cpus-per-task=6           # Number of CPU cores per task
 #SBATCH --mem=6g                    # Job memory request
 #SBATCH --time=01:00:00            # Time limit hrs:min:sec
-#SBATCH --output=%j.out          # Use job name as a variable
-#SBATCH --error=%j.err           # Use job name as a variable
+#SBATCH --output=%j.out          # Use job ID as a variable
+#SBATCH --error=%j.err           # Use job ID as a variable
 ```
 
 ## Modify the body of the script
@@ -101,18 +101,24 @@ Once done with your script, click `esc` to exit the INSERT mode. Then save and q
 Now, if everything looks good submit the job!
 
 ``` bash
-$ sbatch mov10_fastqc.run
+$ mov10_fastqc_full.sh
 ```
 
-You should immediately see a prompt saying `Submitted batch job JobID`. Your job is assigned with that unique identifier `JobID`. You can check on the status of your job with:
+You should immediately see a number pop up. Your job is assigned with that unique identifier `JobID`. You can check on the status of your job with:
 
 ``` bash
 $ squeue -u $USER
 ```
 
-Look for the row that corresponds to your `JobID`. The third column indicates the state of your job. Possible states include `PENDING (PD)`, `RUNNING (R)`, `COMPLETING (CG)`. For this example, once your job is `RUNNING`, you should expect it to finish in less than two minutes (although of course this will not always be the case for longer analyses).
+Look for the row that corresponds to your `JobID`. The third column indicates the state of your job. Possible states include `PENDING (PD)`, `RUNNING (R)`, `COMPLETING (CG)`. **NOTE:** Here is a [table of Job State Codes](https://hpc.nih.gov/docs/userguide.html#states) from the Biowulf User Guide.
 
-> **NOTE:** Here is a [table of Job State Codes](https://hpc.nih.gov/docs/userguide.html#states) from the Biowulf User Guide.
+Once your job is `RUNNING`, you should also get an e-mail with a subject line like: `Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Began, Queued time 00:01:09`.
+
+## After the job has run
+
+Once the job is running, it will take just about 4 minutes to run. Hopefully, you will get another e-mail with a subject like `Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Ended, Run time 00:02:45, COMPLETED, ExitCode 0` . Generally speaking, ExitCode 0 is what we want!
+
+More info about SLURM exit codes can be found in the [SLURM manual](https://slurm.schedmd.com/job_exit_code.html), but it is also useful to search for codes on the Internet when they actually come up in your analysis.
 
 Check out the output files in your directory:
 
@@ -120,7 +126,7 @@ Check out the output files in your directory:
 $ ls -lh ../results/fastqc/
 ```
 
-There should also be one standard error (`.err`) and one standard out (`.out`) files from the job listed in `~/rnaseq/scripts`. You can move these over to your `logs` directory and give them more intuitive names:
+There should also be one standard error (`.err`) and one standard out (`.out`) files from the job listed in `/rnaseq/scripts`. You can move these over to your `logs` directory and give them more intuitive names:
 
 ``` bash
 $ mv *.err ../logs/fastqc.err
@@ -128,6 +134,12 @@ $ mv *.out ../logs/fastqc.out
 ```
 
 > **NOTE:** The `.err` and `.out` files store log information during the script running. They are helpful resources, especially when your script does not run as expected and you need to troubleshoot the script.
+
+Finally, copy over the HTML output file to your /data/\$USER directory so we can open it on a locally mounted drive too:
+
+``` bash
+cp Mov10_oe_1_fastqc.html /data/$USER/
+```
 
 ------------------------------------------------------------------------
 
