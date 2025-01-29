@@ -203,8 +203,6 @@ Exit the interactive session and start a new one with 6 cores:
 ``` bash
 $ exit  #exit the current interactive session (you will be back on a login node)
 $ sinteractive --cpus-per-task=6 --mem=2G
-$ #srun --pty -c 6 -p interactive -t 0-3:00 --mem 2G --reservation=HBC1 /bin/bash  #start a new one with 6 cores (-c 6) and 2GB RAM (--mem 2G)
-$ # Could also be a good opportunity to use tmux to keep our interactive session alive
 ```
 
 Once you are on the compute node, check what job(s) you have running and what resources you are using.
@@ -219,28 +217,30 @@ Now that we are in a new interactive session with the appropriate resources, we 
 $ module load fastqc/0.12.1  #reload the module for the new (6-core) interactive session
 ```
 
-We will also move into the `raw_data` directory (remember we are on a new compute node now):
+Because we are on a new compute node, `raw_data` directory (remember we are on a new compute node now):
 
 ``` bash
-$ cd raw_data/
+$ cd /data/Bspc-training/rnaseq/changes/raw_data
 ```
 
-Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at once (with an additional argument `-t`).
+Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at once (with an additional argument `-t`): 
 
 ``` bash
-$ fastqc -o ~/rnaseq/results/fastqc/ -t 6 *.fq  #note the extra parameter we specified for 6 threads
+$ fastqc -o ../results/fastqc -t 6 *.fq
+# note the extra parameter we specified for 6 threads
 ```
 
 **Discussion Points:**
 
 *Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?*
+*This overwrote our results. What is a way that we could prevent this from happening?*
 
-### Viewing results from FastQC
+## **Viewing results from FastQC**
 
 For each individual FASTQ file that is input to FastQC, there are **two output files that are generated**.
 
 ``` bash
-$ ls -lh ~/rnaseq/results/fastqc/
+$ ls -lh ../results/fastqc/
 ```
 
 1.  The first is **an HTML file** which is a self-contained document with various graphs embedded into it. Each of the graphs evaluate different quality aspects of our data, we will discuss in more detail in this lesson.
@@ -256,7 +256,7 @@ We will only need to look at the HTML report for a given input file. It is not p
 >
 > Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system's web browser.
 
-Follow the instructions on this Biowulf page for your operating system, and navigate to the `results/fastqc` directory.
+Follow the instructions on this Biowulf page for your operating system, and navigate to the `/data/changes/rnaresults/fastqc` directory.
 
 ------------------------------------------------------------------------
 
