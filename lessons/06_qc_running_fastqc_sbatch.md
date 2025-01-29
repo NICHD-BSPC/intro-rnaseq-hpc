@@ -79,6 +79,8 @@ Use Vim in insert mode (`i`) to modify your copied file to use 1 task that makes
 #SBATCH --error=           #error log
 ```
 
+## Modify the body of the script
+
 Now in the body of the script, we can include any commands we want to run, specifying that our input file is now a file in the shared class directory. In this case, it will be the following:
 
 ``` bash
