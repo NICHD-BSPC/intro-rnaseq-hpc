@@ -288,7 +288,7 @@ Practice some of the editing shortcuts, then **quit the document without saving 
 
 ------------------------------------------------------------------------
 
-###**Assignment**
+### **Assignment**
 
 We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let's practice what we just learned in a brief challenge.
 
