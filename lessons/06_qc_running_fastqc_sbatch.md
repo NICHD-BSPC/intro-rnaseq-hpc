@@ -1,39 +1,40 @@
 ---
 title: "Quality control using FASTQC - script running"
-author: "Modified by Sally Chang @ NICHD"
-date: Editing started October 03, 2024
+author: "Harvard HPC Staff, Modified by Sally Chang @ NICHD"
+date: Last edited January 2025
 duration: 45 minutes
 ---
 
 ## Learning Objectives:
 
--   Create and run a SLURM job submission script to automate quality assessment
+-   Modify a template SLURM job submission script
+-   Run a SLURM job submission script to perform quality assessment for a full-sized FASTQ file
 
 ## Quality Control of FASTQ files
 
 ### Performing quality assessment using job submission scripts
 
-So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. `fastqc -o ../results/fastqc/ -t 6 *.fq`). However, we can submit a command or series of commands to these partitions using job submission scripts. ***There might be a number of reasons we would like to be able to do this...EXPAND HERE***
+So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. `fastqc -o ../results/fastqc/ -t 6 *.fq`). However, we can submit a command or series of commands to these partitions using job submission scripts. This is extremely useful when we want to run a job that will take longer than we want to wait around for in an interactive job or will take more memory that we can use during an interactive job. *In this case, we will be running the analysis on the full-sized FASTQ file for one of our samples, which is 10x larger than the subset files we have thus far been working with.*
 
-**Job submission scripts** for Biowulf are just regular shell scripts, but contain the Slurm **options/directives** for our job submission. These directives define the various resources we are requesting for our job (i.e *number of cores, name of partition, runtime limit* )
+**Job submission scripts** for Biowulf are regular shell (command line) scripts, but contain the Slurm **options/directives** for our job submission. These directives define the various resources we are requesting for our job (i.e *number of cores, name of partition, runtime limit* ).
 
-Submission of the script using the `sbatch` command allows Slurm to run your job when its your turn. Let's create a job submission script to automate what we have done in [previous lesson](05_qc_running_fastqc_interactively.md) \<- ***MODIFY THIS LINK TO WHATEVER OURS WILL BE.***
+Submission of the script using the `sbatch` command allows Slurm to run your job when its your turn. Let's create a job submission script to automate what we have done in the previous lesson.
 
 Our script will do the following:
 
-1.  Change directories to where the FASTQ files are located
+1.  Specify important details about our
 2.  Load the FastQC module
-3.  Run FastQC on all of our FASTQ files
+3.  Run FastQC on the full-sized Mov10_1_oe FASTQ file
 
-Let's first change the directory to `/rnaseq/scripts`, and create a script named `mov10_fastqc.run` using `vim`.
+Let's first change the directory to `/rnaseq/scripts`, and copy a template that already has some SLURM parameters listed and re-name this file something informative:
 
 ``` bash
 $ cd rnaseq/scripts
-
-$ vim mov10_fastqc.run
+$ cp /data/Bspc-training/shared/rnaseq_jan2025/slurm_template.sh .
+$ mv slurm_template.sh mov10_fastqc_full.sh
 ```
 
-Once in the vim editor, click `i` to enter INSERT mode. The first thing we need in our script is the **shebang line**:
+Open the renamed file with Vim and take a look at the components.The first thing needed in a SLURM script is the **shebang line**. This tells the command line to interpret this file as a BASH script:
 
 ``` bash
 #!/bin/bash
