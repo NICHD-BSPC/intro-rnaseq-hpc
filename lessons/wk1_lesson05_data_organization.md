@@ -255,7 +255,7 @@ Let's `mv` these files into our raw_data directory.
 $ mv unix_lesson/raw_fastq/*subset.fq raw_data/
 ```
 
-Now the structure of `rnaseq/` should look like this:
+If you were to run the `tree` command from inside the `rnaseq` directory it should now look like this:
 
 ``` bash
 rnaseq
@@ -278,7 +278,7 @@ rnaseq
 1.  Take a moment to create a README for the `rnaseq/` folder (hint: use `vim` to create the file). Give a short description of the project and brief descriptions of the types of files you will be storing within each of the sub-directories.
 2.  Use the same strategy to create a `WORKLOG.rst file` and add your first entry about what you just accomplished.
 
-**Note**: I'll be looking into your `/rnaseq` directory to see that you created the assigned directory structure and these two text files!
+**Note**: Message me on Slack when you've finished this lesson. I'll look into your `/rnaseq` directory to see that you created the assigned directory structure and these two text files!
 
 ------------------------------------------------------------------------
 

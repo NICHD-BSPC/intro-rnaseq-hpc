@@ -15,31 +15,27 @@ date: "Last modified January 2025"
 
 ### Links to sections of this lesson: 
 
--   [Why the Command Line?]
+-   [Why the Command Line?](#why-the-command-line)
+-   [Logging Into Biowulf](#setting-up-and-logging-into-biowulf)
+-   [Moving to a compute node](#moving-to-a-biowulf-compute-node)
+-   [Directories on Biowulf and first commands: pwd and cd](#working-with-directories-on-biwoulf)
+-   [Looking into and moving into Directories](#looking-into-and-moving-into-directories)
+-   [Command line arguments](#command-line-arguments)
+-   [Unix directory structure](#unix-directory-file-structure)
+-   [Full Paths](#working-with-full-paths)
+-   [Tab completion](#tab-completion)
+-   [Copying, creating, moving and removing data](#copying-creating-moving-and-removing-data)
+-   [Exiting from the cluster](#exiting-from-the-cluster) 
 
--   [Setting up and logging into Biowulf]
-
--   [Moving to a Biowulf compute node]
-
--   [Directories on Biowulf and first commands: pwd and cd]
-
--   [Starting with the Shell: Getting data for this lesson]
-
--   [Arguments]
-
--   [Paths]
-
--   [Copying, creating, moving and removing data]
-
--   [Exiting from the cluster]
+<hr> 
 
 ## **Why the Command Line?**
 
-#### What is the command line, anyway?
+### What is the command line, anyway?
 
 To put it simply, the command line interface (CLI), is a text-based way of interacting with the operating system of a computer and the files and applications therein. This is in contrast with using a Graphical User Interface (GUI), which may involve the more familiar buttons and menus you are used to.
 
-#### Why use the command line?
+### Why use the command line?
 
 -   More direct interface between you and the computer - more streamlined, less tabs and windows open etc. 
 
@@ -52,8 +48,10 @@ To put it simply, the command line interface (CLI), is a text-based way of inter
 -   More opportunities in general for batch processing and automations
 
 **Side note:** There are technically mutiple languages with which one could "talk" to their computer on the command line. We are going to use the **Bash** scripting language today, which is extremely common, comes default on most computing systems, and relies on the same principles and highly similar command structure to other command line languages you might encounter. Just an FYI in case I mention "Bash" or if you have heard this term before.
+<hr> 
 
-## Setting up and logging into Biowulf
+
+## **Setting up and logging into Biowulf**
 
 We will spend most of our time learning about the basics of the shell command-line interface (CLI) by exploring experimental data on the **NIH's Biowulf** cluster. So, we will need to log in to this remote compute cluster first before we can start with the basics.
 
@@ -69,13 +67,11 @@ The above image reflects the many computers that make up a **"cluster"** of comp
 
 The data on a cluster is also stored differently than what we are used to with our laptops and desktops, in that it is not computer- or node-specific storage, but all of the data is available to all the nodes in a cluster. This ensures that you don't have to worry about which node is working on your analysis. ***We will be going into more depth about best practices for working on a cluster next week.***
 
-### Logging in to Biowulf
-
-#### Biowulf accounts
+### **Biowulf accounts**
 
 For this workshop we will be using your personal Biowulf accounts, which you can log into using your **NIH password**.
 
-#### Tool(s) to access remote computers/clusters
+### **Tool(s) to access remote computers/clusters**
 
 **With Mac OS**
 
@@ -89,7 +85,7 @@ By default, there is no built-in Terminal that uses the bash shell on the Window
 
 If necessary, you should have installed Git BASH prior to the course. Please find and open Git BASH.
 
-#### Let's log in!
+**Let's log in!**
 
 Everyone should have their Terminal (or Git BASH Terminal) window open. Using this Terminal window, you can interact with your own computer using bash commands!
 
@@ -116,8 +112,10 @@ And our familiar \$ symbol will return, but this time with your Biowulf username
 ``` bash
 username@biowulf:~$ 
 ```
+<hr>
 
-## Moving to a Biowulf compute node
+
+## **Moving to a Biowulf compute node**
 
 The first command we will run on Biowulf will start a "interactive session". This command will connect us to a compute node, so that all of the commands we run will be processed by a computer designated to do analysis (and not designated to log in users). **Copy and paste the command below.**
 
@@ -144,8 +142,9 @@ Let's consider the difference between the Login node and a compute node:
 **The Biowulf cluster (compute nodes)** The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
 
 **Make sure that your command prompt now contains "cn" followed by some numbers. Once it does, we are ready to copy over some data to work with!**
+<hr> 
 
-## Directories on Biowulf and first commands: `pwd and cd`
+## **Working with Directories on Biwoulf**
 
 Let's see where we've "landed" on Biowulf - That is, figure out what directory we are in. This is important because Bash commands (and indeed, most programming) requires you to know where you are in relation to the files you want to manipulate (more on referring to files later!).
 
@@ -193,7 +192,9 @@ A few things about this command:
 
 Note the distinct \$USER directories with the same name but different locations!
 
-## Starting with the Shell: Getting data for this lesson
+<hr> 
+
+## **Looking into and moving into directories**
 
 The first thing to do is to check if there are any files in the data folder we are currently in.
 
@@ -227,7 +228,7 @@ ls
 
 You should see "unix_lesson" show up as the output of `ls`, which is a *copy* of the directory, in your own space, that you can modify without affecting the original version.
 
-### Starting with the shell
+### Changing Directories
 
 Let's look at what is inside the data folder and explore further. First, instead of clicking on the folder name to open it and look at its contents, we have to change the folder we are in. When working with any programming tools, **folders are called directories**. We will be using folder and directory interchangeably moving forward.
 
@@ -248,8 +249,9 @@ You should see:
 ```         
 genomics_data  other  raw_fastq  README.txt  reference_data
 ```
+<hr> 
 
-## Arguments
+## **Command Line Arguments**
 
 There are five items listed when you run `ls`, but what types of files are they, or are they directories or files?
 
@@ -342,7 +344,7 @@ One useful command is `ls -lrt`. Looking at the `ls` `man` page, how does this m
 
 ------------------------------------------------------------------------
 
-## The Unix directory file structure
+## **Unix directory file structure**
 
 Let's practice moving around a bit. Let's go into the raw_fastq directory and see what is in there.
 
@@ -354,7 +356,7 @@ $ ls -l
 
 Great, we have now traversed some sub-directories, but where are we in the context of our pre-designated "home" directory that contains the `unix_lesson` directory?!
 
-### The "root" directory!
+### The "root" directory
 
 Like on any computer you have used before, the file structure within a Unix/Linux system is hierarchical, like an upside down tree with the "/" directory, called "root" as the starting point of this tree-like structure:
 
@@ -373,8 +375,9 @@ When you log in to a remote computer you land on one of the branches of that tre
 > **Tip** - On mac OS, which is a UNIX-based OS, the root level is also "/".
 >
 > **Tip** - On a windows OS, it is drive specific; "C:" is considered the default root, but it changes to "D:/", if you are on that drive.
+<hr> 
 
-### Paths
+## **Working with Full Paths**
 
 Now let's learn more about the "addresses" of directories, called **"path"** and move around the file system.
 
@@ -402,7 +405,7 @@ $ pwd
 
 This should now display a shorter string of directories starting with root. This is the full address to your home directory, also referred to as "**full path**". **The "full" here refers to the fact that the path starts with the root, which means you know which branch of the tree you are on in reference to the root.**
 
-#### A note about your /home directory
+### A note about your /home directory
 
 Since we are NOT working from your /home directory, this is not relevant at the moment, but still very useful to know. Take a look at your command prompt now, does it show you the name of this directory (your username?)?
 
@@ -416,7 +419,7 @@ Can we just type `~` instead of `/home/username`?
 
 *Yes, we can!*
 
-#### Using full paths with commands
+### Using full paths with commands
 
 You can do a lot more with the idea of stringing together *parent/child* directories. Let's say we want to look at the contents of the `raw_fastq` folder, but do it from our main course directory (`/data/Bspc-training/$USER` ). We can use the list command and follow it up with the path to the folder we want to list!
 
@@ -462,14 +465,14 @@ $ cd /data/Bspc-training/$USER/unix_lesson/
 
 ------------------------------------------------------------------------
 
-## Tab completion
+## **Tab completion**
 
 Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use **tab completion**. The `tab` key is located on the left side of your keyboard, right above the `caps lock` key. When you start typing out the first few characters of a directory name, then hit the `tab` key, bash will try to fill in the rest of the directory name.
 
-For example, first type `cd` to get back to your home directly, then type `cd uni`, followed by pressing the `tab` key:
+For example, change directories to get back to your home directly, then type `cd uni`, followed by pressing the `tab` key:
 
 ``` bash
-$ cd
+$ cd /data/Bspc-training/$USER/
 $ cd uni<tab>
 ```
 
@@ -499,8 +502,9 @@ $ ls Mov10_oe_1<tab>
 > **NOTE:** Tab completion can also fill in the names of commands. For example, enter `e<tab><tab>`. You will see the name of every command that starts with an `e`. One of those is `echo`. If you enter `ech<tab>`, you will see that tab completion works.
 
 **Tab completion is your friend!** It helps prevent spelling mistakes, and speeds up the process of typing in the full command. We encourage you to use this when working on the command line.
+<hr> 
 
-## Relative paths
+## **Relative paths**
 
 We have talked about **full** paths so far, but there is a way to specify paths to folders and files without having to worry about the root directory. And you have used this before when we were learning about the `cd` command.
 
@@ -575,8 +579,9 @@ A relative path is like getting directions from someone on the street. They tell
 You can usually use either a full path or a relative path depending on what is most convenient. If we are in the home directory, it is more convenient to just enter the relative path since it involves less typing.
 
 Over time, it will become easier for you to keep a mental note of the structure of the directories that you are using and how to quickly navigate among them.
+<hr> 
 
-## Copying, creating, moving and removing data
+## **Copying, creating, moving and removing data**
 
 Now we can move around within the directory structure using the command line. But what if we want to do things like copy files or move them from one directory to another, rename them?
 
@@ -709,7 +714,7 @@ $ rm -ri fastq_backup
 
 ------------------------------------------------------------------------
 
-## Exiting from the cluster
+## **Exiting from the cluster**
 
 To close the interactive session on the cluser as well as to disconnect from the cluster, the command is `exit`. So, you are going to have to run the exit command twice.
 

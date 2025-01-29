@@ -112,39 +112,25 @@ $ squeue -u $USER
 
 ### Requesting resources from Slurm
 
-Below is table with some of the arguments you can specify when requesting resources from Slurm for both `srun` and `sbatch`:
+Below are some of the arguments you can specify when requesting resources from Slurm for both `srun` and `sbatch`:
 
-+------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
-| Argument         | Description / Input                               | Examples                                               | Links                                                                                                               |
-+:================:+:=================================================:+:======================================================:+:===================================================================================================================:+
-| `--partion`      | name of compute partition                         | norm (default) largemem, quick                         | [Biowulf partitions](https://hpc.nih.gov/docs/userguide.html#partitions)                                            |
-+------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
-| `--time`         | how much time to allocate to job                  | 08:00:00 (for 8 hours)                                 | [Walltime limits for partitions](https://hpc.nih.gov/docs/userguide.html#wall)                                      |
-+------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
-| --cpus-per-task  | Number of CPUs required                           | '8' for an 8-way multithreaded job                     |                                                                                                                     |
-+------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
-| `--mem`          | max memory                                        | 8G (8 gigabytes)                                       |                                                                                                                     |
-+------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
-| `-J`             | name of the job                                   | Fastqc_run, rnaseq_workflow_mov10                      | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference) |
-+------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
-| `--mail-type`    | send an email when job starts, ends or errors out | END, ALL                                               | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference) |
-+------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
-| `--mail-user`    | send email to this address                        | [xyz10\@harvard.edu](mailto:xyz10@harvard.edu){.email} | [O2 Wiki](https://wiki.rc.hms.harvard.edu/display/O2/Using+Slurm+Basic#UsingSlurmBasic-sbatchoptionsquickreference) |
-+------------------+---------------------------------------------------+--------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------+
+* `--partition=` : name of compute partition (ex. norm (default) largemem, quick) [Biowulf partitions](https://hpc.nih.gov/docs/userguide.html#partitions)        
+* `--time=` : how much time to allocate to job (ex. 08:00:00 for 8 hours) [Walltime limits for partitions](https://hpc.nih.gov/docs/userguide.html#wall) 
+* `--cpus-per-task=`: Number of CPUs required (ex. '8' for 8 CPUS)
+*  `--mem=`: maximum memory, i.e. 8G (8 gigabytes)
+* `--job-name=` name of the job (ex. Fastqc_run, rnaseq_workflow_mov10) 
+* `--mail-type=`: send an email to your NIH account when job starts, ends or quits with an error (ex. END, ALL)
+* `--output=`: The name of a log file to send any output that would normally be printed to screen (ex. mov10_fastqc.log)
+
+More about these options and many others can found in the [Biowulf User Guide](https://hpc.nih.gov/docs/userguide.html).                                           
 
 ### `sbatch` job submission script: Example
 
 An `sbatch` job submission script is essentially a normal shell script with the Slurm resource request specified at the top (Slurm directives) preceded by `#SBATCH`. Below is an example of an sbatch shell script that is requesting the following:
 
 -   The "quick" partition: For jobs \<4 hours, which are scheduled at higher priority.
-
-```{=html}
-<!-- -->
-```
 -   2 hours
-
 -   4 CPUS
-
 -   Using 400 megabytes (100MiB for each core)
 
 ***DO NOT RUN - you'll practice writing one of these yourself soon.***
@@ -231,26 +217,16 @@ $ module load fastqc
 This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on Biowulf easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
 Some key LMOD commands are listed below:
-
-+------------------------------------+-----------------------------------------------------------------------------------+
-| LMOD command                       | description                                                                       |
-+:==================================:+:=================================================================================:+
-| `module spider`                    | List all possible modules on the cluster                                          |
-+------------------------------------+-----------------------------------------------------------------------------------+
-| `module spider modulename`         | List all possible versions of that module                                         |
-+------------------------------------+-----------------------------------------------------------------------------------+
-| `module avail`                     | List available modules available on the cluster                                   |
-+------------------------------------+-----------------------------------------------------------------------------------+
-| `module avail string`              | List available modules containing that string                                     |
-+------------------------------------+-----------------------------------------------------------------------------------+
-| `module load modulename/version`   | Add the full path to the tool to `$PATH` (and modify other environment variables) |
-+------------------------------------+-----------------------------------------------------------------------------------+
-| `module list`                      | List loaded modules                                                               |
-+------------------------------------+-----------------------------------------------------------------------------------+
-| `module unload modulename/version` | Unload a specific module                                                          |
-+------------------------------------+-----------------------------------------------------------------------------------+
-| `module purge`                     | Unload all loaded modules                                                         |
-+------------------------------------+-----------------------------------------------------------------------------------+
+|            LMOD command            |                                    description                                    |
+|:----------------------------------:|:----------------------------------:|
+|          `module spider`           |                     List all possible modules on the cluster                      |
+|     `module spider modulename`     |                     List all possible versions of that module                     |
+|           `module avail`           |                  List available modules available on the cluster                  |
+|       `module avail string`        |                   List available modules containing that string                   |
+|  `module load modulename/version`  | Add the full path to the tool to `$PATH` (and modify other environment variables) |
+|           `module list`            |                                List loaded modules                                |
+| `module unload modulename/version` |                             Unload a specific module                              |
+|           `module purge`           |                             Unload all loaded modules                             |
 
 ------------------------------------------------------------------------
 
@@ -276,25 +252,6 @@ Some key LMOD commands are listed below:
 -   It is often best practice to use temporary storage spaces (called "scratch" spaces, see below) while running analyses. We'll use scratch space in a few exercises during this course.
 -   **Most importantly: Disk space on the NIH HPC should never be used as archival storage. *Before you even get your project data in the first place, think about where you'll store it after the project is done.***
 -   So much more information about storage best practices can be found on the [Biowulf Storage page](https://hpc.nih.gov/storage/index.html).
-
-**Summary of file storage options on Biowulf:**
-
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
-|                                                                      | **Location**       | **Creation**               | **Backups** | **Space**                                             | **Available from**         |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
-| [/home](https://hpc.nih.gov/storage/index.html#home)                 | network (NFS)      | with Biowulf/Helix account | yes         | 16 GB quota (don't use this as a place to do work!)   | Biowulf login node\        |
-|                                                                      |                    |                            |             |                                                       | Biowulf compute nodes\     |
-|                                                                      |                    |                            |             |                                                       | Helix                      |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
-| [/lscratch (nodes)](https://hpc.nih.gov/storage/index.html#lscratch) | local              | created by user job        | no          | up to \~3,200 GB\                                     | Biowulf compute nodes only |
-|                                                                      |                    |                            |             | as requested by job                                   |                            |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
-| [/scratch](https://hpc.nih.gov/storage/index.html#scratch)           | network (NFS)      | created by user            | no          | 100 TB shared                                         | Biowulf login node\        |
-|                                                                      |                    |                            |             |                                                       | Helix                      |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
-| [/data](https://hpc.nih.gov/storage/index.html#data)                 | network (GPFS/NFS) | with Biowulf/Helix account | no          | 100 GB default quota (this is what you started with)  | Biowulf login node\        |
-|                                                                      |                    |                            |             |                                                       | Biowulf compute no         |
-+----------------------------------------------------------------------+--------------------+----------------------------+-------------+-------------------------------------------------------+----------------------------+
 
 ### Data Management and Checking your Quota
 
