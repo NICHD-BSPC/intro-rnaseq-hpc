@@ -87,13 +87,27 @@ In the above command the parameters we are using are requesting specific resourc
 
 `--mem=1G` - memory needed - 1 gigibyte (GiB)
 
-> These parameters are used for `sbatch` as well, but they are listed differently within the script used to submit a batch job. We will be reviewing this later in this lesson.
+> These parameters are used for `sbatch` as well, but they are listed differently within the script used to submit a batch job. We will be reviewing this later in this lesson. The defaults for `sinteractive` are: 8 hrs, 1 CPU, and 768 MB of RAM. See more in [this section of the Biowulf docs](https://hpc.nih.gov/docs/userguide.html#int).
 
 Let's check how many jobs we have running currently, and what resources they are using.
 
 ``` bash
 $ squeue -u $USER
 ```
+
+How much *could* we have asked for? This will show the limits per user:
+
+```bash
+batchlim
+```
+
+How busy is Biowulf?
+
+```bash
+freen
+```
+
+This will show all of the resources on the cluster. See [freen docs](https://hpc.nih.gov/docs/biowulf_tools.html#freen) for an example, and an explantation of the output. This helps you figure out what's available and what's being used.
 
 ## More about Slurm
 
