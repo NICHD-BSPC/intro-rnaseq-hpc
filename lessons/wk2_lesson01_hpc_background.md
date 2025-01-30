@@ -223,17 +223,16 @@ $ module load fastqc
 This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on Biowulf easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
 Some key LMOD commands are listed below:
-|            LMOD command            |                                    description                                    |
-|:----------------------------------:|:----------------------------------:|
-|          `module spider`           |                     List all possible modules on the cluster                      |
-|     `module spider modulename`     |                     List all possible versions of that module                     |
-|           `module avail`           |                  List available modules available on the cluster                  |
-|       `module avail string`        |                   List available modules containing that string                   |
-|  `module load modulename/version`  | Add the full path to the tool to `$PATH` (and modify other environment variables) |
-|           `module list`            |                                List loaded modules                                |
-| `module unload modulename/version` |                             Unload a specific module                              |
-|           `module purge`           |                             Unload all loaded modules                             |
-
+| LMOD command                       | description                                                                       |
+|------------------------------------|-----------------------------------------------------------------------------------|
+| `module spider`                    | List all possible modules on the cluster                                          |
+| `module spider modulename`         | List all possible versions of that module                                         |
+| `module avail`                     | List available modules available on the cluster                                   |
+| `module avail string`              | List available modules containing that string                                     |
+| `module load modulename/version`   | Add the full path to the tool to `$PATH` (and modify other environment variables) |
+| `module list`                      | List loaded modules                                                               |
+| `module unload modulename/version` | Unload a specific module                                                          |
+| `module purge`                     | Unload all loaded modules                                                         |
 ------------------------------------------------------------------------
 
 #### Exercises
