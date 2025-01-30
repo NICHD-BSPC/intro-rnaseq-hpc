@@ -1,7 +1,7 @@
 ---
 title: "Quality control: Assessing FASTQC results"
-author: "Mary Piper, Radhika Khetani - Adapted by Sally Chang @ NICHD"
-date: Editing started October 04, 2024
+author: Harvard HPC staff, adapted by Sally Chang @ NICHD
+date: Last edited January 2025
 duration: 45 minutes
 ---
 
@@ -14,7 +14,8 @@ duration: 45 minutes
 For each individual FASTQ file that is input to FastQC, there are **two output files that are generated**.
 
 ``` bash
-$ ls -lh ~/rnaseq/results/fastqc/
+# assuming that you are in your /data/Bspc-training/$USER directory
+$ ls -lh /rnaseq/results/fastqc/
 ```
 
 1.  The first is **an HTML file** which is a self-contained document with various graphs embedded into it. Each of the graphs evaluate different quality aspects of our data, we will discuss in more detail in this lesson.
@@ -22,7 +23,7 @@ $ ls -lh ~/rnaseq/results/fastqc/
 
 ## Viewing the HTML report
 
-We will only need to look at the HTML report for a given input file. It is not possible to view HTML files directly on the cluster from the command line. We will view the HTML result for `Mov10_oe_1.subset.fq` by [locally mounting an HPC System Directory](https://hpc.nih.gov/docs/hpcdrive.html) so you can access the HTMLs locally.
+We will only need to look at the HTML report for a given input file. It is not possible to view HTML files directly on the cluster from the command line. We will view the HTML result for `Mov10_oe_1.subset.fq` by [locally mounting an HPC System Directory](https://hpc.nih.gov/docs/hpcdrive.html) so you can access the HTMLs locally. You should have copied your files over to your `/data/$USER` directory during previous lesson.
 
 > ### What does this do?
 >
@@ -32,11 +33,9 @@ We will only need to look at the HTML report for a given input file. It is not p
 
 Follow the instructions on this Biowulf page for your operating system, and navigate to the `results/fastqc` directory.
 
+Ultimately, navigate to the [`smb://hpcdrive.nih.gov/data/username`](smb://hpcdrive.nih.gov/data/username) directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`.
+
 ## Interpreting the HTML report
-
-Once you have found the html output for `Mov10_oe1` **copy it over** by double clicking it or drag it over to right hand side panel. Once you have the HTML file copied over to your laptop, you can leave the Filezilla interface. You can then locate the HTML file on your computer and open it up in a browser.
-
-Now we can take a look at the metrics and assess the quality of our sequencing data!
 
 FastQC has a really well documented [manual page](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) with [detailed explanations](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/) about every plot in the report.
 
