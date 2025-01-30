@@ -46,21 +46,13 @@ You can kick off very computationally expensive jobs that might run for many hou
 
 Point 2 in the last section brings us to the idea of **parallelization** or parallel computing that enables us to efficiently use the resources available on the cluster.
 
-What if we had 3 input files that we wanted to analyze? Well, we could process these files **in serial**, i.e. use the same core(s) over and over again, with or without multithreading, as shown in the image below.
+What if we had input files for 3 samples that we wanted to process? Well, we could process these files **in serial**, i.e. use the same CPU over and over again. If we imagine it takes 300 seconds (5 mins) per sample, we would get results in 15 mins.
 
-<p align="center">
+If the tool we were using supported multiple threads, and our node had multiple CPUs available, we could have the program run in multiple threads (the program's documentation would tell us how to do this). Say, with 10 CPUs we could tell the program to use all 10 of them. In this scenario, the first sample would run on 10 CPUs (taking something like 10x faster, but that's not always the case). 10x faster means 30 seconds. Then sample 2 would run with 10 CPUs, then sample 3, for a total of 30  + 30 + 30 seconds = 1.5 mins.
 
-<img src="../img/serial_hpc_3samples.png" width="450"/>
+This would be as far as we could go with a laptop. But on a cluster, we have *many* computers at our disposal!
 
-</p>
-
-This is great, but it is not as efficient as multithreading each analysis, and using a set of 8 cores for each of the three input samples. With this type of parallelization, several samples can be analysed at the same time!
-
-<p align="center">
-
-<img src="../img/multithreaded_hpc_3samples.png" width="650"/>
-
-</p>
+So we could run sample 1 with 10 CPUs on one node, sample 2 on a *different* node with 10 CPUs, and sample 3 on yet another node wth 10 CPUs. This way, we would get results in *a total 30 seconds* because each 30-second job runs at the same time instead of one after the other. We get this speedup by running in parallel CPUs on each node (if the program supports it), as well as running in parallel across multiple nodes (which we can do even for single-threaded programs).
 
 ## Refresher: Connect to the *login* node on Biouwulf
 
