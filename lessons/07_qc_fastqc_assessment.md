@@ -107,7 +107,7 @@ As sequencing progresses from the first cycle to the last cycle we often anticip
 
 #### Worrisome Error Profiles
 
--   **Overclustering:** Sequencing facilities can overcluster the flow cells, which results in small distances between clusters and an overlap in the signals. The two clusters can be interpreted as a single cluster with mixed fluorescent signals being detected, decreasing signal purity, generating lower quality scores across the **entire read**.
+**Overclustering:** Sequencing facilities can overcluster the flow cells, which results in small distances between clusters and an overlap in the signals. The two clusters can be interpreted as a single cluster with mixed fluorescent signals being detected, decreasing signal purity, generating lower quality scores across the **entire read**.
 
 <p align="center">
 
@@ -115,13 +115,15 @@ As sequencing progresses from the first cycle to the last cycle we often anticip
 
 </p>
 
--   **Instrumentation breakdown:** Sequencing facilities can occasionally have issues with the sequencing instruments during a run. **Any sudden drop in quality or a large percentage of low quality reads across the read could indicate a problem at the facility.** Examples of such issues are shown below, including a manifold burst, cycles lost, and read 2 failure. For such data, the sequencing facility should be contacted for resolution, if possible.
+**Instrumentation breakdown:** Sequencing facilities can occasionally have issues with the sequencing instruments during a run. **Any sudden drop in quality or a large percentage of low quality reads across the read could indicate a problem at the facility.** Examples of such issues are shown below, including a manifold burst, cycles lost, and read 2 failure. For such data, the sequencing facility should be contacted for resolution, if possible.
 
-    <img src="../img/qc_manifold_burst.png" width="300"/>
+**Some examples of the problematic error profiles - you would want to reach out to the sequencing center staff:**
 
-    <img src="../img/qc_cycles_lost.png" width="300"/>
+<img src="../img/qc_manifold_burst.png" width="300"/>
 
-    <img src="../img/qc_read2_failed.png" width="350"/>
+<img src="../img/qc_cycles_lost.png" width="300"/>
+
+<img src="../img/qc_read2_failed.png" width="350"/>
 
 ### Per sequence quality scores
 
@@ -138,8 +140,6 @@ This data has a small bump at a mean quality of 12. Since it doesn't represent a
 ### Per base sequence content
 
 The next plot gives the **"Per base sequence content"**, which always gives a FAIL for RNA-seq data. This is because the first 10-12 bases result from the 'random' hexamer priming that occurs during RNA-seq library preparation. This priming is not as random as we might hope giving an enrichment in particular bases for these intial nucleotides.
-
-<p align="center">
 
 <img src="../img/fastqc_per_base_sequence_content.png" width="400"/>
 
@@ -183,9 +183,9 @@ Since our data is just a subset of the original data and it contains the over-ex
 
 ## Summary
 
-As our report only represents a subset of reads (chromosome 1) for `Mov10_oe_1.subset.fq`, which can skew the QC results. We encourage you to look at the [report for the full set of reads](../fastqc/Mov10oe_1-fastqc_report.html), and note how the QC results differ when using the entire dataset.
+As our report only represents a subset of reads for `Mov10_oe_1.subset.fq`, which can skew the QC results. We encourage you to look at the [report for the full set of reads](../fastqc/Mov10oe_1-fastqc_report.html), and note how the QC results differ when using the entire dataset.
 
-If the quality of the raw data is acceptable, we can move on to the next step and quantify gene expression. Note that the quantification tools we use (salmon and STAR) are able to account for some of the quality issues that you may encounter like adapter contamination, vector contamination and low-quality bases at the ends of reads. It is not necessary (any more) to perform a trimming step prior to quantification.
+If the quality of the raw data is acceptable, we can move on to the next step and quantify gene expression. Note that the quantification tools we use are able to account for some of the quality issues that you may encounter like adapter contamination, vector contamination and low-quality bases at the ends of reads. It is not necessary (any more) to perform a trimming step prior to quantification.
 
 ------------------------------------------------------------------------
 
