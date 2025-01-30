@@ -149,7 +149,7 @@ The next plot gives the **"Per base sequence content"**, which always gives a FA
 
 The **"Per sequence GC content"** plot gives the GC distribution over all sequences. Generally is a good idea to note whether the GC content of the central peak corresponds to the [expected % GC for the organism](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2909565/). Also, the distribution should be normal unless over-represented sequences (sharp peaks on a normal distribution) or contamination with another organism (broad peak).
 
-This plot would indicate some type of over-represented sequence with the sharp peaks, indicating either contamination or a highly over-expressed gene.
+This plot would indicate some type of over-represented sequence with the sharp peaks, indicating either contamination or a highly over-expressed gene. **This might be something to keep in mind as we move forward with our analyses!** Luckily, we are only looking at a subset of our data so far, so we can compare it with the full data set (see assignment below).
 
 <p align="center">
 
@@ -171,7 +171,7 @@ The next module explores numbers of duplicated sequences in the library. This pl
 
 The **"Overrepresented sequences"** table is another important module as it displays the sequences (at least 20 bp) that occur in more than 0.1% of the total number of sequences. This table aids in identifying contamination, such as vector or adapter sequences. If the %GC content was off in the above module, this table can help identify the source. If not listed as a known adapter or vector, it can help to BLAST the sequence to determine the identity.
 
-Since our data is just a subset of the original data and it contains the over-expressed MOV10 gene, if we BLAST the sequences we will find they belong to MOV10. For this experiment, these over-represented sequences are not concerning.
+Since our data is just a subset of the original data and it contains the over-expressed MOV10 gene, if we [BLAST the sequences](https://blast.ncbi.nlm.nih.gov/Blast.cgi) we will find they belong to MOV10. For this experiment, these over-represented sequences are not concerning.
 
 <p align="center">
 
@@ -183,9 +183,14 @@ Since our data is just a subset of the original data and it contains the over-ex
 
 ## Summary
 
-As our report only represents a subset of reads for `Mov10_oe_1.subset.fq`, which can skew the QC results. We encourage you to look at the [report for the full set of reads](../fastqc/Mov10oe_1-fastqc_report.html), and note how the QC results differ when using the entire dataset.
-
 If the quality of the raw data is acceptable, we can move on to the next step and quantify gene expression. Note that the quantification tools we use are able to account for some of the quality issues that you may encounter like adapter contamination, vector contamination and low-quality bases at the ends of reads. It is not necessary (any more) to perform a trimming step prior to quantification.
+
+## Assignment
+
+1.  As our report only represents a subset of reads for the `Mov10_oe_1` sample, it may be skewed. To figure this out, pull up both the Mov10_oe_1.fq and Mov10_oe_1.subset.fq FASTQC reports and compare: In a file called `fastqc_interpretation.txt` in your `/results/fastqc` briefly describe three differences (bullet points are fine) between the two reports.
+2.  Similarly, open the report you generated for the `Mov10_oe_2` sample, and write a sentence or two about any differences you observe between this sample and `Mov10_oe_1`. Do you see any differences despite these being from the same treatment group?
+
+**Please message your instructor when you are ready for me to check this file out!**
 
 ------------------------------------------------------------------------
 
