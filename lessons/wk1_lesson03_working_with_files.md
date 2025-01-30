@@ -213,7 +213,7 @@ After you have saved the file, the total number of lines and characters in the f
 
 <p align="center">
 
-<img src="../img/vim_postsave.png" width="600", alt="terminal with vim open after saving a file reporting total number of lines and characters"/>
+<img src="../img/vim_postsave.png" width="600" alt="terminal with vim open after saving a file reporting total number of lines and characters"/>
 
 </p>
 
