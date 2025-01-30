@@ -287,6 +287,7 @@ Practice some of the editing shortcuts, then **quit the document without saving 
 | <button>:%s/*search*/*replace*/g</button> | to search for a pattern and replace for all occurrences        |
 
 ------------------------------------------------------------------------
+**More VIM resources**: The BSPC training page has a number of resources and cheatsheets for solidifying these Vim skills and 
 
 ### **Assignment**
 
