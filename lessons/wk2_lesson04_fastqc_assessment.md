@@ -1,7 +1,7 @@
 ---
 title: "Quality control: Assessing FASTQC results"
-author: "Mary Piper, Radhika Khetani - Adapted by Sally Chang @ NICHD"
-date: Editing started October 04, 2024
+author: Harvard HPC staff, adapted by Sally Chang @ NICHD
+date: Last edited January 2025
 duration: 45 minutes
 ---
 
@@ -14,7 +14,8 @@ duration: 45 minutes
 For each individual FASTQ file that is input to FastQC, there are **two output files that are generated**.
 
 ``` bash
-$ ls -lh ~/rnaseq/results/fastqc/
+# assuming that you are in your /data/Bspc-training/$USER directory
+$ ls -lh /rnaseq/results/fastqc/
 ```
 
 1.  The first is **an HTML file** which is a self-contained document with various graphs embedded into it. Each of the graphs evaluate different quality aspects of our data, we will discuss in more detail in this lesson.
@@ -22,7 +23,7 @@ $ ls -lh ~/rnaseq/results/fastqc/
 
 ## Viewing the HTML report
 
-We will only need to look at the HTML report for a given input file. It is not possible to view HTML files directly on the cluster from the command line. We will view the HTML result for `Mov10_oe_1.subset.fq` by [locally mounting an HPC System Directory](https://hpc.nih.gov/docs/hpcdrive.html) so you can access the HTMLs locally.
+We will only need to look at the HTML report for a given input file. It is not possible to view HTML files directly on the cluster from the command line. We will view the HTML result for `Mov10_oe_1.subset.fq` by [locally mounting an HPC System Directory](https://hpc.nih.gov/docs/hpcdrive.html) so you can access the HTMLs locally. You should have copied your files over to your `/data/$USER` directory during previous lesson.
 
 > ### What does this do?
 >
@@ -32,11 +33,9 @@ We will only need to look at the HTML report for a given input file. It is not p
 
 Follow the instructions on this Biowulf page for your operating system, and navigate to the `results/fastqc` directory.
 
+Ultimately, navigate to the [`smb://hpcdrive.nih.gov/data/username`](smb://hpcdrive.nih.gov/data/username) directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`.
+
 ## Interpreting the HTML report
-
-Once you have found the html output for `Mov10_oe1` **copy it over** by double clicking it or drag it over to right hand side panel. Once you have the HTML file copied over to your laptop, you can leave the Filezilla interface. You can then locate the HTML file on your computer and open it up in a browser.
-
-Now we can take a look at the metrics and assess the quality of our sequencing data!
 
 FastQC has a really well documented [manual page](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) with [detailed explanations](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/Help/) about every plot in the report.
 
@@ -108,7 +107,7 @@ As sequencing progresses from the first cycle to the last cycle we often anticip
 
 #### Worrisome Error Profiles
 
--   **Overclustering:** Sequencing facilities can overcluster the flow cells, which results in small distances between clusters and an overlap in the signals. The two clusters can be interpreted as a single cluster with mixed fluorescent signals being detected, decreasing signal purity, generating lower quality scores across the **entire read**.
+**Overclustering:** Sequencing facilities can overcluster the flow cells, which results in small distances between clusters and an overlap in the signals. The two clusters can be interpreted as a single cluster with mixed fluorescent signals being detected, decreasing signal purity, generating lower quality scores across the **entire read**.
 
 <p align="center">
 
@@ -116,13 +115,15 @@ As sequencing progresses from the first cycle to the last cycle we often anticip
 
 </p>
 
--   **Instrumentation breakdown:** Sequencing facilities can occasionally have issues with the sequencing instruments during a run. **Any sudden drop in quality or a large percentage of low quality reads across the read could indicate a problem at the facility.** Examples of such issues are shown below, including a manifold burst, cycles lost, and read 2 failure. For such data, the sequencing facility should be contacted for resolution, if possible.
+**Instrumentation breakdown:** Sequencing facilities can occasionally have issues with the sequencing instruments during a run. **Any sudden drop in quality or a large percentage of low quality reads across the read could indicate a problem at the facility.** Examples of such issues are shown below, including a manifold burst, cycles lost, and read 2 failure. For such data, the sequencing facility should be contacted for resolution, if possible.
 
-    <img src="../img/qc_manifold_burst.png" width="300"/>
+**Some examples of the problematic error profiles - you would want to reach out to the sequencing center staff:**
 
-    <img src="../img/qc_cycles_lost.png" width="300"/>
+<img src="../img/qc_manifold_burst.png" width="300"/>
 
-    <img src="../img/qc_read2_failed.png" width="350"/>
+<img src="../img/qc_cycles_lost.png" width="300"/>
+
+<img src="../img/qc_read2_failed.png" width="350"/>
 
 ### Per sequence quality scores
 
@@ -140,8 +141,6 @@ This data has a small bump at a mean quality of 12. Since it doesn't represent a
 
 The next plot gives the **"Per base sequence content"**, which always gives a FAIL for RNA-seq data. This is because the first 10-12 bases result from the 'random' hexamer priming that occurs during RNA-seq library preparation. This priming is not as random as we might hope giving an enrichment in particular bases for these intial nucleotides.
 
-<p align="center">
-
 <img src="../img/fastqc_per_base_sequence_content.png" width="400"/>
 
 </p>
@@ -150,7 +149,7 @@ The next plot gives the **"Per base sequence content"**, which always gives a FA
 
 The **"Per sequence GC content"** plot gives the GC distribution over all sequences. Generally is a good idea to note whether the GC content of the central peak corresponds to the [expected % GC for the organism](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2909565/). Also, the distribution should be normal unless over-represented sequences (sharp peaks on a normal distribution) or contamination with another organism (broad peak).
 
-This plot would indicate some type of over-represented sequence with the sharp peaks, indicating either contamination or a highly over-expressed gene.
+This plot would indicate some type of over-represented sequence with the sharp peaks, indicating either contamination or a highly over-expressed gene. **This might be something to keep in mind as we move forward with our analyses!** Luckily, we are only looking at a subset of our data so far, so we can compare it with the full data set (see assignment below).
 
 <p align="center">
 
@@ -172,7 +171,7 @@ The next module explores numbers of duplicated sequences in the library. This pl
 
 The **"Overrepresented sequences"** table is another important module as it displays the sequences (at least 20 bp) that occur in more than 0.1% of the total number of sequences. This table aids in identifying contamination, such as vector or adapter sequences. If the %GC content was off in the above module, this table can help identify the source. If not listed as a known adapter or vector, it can help to BLAST the sequence to determine the identity.
 
-Since our data is just a subset of the original data and it contains the over-expressed MOV10 gene, if we BLAST the sequences we will find they belong to MOV10. For this experiment, these over-represented sequences are not concerning.
+Since our data is just a subset of the original data and it contains the over-expressed MOV10 gene, if we [BLAST the sequences](https://blast.ncbi.nlm.nih.gov/Blast.cgi) we will find they belong to MOV10. For this experiment, these over-represented sequences are not concerning.
 
 <p align="center">
 
@@ -184,9 +183,14 @@ Since our data is just a subset of the original data and it contains the over-ex
 
 ## Summary
 
-As our report only represents a subset of reads (chromosome 1) for `Mov10_oe_1.subset.fq`, which can skew the QC results. We encourage you to look at the [report for the full set of reads](../fastqc/Mov10oe_1-fastqc_report.html), and note how the QC results differ when using the entire dataset.
+If the quality of the raw data is acceptable, we can move on to the next step and quantify gene expression. Note that the quantification tools we use are able to account for some of the quality issues that you may encounter like adapter contamination, vector contamination and low-quality bases at the ends of reads. It is not necessary (any more) to perform a trimming step prior to quantification.
 
-If the quality of the raw data is acceptable, we can move on to the next step and quantify gene expression. Note that the quantification tools we use (salmon and STAR) are able to account for some of the quality issues that you may encounter like adapter contamination, vector contamination and low-quality bases at the ends of reads. It is not necessary (any more) to perform a trimming step prior to quantification.
+## Assignment
+
+1.  As our report only represents a subset of reads for the `Mov10_oe_1` sample, it may be skewed. To figure this out, pull up both the Mov10_oe_1.fq and Mov10_oe_1.subset.fq FASTQC reports and compare: In a file called `fastqc_interpretation.txt` in your `/results/fastqc` briefly describe three differences (bullet points are fine) between the two reports.
+2.  Similarly, open the report you generated for the `Mov10_oe_2` sample, and write a sentence or two about any differences you observe between this sample and `Mov10_oe_1`. Do you see any differences despite these being from the same treatment group?
+
+**Please message your instructor when you are ready for me to check this file out!**
 
 ------------------------------------------------------------------------
 

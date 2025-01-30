@@ -101,7 +101,7 @@ Once done with your script, click `esc` to exit the INSERT mode. Then save and q
 Now, if everything looks good submit the job!
 
 ``` bash
-$ mov10_fastqc_full.sh
+$ sbatch mov10_fastqc_full.sh
 ```
 
 You should immediately see a number pop up. Your job is assigned with that unique identifier `JobID`. You can check on the status of your job with:
@@ -148,6 +148,20 @@ cp Mov10_oe_1_fastqc.html /data/$USER/
 1\. Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session?
 
 2\. How would you change your script to analyze the 6 files we used in the last episode?
+
+## Assignment
+
+Write a SLURM job script in your `/script` directory called `mov10_oe_2_fastqc_full.sh` (you can start by copying the template or the script we just ran) that does the following:
+
+-   Uses `/data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_2.fq` as input
+
+-   Puts the output file in the same `/results/fastq` we've been using
+
+-   Only requests 30 minutes of walltime - recall how our job only ended up taking a few minutes to run
+
+-   Comes up with more informative names for the output and error files instead of the Job ID variable (use part of the input filename, perhaps?). Likewise, make any other changes to this script that reference the old file
+
+-   Ask your instructor to look at the script before submitting (I can look into your `/script` directory). Then, go ahead and submit the script using `sbatch`!
 
 ------------------------------------------------------------------------
 
