@@ -185,6 +185,9 @@ $ # Type some random words into the command prompt, then hit "Ctrl + C". Observe
 
 -   <button>Ctrl</button><button>E</button> will bring you to the end of the command.
 
+#### Using the up-arrow button 
+One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands. 
+
 ------------------------------------------------------------------------
 
 **Exercise**
