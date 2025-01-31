@@ -93,7 +93,7 @@ Do each of the following using a single `ls` command without navigating to a dif
 
     <summary><i>Question 1</i></summary>
 
-    <code>ls /bin/c\*</code>
+    <code>ls /bin/c*</code>
 
     </details>
 
@@ -109,7 +109,7 @@ Do each of the following using a single `ls` command without navigating to a dif
 
     <summary><i>Question 3</i></summary>
 
-    <code>ls /bin/\*o</code>
+    <code>ls /bin/*o</code>
 
     </details>
 
