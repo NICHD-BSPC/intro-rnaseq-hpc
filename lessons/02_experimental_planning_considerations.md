@@ -184,11 +184,12 @@ If *any* of the answers is **‘No’**, then you have batches.
 
 **Exercise**
 
-Your experiment has three different treatment groups, A, B, and C. Due to the lengthy process of tissue extraction, you can only isolate the RNA from two samples at the same time. You plan to have 4 replicates per group.
+Your experiment has three different treatment groups, A, B, and C. Due to the lengthy process of tissue extraction, you can only isolate the RNA from two samples at the same time. You plan to have 4 replicates per group. To avoid any confounding, you fill out a sample table ahead of time to help you plan for things like extraction group and which researcher is working with which samples.
 
-1.  Fill in the `RNA isolation` column of the metadata table. Since we can only prepare 2 samples at a time and we have 12 samples total, you will need to isolate RNA in 6 batches. In the `RNA isolation` column, enter one of the following values for each sample: `group1`, `group2`, `group3`, `group4`, `group5`, `group6`. **Make sure to fill in the table so as to avoid confounding by batch of `RNA isolation`.**
+1.  Download this Excel version of the table below. Fill in the `RNA isolation` column of the metadata table. Since we can only prepare 2 samples at a time and we have 12 samples total, you will need to isolate RNA in 6 batches. In the `RNA isolation` column, enter one of the following values for each sample: `group1`, `group2`, `group3`, `group4`, `group5`, `group6`. **Make sure to fill in the table so as to avoid confounding by batch of `RNA isolation`.**
+2.  To perform the RNA isolations more quickly, you devote two researchers to perform the RNA isolations. Create a `researcher` column and fill in the researchers' initials for the samples they will prepare: use initials `AB` or `CD`. Like before, make sure to avoid confounding by batch (i.e researcher) if at all possible!
 
-2.  **BONUS:** To perform the RNA isolations more quickly, you devote two researchers to perform the RNA isolations. Create a `researcher` column and fill in the researchers' initials for the samples they will prepare: use initials `AB` or `CD`.
+Feel free to compare notes with other classmates or ask your instructors for help. We can go over this during a future practice session.
 
 | sample   | treatment | sex | replicate | RNA isolation |
 |----------|-----------|-----|-----------|---------------|
