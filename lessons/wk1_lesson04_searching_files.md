@@ -302,8 +302,8 @@ $ mv bad_reads.txt ../other/
 **The redirection command for using the output of a command as input for
 a different command is `|`.**
 
-**The pipe key** (<kbd>\|</kbd>) is very likely not something you use
-very often (it is on the same key as the back slash (<kbd>\\</kbd>),
+**The pipe key** (<kbd>|</kbd>) is very likely not something you use
+very often (it is on the same key as the back slash (<kbd>\</kbd>),
 right above the <button>Enter/Return</button> key).
 
 What `|` does is take the output from one command, e.g. the output from

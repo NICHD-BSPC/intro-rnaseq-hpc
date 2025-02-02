@@ -93,7 +93,7 @@ Do each of the following using a single `ls` command without navigating to a dif
 
     <summary><i>Question 1</i></summary>
 
-    <code>ls /bin/c\*</code>
+    <code>ls /bin/c*</code>
 
     </details>
 
@@ -109,7 +109,7 @@ Do each of the following using a single `ls` command without navigating to a dif
 
     <summary><i>Question 3</i></summary>
 
-    <code>ls /bin/\*o</code>
+    <code>ls /bin/*o</code>
 
     </details>
 
@@ -184,6 +184,9 @@ $ # Type some random words into the command prompt, then hit "Ctrl + C". Observe
 -   <button>Ctrl</button><button>A</button> will bring you to the start of the command you are writing.
 
 -   <button>Ctrl</button><button>E</button> will bring you to the end of the command.
+
+#### Using the up-arrow button 
+One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands. 
 
 ------------------------------------------------------------------------
 
