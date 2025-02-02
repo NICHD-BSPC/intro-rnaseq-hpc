@@ -190,7 +190,7 @@ If the quality of the raw data is acceptable, we can move on to the next step an
 1.  As our report only represents a subset of reads for the `Mov10_oe_1` sample, it may be skewed. To figure this out, pull up both the Mov10_oe_1.fq and Mov10_oe_1.subset.fq FASTQC reports and compare: In a file called `fastqc_interpretation.txt` in your `/results/fastqc` briefly describe three differences (bullet points are fine) between the two reports.
 2.  Similarly, open the report you generated for the `Mov10_oe_2` sample, and write a sentence or two about any differences you observe between this sample and `Mov10_oe_1`. Do you see any differences despite these being from the same treatment group?
 
-**Please message your instructor when you are ready for me to check this file out!**
+**Please message your instructor when you are ready for them to check this file out!**
 
 ------------------------------------------------------------------------
 
