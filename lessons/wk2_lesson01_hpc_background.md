@@ -48,7 +48,7 @@ Point 2 in the last section brings us to the idea of **parallelization** or para
 
 What if we had input files for 3 samples that we wanted to process? Well, we could process these files **in serial**, i.e. use the same CPU over and over again. If we imagine it takes 300 seconds (5 mins) per sample, we would get results in 15 mins.
 
-If the tool we were using supported multiple threads, and our node had multiple CPUs available, we could have the program run in multiple threads (the program's documentation would tell us how to do this). Say, with 10 CPUs we could tell the program to use all 10 of them. In this scenario, the first sample would run on 10 CPUs (taking something like 10x faster, but that's not always the case). 10x faster means 30 seconds. Then sample 2 would run with 10 CPUs, then sample 3, for a total of 30  + 30 + 30 seconds = 1.5 mins.
+If the tool we were using supported multiple threads, and our node had multiple CPUs available, we could have the program run in multiple threads (the program's documentation would tell us how to do this). Say, with 10 CPUs we could tell the program to use all 10 of them. In this scenario, the first sample would run on 10 CPUs (taking something like 10x faster, but that's not always the case). 10x faster means 30 seconds. Then sample 2 would run with 10 CPUs, then sample 3, for a total of 30 + 30 + 30 seconds = 1.5 mins.
 
 This would be as far as we could go with a laptop. But on a cluster, we have *many* computers at our disposal!
 
@@ -97,13 +97,13 @@ $ squeue -u $USER
 
 How much *could* we have asked for? This will show the limits per user:
 
-```bash
+``` bash
 batchlim
 ```
 
 How busy is Biowulf?
 
-```bash
+``` bash
 freen
 ```
 
@@ -222,24 +222,8 @@ $ module load fastqc
 
 This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on Biowulf easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
-<<<<<<< HEAD
-Some key LMOD commands are listed below: \| LMOD command \| description \| \|:----------------------------------:\|:----------------------------------:\| \| `module spider` \| List all possible modules on the cluster \| \| `module spider modulename` \| List all possible versions of that module \| \| `module avail` \| List available modules available on the cluster \| \| `module avail string` \| List available modules containing that string \| \| `module load modulename/version` \| Add the full path to the tool to `$PATH` (and modify other environment variables) \| \| `module list` \| List loaded modules \| \| `module unload modulename/version` \| Unload a specific module \| \| `module purge` \| Unload all loaded modules \|
-
-||||||| ffe10f6
 Some key LMOD commands are listed below:
-|            LMOD command            |                                    description                                    |
-|:----------------------------------:|:----------------------------------:|
-|          `module spider`           |                     List all possible modules on the cluster                      |
-|     `module spider modulename`     |                     List all possible versions of that module                     |
-|           `module avail`           |                  List available modules available on the cluster                  |
-|       `module avail string`        |                   List available modules containing that string                   |
-|  `module load modulename/version`  | Add the full path to the tool to `$PATH` (and modify other environment variables) |
-|           `module list`            |                                List loaded modules                                |
-| `module unload modulename/version` |                             Unload a specific module                              |
-|           `module purge`           |                             Unload all loaded modules                             |
 
-=======
-Some key LMOD commands are listed below:
 | LMOD command                       | description                                                                       |
 |------------------------------------|-----------------------------------------------------------------------------------|
 | `module spider`                    | List all possible modules on the cluster                                          |
@@ -250,7 +234,7 @@ Some key LMOD commands are listed below:
 | `module list`                      | List loaded modules                                                               |
 | `module unload modulename/version` | Unload a specific module                                                          |
 | `module purge`                     | Unload all loaded modules                                                         |
->>>>>>> efb3c9fe94074155a14969e03b1f33661add1adf
+
 ------------------------------------------------------------------------
 
 #### Exercises
