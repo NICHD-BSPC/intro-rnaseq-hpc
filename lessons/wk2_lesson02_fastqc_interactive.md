@@ -278,7 +278,7 @@ $ fastqc -o ../results/fastqc -t 6 *.fq
 
 **Discussion Points:**
 
-*Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?* *This overwrote our results. What is a way that we could prevent this from happening?*
+*Do you notice a difference? Is there anything in the output that suggests this is no longer running serially?* *This overwrote our results. What is a way that we could prevent this from happening?*
 
 ## **Viewing results from FastQC**
 
