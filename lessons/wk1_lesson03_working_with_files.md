@@ -73,7 +73,7 @@ $ less Mov10_oe_1.subset.fq
 
 Rather than printing to screen, the `less` command opens the file in a new buffer allowing you to navigate through it. Does this look familiar? You might remember encountering a similar interface when you used the `man` command. This is because `man` is using the `less` command to open up the documentation files! The keys used to move around the file are identical to the `man` command. Below we have listed some additional shortcut keys for navigating through your file when using `less`.
 
-[Shortcuts for `less`]{.caption}
+**Shortcuts for `less`**
 
 | key              | action                 |
 |------------------|------------------------|
@@ -213,7 +213,7 @@ After you have saved the file, the total number of lines and characters in the f
 
 <p align="center">
 
-<img src="../img/vim_postsave.png" width="600", alt="terminal with vim open after saving a file reporting total number of lines and characters"/>
+<img src="../img/vim_postsave.png" width="600" alt="terminal with vim open after saving a file reporting total number of lines and characters"/>
 
 </p>
 
@@ -287,8 +287,9 @@ Practice some of the editing shortcuts, then **quit the document without saving 
 | <button>:%s/*search*/*replace*/g</button> | to search for a pattern and replace for all occurrences        |
 
 ------------------------------------------------------------------------
+**More VIM resources**: The [BSPC training page](https://nichd-bspc.github.io/training/vim.html) has a number of resources and cheatsheets for solidifying these Vim skills!
 
-###**Assignment**
+### **Assignment**
 
 We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let's practice what we just learned in a brief challenge.
 

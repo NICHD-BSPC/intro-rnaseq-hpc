@@ -465,7 +465,7 @@ $ cd /data/Bspc-training/$USER/unix_lesson/
 
 ------------------------------------------------------------------------
 
-## **Tab completion**
+## **Tab completion and Up-Arrow**
 
 Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use **tab completion**. The `tab` key is located on the left side of your keyboard, right above the `caps lock` key. When you start typing out the first few characters of a directory name, then hit the `tab` key, bash will try to fill in the rest of the directory name.
 
@@ -503,6 +503,9 @@ $ ls Mov10_oe_1<tab>
 
 **Tab completion is your friend!** It helps prevent spelling mistakes, and speeds up the process of typing in the full command. We encourage you to use this when working on the command line.
 <hr> 
+
+### Using the up-arrow button 
+One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands. 
 
 ## **Relative paths**
 

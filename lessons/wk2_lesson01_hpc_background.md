@@ -16,7 +16,7 @@ date: Last Edited January 2025
 
 ### Cores
 
-CPUs (Central Processing Units) are composed of a single or multiple cores. If I have a processor with 4 "cores", i.e. a "quad-core" processor. This means that my processor can do 4 distinct computations at the same time.
+CPUs (Central Processing Units) are composed of a single or multiple cores. If I have a processor with 4 "cores", i.e. a "quad-core" processor, this means that my processor can do 4 distinct computations at the same time.
 
 ### Data Storage
 
@@ -24,7 +24,7 @@ Data storage is measured in bytes, usually Gigabytes (GB), Terabytes (TB), Petab
 
 ### Memory
 
-Memory, in an HPC setting, refers to volatile or temporary information used by running processes - typically this refers to RAM (random access memory). This is distinct from data storage we discussed in the previous point. It is an essential component of any computer, as this is where data is stored *when some computation is being performed* on it. If you have ever used R, all the objects in your environment are usually stored in memory until you save your environment. My laptop has 16 GB of memory available to it, for example.
+Memory, in an HPC setting, refers to volatile or temporary information used by running processes - typically this refers to RAM (random access memory). This is distinct from data storage we discussed in the previous point. It is an essential component of any computer, as this is where data is stored *when some computation is being performed* on it. If you have ever used R, all the objects in your environment are usually stored in memory while you are working on them. My laptop has 16 GB of memory available to it, for example.
 
 ## Why use the cluster or an HPC environment?
 
@@ -34,37 +34,29 @@ Memory, in an HPC setting, refers to volatile or temporary information used by r
 
 </p>
 
-1.  A lot of software is designed to work with the resources on an HPC environment and is either unavailable for, or unusable on, a personal computer.
+1.  A lot of software is designed to work with the resources on an HPC environment and is either unavailable for, or unusable on, a personal computer. For example, most bioinformatics tools run on the command line will only run on Linux (which is what Biowulf uses).
 2.  If you are performing analysis on large data files (e.g. high-throughput sequencing data), you should work on the cluster to avoid issues with memory and to get the analysis done a lot faster with the superior processing capacity. Essentially, Biowulf has:
     -   96,000 processor cores
     -   40+ Petabytes of storage!
     -   Anywhere from 128 GB - 3TB of memory depending on the node!
 
-Check out
+You can kick off very computationally expensive jobs that might run for many hours on the cluster, freeing up your laptop for other, less computationally expensive work.
 
 ### Parallelization
 
 Point 2 in the last section brings us to the idea of **parallelization** or parallel computing that enables us to efficiently use the resources available on the cluster.
 
-What if we had 3 input files that we wanted to analyze? Well, we could process these files **in serial**, i.e. use the same core(s) over and over again, with or without multithreading, as shown in the image below.
+What if we had input files for 3 samples that we wanted to process? Well, we could process these files **in serial**, i.e. use the same CPU over and over again. If we imagine it takes 300 seconds (5 mins) per sample, we would get results in 15 mins.
 
-<p align="center">
+If the tool we were using supported multiple threads, and our node had multiple CPUs available, we could have the program run in multiple threads (the program's documentation would tell us how to do this). Say, with 10 CPUs we could tell the program to use all 10 of them. In this scenario, the first sample would run on 10 CPUs (taking something like 10x faster, but that's not always the case). 10x faster means 30 seconds. Then sample 2 would run with 10 CPUs, then sample 3, for a total of 30  + 30 + 30 seconds = 1.5 mins.
 
-<img src="../img/serial_hpc_3samples.png" width="450"/>
+This would be as far as we could go with a laptop. But on a cluster, we have *many* computers at our disposal!
 
-</p>
+So we could run sample 1 with 10 CPUs on one node, sample 2 on a *different* node with 10 CPUs, and sample 3 on yet another node wth 10 CPUs. This way, we would get results in *a total 30 seconds* because each 30-second job runs at the same time instead of one after the other. We get this speedup by running in parallel CPUs on each node (if the program supports it), as well as running in parallel across multiple nodes (which we can do even for single-threaded programs).
 
-This is great, but it is not as efficient as multithreading each analysis, and using a set of 8 cores for each of the three input samples. With this type of parallelization, several samples can be analysed at the same time!
+## Refresher: Connect to the *login* node on Biouwulf
 
-<p align="center">
-
-<img src="../img/multithreaded_hpc_3samples.png" width="650"/>
-
-</p>
-
-## Refresher: Connect to a *login* node on Biouwulf
-
-Let's get started with the hands-on component by typing in the following command to log in to O2:
+Let's get started with the hands-on component by typing in the following command to log in to Biowulf:
 
 ``` bash
 ssh username@biowulf.nih.gov
@@ -86,7 +78,7 @@ For now let's start an interactive session, but specify more more particulars:
 
 ``` bash
 # This is an example, you don't need to run this
-$ sinteractive --time=02:00:00 --mem==1g 
+$ sinteractive --time=02:00:00 --mem=1g
 ```
 
 In the above command the parameters we are using are requesting specific resources:
@@ -95,13 +87,27 @@ In the above command the parameters we are using are requesting specific resourc
 
 `--mem=1G` - memory needed - 1 gigibyte (GiB)
 
-> These parameters are used for `sbatch` as well, but they are listed differently within the script used to submit a batch job. We will be reviewing this later in this lesson.
+> These parameters are used for `sbatch` as well, but they are listed differently within the script used to submit a batch job. We will be reviewing this later in this lesson. The defaults for `sinteractive` are: 8 hrs, 1 CPU, and 768 MB of RAM. See more in [this section of the Biowulf docs](https://hpc.nih.gov/docs/userguide.html#int).
 
 Let's check how many jobs we have running currently, and what resources they are using.
 
 ``` bash
 $ squeue -u $USER
 ```
+
+How much *could* we have asked for? This will show the limits per user:
+
+```bash
+batchlim
+```
+
+How busy is Biowulf?
+
+```bash
+freen
+```
+
+This will show all of the resources on the cluster. See [freen docs](https://hpc.nih.gov/docs/biowulf_tools.html#freen) for an example, and an explantation of the output. This helps you figure out what's available and what's being used.
 
 ## More about Slurm
 
@@ -161,15 +167,15 @@ fastqc -t 4 file1_1.fq file1_2.fq file2_1.fq file2_2.fq
 
 Environment variables are, in short, variables that describe the environment in which programs run, and they are predefined for a given computer or cluster that you are on.
 
-Here are some of the most
+Here are some of the most commonly-used:
 
--   `$USER` Recall how that we can use `$USER` as a variable instead of actually writing out our username every time? That's because this is a built-in environmental variable on
+-   `$USER` Recall how that we can use `$USER` as a variable instead of actually writing out our username every time? That's because this is a built-in environmental variable on Linux systems like Biowulf.
 
--   \$HOME defines the full path for the home directory of a given user. Try typing `echo $HOME` to confirm!
+-   `$HOME` defines the full path for the home directory of a given user. Try typing `echo $HOME` to confirm!
 
 -   `$PATH` defines a list of directories to search in when looking for a command/program to execute.
 
-In this lesson, we are going to focus on \$PATH. If you want to see what is on your \$PATH, you can use the echo command again. As a beginning Biowulf user, you probably don't have as many entries as I do!
+In this lesson, we are going to focus on `$PATH`. If you want to see what is on your `$PATH`, you can use the echo command again. As a beginning Biowulf user, you probably don't have as many entries as I do!
 
 ``` bash
 $ echo $PATH
@@ -177,7 +183,7 @@ $ echo $PATH
 /gpfs/gsfs11/users/changes/mambaforge/condabin:/usr/local/slurm/bin:/usr/local/bin:/usr/X11R6/bin:/usr/local/jdk/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/mysql/bin:/home/changes/opt/bin:/data/changes/mambaforge/condabin:/data/NICHD-core1/bin
 ```
 
-This output is a lot more complex than the output from \$HOME! When you look closely at the output of `echo $PATH`, you should a list of full paths separated from each other by a ":".
+This output is a lot more complex than the output from `$HOME`! When you look closely at the output of `echo $PATH`, you should a list of full paths separated from each other by a ":".
 
 ### What are all these paths? And what do they represent?
 
@@ -193,7 +199,7 @@ Try it on a few of the basic commands we have learned so far:
 
 ```         
 $ which <your favorite command>
-$ which <your favorite command>
+$ which <your second favorite command>
 ```
 
 Check the path `/usr/bin/` and see what other executable files you recognize. (Note that executable files will be listed as green text or have the `*` after their name).
@@ -216,8 +222,35 @@ $ module load fastqc
 
 This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on Biowulf easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
+<<<<<<< HEAD
 Some key LMOD commands are listed below: \| LMOD command \| description \| \|:----------------------------------:\|:----------------------------------:\| \| `module spider` \| List all possible modules on the cluster \| \| `module spider modulename` \| List all possible versions of that module \| \| `module avail` \| List available modules available on the cluster \| \| `module avail string` \| List available modules containing that string \| \| `module load modulename/version` \| Add the full path to the tool to `$PATH` (and modify other environment variables) \| \| `module list` \| List loaded modules \| \| `module unload modulename/version` \| Unload a specific module \| \| `module purge` \| Unload all loaded modules \|
 
+||||||| ffe10f6
+Some key LMOD commands are listed below:
+|            LMOD command            |                                    description                                    |
+|:----------------------------------:|:----------------------------------:|
+|          `module spider`           |                     List all possible modules on the cluster                      |
+|     `module spider modulename`     |                     List all possible versions of that module                     |
+|           `module avail`           |                  List available modules available on the cluster                  |
+|       `module avail string`        |                   List available modules containing that string                   |
+|  `module load modulename/version`  | Add the full path to the tool to `$PATH` (and modify other environment variables) |
+|           `module list`            |                                List loaded modules                                |
+| `module unload modulename/version` |                             Unload a specific module                              |
+|           `module purge`           |                             Unload all loaded modules                             |
+
+=======
+Some key LMOD commands are listed below:
+| LMOD command                       | description                                                                       |
+|------------------------------------|-----------------------------------------------------------------------------------|
+| `module spider`                    | List all possible modules on the cluster                                          |
+| `module spider modulename`         | List all possible versions of that module                                         |
+| `module avail`                     | List available modules available on the cluster                                   |
+| `module avail string`              | List available modules containing that string                                     |
+| `module load modulename/version`   | Add the full path to the tool to `$PATH` (and modify other environment variables) |
+| `module list`                      | List loaded modules                                                               |
+| `module unload modulename/version` | Unload a specific module                                                          |
+| `module purge`                     | Unload all loaded modules                                                         |
+>>>>>>> efb3c9fe94074155a14969e03b1f33661add1adf
 ------------------------------------------------------------------------
 
 #### Exercises
