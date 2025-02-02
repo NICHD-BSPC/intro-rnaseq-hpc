@@ -114,15 +114,15 @@ $ squeue -u $USER
 
 Below are some of the arguments you can specify when requesting resources from Slurm for both `srun` and `sbatch`:
 
-* `--partition=` : name of compute partition (ex. norm (default) largemem, quick) [Biowulf partitions](https://hpc.nih.gov/docs/userguide.html#partitions)        
-* `--time=` : how much time to allocate to job (ex. 08:00:00 for 8 hours) [Walltime limits for partitions](https://hpc.nih.gov/docs/userguide.html#wall) 
-* `--cpus-per-task=`: Number of CPUs required (ex. '8' for 8 CPUS)
-*  `--mem=`: maximum memory, i.e. 8G (8 gigabytes)
-* `--job-name=` name of the job (ex. Fastqc_run, rnaseq_workflow_mov10) 
-* `--mail-type=`: send an email to your NIH account when job starts, ends or quits with an error (ex. END, ALL)
-* `--output=`: The name of a log file to send any output that would normally be printed to screen (ex. mov10_fastqc.log)
+-   `--partition=` : name of compute partition (ex. norm (default) largemem, quick) [Biowulf partitions](https://hpc.nih.gov/docs/userguide.html#partitions)\
+-   `--time=` : how much time to allocate to job (ex. 08:00:00 for 8 hours) [Walltime limits for partitions](https://hpc.nih.gov/docs/userguide.html#wall)
+-   `--cpus-per-task=`: Number of CPUs required (ex. '8' for 8 CPUS)
+-   `--mem=`: maximum memory, i.e. 8G (8 gigabytes)
+-   `--job-name=` name of the job (ex. Fastqc_run, rnaseq_workflow_mov10)
+-   `--mail-type=`: send an email to your NIH account when job starts, ends or quits with an error (ex. END, ALL)
+-   `--output=`: The name of a log file to send any output that would normally be printed to screen (ex. mov10_fastqc.log)
 
-More about these options and many others can found in the [Biowulf User Guide](https://hpc.nih.gov/docs/userguide.html).                                           
+More about these options and many others can found in the [Biowulf User Guide](https://hpc.nih.gov/docs/userguide.html).
 
 ### `sbatch` job submission script: Example
 
@@ -216,17 +216,7 @@ $ module load fastqc
 
 This `module load` command is part of the LMOD system available on Biowulf. It enables users to access software installed on Biowulf easily, and manages every software's dependency. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
-Some key LMOD commands are listed below:
-|            LMOD command            |                                    description                                    |
-|:----------------------------------:|:----------------------------------:|
-|          `module spider`           |                     List all possible modules on the cluster                      |
-|     `module spider modulename`     |                     List all possible versions of that module                     |
-|           `module avail`           |                  List available modules available on the cluster                  |
-|       `module avail string`        |                   List available modules containing that string                   |
-|  `module load modulename/version`  | Add the full path to the tool to `$PATH` (and modify other environment variables) |
-|           `module list`            |                                List loaded modules                                |
-| `module unload modulename/version` |                             Unload a specific module                              |
-|           `module purge`           |                             Unload all loaded modules                             |
+Some key LMOD commands are listed below: \| LMOD command \| description \| \|:----------------------------------:\|:----------------------------------:\| \| `module spider` \| List all possible modules on the cluster \| \| `module spider modulename` \| List all possible versions of that module \| \| `module avail` \| List available modules available on the cluster \| \| `module avail string` \| List available modules containing that string \| \| `module load modulename/version` \| Add the full path to the tool to `$PATH` (and modify other environment variables) \| \| `module list` \| List loaded modules \| \| `module unload modulename/version` \| Unload a specific module \| \| `module purge` \| Unload all loaded modules \|
 
 ------------------------------------------------------------------------
 

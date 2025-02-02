@@ -1,7 +1,7 @@
 ---
 title: "Experimental design considerations"
-author: "Mary Piper, Meeta Mistry, Radhika Khetani - Edited by Sally Chang at NICHD"
-date: "Started edits Thursday, Sept. 26th 2024"
+author: "Harvard HPC Staff, Modified by Sally Chang at NICHD"
+date: "Last Modified February 2025"
 ---
 
 Approximate time: 50 minutes
