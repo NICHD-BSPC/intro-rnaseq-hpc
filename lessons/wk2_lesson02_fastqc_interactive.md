@@ -27,7 +27,7 @@ The first step in the RNA-Seq workflow is to take the FASTQ files received from 
 The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the defacto file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
 
 | Line | Description                                                                                               |
-|------------------|------------------------------------------------------|
+|------|-----------------------------------------------------------------------------------------------------------|
 | 1    | Always begins with '\@', followed by information about the read                                           |
 | 2    | The actual DNA sequence                                                                                   |
 | 3    | Always begins with a '+', and sometimes the same info as in line 1                                        |
@@ -59,7 +59,7 @@ Q = -10 x log10(P), where P is the probability that a base call is erroneous
 These probability values are the results from the base calling algorithm and dependent on how much signal was captured for the base incorporation. The score values can be interpreted as follows:
 
 | Phred Quality Score | Probability of incorrect base call | Base call accuracy |
-|:------------------:|:-------------------------------:|:-----------------:|
+|:-------------------:|:----------------------------------:|:------------------:|
 |         10          |              1 in 10               |        90%         |
 |         20          |              1 in 100              |        99%         |
 |         30          |             1 in 1000              |       99.9%        |
@@ -67,7 +67,7 @@ These probability values are the results from the base calling algorithm and dep
 
 Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.
 
-## Finding "bad reads" in a FASTQ using `grep` 
+## Finding "bad reads" in a FASTQ using `grep`
 
 Suppose we want to see how many reads in our file `Mov10_oe_1.subset.fq` contain "bad" data, i.e. reads with 10 consecutive Ns (`NNNNNNNNNN`), and capture these reads in a file for future analyses.
 
@@ -176,7 +176,7 @@ $ module list
 **As a reminder - some LMOD commands are listed below**
 
 |            LMOD command            |                                    description                                    |
-|:----------------------------------:|:----------------------------------:|
+|:----------------------------------:|:---------------------------------------------------------------------------------:|
 |          `module spider`           |                     List all possible modules on the cluster                      |
 |     `module spider modulename`     |                     List all possible versions of that module                     |
 |           `module avail`           |                  List available modules available on the cluster                  |
