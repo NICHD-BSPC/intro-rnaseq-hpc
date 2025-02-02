@@ -27,7 +27,7 @@ The first step in the RNA-Seq workflow is to take the FASTQ files received from 
 The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the defacto file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
 
 | Line | Description                                                                                               |
-|----------------|--------------------------------------------------------|
+|------------------|------------------------------------------------------|
 | 1    | Always begins with '\@', followed by information about the read                                           |
 | 2    | The actual DNA sequence                                                                                   |
 | 3    | Always begins with a '+', and sometimes the same info as in line 1                                        |
@@ -67,9 +67,55 @@ These probability values are the results from the base calling algorithm and dep
 
 Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.
 
+## Finding "bad reads" in a FASTQ using `grep` 
+
+Suppose we want to see how many reads in our file `Mov10_oe_1.subset.fq` contain "bad" data, i.e. reads with 10 consecutive Ns (`NNNNNNNNNN`), and capture these reads in a file for future analyses.
+
+``` bash
+$ cd /data/Bspc-training/$USER/rnaseq/raw_fastq
+
+$ grep NNNNNNNNNN Mov10_oe_1.subset.fq
+```
+
+We get back a lot of reads or lines of text! You can add the `-c` option to count the number.
+
+#### Extracting the full FASTQ Reads
+
+As we just learned, one read in a FASTQ file is actually represented by 4 lines. We would need to modify the default behavior of `grep` and specify some argument/options. To look for all available options for the `grep` command, we can type `grep --help` (or `man grep`).
+
+The `-B` and `-A` arguments for grep will be useful to return the matched line plus one before (`-B 1`) and two lines after (`-A 2`). Since each record is four lines, using these arguments will return the whole record.
+
+```         
+@HWI-ST330:304:H045HADXX:1:1101:1111:61397
+CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNNNNNNNNNNNNNNGATCTTGG
++
+@?@DDDDDDHHH?GH:?FCBGGB@C?DBEGIIIIAEF;FCGGI#########################################################
+--
+@HWI-ST330:304:H045HADXX:1:1101:1106:89824
+CACAAATCGGCTCAGGAGGCTTGTAGAAAAGCTCAGCTTGACANNNNNNNNNNNNNNNNNGNGNACGAAACNNNNGNNNNNNNNNNNNNNNNNNNGTTGG
++
+?@@DDDDDB1@?:E?;3A:1?9?E9?<?DGCDGBBDBF@;8DF#########################################################
+```
+
+#### Group separators (`--`), and how to remove them
+
+You will notice that when we use the `-B` and/or `-A` arguments with the `grep` command, the output has some additional lines with dashes (`--`), these dashes work to separate your returned "groups" of lines and are referred to as "group separators". This might be problematic if you are trying to maintain the FASTQ file structure or if you simply do not want them in your output. Using the argument `--no-group-separator` with `grep` will disable this behavior.
+
+``` bash
+$ grep -B 1 -A 2 --no-group-separator NNNNNNNNNN Mov10_oe_1.subset.fq
+```
+
+We can take this a step further and use `>` to direct our output to a file.
+
+```         
+$ grep -B 1 -A 2 --no-group-separator NNNNNNNNNN Mov10_oe_1.subset.fq > bad_reads.fq 
+```
+
+Looking at individual reads in a small FASTQ file is nice, but what about getting the whole picture for much bigger FASTQ files? *This is where a program like FASTQC will be useful!*
+
 ## **Loading the FASTQC module**
 
-Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data.
+Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data. Rather than
 
 [FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) provides a simple way to do some quality checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses, which you can use to obtain an impression of whether your data has any problems that you should be aware of before moving on to the next analysis.
 
@@ -232,7 +278,7 @@ $ fastqc -o ../results/fastqc -t 6 *.fq
 
 **Discussion Points:**
 
-*Do you notice a difference? Is there anything in the ouput that suggests this is no longer running serially?* *This overwrote our results. What is a way that we could prevent this from happening?*
+*Do you notice a difference? Is there anything in the output that suggests this is no longer running serially?* *This overwrote our results. What is a way that we could prevent this from happening?*
 
 ## **Viewing results from FastQC**
 
@@ -257,7 +303,7 @@ We will only need to look at the HTML report for a given input file. It is not p
 
 Right now, this capability only works from your `/data/$USER` directory:
 
-1.   Copy your `results/fastqc` directory to `/data/$USER` using `copy -r`
+1.  Copy your `results/fastqc` directory to `/data/$USER` using `copy -r`
 2.  Follow the instructions on the Biowulf page above for your operating system, and navigate to the `smb://hpcdrive.nih.gov/data/username` directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`. In another lesson this week you will learn more about interpreting this result!
 
 ------------------------------------------------------------------------
