@@ -16,7 +16,27 @@ duration: 45 minutes
 
 So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. `fastqc -o ../results/fastqc/ -t 6 *.fq`). However, we can submit a command or series of commands to these partitions using job submission scripts. This is extremely useful when we want to run a job that will take longer than we want to wait around for in an interactive job or will take more memory that we can use during an interactive job. *In this case, we will be running the analysis on the full-sized FASTQ file for one of our samples, which is 10x larger than the subset files we have thus far been working with.*
 
-**Job submission scripts** for Biowulf are regular shell (command line) scripts, but contain the Slurm **options/directives** for our job submission. These directives define the various resources we are requesting for our job (i.e *number of cores, name of partition, runtime limit* ).
+We didn't talk about it yet, but a shell script is simply a text file containing commands that are run consecutively.
+
+For example, the following 2-line script would change to your directory and print the `tree` output to a file in that directory:
+
+```bash
+cd /data/Bspc-training/$USER/
+tree > mytree.txt
+```
+
+If this script is called `myscript.bash` you could run it like this:
+
+```bash
+bash myscript.bash
+```
+
+and then you would get the `tree` output in `/data/Bspc-training/$USER`.
+
+> NOTE:
+> It doesn't matter where you save this example script, and it will still work correctly. Why?
+
+**Job submission scripts** for Biowulf are regular shell scripts, but contain the Slurm **options/directives** for our job submission. These directives define the various resources we are requesting for our job (i.e *number of cores, name of partition, runtime limit* ).
 
 Submission of the script using the `sbatch` command allows Slurm to run your job when its your turn. Let's create a job submission script to automate what we have done in the previous lesson.
 
