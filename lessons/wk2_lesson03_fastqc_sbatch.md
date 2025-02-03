@@ -138,7 +138,7 @@ Once your job is `RUNNING`, you should also get an e-mail with a subject line li
 
 Once the job is running, it will take just about 4 minutes to run. Hopefully, you will get another e-mail with a subject like `Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Ended, Run time 00:02:45, COMPLETED, ExitCode 0` . Generally speaking, ExitCode 0 is what we want!
 
-More info about SLURM exit codes can be found in the [SLURM manual](https://slurm.schedmd.com/job_exit_code.html), but it is also useful to search for codes on the Internet when they actually come up in your analysis.
+More info about SLURM exit codes can be found in the [SLURM manual](https://slurm.schedmd.com/job_exit_code.html), but it is also useful to search for codes on the Internet when they actually come up in your analysis. By convention, exit code 0 means "everything's OK". A non-zero exit code indicates a problem.
 
 Check out the output files in your directory:
 
