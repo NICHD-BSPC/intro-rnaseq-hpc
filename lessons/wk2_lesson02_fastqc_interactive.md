@@ -304,7 +304,7 @@ We will only need to look at the HTML report for a given input file. It is not p
 
 Right now, this capability only works from your `/data/$USER` directory:
 
-1.  Copy your `results/fastqc` directory to `/data/$USER` using `copy -r`
+1.  Copy your `/fastqc` directory to `/data/$USER` using `copy -r`
 2.  Follow the instructions on the Biowulf page above for your operating system, and navigate to the `smb://hpcdrive.nih.gov/data/username` directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`. In another lesson this week you will learn more about interpreting this result!
 
 ------------------------------------------------------------------------
@@ -315,21 +315,31 @@ Another useful way of viewing the HTML or other output from Biowulf is to actual
 
 We will be using the `scp` (secure copy) command to get the same HTML report from its location on Biowulf to your Desktop. This command should be available from both GitBash and Terminal.
 
-`scp` can be used from your local computer to both The general form of the `scp` command is as follows First, specific
+`scp` can be used from your local computer to both get a remote file, OR send a local file to a server like Biowulf. The general form of the `scp` command for *getting* a remote file is as follows.
+
+First, specify your login info and the location of the remote file you want to transfer. Then, specify the path where you want your file to end up once copied:
 
 ``` bash
 $ scp username@helix.nih.gov:/path/to/desired/dir/file   /path/to/local/dir
 ```
 
+Interactive Data Transfers should be performed on **helix.nih.gov**, the designated system for interactive data transfers and large-scale file manipulation. It has the same directory structure as Biowulf and access to all of the files.
+
 1.  Before you run `scp`, make sure to open another Terminal/GitBash window, so your first one can stay logged into Biowulf.
 
-2.  Then, for consistency, let's all navigate to our LOCAL computer's desktop folder. In the window you just opened, something like this command should work:
+2.  Then, for consistency, let's all navigate to our LOCAL computer's desktop folder. In the window you just opened, something like this command should work (but let us know if the Windows equivalent is different):
 
     ```         
     $ cd ~/Desktop
     ```
 
-3.  Type in the following command to grab an output HTML from Biowulf to xs
+3.  Type in the following command to grab an output HTML from Biowulf (let's use the copy you just placed in your `/data/$USER` directory) and put it in your current directory ( `.`).
+
+    ``` bash
+    scp username@helix:/data/$USER/fastqc/Mov10_oe_1.subset_fastqc.html .
+    ```
+
+4.  The file should appear on your Desktop. Click to open!
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
 
