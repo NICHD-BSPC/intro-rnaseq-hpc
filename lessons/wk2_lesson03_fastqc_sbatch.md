@@ -146,7 +146,7 @@ Check out the output files in your directory:
 $ ls -lh ../results/fastqc/
 ```
 
-There should also be one standard error (`.err`) and one standard out (`.out`) files from the job listed in `/rnaseq/scripts`. You can move these over to your `logs` directory and give them more intuitive names:
+There should also be one standard error (`.err`) and one standard out (`.out`) files from the job found in `/rnaseq/scripts`. They are named after the job ID. You can move these over to your `logs` directory and give them more intuitive names:
 
 ``` bash
 $ mv *.err ../logs/fastqc.err
