@@ -68,6 +68,9 @@ These probability values are the results from the base calling algorithm and dep
 
 Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.
 
+> NOTE:
+> What other ways can you think of for recording a quality score that corresponds to each base? What are the advantages/disadvantages?
+
 ## Finding "bad reads" in a FASTQ using `grep`
 
 Suppose we want to see how many reads in our file `Mov10_oe_1.subset.fq` contain "bad" data, i.e. reads with 10 consecutive Ns (`NNNNNNNNNN`), and capture these reads in a file for future analyses.
@@ -79,6 +82,9 @@ $ grep NNNNNNNNNN Mov10_oe_1.subset.fq
 ```
 
 We get back a lot of reads or lines of text! You can add the `-c` option to count the number.
+
+> NOTE:
+> What's another way of counting lines?
 
 #### Extracting the full FASTQ Reads
 
@@ -101,6 +107,9 @@ CACAAATCGGCTCAGGAGGCTTGTAGAAAAGCTCAGCTTGACANNNNNNNNNNNNNNNNNGNGNACGAAACNNNNGNNNN
 #### Group separators (`--`), and how to remove them
 
 You will notice that when we use the `-B` and/or `-A` arguments with the `grep` command, the output has some additional lines with dashes (`--`), these dashes work to separate your returned "groups" of lines and are referred to as "group separators". This might be problematic if you are trying to maintain the FASTQ file structure or if you simply do not want them in your output. Using the argument `--no-group-separator` with `grep` will disable this behavior.
+
+> NOTE:
+> What's another way of getting rid of those `---` lines?
 
 ``` bash
 $ grep -B 1 -A 2 --no-group-separator NNNNNNNNNN Mov10_oe_1.subset.fq
@@ -153,6 +162,8 @@ $ module list
 ```
 
 This is because the FastQC program is not in our \$PATH (i.e. it's not in a directory that shell will automatically check to run commands/programs).
+> NOTE: 
+> How to check your $PATH?
 
 To run the FastQC program, we first need to load the appropriate module, so it puts the program into our path. To find the FastQC module to load we need to search the versions available:
 
@@ -173,6 +184,9 @@ Once a module for a tool is loaded, you have essentially made it directly availa
 ``` bash
 $ module list
 ```
+
+> NOTE:
+> How do you expect your PATH to change? Check to see if you were right!
 
 **As a reminder - some LMOD commands are listed below**
 
@@ -200,6 +214,11 @@ We will need to specify this directory in the command to run FastQC. How do we k
 ``` bash
 $ fastqc --help
 ```
+
+> NOTE:
+> When to use `man`, when to use `--help` or `-h`? 
+>
+> Use `man` for built-in Bash commands. Use `--help` or `-h` for other tools. Sometimes you can run the tool with no arguments and it will print the help. Sometimes it might need another command. It depends, but `-h` seems to be fairly standard.
 
 From the help manual, we know that `-o` (or `--outdir`) will create all output files in the specified output directory.
 
@@ -251,6 +270,9 @@ Exit the interactive session and start a new one with 6 cores:
 $ exit  #exit the current interactive session (you will be back on a login node)
 $ sinteractive --cpus-per-task=6 --mem=2G
 ```
+
+> NOTE:
+> Why did we choose 6? Why 2G?
 
 Once you are on the compute node, check what job(s) you have running and what resources you are using.
 
