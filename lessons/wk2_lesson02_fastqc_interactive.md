@@ -25,13 +25,17 @@ The first step in the RNA-Seq workflow is to take the FASTQ files received from 
 
 ### Unmapped read data (FASTQ)
 
-The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the defacto file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
+The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the *de facto* file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. 
+
+The sequencer self-reports how good of a job it thinks it did calling each base correctly. If you need a refresher on how sequencing works, you can watch [this youtube video from Illumina](https://www.youtube.com/watch?v=fCd6B5HRaZ8). One way to think of the quality score is by how blurry the image is or how well it can be aligned to the previous image -- see [this timestamp within the video](https://youtu.be/fCd6B5HRaZ8?t=184).
+
+Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
 
 | Line | Description                                                                                               |
 |-------------------|-----------------------------------------------------|
-| 1    | Always begins with '\@', followed by information about the read                                           |
+| 1    | Always begins with `@`, followed by information about the read                                           |
 | 2    | The actual DNA sequence                                                                                   |
-| 3    | Always begins with a '+', and sometimes the same info as in line 1                                        |
+| 3    | Always begins with a `+`, and sometimes the same info as in line 1                                        |
 | 4    | Has a string of characters representing the quality scores; must have same number of characters as line 2 |
 
 Let's use the following read as an example:
@@ -68,6 +72,9 @@ These probability values are the results from the base calling algorithm and dep
 
 Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.
 
+> NOTE:
+> What other ways can you think of for recording a quality score that corresponds to each base? What are the advantages/disadvantages?
+
 ## Finding "bad reads" in a FASTQ using `grep`
 
 Suppose we want to see how many reads in our file `Mov10_oe_1.subset.fq` contain "bad" data, i.e. reads with 10 consecutive Ns (`NNNNNNNNNN`), and capture these reads in a file for future analyses.
@@ -79,6 +86,9 @@ $ grep NNNNNNNNNN Mov10_oe_1.subset.fq
 ```
 
 We get back a lot of reads or lines of text! You can add the `-c` option to count the number.
+
+> NOTE:
+> What's another way of counting lines?
 
 #### Extracting the full FASTQ Reads
 
@@ -102,6 +112,9 @@ CACAAATCGGCTCAGGAGGCTTGTAGAAAAGCTCAGCTTGACANNNNNNNNNNNNNNNNNGNGNACGAAACNNNNGNNNN
 
 You will notice that when we use the `-B` and/or `-A` arguments with the `grep` command, the output has some additional lines with dashes (`--`), these dashes work to separate your returned "groups" of lines and are referred to as "group separators". This might be problematic if you are trying to maintain the FASTQ file structure or if you simply do not want them in your output. Using the argument `--no-group-separator` with `grep` will disable this behavior.
 
+> NOTE:
+> What's another way of getting rid of those `---` lines?
+
 ``` bash
 $ grep -B 1 -A 2 --no-group-separator NNNNNNNNNN Mov10_oe_1.subset.fq
 ```
@@ -116,9 +129,9 @@ Looking at individual reads in a small FASTQ file is nice, but what about gettin
 
 ## **Loading the FASTQC module**
 
-Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data. Rather than
+Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data. Rather than use built-in Bash tools though, we'll use a specialized tool mde for this.
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) provides a simple way to do some quality checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses, which you can use to obtain an impression of whether your data has any problems that you should be aware of before moving on to the next analysis.
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) provides a simple way to do some quality checks on raw sequence data coming from high throughput sequencing. It provides a modular set of analyses, which you can use to obtain an impression of whether your data has any problems that you should be aware of before moving on to the next analysis.
 
 FastQC does the following:
 
@@ -130,10 +143,10 @@ FastQC does the following:
 
 ------------------------------------------------------------------------
 
-> NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (1.5 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
+> NOTE: > NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (0.75 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
 >
 > ``` bash
-> $ sinteractive 
+> $ sinteractive
 > ```
 >
 > ***And we should be in our rnaseq/ directory from within student directories:***
@@ -146,13 +159,24 @@ FastQC does the following:
 
 Before we start using software, we have to load the module for each tool. On Biowulf, this is done using an **LMOD** system. It enables users to access software installed on Biwoulf easily, and manages every software's dependencies. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
+Biowulf staff members have done the hard work of installing the software and all of its dependencies so that we don't need to worry about that.
+
 If we check which modules we currently have loaded, we should not see FastQC.
 
 ``` bash
 $ module list
 ```
 
-This is because the FastQC program is not in our \$PATH (i.e. it's not in a directory that shell will automatically check to run commands/programs).
+If we try to run FastQC:
+
+```bash
+fastqc
+```
+
+We'll get `fastqc: command not found`. This is because the FastQC program is not in our `$PATH` (i.e. it's not in a directory that shell will automatically check to run commands/programs).
+
+> NOTE: 
+> How to check your $PATH?
 
 To run the FastQC program, we first need to load the appropriate module, so it puts the program into our path. To find the FastQC module to load we need to search the versions available:
 
@@ -173,6 +197,9 @@ Once a module for a tool is loaded, you have essentially made it directly availa
 ``` bash
 $ module list
 ```
+
+> NOTE:
+> How do you expect your PATH to change? Check to see if you were right!
 
 **As a reminder - some LMOD commands are listed below**
 
@@ -201,6 +228,11 @@ We will need to specify this directory in the command to run FastQC. How do we k
 $ fastqc --help
 ```
 
+> NOTE:
+> When to use `man`, when to use `--help` or `-h`? 
+>
+> Use `man` for built-in Bash commands. Use `--help` or `-h` for other tools. Sometimes you can run the tool with no arguments and it will print the help. Sometimes it might need another command. It depends, but `-h` seems to be fairly standard.
+
 From the help manual, we know that `-o` (or `--outdir`) will create all output files in the specified output directory.
 
 > **You can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster! See the** [fastqc page](https://hpc.nih.gov/apps/fastqc.html) **as an example.**
@@ -221,7 +253,7 @@ fastqc -o ../results/fastqc
 fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc
 ```
 
-**Specifying input files**: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FASTQC you don't need to specify an argument before listing input files like we did before specifying the output location.
+**Specifying input files**: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FastQC you don't need to specify an argument before listing input files like we did before specifying the output location.
 
 ``` bash
 $ cd raw_data
@@ -241,7 +273,7 @@ $ fastqc -o ../results/fastqc *.fq
 
 FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to:
 
--   Exit the current interactive session and start another with more additional CPUs , since we started this interactive session with only the default 2 cores. We cannot have a tool to use more cores than requested on a compute node.
+-   Exit the current interactive session and start another with more additional CPUs , since we started this interactive session with only the default 2 cores. We cannot have a tool to use more cores than requested on a compute node, or the scheduler (Slurm) will kill our job.
 
 -   Specify an argument in FASTQC itself (-t) to process more than one input file at once
 
@@ -251,6 +283,9 @@ Exit the interactive session and start a new one with 6 cores:
 $ exit  #exit the current interactive session (you will be back on a login node)
 $ sinteractive --cpus-per-task=6 --mem=2G
 ```
+
+> NOTE:
+> Why did we choose 6? Why 2G?
 
 Once you are on the compute node, check what job(s) you have running and what resources you are using.
 
@@ -264,7 +299,7 @@ Now that we are in a new interactive session with the appropriate resources, we 
 $ module load fastqc/0.12.1  #reload the module for the new (6-core) interactive session
 ```
 
-Because we are on a new compute node, `raw_data` directory (remember we are on a new compute node now):
+Because we are on a new compute node, get to the `raw_data` directory (remember we are on a new compute node now):
 
 ``` bash
 $ cd /data/Bspc-training/rnaseq/changes/raw_data
@@ -298,7 +333,7 @@ We will only need to look at the HTML report for a given input file. It is not p
 
 > ### What does this do?
 >
-> The [HPC System Directories](https://hpc.nih.gov/storage), which include /home, /data, and /scratch, can be mounted to your local workstation if you are on the NIH network or VPN, allowing you to easily drag and drop files between the two places. Note that this is most suitable for transferring small file. Users transferring large amounts of data to and from the HPC systems should continue to use scp/sftp/globus.
+> The [HPC System Directories](https://hpc.nih.gov/storage), which include /home, /data, and /scratch, can be mounted to your local workstation if you are on the NIH network or VPN, allowing you to easily drag and drop files between the two places. Note that this is most suitable for transferring small file. Users transferring large amounts of data to and from the HPC systems should continue to use rsync or Globus.
 >
 > Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system's web browser.
 

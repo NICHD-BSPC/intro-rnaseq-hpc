@@ -16,7 +16,27 @@ duration: 45 minutes
 
 So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. `fastqc -o ../results/fastqc/ -t 6 *.fq`). However, we can submit a command or series of commands to these partitions using job submission scripts. This is extremely useful when we want to run a job that will take longer than we want to wait around for in an interactive job or will take more memory that we can use during an interactive job. *In this case, we will be running the analysis on the full-sized FASTQ file for one of our samples, which is 10x larger than the subset files we have thus far been working with.*
 
-**Job submission scripts** for Biowulf are regular shell (command line) scripts, but contain the Slurm **options/directives** for our job submission. These directives define the various resources we are requesting for our job (i.e *number of cores, name of partition, runtime limit* ).
+We didn't talk about it yet, but a shell script is simply a text file containing commands that are run consecutively.
+
+For example, the following 2-line script would change to your directory and print the `tree` output to a file in that directory:
+
+```bash
+cd /data/Bspc-training/$USER/
+tree > mytree.txt
+```
+
+If this script is called `myscript.bash` you could run it like this:
+
+```bash
+bash myscript.bash
+```
+
+and then you would get the `tree` output in `/data/Bspc-training/$USER`.
+
+> NOTE:
+> It doesn't matter where you save this example script, and it will still work correctly. Why?
+
+**Job submission scripts** for Biowulf are regular shell scripts, but contain the Slurm **options/directives** for our job submission. These directives define the various resources we are requesting for our job (i.e *number of cores, name of partition, runtime limit* ).
 
 Submission of the script using the `sbatch` command allows Slurm to run your job when its your turn. Let's create a job submission script to automate what we have done in the previous lesson.
 
@@ -45,10 +65,10 @@ Following the shebang line are the Slurm directives. These are directives that y
 ``` bash
 #SBATCH --job-name=
 #SBATCH --partition=
-#SBATCH --mail-type=                # Mail events 
-#SBATCH --ntasks=                  # Run a single task     
-#SBATCH --cpus-per-task=            # Number of CPU cores per task
-#SBATCH --mem=                    # Job memory request
+#SBATCH --mail-type=       # Mail events 
+#SBATCH --ntasks=          # Run a single task     
+#SBATCH --cpus-per-task=   # Number of CPU cores per task
+#SBATCH --mem=             # Job memory request
 #SBATCH --time=            # Time limit hrs:min:sec
 #SBATCH --output=          # Standard output log
 #SBATCH --error=           #error log
@@ -71,13 +91,13 @@ Use Vim in insert mode (`i`) to modify your copied file to use 1 task that makes
 #!/bin/bash
 #SBATCH --job-name=mov10_oe1_full_fastqc
 #SBATCH --partition=quick
-#SBATCH --mail-type=ALL                # Mail events 
-#SBATCH --ntasks=1                  # Run a single task     
-#SBATCH --cpus-per-task=6           # Number of CPU cores per task
-#SBATCH --mem=6g                    # Job memory request
-#SBATCH --time=01:00:00            # Time limit hrs:min:sec
-#SBATCH --output=%j.out          # Use job ID as a variable
-#SBATCH --error=%j.err           # Use job ID as a variable
+#SBATCH --mail-type=ALL     # Mail events 
+#SBATCH --ntasks=1          # Run a single task     
+#SBATCH --cpus-per-task=6   # Number of CPU cores per task
+#SBATCH --mem=6g            # Job memory request
+#SBATCH --time=01:00:00     # Time limit hrs:min:sec
+#SBATCH --output=%j.out     # Use job ID as a variable
+#SBATCH --error=%j.err      # Use job ID as a variable
 ```
 
 ## Modify the body of the script
@@ -94,7 +114,7 @@ fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc /data/Bspc-training/sh
 
 > **NOTE:** These are the same commands we used when running FASTQC in the interactive session. Since we are writing them in a script, the `tab` completion function will **not work**, so please make sure you don't have any typos when writing the script!
 
-Once done with your script, click `esc` to exit the INSERT mode. Then save and quit the script by typing `:wq`. You may double check your script by typing `less mov10_fastqc.run`.
+Once done with your script, click `esc` to exit INSERT mode. Then save and quit the script by typing `:wq`. You may double check your script by typing `less mov10_fastqc.run`.
 
 ## Submit the job script
 
@@ -118,7 +138,7 @@ Once your job is `RUNNING`, you should also get an e-mail with a subject line li
 
 Once the job is running, it will take just about 4 minutes to run. Hopefully, you will get another e-mail with a subject like `Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Ended, Run time 00:02:45, COMPLETED, ExitCode 0` . Generally speaking, ExitCode 0 is what we want!
 
-More info about SLURM exit codes can be found in the [SLURM manual](https://slurm.schedmd.com/job_exit_code.html), but it is also useful to search for codes on the Internet when they actually come up in your analysis.
+More info about SLURM exit codes can be found in the [SLURM manual](https://slurm.schedmd.com/job_exit_code.html), but it is also useful to search for codes on the Internet when they actually come up in your analysis. By convention, exit code 0 means "everything's OK". A non-zero exit code indicates a problem.
 
 Check out the output files in your directory:
 
@@ -126,7 +146,7 @@ Check out the output files in your directory:
 $ ls -lh ../results/fastqc/
 ```
 
-There should also be one standard error (`.err`) and one standard out (`.out`) files from the job listed in `/rnaseq/scripts`. You can move these over to your `logs` directory and give them more intuitive names:
+There should also be one standard error (`.err`) and one standard out (`.out`) files from the job found in `/rnaseq/scripts`. They are named after the job ID. You can move these over to your `logs` directory and give them more intuitive names:
 
 ``` bash
 $ mv *.err ../logs/fastqc.err
@@ -145,9 +165,9 @@ cp Mov10_oe_1_fastqc.html /data/$USER/
 
 **Exercise**
 
-1\. Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session?
+1. Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session?
 
-2\. How would you change your script to analyze the 6 files we used in the last episode?
+2. How would you change your script to analyze the 6 files we used in the last episode?
 
 ## Assignment
 
