@@ -65,10 +65,10 @@ Following the shebang line are the Slurm directives. These are directives that y
 ``` bash
 #SBATCH --job-name=
 #SBATCH --partition=
-#SBATCH --mail-type=                # Mail events 
-#SBATCH --ntasks=                  # Run a single task     
-#SBATCH --cpus-per-task=            # Number of CPU cores per task
-#SBATCH --mem=                    # Job memory request
+#SBATCH --mail-type=       # Mail events 
+#SBATCH --ntasks=          # Run a single task     
+#SBATCH --cpus-per-task=   # Number of CPU cores per task
+#SBATCH --mem=             # Job memory request
 #SBATCH --time=            # Time limit hrs:min:sec
 #SBATCH --output=          # Standard output log
 #SBATCH --error=           #error log
@@ -91,13 +91,13 @@ Use Vim in insert mode (`i`) to modify your copied file to use 1 task that makes
 #!/bin/bash
 #SBATCH --job-name=mov10_oe1_full_fastqc
 #SBATCH --partition=quick
-#SBATCH --mail-type=ALL                # Mail events 
-#SBATCH --ntasks=1                  # Run a single task     
-#SBATCH --cpus-per-task=6           # Number of CPU cores per task
-#SBATCH --mem=6g                    # Job memory request
-#SBATCH --time=01:00:00            # Time limit hrs:min:sec
-#SBATCH --output=%j.out          # Use job ID as a variable
-#SBATCH --error=%j.err           # Use job ID as a variable
+#SBATCH --mail-type=ALL     # Mail events 
+#SBATCH --ntasks=1          # Run a single task     
+#SBATCH --cpus-per-task=6   # Number of CPU cores per task
+#SBATCH --mem=6g            # Job memory request
+#SBATCH --time=01:00:00     # Time limit hrs:min:sec
+#SBATCH --output=%j.out     # Use job ID as a variable
+#SBATCH --error=%j.err      # Use job ID as a variable
 ```
 
 ## Modify the body of the script
@@ -114,7 +114,7 @@ fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc /data/Bspc-training/sh
 
 > **NOTE:** These are the same commands we used when running FASTQC in the interactive session. Since we are writing them in a script, the `tab` completion function will **not work**, so please make sure you don't have any typos when writing the script!
 
-Once done with your script, click `esc` to exit the INSERT mode. Then save and quit the script by typing `:wq`. You may double check your script by typing `less mov10_fastqc.run`.
+Once done with your script, click `esc` to exit INSERT mode. Then save and quit the script by typing `:wq`. You may double check your script by typing `less mov10_fastqc.run`.
 
 ## Submit the job script
 
@@ -165,9 +165,9 @@ cp Mov10_oe_1_fastqc.html /data/$USER/
 
 **Exercise**
 
-1\. Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session?
+1. Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session?
 
-2\. How would you change your script to analyze the 6 files we used in the last episode?
+2. How would you change your script to analyze the 6 files we used in the last episode?
 
 ## Assignment
 
