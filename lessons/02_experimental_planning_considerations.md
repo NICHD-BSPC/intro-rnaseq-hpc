@@ -208,6 +208,12 @@ Feel free to compare notes with other classmates or ask your instructors for hel
 
 ------------------------------------------------------------------------
 
-Assignment:
+## Assignment
+
+In this lesson, you learned a lot about how experimental design can mitigate downstream statistical issues. Even though you have already carried out your own RNAseq experiments, laying out your experimental data in this manner can help you
+
+1.  In a fresh Excel spreadsheet, create a table reflecting the RNAseq project you are working on.
+2.  Save it as
+3.  Practice using file transfer to put it in your
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
