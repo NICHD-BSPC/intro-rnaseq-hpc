@@ -27,7 +27,7 @@ Note: Links to weekly lessons will be provided several days in advance in the ta
 | Link to Materials                      | Topic                                                     |
 |-----------------|-------------------------------------------------------|
 | [Week 1](schedule/links-to-lessons.md#week-1) | Introduction to the command line and logging into Biowulf |
-| Week 2                                 | Biowulf best practices, experimental design, quality control of sequence data|
+| [Week 2](schedule/links-to-lessons.md#week-2) | Scientific software on Biowulf, quality control of sequence data, experimental design|
 | Week 3                                 | Reference genomes, theory and practice of mapping RNAseq reads to a reference|
 | Week 4                                 | QC of mapping, quantifying expression, automating workflows|
 
