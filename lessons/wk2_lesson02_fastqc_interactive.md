@@ -25,7 +25,11 @@ The first step in the RNA-Seq workflow is to take the FASTQ files received from 
 
 ### Unmapped read data (FASTQ)
 
-The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the defacto file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
+The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the *de facto* file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. 
+
+The sequencer self-reports how good of a job it thinks it did calling each base correctly. If you need a refresher on how sequencing works, you can watch [this youtube video from Illumina](https://www.youtube.com/watch?v=fCd6B5HRaZ8). One way to think of the quality score is by how blurry the image is or how well it can be aligned to the previous image -- see [this timestamp within the video](https://youtu.be/fCd6B5HRaZ8?t=184).
+
+Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
 
 | Line | Description                                                                                               |
 |-------------------|-----------------------------------------------------|
@@ -139,7 +143,7 @@ FastQC does the following:
 
 ------------------------------------------------------------------------
 
-> NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (1.5 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
+> NOTE: > NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (0.75 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
 >
 > ``` bash
 > $ sinteractive
@@ -155,13 +159,22 @@ FastQC does the following:
 
 Before we start using software, we have to load the module for each tool. On Biowulf, this is done using an **LMOD** system. It enables users to access software installed on Biwoulf easily, and manages every software's dependencies. The LMOD system adds directory paths of software executables and their dependencies (if any) into the `$PATH` variable.
 
+Biowulf staff members have done the hard work of installing the software and all of its dependencies so that we don't need to worry about that.
+
 If we check which modules we currently have loaded, we should not see FastQC.
 
 ``` bash
 $ module list
 ```
 
-This is because the FastQC program is not in our \$PATH (i.e. it's not in a directory that shell will automatically check to run commands/programs).
+If we try to run FastQC:
+
+```bash
+fastqc
+```
+
+We'll get `fastqc: command not found`. This is because the FastQC program is not in our `$PATH` (i.e. it's not in a directory that shell will automatically check to run commands/programs).
+
 > NOTE: 
 > How to check your $PATH?
 
@@ -260,7 +273,7 @@ $ fastqc -o ../results/fastqc *.fq
 
 FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to:
 
--   Exit the current interactive session and start another with more additional CPUs , since we started this interactive session with only the default 2 cores. We cannot have a tool to use more cores than requested on a compute node.
+-   Exit the current interactive session and start another with more additional CPUs , since we started this interactive session with only the default 2 cores. We cannot have a tool to use more cores than requested on a compute node, or the scheduler (Slurm) will kill our job.
 
 -   Specify an argument in FASTQC itself (-t) to process more than one input file at once
 
@@ -320,7 +333,7 @@ We will only need to look at the HTML report for a given input file. It is not p
 
 > ### What does this do?
 >
-> The [HPC System Directories](https://hpc.nih.gov/storage), which include /home, /data, and /scratch, can be mounted to your local workstation if you are on the NIH network or VPN, allowing you to easily drag and drop files between the two places. Note that this is most suitable for transferring small file. Users transferring large amounts of data to and from the HPC systems should continue to use scp/sftp/globus.
+> The [HPC System Directories](https://hpc.nih.gov/storage), which include /home, /data, and /scratch, can be mounted to your local workstation if you are on the NIH network or VPN, allowing you to easily drag and drop files between the two places. Note that this is most suitable for transferring small file. Users transferring large amounts of data to and from the HPC systems should continue to use rsync or Globus.
 >
 > Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system's web browser.
 
