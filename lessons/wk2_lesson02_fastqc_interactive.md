@@ -29,9 +29,9 @@ The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the defac
 
 | Line | Description                                                                                               |
 |-------------------|-----------------------------------------------------|
-| 1    | Always begins with '\@', followed by information about the read                                           |
+| 1    | Always begins with `@`, followed by information about the read                                           |
 | 2    | The actual DNA sequence                                                                                   |
-| 3    | Always begins with a '+', and sometimes the same info as in line 1                                        |
+| 3    | Always begins with a `+`, and sometimes the same info as in line 1                                        |
 | 4    | Has a string of characters representing the quality scores; must have same number of characters as line 2 |
 
 Let's use the following read as an example:
@@ -116,9 +116,9 @@ Looking at individual reads in a small FASTQ file is nice, but what about gettin
 
 ## **Loading the FASTQC module**
 
-Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data. Rather than
+Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data. Rather than use built-in Bash tools though, we'll use a specialized tool mde for this.
 
-[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) provides a simple way to do some quality checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses, which you can use to obtain an impression of whether your data has any problems that you should be aware of before moving on to the next analysis.
+[FastQC](http://www.bioinformatics.babraham.ac.uk/projects/fastqc/) provides a simple way to do some quality checks on raw sequence data coming from high throughput sequencing. It provides a modular set of analyses, which you can use to obtain an impression of whether your data has any problems that you should be aware of before moving on to the next analysis.
 
 FastQC does the following:
 
@@ -133,7 +133,7 @@ FastQC does the following:
 > NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (1.5 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
 >
 > ``` bash
-> $ sinteractive 
+> $ sinteractive
 > ```
 >
 > ***And we should be in our rnaseq/ directory from within student directories:***
@@ -221,7 +221,7 @@ fastqc -o ../results/fastqc
 fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc
 ```
 
-**Specifying input files**: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FASTQC you don't need to specify an argument before listing input files like we did before specifying the output location.
+**Specifying input files**: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FastQC you don't need to specify an argument before listing input files like we did before specifying the output location.
 
 ``` bash
 $ cd raw_data
@@ -264,7 +264,7 @@ Now that we are in a new interactive session with the appropriate resources, we 
 $ module load fastqc/0.12.1  #reload the module for the new (6-core) interactive session
 ```
 
-Because we are on a new compute node, `raw_data` directory (remember we are on a new compute node now):
+Because we are on a new compute node, get to the `raw_data` directory (remember we are on a new compute node now):
 
 ``` bash
 $ cd /data/Bspc-training/rnaseq/changes/raw_data
