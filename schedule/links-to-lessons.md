@@ -22,3 +22,13 @@
 ------------------------------------------------------------------------
 
 ## Week 2
+
+**In-Person**
+-   [HPC Background](../lessons/wk2_lesson01_hpc_background.md) This is background reference material for your use as you get used to Biowulf, but we will go over a lot of this in class. 
+-   [Running FASTQC Interactively](../lessons/wk2_lesson02_fastqc_interactive.md)
+-   [Running FASTQC Using Job Submission](../lessons/wk2_lesson03_fastqc_sbatch.md) We will go over this in class up to the assignment. 
+
+**Asynchronous** 
+-   [Running FASTQC Using Job Submission](../lessons/wk2_lesson03_fastqc_sbatch.md) (Assignment at the end of the page)
+-   [FASTQC Assessment](../lessons/wk2_lesson04_fastqc_assessment.md) 50 minutes (contains Assignment) 
+-   [Experimental Design](../lessons/wk2_lesson05_experimental_design.md) ~30 minutes of reading, ~30 minutes of assignment. **Note: This assignment can be done any time between now and the end of Week 4**
