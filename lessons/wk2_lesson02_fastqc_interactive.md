@@ -10,7 +10,8 @@ duration: 45 minutes
 -   Practice using more features of Biowulf (loading modules, running software, parallelization)
 -   Describe the contents and format of a FASTQ file
 -   Create a quality report using FASTQC
--   Open and look at the report(s) you generated
+-   Open and look at the report(s) you generated using
+-   Optionally, transfer one of the HTML files to your local computer using `scp`
 
 ## Quality Control of FASTQ files
 
@@ -27,7 +28,7 @@ The first step in the RNA-Seq workflow is to take the FASTQ files received from 
 The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the defacto file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
 
 | Line | Description                                                                                               |
-|------|-----------------------------------------------------------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | 1    | Always begins with '\@', followed by information about the read                                           |
 | 2    | The actual DNA sequence                                                                                   |
 | 3    | Always begins with a '+', and sometimes the same info as in line 1                                        |
@@ -59,7 +60,7 @@ Q = -10 x log10(P), where P is the probability that a base call is erroneous
 These probability values are the results from the base calling algorithm and dependent on how much signal was captured for the base incorporation. The score values can be interpreted as follows:
 
 | Phred Quality Score | Probability of incorrect base call | Base call accuracy |
-|:-------------------:|:----------------------------------:|:------------------:|
+|:------------------:|:-------------------------------:|:-----------------:|
 |         10          |              1 in 10               |        90%         |
 |         20          |              1 in 100              |        99%         |
 |         30          |             1 in 1000              |       99.9%        |
@@ -176,7 +177,7 @@ $ module list
 **As a reminder - some LMOD commands are listed below**
 
 |            LMOD command            |                                    description                                    |
-|:----------------------------------:|:---------------------------------------------------------------------------------:|
+|:----------------------------------:|:----------------------------------:|
 |          `module spider`           |                     List all possible modules on the cluster                      |
 |     `module spider modulename`     |                     List all possible versions of that module                     |
 |           `module avail`           |                  List available modules available on the cluster                  |
@@ -303,10 +304,42 @@ We will only need to look at the HTML report for a given input file. It is not p
 
 Right now, this capability only works from your `/data/$USER` directory:
 
-1.  Copy your `results/fastqc` directory to `/data/$USER` using `copy -r`
+1.  Copy your `/fastqc` directory to `/data/$USER` using `copy -r`
 2.  Follow the instructions on the Biowulf page above for your operating system, and navigate to the `smb://hpcdrive.nih.gov/data/username` directory. You will actually need to write out your username here - the `$USER` variable will not work in this context. From here, you can click through to navigate to open `Mov10_oe_1.subset_fastqc.html`. In another lesson this week you will learn more about interpreting this result!
 
 ------------------------------------------------------------------------
+
+## **BONUS**: Using secure copy
+
+Another useful way of viewing the HTML or other output from Biowulf is to actually copy the file from Biowulf to your local computer using the command line.
+
+We will be using the `scp` (secure copy) command to get the same HTML report from its location on Biowulf to your Desktop. This command should be available from both GitBash and Terminal.
+
+`scp` can be used from your local computer to both get a remote file, OR send a local file to a server like Biowulf. The general form of the `scp` command for *getting* a remote file is as follows.
+
+First, specify your login info and the location of the remote file you want to transfer. Then, specify the path where you want your file to end up once copied:
+
+``` bash
+$ scp username@helix.nih.gov:/path/to/desired/dir/file   /path/to/local/dir
+```
+
+Interactive Data Transfers should be performed on **helix.nih.gov**, the designated system for interactive data transfers and large-scale file manipulation. It has the same directory structure as Biowulf and access to all of the files.
+
+1.  Before you run `scp`, make sure to open another Terminal/GitBash window, so your first one can stay logged into Biowulf.
+
+2.  Then, for consistency, let's all navigate to our LOCAL computer's desktop folder. In the window you just opened, something like this command should work (but let us know if the Windows equivalent is different):
+
+    ```         
+    $ cd ~/Desktop
+    ```
+
+3.  Type in the following command to grab an output HTML from Biowulf (let's use the copy you just placed in your `/data/$USER` directory) and put it in your current directory ( `.`).
+
+    ``` bash
+    scp username@helix:/data/$USER/fastqc/Mov10_oe_1.subset_fastqc.html .
+    ```
+
+4.  The file should appear on your Desktop. Click to open!
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
 

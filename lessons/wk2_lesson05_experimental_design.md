@@ -4,7 +4,7 @@ author: "Harvard HPC Staff, Modified by Sally Chang at NICHD"
 date: "Last Modified February 2025"
 ---
 
-Approximate time: 50 minutes
+Approximate time: 40 minutes for reading, 40 for assignment
 
 ## Learning Objectives:
 
@@ -184,11 +184,12 @@ If *any* of the answers is **‘No’**, then you have batches.
 
 **Exercise**
 
-Your experiment has three different treatment groups, A, B, and C. Due to the lengthy process of tissue extraction, you can only isolate the RNA from two samples at the same time. You plan to have 4 replicates per group.
+Your experiment has three different treatment groups, A, B, and C. Due to the lengthy process of tissue extraction, you can only isolate the RNA from two samples at the same time. You plan to have 4 replicates per group. *To avoid any confounding or batch effects, you fill out a sample table ahead of time to help you plan your extraction approach:*
 
-1.  Fill in the `RNA isolation` column of the metadata table. Since we can only prepare 2 samples at a time and we have 12 samples total, you will need to isolate RNA in 6 batches. In the `RNA isolation` column, enter one of the following values for each sample: `group1`, `group2`, `group3`, `group4`, `group5`, `group6`. **Make sure to fill in the table so as to avoid confounding by batch of `RNA isolation`.**
+1.  Download this Excel version of the table found below. Fill in the `RNA isolation` column of the metadata table. Since we can only prepare 2 samples at a time and we have 12 samples total, you will need to isolate RNA in 6 batches. In the `RNA isolation` column, enter one of the following values for each sample: `group1`, `group2`, `group3`, `group4`, `group5`, `group6`. **Make sure to fill in the table so as to avoid confounding by batch of `RNA isolation`.**
+2.  To perform the RNA isolations more quickly, you devote two researchers to perform the RNA isolations. Create a `researcher` column and fill in the researchers' initials for the samples they will prepare: use initials `AB` or `CD`. *Like before, make sure to avoid confounding by batch (i.e researcher) if at all possible!*
 
-2.  **BONUS:** To perform the RNA isolations more quickly, you devote two researchers to perform the RNA isolations. Create a `researcher` column and fill in the researchers' initials for the samples they will prepare: use initials `AB` or `CD`.
+Feel free to compare notes with other classmates or ask your instructors for help. We can go over this during a future practice session.
 
 | sample   | treatment | sex | replicate | RNA isolation |
 |----------|-----------|-----|-----------|---------------|
@@ -207,6 +208,32 @@ Your experiment has three different treatment groups, A, B, and C. Due to the le
 
 ------------------------------------------------------------------------
 
-Assignment:
+## Assignment
+
+In this lesson, you learned a lot about how planning your experimental design can mitigate downstream statistical issues. Even though you have already carried out your RNAseq experiments at this point, filling out a sample table will help you communicate with other researchers (like the BSPC) and make decisions when we get to actual differential expressions step of our pipeline.
+
+This exercise will also give you another chance to practice using `scp` to copy files and get in the habit of saving tables in text format (.tsv) that is appropriate for downstream analyses.
+
+In a fresh Excel spreadsheet, create a spreadsheet reflecting the RNAseq project you are working on (or perhaps you and/or your PI have already created one with BSPC - find it and take a look and add to it if needed!).
+
+1.  Add all the columns (and their values) relevant to your experimental design. Minimally this would include `Sample ID` , `treatment`, `replicate` and other variables you would like to understand or account for (i.e. `sex`) .
+
+2.  Add columns (and their values) for any info you have that will help us watch out for batch effects (e.g. extraction date, person who did made the RNAseq library).
+
+3.  Make sure your none of your column names or any cells have spaces between words or any other unusual characters (for example: \*, \$, \\, /) . Underscores are a good, Bash-friendly substitute for spaces.
+
+4.  Save the file as a TSV (tab separated values) named `rnaseq_sample_table.tsv` on your Desktop. Tab-delimited means that tabs separate different fields (columns) of data.
+
+5.  Assuming your file is on the Desktop use the following command to send this file to your `rnaseq/metadata` directory on Biowulf. Note that for sending a file to Biowulf, the local file is listed first ( then the destination (compare this with what we did in Week 2 Lesson 02).
+
+    ``` bash
+    $ scp rnaseq_sample_table.tsv username@helix.nih.gov:/data/Bspc-training/$USER/rnaseq/metadata 
+    ```
+
+6.  In your Biowulf window, navigate to the directory where you sent the file (i.e. /data/Bspc-training/. View your file in `less` - does this look like you expected?
+
+7.  Try extracting just the first column using `cut -f 1 rnaseq_sample_table.tsv` . Does that look like you expected? *This is just to drive home the point that if you carefully save your tables in a text format like `.tsv`, you can manipulate them using the CLI which can really come in handy!*
+
+**When you are done with this, let your instructor know. They will give you feedback on your table and may ask you follow up questions!**
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
