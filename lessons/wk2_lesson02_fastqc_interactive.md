@@ -127,6 +127,25 @@ $ grep -B 1 -A 2 --no-group-separator NNNNNNNNNN Mov10_oe_1.subset.fq > bad_read
 
 Looking at individual reads in a small FASTQ file is nice, but what about getting the whole picture for much bigger FASTQ files? *This is where a program like FASTQC will be useful!*
 
+## Working with Compressed Files
+
+Sequencing data files can be huge - from a few megabytes to gigabytes. And with even more sequencing at decreasing price points, it's not hard to run out of storage space. As a result, most sequencing facilities will give you compressed sequencing data files, and **Biowulf recommends that you keep your FASTQ files compressed when at all possible**. 
+
+The most common compression program used for individual files is `gzip` whose compressed files have the `.gz` extension. The tar and zip programs are most commonly used for compressing directories. Let's take a look at the size difference between uncompressed and compressed files. We use the `-l` option of `ls` to get a long listing that includes the file size, and `-h` to have that size displayed in "human readable" form. 
+
+```
+$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq
+$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz
+```
+To extract the file again, you could run `gunzip filename.gz`. However, there are many options for working with compressed files directly without extracting them to their full size again. **Luckily for us, current versions of FASTQC can read `.gz` files directly.** Another example is `zcat` – which is like `cat` except that it works on `gzip`-compressed (.gz) files! This is often paired with using pipe `|` into another command like below: 
+
+```
+$ zcat /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz | head
+``` 
+Check out [this page from the University of Texas at Austin](https://cloud.wikis.utexas.edu/wiki/spaces/CoreNGSTools/pages/54069228/Working+with+FASTQ+files) for more info and a longer tutorial about `gzip`.
+
+<hr> 
+
 ## **Loading the FASTQC module**
 
 Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data. Rather than use built-in Bash tools though, we'll use a specialized tool mde for this.
