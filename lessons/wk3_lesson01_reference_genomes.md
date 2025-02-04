@@ -7,10 +7,17 @@ date: Last modified February 2025
 Approximate time: 50 minutes
 
 ## Learning Objectives:
-- Download reference genome files needed for mapping
-- Find an appropriate reference genome for "your" organism
-- Build a genome index that will be used in the next lesson
-- Use Bash commands to summarize aspects of a GTF file
+
+-   Download reference genome files needed for mapping
+-   Find an appropriate reference genome for "your" organism
+-   Build a genome index that will be used in the next lesson
+-   Use Bash commands to summarize aspects of a GTF file
+
+## Read Alignment
+
+<img src="../img/RNAseqWorkflow.png" width="400"/>
+
+Now that we have explored the quality of our raw reads, we can move on to read alignment. We perform read alignment or mapping to determine where in the genome the reads originated from. The alignment process consists of choosing an appropriate reference genome to map our reads against and performing the read alignment using one of several splice-aware alignment tools such as [STAR](http://bioinformatics.oxfordjournals.org/content/early/2012/10/25/bioinformatics.bts635) or [HISAT2](http://ccb.jhu.edu/software/hisat2/index.shtml). The choice of aligner is often a personal preference and also dependent on the computational resources that are available to you.
 
 ## Quality Control
 
