@@ -108,8 +108,8 @@ Now in the body of the script, we can include any commands we want to run, speci
 ## Load modules required for script commands
 module load fastqc/0.12.1
 
-## Run FASTQC on a full-sized file in the class shared directory
-fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq
+## Run FASTQC on the compressed full-sized file in the class shared directory
+fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz
 ```
 
 > **NOTE:** These are the same commands we used when running FASTQC in the interactive session. Since we are writing them in a script, the `tab` completion function will **not work**, so please make sure you don't have any typos when writing the script!
@@ -173,7 +173,7 @@ cp Mov10_oe_1_fastqc.html /data/$USER/
 
 Write a SLURM job script in your `/script` directory called `mov10_oe_2_fastqc_full.sh` (you can start by copying the template or the script we just ran) that does the following:
 
--   Uses `/data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_2.fq` as input
+-   Uses `/data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_2.fq.gz` as input
 
 -   Puts the output file in the same `/results/fastq` we've been using
 
