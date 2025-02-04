@@ -1,15 +1,16 @@
 ---
-title: "QC with STAR and Qualimap"
-author: "Meeta Mistry, Mary Piper, Radhika Khetani, Jihe Liu - Edited by Sally Chang @ NICHD"
-date: Editing started on October 7th, 2024
+title: "Reference genomes and genome indices"
+author: "Harvard HPC Staff, modified by Sally Chang @ NICHD"
+date: Last modified February 2025
 ---
 
 Approximate time: 50 minutes
 
 ## Learning Objectives:
-
--   Run an alignment tool to generate BAM files for input to Qualimap
--   Run Qualimap to compute metrics on alignment files
+- Download reference genome files needed for mapping
+- Find an appropriate reference genome for "your" organism
+- Build a genome index that will be used in the next lesson
+- Use Bash commands to summarize aspects of a GTF file
 
 ## Quality Control
 
