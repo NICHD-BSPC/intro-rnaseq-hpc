@@ -395,6 +395,8 @@ Interactive Data Transfers should be performed on **helix.nih.gov**, the designa
 
 4.  The file should appear on your Desktop. Click to open!
 
+**Note**: When working with bigger files, you will likely want to use the `rsync` command, which has many advantages, such as restarting the transfer if your connection drops. There are some good [BSPC training materials](https://nichd-bspc.github.io/training/rsync.html) about this. 
+
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
 
 -   *The materials used in this lesson was derived from work that is Copyright © Data Carpentry (<http://datacarpentry.org/>). All Data Carpentry instructional material is made available under the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0).*
