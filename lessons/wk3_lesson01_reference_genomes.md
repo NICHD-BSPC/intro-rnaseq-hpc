@@ -53,17 +53,9 @@ rnaseq
     └── scripts
 ```
 
-## Reference Genomes
+## Finding Reference Genomes
 
-As mentioned above, we will need to find both a
-
-> ***UPDATE BASED ON SHARED LOCATION FOR BSPC AND/OR BIOWULF***
->
-> A quick note on shared databases for human and other commonly used model organisms. The O2 cluster has a designated directory at `/n/groups/shared_databases/` in which there are files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you.
->
-> ``` bash
-> $ ls -l /n/groups/shared_databases/igenome/
-> ```
+As mentioned above, we need to identify the relevant reference genome and an associated annotation file.
 
 ``` bash
 $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh38.primary_assembly.genome.fa.gz
@@ -74,6 +66,69 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/genc
 ```
 
 It contains the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes.
+
+## The GTF Format
+
+**Exercises**
+
+Now that we know what type of information is inside the GTF file, let's use the commands we have learned so far to answer a simple question about our data: **how many unique exons are present on chromosome 1 using `chr1-hg19_genes.gtf`?**
+
+To determine the number of unique exons on chromosome 1, we are going to perform a series of steps as shown below. In this exercise, you need to figure out the command line for each step.
+
+1.  Extract only the genomic coordinates of exon features
+2.  Subset dataset to only keep genomic coordinates
+3.  Remove duplicate exons
+4.  Count the total number of exons
+
+Your end goal is to have a single line of code, wherein you have strung together multiple commands using the pipe operator. But, we recommend that you do it in a stepwise manner as detailed below.
+
+#### 1. Extract only the genomic coordinates of exon features
+
+We only want the exons (not CDS or start_codon features), so let's use `grep` to search for the word "exon". You should do sanity check on the first few lines of the output of `grep` by piping the result to the `head` command. ***Report the command you have at this stage.***
+
+#### 2. Subset the extracted information from step 1 to only keep genomic coordinates
+
+We will define the uniqueness of an exon by its genomic coordinates, both start and end. Therefore, from the step 1 output, we need to keep 4 columns (chr, start, stop, and strand) to find the total number of unique exons. The column numbers you want are 1, 4, 5, and 7.
+
+You can use `cut` to extract those columns from the output of step 1. ***Report the command you have at this stage.***
+
+At this point, the first few lines should look like this:
+
+```         
+chr1    14362   14829   -
+chr1    14970   15038   -
+chr1    15796   15947   -
+chr1    16607   16765   -
+chr1    16858   17055   -
+```
+
+#### 3. Remove duplicate exons
+
+Now, we need to remove those exons that show up multiple times for different transcripts. We can use the `sort` command with the `-u` option. ***Report the command you have at this stage.***
+
+Do you see a change in how the sorting has changed? By default the `sort` command will sort and what you can't see here is that it has removed the duplicates. We will use step 4 to check if this step worked.
+
+#### 4. Count the total number of exons
+
+First, check how many lines we would have without using `sort -u` by piping the output to `wc -l`.
+
+Now, to count how many unique exons are on chromosome 1, we will add back the `sort -u` and pipe the output to `wc -l`. Do you observe a difference in number of lines?
+
+***Report the command you have at this stage and the number of lines you see with and without the `sort -u`.***
+
+<details>
+
+<summary><b><i>Answers</i></b></summary>
+
+<p><i>Question 1</i><br> <code>grep exon chr1-hg19_genes.gtf \| head</code><br></p>
+
+<p><i>Question 2</i><br> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| head</code><br></p>
+
+<p><i>Question 3</i><br> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| sort -u \| head</code><br></p>
+
+<p><i>Question 4</i><br> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| wc -l</code><br> The output returns 37,213 lines.<br> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| sort -u \| wc -l</code><br> The output returns 22,769 lines, indicating that repetitive lines have been removed.<br></p>
+
+</details>
 
 ## Create a genome index with STAR
 
@@ -135,4 +190,12 @@ STAR --runThreadN 6 \
 $ sbatch ~/rnaseq/scripts/genome_index.run
 ```
 
-#### 
+## Reference Genomes on Biowulf
+
+> ***UPDATE BASED ON SHARED LOCATION FOR BSPC AND/OR BIOWULF***
+>
+> A quick note on shared databases for human and other commonly used model organisms. The O2 cluster has a designated directory at `/n/groups/shared_databases/` in which there are files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you.
+>
+> ``` bash
+> $ ls -l /n/groups/shared_databases/igenome/
+> ```
