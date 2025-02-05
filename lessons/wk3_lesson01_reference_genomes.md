@@ -55,13 +55,23 @@ rnaseq
 
 ## Finding Reference Genomes
 
-As mentioned above, we need to identify the relevant reference genome and an associated annotation file.
+As mentioned above, we need to identify the relevant reference genome and an associated annotation file. [According to NHGRI](https://www.genome.gov/genetics-glossary/Human-Genome-Reference-Sequence), a reference genome (or reference assembly) is an accepted representation of the human genome sequence that is used as a standard for comparison to DNA/RNA sequences generated other studies. Having this standard genome assembly allows authors to
+
+> **Discussion**: As of February 2025, NCBI hosts [1,831 human genome assemblies](https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=9606). How do we pick a genome to serve as reference for an organism? What qualities make for a good reference genome? Who makes these decisions?
+
+For humans and several other model organisms, the authority for
+
+How do we know which one of these assemblies and annotation files is right for my organism?
+
+Once we have identified files we are interested in, we use `wget` , which is a built-in piece of software that downloads files stored at HTTP, HTTPS, FTP and FTPS addresses.
 
 ``` bash
+# DO NOT RUN - I have already downloaded this file for us
 $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh38.primary_assembly.genome.fa.gz
 ```
 
 ``` bash
+# DO NOT RUN - I have already downloaded this file for us
 $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.primary_assembly.annotation.gtf.gz
 ```
 
