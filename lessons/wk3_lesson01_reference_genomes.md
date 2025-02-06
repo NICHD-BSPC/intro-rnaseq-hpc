@@ -85,7 +85,7 @@ Luckily for us, the developers of STAR make pretty specific recommendations for 
 
 The PRI files contain the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes, which STAR cannot make use of during mapping.
 
-So, from that page, find the
+So, from that page, find the following listings and copy the links for the `PRI` GTF file and the FASTA for `Genome sequence, primary assembly`.
 
 Once we have those URLS handy, we use `wget` , which is a built-in piece of software that downloads files stored at HTTP, HTTPS, FTP and FTPS addresses. These are the commands I used to download these files into our shared space:
 
@@ -98,6 +98,8 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh
 # DO NOT RUN - I have already downloaded this file for us
 $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.primary_assembly.annotation.gtf.gz
 ```
+
+**IMPORTANT NOTE:** Due to differences in formatting and gene/chromosome names between versions and consortia, it is recommended you use GTFs and FASTAs from the SAME version and SAME provider (i.e. ENCODE) for analyses.
 
 ## The GTF Format
 
@@ -220,12 +222,12 @@ STAR --runThreadN 6 \
 $ sbatch ~/rnaseq/scripts/genome_index.run
 ```
 
-## Reference Genomes on Biowulf
+## Genome Indices on Biowulf
 
-> ***UPDATE BASED ON SHARED LOCATION FOR BSPC AND/OR BIOWULF***
->
-> A quick note on shared databases for human and other commonly used model organisms. The O2 cluster has a designated directory at `/n/groups/shared_databases/` in which there are files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you.
->
+Going right to the source to download the
+
+A quick note on shared databases for human and other commonly used model organisms. The O2 cluster has a designated directory at `/n/groups/shared_databases/` in which there are files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you.
+
 > ``` bash
 > $ ls -l /n/groups/shared_databases/igenome/
 > ```
