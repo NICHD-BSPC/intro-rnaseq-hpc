@@ -390,7 +390,7 @@ Interactive Data Transfers should be performed on **helix.nih.gov**, the designa
 3.  Type in the following command to grab an output HTML from Biowulf (let's use the copy you just placed in your `/data/$USER` directory) and put it in your current directory ( `.`).
 
     ``` bash
-    scp username@helix:/data/$USER/fastqc/Mov10_oe_1.subset_fastqc.html .
+    scp username@helix.nih.gov:/data/Bspc-training/$USER/results/fastqc/Mov10_oe_1.subset_fastqc.html .
     ```
 
 4.  The file should appear on your Desktop. Click to open!
