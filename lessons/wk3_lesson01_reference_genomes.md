@@ -101,9 +101,21 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/genc
 
 **IMPORTANT NOTE:** Due to differences in formatting and gene/chromosome names between versions and consortia, it is recommended you use GTFs and FASTAs from the SAME version and SAME provider (i.e. ENCODE) for analyses.
 
-## The GTF Format
+## A note about the GTF Format
 
-**Exercises**
+**The GTF (Gene Transfer Format) file** is a *tab-delimited* file arranged in a very specific manner to store info about gene structure. The ENCODE [data format page](https://www.gencodegenes.org/pages/data_format.html) specifies that the columns of a GTF provided by that consortia are as follows:
+
+| Column Number | Content                                                         | Format                                                      |
+|--------------|-----------------------------|-----------------------------|
+| 1             | chromosome name                                                 | chr1, chr2 etc.                                             |
+| 2             | annotation source                                               | ENSEMBL, HAVANA                                             |
+| 3             | feature type                                                    | gene, transcript, exon etc.                                 |
+| 4             | genomic start location                                          | 1-based integer                                             |
+| 5             | genomic end location                                            | integer                                                     |
+| 6             | score (not used)                                                | N/A                                                         |
+| 7             | genomic strand                                                  | +, -                                                        |
+| 8             | genomic phase                                                   | 0, 1, 2                                                     |
+| 9             | additional values, stored as key pairs, separated by semicolons | For example: gene_type 'protein_coding'; gene_name "C2CD4C" |
 
 Now that we know what type of information is inside the GTF file, let's use the commands we have learned so far to answer a simple question about our data: **how many unique exons are present on chromosome 1 using `chr1-hg19_genes.gtf`?**
 
@@ -166,17 +178,15 @@ Now, to count how many unique exons are on chromosome 1, we will add back the `s
 
 ## Create a genome index with STAR
 
-To use the STAR aligner. Explore
+Before we set up a script, let's explore the
 
 ``` bash
 $ module load star
 ```
 
-For this workshop we have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices (it takes a while and requires a lot of memory). The index can be found in `/data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28`
-
 The basic options to **generate genome indices** using STAR are as follows:
 
--   `--runThreadN`: number of threads
+-   `--runThreadN`: number of threads, should match the number of CPUS we specify in the SLURM directives
 -   `--runMode`: genomeGenerate mode
 -   `--genomeDir`: /path/to/store/genome_indices
 -   `--genomeFastaFiles`: /path/to/FASTA_file
@@ -218,6 +228,8 @@ STAR --runThreadN 8 --runMode genomeGenerate --genomeDir /data/changes/reference
 $ sbatch ~/rnaseq/scripts/genome_index.run
 ```
 
+For this workshop we have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices (it takes a while and requires a lot of memory). The index can be found in `/data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28`
+
 ## Genome Indices on Biowulf
 
 Going right to the source to download the GTF Files is
@@ -227,3 +239,5 @@ A quick note on shared databases for human and other commonly used model organis
 > ``` bash
 > $ ls -l /n/groups/shared_databases/igenome/
 > ```
+
+## Assignment 
