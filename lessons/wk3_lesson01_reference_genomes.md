@@ -17,21 +17,23 @@ Approximate time: 50 minutes
 
 <img src="../img/RNAseqWorkflow.png" width="400"/>
 
-Now that we have explored the quality of our raw reads, we can move on to read alignment. We perform read alignment or mapping to determine where in the genome the reads originated from. The alignment process consists of choosing an appropriate reference genome to map our reads against and performing the read alignment using one of several splice-aware alignment tools such as [STAR](http://bioinformatics.oxfordjournals.org/content/early/2012/10/25/bioinformatics.bts635) or [HISAT2](http://ccb.jhu.edu/software/hisat2/index.shtml). The choice of aligner is often a personal preference and also dependent on the computational resources that are available to you.
+Now that we have explored the quality of our raw reads, we can move on to read alignment. We perform read alignment or mapping to determine where in the genome the reads originated from. The alignment process consists of choosing an appropriate reference genome to map our reads against and performing the read alignment using one of several splice-aware alignment tools. We are going to make use of the [STAR](http://bioinformatics.oxfordjournals.org/content/early/2012/10/25/bioinformatics.bts635) aligner.
 
 **No matter what aligner you are using steps involved are:**
 
-1.  Create a genome index (after identifying the appropriate reference for your organism or use case)
-2.  Map reads to the genome
+1.  Creating a genome index (after identifying the appropriate reference for your organism or use case). For STAR, the necessary input is:
+    1.  The reference sequence in FASTA format
+    2.  Annotations associated with the reference genome in GTF format
+2.  Mapping reads to the genome, which needs:
+    1.  Your quality-checked reads in FASTQ format
+    2.  The output of the genome indexing step, above
 
-This lesson will cover all of the first bullet point above.
+## Prepping for this lesson
 
-## Where to start this lesson
-
-To get started with this lesson, start an interactive session with 6 cores and 8G of memory:
+To get started with this lesson, start an interactive session:
 
 ``` bash
-$ sinteractive --cpus-per-task=6 --mem=8G  
+$ sinteractive
 ```
 
 You should have a directory tree setup similar to that shown below. It is best practice to have all files you intend on using for your workflow present within the same directory.
@@ -51,242 +53,281 @@ rnaseq
     └── scripts
 ```
 
-## Genome Indices
+## Finding Reference Genomes
 
-To use the STAR aligner, load the module:
+As mentioned above, we need to identify the relevant reference genome and an associated annotation file.
 
-``` bash
-$ module load star/2.7.6a #needed newer version of STAR than what was listed in tutorial originally
-```
+#### Reference Consortia
 
-> ***UPDATE BASED ON SHARED LOCATION FOR BSPC AND/OR BIOWULF***
->
-> A quick note on shared databases for human and other commonly used model organisms. The O2 cluster has a designated directory at `/n/groups/shared_databases/` in which there are files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you.
->
-> ``` bash
-> $ ls -l /n/groups/shared_databases/igenome/
-> ```
+[According to NHGRI](https://www.genome.gov/genetics-glossary/Human-Genome-Reference-Sequence), a reference genome (or reference assembly) is an accepted representation of the human genome sequence that is used as a standard for comparison to DNA/RNA sequences generated other studies. Having this standard genome assembly allows researchers to "speak the same language" when it comes to genomic locations and features.
 
-#### Creating a genome index
+> **Discussion**: As of February 2025, NCBI hosts [1,831 human genome assemblies](https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=9606). How do we pick a genome to serve as reference for an organism? What qualities make for a good reference genome? Who makes these decisions?
 
-For this workshop we have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices (it takes a while and requires a lot of memory). The index can be found in `/data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28`
+For humans and several other model organisms, the research community makes use of a well-vetted and standardized assembly from the [Reference Genome Consortium](https://www.ncbi.nlm.nih.gov/grc). There are other organism-specific consortia doing annotation and assembly such as [FlyBase](https://flybase.org/) for Drosophila.
 
-The command to create an index can be found in the job submission script we have linked [here](../scripts/star_genome_index.run)
+As of this writing, the most recent version of this genome is known as `GRCH38.p14`, which is the 38th major "build" (released in 2013) of the assembly, and the 14th update, of this build (released in 2022). These new builds and updates represent corrections and updates to our knowledge of the content and structure of the human genome. This [YouTube video](https://www.youtube.com/watch?v=DeZTPCOKZrg) is a nice introduction to some of the genome assembly nomenclature and compares several versions of the human reference.
 
-> **NOTE:** By default the latest human genome build, GRCh38, contains information about alternative alleles for various locations on the genome. If using this version of the GRCh38 genome then it is advisable to use the HISAT2 aligner as it is able to utilize this information during the alignment. There is a version of GRCh38 available that does not have these alleles represented, which is the appropriate version to use with STAR. This is because STAR does not have the functionality to appropriately deal with the presence of alternate alleles as yet.
+#### Sources of annotation 
 
-#### Aligning reads
+Briefly, genome annotation is the process of inferring the identity and location of functional elements, like genes, on an assembled genome. As you can probably imagine, this is crucial for making sense of any sequencing projects!
 
-Since we already have the reference index ready, we can move on to aligning reads to the genome.
+As is the case for assemblies, major annotation efforts are conducted by research consortia, such as [ENCODE](https://www.encodeproject.org/help/project-overview/), which was started and funded by NHGRI:
 
-Create an output directory for our alignment files:
+> The goal of ENCODE is to build a comprehensive parts list of functional elements in the human genome, including elements that act at the protein and RNA levels, and regulatory elements that control cells and circumstances in which a gene is active. The discovery and annotation of gene elements is accomplished primarily by sequencing a diverse range of RNA sources, comparative genomics, integrative bioinformatic methods, and human curation.
 
-``` bash
-$ cd ~/rnaseq/raw_data
+A look at the landing page for the [current GENCODE human genome](https://www.gencodegenes.org/human/) shows us a number of different GTF and FASTA files we could download - *which one is most relevant for mapping with STAR?*
 
-$ mkdir ../results/STAR
-```
+#### Obtaining Reference Genome Files
 
-For now, we're going to work on just one sample to set up our workflow. To start we will use the first replicate in the Mov10 over-expression group, `Mov10_oe_1.subset.fq`. Details on STAR and its functionality can be found in the [user manual](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf); we encourage you to peruse through to get familiar with all available options.
+Luckily for us, the developers of STAR make pretty specific recommendations for us on page 6 of the [STAR manual](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf):
 
-The basic options for aligning reads to the genome using STAR are:
+> GENCODE: files marked with PRI (primary) strongly recommended for mouse and human.
 
--   `--runThreadN`: number of threads / cores
--   `--readFilesIn`: /path/to/FASTQ_file
--   `--genomeDir`: /path/to/genome_indices_directory
--   `--outFileNamePrefix`: prefix for all output files
+The PRI files contain the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes, which STAR cannot make use of during mapping. For other organisms, this might be annotations for
 
-Listed below are additional parameters that we will use in our command:
+So, from that page, find the following listings and copy the links for the `PRI` GTF file and the FASTA for `Genome sequence, primary assembly`.
 
--   `--outSAMtype`: output filetype (SAM default)
--   `--outSAMunmapped`: what to do with unmapped reads
-
-> **NOTE:** Note that "**STAR’s default parameters are optimized for mammalian genomes.** Other species may require significant modifications of some alignment parameters; in particular, the maximum and minimum intron sizes have to be reduced for organisms with smaller introns" [[1](http://bioinformatics.oxfordjournals.org/content/early/2012/10/25/bioinformatics.bts635.full.pdf+html)].
-
-The full command is provided below for you to copy paste into your terminal. If you want to manually enter the command, it is advisable to first type out the full command in a text editor (i.e. [Sublime Text](http://www.sublimetext.com/) or [Notepad++](https://notepad-plus-plus.org/)) on your local machine and then copy paste into the terminal. This will make it easier to catch typos and make appropriate changes.
+Once we have those URLS handy, we use `wget` , which is a built-in piece of software that downloads files stored at HTTP, HTTPS, FTP and FTPS addresses. These are the commands I used to download these files into our shared space:
 
 ``` bash
-# assumes you are in raw_data directory
-$ STAR --genomeDir /data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28 \
---runThreadN 6 \
---readFilesIn Mov10_oe_1.subset.fq \
---outFileNamePrefix ../results/STAR/Mov10_oe_1_ \
---outSAMtype BAM SortedByCoordinate \
---outSAMunmapped Within \
---outSAMattributes Standard 
+# DO NOT RUN - I have already downloaded this file for us
+$ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh38.primary_assembly.genome.fa.gz
 ```
 
-Since this will take longer with a full-size human reference genome, let's submit an SBATCH script:
+``` bash
+# DO NOT RUN - I have already downloaded this file for us
+$ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.primary_assembly.annotation.gtf.gz
+```
+
+**IMPORTANT NOTE:** Due to differences in formatting and gene/chromosome names between versions and consortia, it is recommended you use GTFs and FASTAs from the SAME version and SAME provider (i.e. ENCODE) for analyses.
+
+**OTHER IMPORTANT NOTE:** For organisms not on GENCODE, Ensembl, UCSC or an organism-specific databases, like FlyBase, are another good choice.
+
+## A note about the GTF Format
+
+**The GTF (Gene Transfer Format) file** is a *tab-delimited* file arranged in a very specific manner to store info about gene structure. The ENCODE [data format page](https://www.gencodegenes.org/pages/data_format.html) specifies that the columns of a GTF provided by that consortia are as follows:
+
+| Column Number | Content                                                         | Format                                                      |
+|--------------|-----------------------------|-----------------------------|
+| 1             | chromosome name                                                 | chr1, chr2 etc.                                             |
+| 2             | annotation source                                               | ENSEMBL, HAVANA                                             |
+| 3             | feature type                                                    | gene, transcript, exon etc.                                 |
+| 4             | genomic start location                                          | 1-based integer                                             |
+| 5             | genomic end location                                            | integer                                                     |
+| 6             | score (not used)                                                | .                                                           |
+| 7             | genomic strand                                                  | +, -                                                        |
+| 8             | genomic phase                                                   | 0, 1, 2, .                                                  |
+| 9             | additional values, stored as key pairs, separated by semicolons | For example: gene_type 'protein_coding'; gene_name "C2CD4C" |
+
+Here is what a few lines of that look like in practice:
+
+```         
+chr19   HAVANA   gene   405438   409170   .   -   .   gene_id "ENSG00000183186.7"; gene_type "protein_coding"; gene_name "C2CD4C"; level 2; havana_gene "OTTHUMG00000180534.3";
+chr19   HAVANA   transcript   405438   409170   .   -   .   gene_id "ENSG00000183186.7"; transcript_id "ENST00000332235.7"; gene_type "protein_coding"; gene_name "C2CD4C"; transcript_type "protein_coding"; transcript_name "C2CD4C-001"; level 2; protein_id "ENSP00000328677.4"; transcript_support_level "2"; tag "basic"; tag "appris_principal_1"; tag "CCDS"; ccdsid "CCDS45890.1"; havana_gene "OTTHUMG00000180534.3"; havana_transcript "OTTHUMT00000451789.3";
+```
+
+### Refresher about, `grep`  `cut` and `sort`
+
+Given our understanding of splice isoforms, we know that a given exon can be part of 2 or more different transcripts generated from the same gene. In a GTF file, this exon will be represented multiple times, once for each transcript (or splice isoform).
+
+``` bash
+$ grep "PLEKHN1" GRCh38.primary_assembly.genome.fa | head -n 5
+```
+
+**`cut` is a command that extracts columns from files.**
+
+We will use `cut` with the `-f` argument to specify which specific fields or columns from the dataset we want to extract. Let's say we want to get the 1st column (chromosome number) and the 4th column (starting genomic position) from `chr1-hg19_genes.gtf` file, we can say:
+
+``` bash
+$ cut -f 1,4 GRCh38.primary_assembly.genome.fa | head
+```
+
+```         
+##description: evidence-based annotation of the human genome (GRCh38), version 47 (Ensembl 113)
+##provider: GENCODE
+##contact: gencode-help@ebi.ac.uk
+##format: gtf
+##date: 2024-07-19
+chr1	11121
+chr1	11121
+chr1	11121
+chr1	12010
+chr1	12613
+```
+
+> The `cut` command assumes our data columns are separated by tabs (i.e. tab-delimited). Since GTFs are a tab-delimited file, so the default `cut` command works for us. However, data can be separated by other types of delimiters like "," or ";". If your data is not tab delimited, there is an argument you can add to your `cut` command, `-d` to specify the delimiter (e.g. `-d ","` with a .csv file).
+
+**`sort` is a command used to sort the contents of a file in a particular order.** It has arguments that let you pick which column to sort by (`-k`), what kind of sorting you want to do (numeric `n`) and also if the result of the sorting should only return unique (`-u`) values. These are just 2 of the many features of the sort command.
+
+Let's do a quick test of how the `-u` argument returns only unique lines (and remove duplicates).
+
+``` bash
+$ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf  | wc -l
+```
+
+*How many lines are returned to you?*
+
+<details>
+
+<summary><b><i>Click here to check your output</i></b></summary>
+
+<p>Your command should have returned 4117652 lines...but how many do we need to subtract for that header? </p>
+
+</details>
+
+Now apply the `sort -u` command before counting the lines.
+
+``` bash
+$ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf | sort -u | wc -l
+```
+
+*How many lines do you see now?*
+
+<details>
+
+<summary><b><i>Click here to check your output</i></b></summary>
+
+<p>Your command should have returned 796,720 lines. But again, does this include those header comment lines? </p>
+
+</details>
+
+You can practice chaining together these skills in the GTF Exercise in Week 1 Lesson 04 if you haven't done so already. The assignment for this week also challenges you to put a few of these together.
+
+------------------------------------------------------------------------
+
+## Create a genome index with STAR
+
+Before we set up a script, let's explore the possible versions of STAR on Biowulf.
+
+``` bash
+$ module spider star
+```
+
+```         
+  Versions:
+        STAR/2.5.4a
+        STAR/2.6.1c
+        STAR/2.7.0f
+        STAR/2.7.3a
+        STAR/2.7.6a
+        STAR/2.7.8a
+        STAR/2.7.9a
+        STAR/2.7.10b
+        STAR/2.7.11b
+```
+
+Let's go ahead and load the default version of STAR, which happens to be the most recent:
+
+```         
+$ module load STAR
+$ [+] Loading STAR  2.7.11b
+```
+
+> **IMPORTANT NOTE**: This is one of those times where you may not want to always use the most recent version. Newer versions of STAR are not backwards compatible with all genome indices created by older versions. Something to keep in mind if you are trying to re-work old analyses! We'll look at available indices on Biowulf below.
+
+The basic options to **generate genome indices** using STAR are as follows:
+
+-   `--runThreadN`: number of threads, should match the number of CPUS we specify in the SLURM directives
+-   `--runMode`: genomeGenerate mode
+-   `--genomeDir`: /path/to/store/genome_indices
+-   `--genomeFastaFiles`: /path/to/FASTA_file
+-   `--sjdbGTFfile`: /path/to/GTF_file
+-   `--sjdbOverhang`: readlength -1
+
+> *NOTE:* In case of reads of varying length, the ideal value for `--sjdbOverhang` is max(ReadLength)-1. In most cases, the default value of 100 will work similarly to the ideal value.
+
+Now let's create a job submission script to generate the genome index. *We will NOT run this script, as it uses a lot of memory, will take up a bunch of disk space and will take a long time to run! This is the script I used to generate the files we will use in the next lesson.*
+
+``` bash
+# Since we are not actually going to run this, you can work on this text document from any directory
+$ vim genome_index.sh
+```
+
+Within `vim` we now add our shebang line, the SLURM directives, and our STAR command.
 
 ``` bash
 #!/bin/bash
 
-#SBATCH --partition=quick
-#SBATCH --time=03:00:00       # time limit
-#SBATCH --cpus-per-task=6        # number of cores
-#SBATCH --mem=32g   # requested memory
-#SBATCH --job-name salmon_in_serial      # Job name
-#SBATCH -o %j.out           # File to which standard output will be written
-#SBATCH -e %j.err       # File to which standard error will be written
+#SBATCH --partition=quick #quick partition
+#SBATCH --time=04:00:00 # time limit
+#SBATCH --cpus-per-task=8 # number of cores
+#SBATCH --mem=48g # requested memory
+#SBATCH --job-name grch38_star_index # Job name
+#SBATCH -o %j.out # File to which standard output will be written
+#SBATCH -e %j.err # File to which standard error will be written
 #SBATCH --mail-type=BEGIN,END
 
-# Load Salmon module
-module load star/2.7.6a
+# load most recent STAR module 
+module load STAR
 
 # Change directory to where the data is
-cd /data/NICHD-core0/test/changes/rc_training/rnaseq/raw_data
+cd /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38
 
-STAR --genomeDir /data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28 --runThreadN 6 --readFilesIn Mov10_oe_1.subset.fq --outFileNamePrefix ../results/STAR/Mov10_oe_1_ --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard 
+STAR --runThreadN 8 --runMode genomeGenerate --genomeDir /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38 --genomeFastaFiles /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/GRCh38.primary_assembly.genome.fa --sjdbGTFfile /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf --sjdbOverhang 99
 ```
 
-#### STAR output
+#### Results
 
-After running our single FASTQ file through the STAR aligner, you should have a number of output files in the `~/rnaseq/results/STAR` directory. Let's take a quick look at some of the files that were generated and explore their content.
+For this workshop we have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices (it takes a while and requires a lot of memory). To see what all the genome index result files are, take a look:
 
 ``` bash
-$ cd ~/rnaseq/results/STAR
-    
-$ ls -lh
+$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38
+$ -rw-rw----+ 1 changes Bspc-training 1.2K Feb  6 11:32 chrLength.txt
+-rw-rw----+ 1 changes Bspc-training 3.2K Feb  6 11:32 chrNameLength.txt
+-rw-rw----+ 1 changes Bspc-training 2.0K Feb  6 11:32 chrName.txt
+-rw-rw----+ 1 changes Bspc-training 2.1K Feb  6 11:32 chrStart.txt
+-rw-rw----+ 1 changes Bspc-training  74M Feb  6 11:32 exonGeTrInfo.tab
+-rw-rw----+ 1 changes Bspc-training  30M Feb  6 11:32 exonInfo.tab
+-rw-rw----+ 1 changes Bspc-training 1.7G Feb  6 11:32 gencode.v47.primary_assembly.annotation.gtf #input
+-rw-rw----+ 1 changes Bspc-training 3.2M Feb  6 11:32 geneInfo.tab
+-rw-rw----+ 1 changes Bspc-training 3.1G Feb  6 11:32 Genome
+-rw-rw----+ 1 changes Bspc-training  872 Feb  6 11:32 genomeParameters.txt
+-rw-rw----+ 1 changes Bspc-training 3.0G Feb  6 11:32 GRCh38.primary_assembly.genome.fa #input
+-rw-rw----+ 1 changes Bspc-training  33K Feb  6 11:32 Log.out
+-rw-rw----+ 1 changes Bspc-training  24G Feb  6 11:32 SA
+-rw-rw----+ 1 changes Bspc-training 1.5G Feb  6 11:32 SAindex
+-rw-rw----+ 1 changes Bspc-training  15M Feb  6 11:32 sjdbInfo.txt
+-rw-rw----+ 1 changes Bspc-training  17M Feb  6 11:32 sjdbList.fromGTF.out.tab
+-rw-rw----+ 1 changes Bspc-training  14M Feb  6 11:32 sjdbList.out.tab
+-rw-rw----+ 1 changes Bspc-training  25M Feb  6 11:32 transcriptInfo.tab
 ```
 
-You should have **5 output files** plus a single `.tmp` directory for the Mov10_oe_1 sample. The contents of the 5 files are described below:
+## Genome Indices on Biowulf
 
--   `Log.final.out` - a summary of mapping statistics for the sample
--   `Aligned.sortedByCoord.out.bam` - the aligned reads, sorted by coordinate, in BAM format
--   `Log.out` - a running log from STAR, with information about the run
--   `Log.progress.out` - job progress with the number of processed reads, % of mapped reads etc., updated every \~1 minute
--   `SJ.out.tab` - high confidence collapsed splice junctions in tab-delimited format. Only junctions supported by uniquely mapping reads are reported
+Going right to the source to download the GTF and FASTA is a great way of makign sure you are using the most up-to-date version.
 
-**We are most interested in the BAM file, which will allow us to proceed with Qualimap.**
+However, Biowulf also provides centrally-maintained [scientific reference databases](https://hpc.nih.gov/refdb/index.php) for users, which includes many pre-generated genome indices for various alignment software.
 
-### Running Qualimap
+According to that page, STAR indices are all kept in a directory: `/fdb/STAR_indices`, which contains the following files and subdirectories:
 
-Alignment data files frequently contain biases that are introduced by sequencing technologies and/or during sample preparation. Therefore, one of the fundamental requirement during analysis of these data is to perform quality control. In this way, we get an idea of **how well our reads align to the reference** and **how well data fit with the expected outcome**.
+```         
+00init.sh  01build.sh		03check_repo.sh  2.6.1c  2.7.10b  2.7.3a  2.7.8a  refdb.yml 00lib.sh   02dedup_existing.sh	2.5.4 2.7.0f  2.7.11b  2.7.6a  2.7.9a  repo
+```
 
-We will take the BAM file we generated in the previous step and use it as input to Qualimap which computes various quality metrics such as DNA or rRNA contamination, 5'-3' biases, and coverage biases.
-
-To **run Qualimap**, change directories to the `rnaseq` folder and make a `qualimap` folder inside the `results` directory:
+Navigating further into 2.7.11b (indices built using the most recent version of STAR on Biowulf), we can eventually get to the ENCODE human genome versions:
 
 ``` bash
-$ cd ~/rnaseq
-
-$ mkdir -p results/qualimap
+$ ls -lh /fdb/STAR_indices/2.7.11b/GENCODE/Gencode_human/
+drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_19
+drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_39
+drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_45
 ```
 
-By default, Qualimap will try to open a GUI to run Qualimap, so we need to run the `unset DISPLAY` command:
+Looking into this folder, you can see a number of index files as well as the input GTF and FASTQ files used.
 
-``` bash
-$ unset DISPLAY
-```
+## Exercise: 
 
-We also need to load the qualimap module:
+Note that the most recent Gencode annotations they have are for `release_45`, whereas the up-to-date version we used earlier are from Release 47.
 
-``` bash
-$ module load qualimap/2.2.1
-```
+-   Does it like there is a `STAR 2.7.11b` index available for a recent release on Biowulf somewhere in `/fdb/STAR_indices`? You may need to check both in both the Gencode and UCSC subfolders.
+-   If not - look in the `/fdb/STAR_indices/2.7.10b` directory. This slightly older version of STAR has more pre-prepared indices. If you find a relevant index folder - report the full path to that directory.
 
-Now we are ready to run Qualimap on our BAM file! There are different tools or modules available through Qualimap, and the [documentation website](http://qualimap.bioinfo.cipf.es/doc_html/command_line.html) details the tools and options available. We are interested in the `rnaseq` tool. To see the arguments available for this tool we can search the help:
+## Assignment 
 
-``` bash
-$ qualimap rnaseq 
-```
+Looking at recent publications or talking to your labmates - what is the most recent major genome build for your organism used by your research community? For example `GRCh38` for human - sometimes abbreviated to `hg38` by providers such as UCSC.
 
-We will be running Qualimap with the following specifications:
-
--   `-outdir`: output directory for html report
--   `-a`: Counting algorithm - uniquely-mapped-reads(default) or proportional (each multi-mapped read is weighted according to the number of mapped locations)
--   `-bam`: path/to/bam/file(s)
--   `-p`: Sequencing library protocol - strand-specific-forward, strand-specific-reverse or non-strand-specific (default)
--   `-gtf`: path/to/gtf/file - **needs to match the genome build and GTF used in alignment**
--   `--java-mem-size=`: set Java memory
-
-``` bash
-# assuming you are running the script from /results
-qualimap rnaseq -outdir results/qualimap/Mov10_oe_1 -a proportional /
--bam STAR/Mov10_oe_1_Aligned.sortedByCoord.out.bam /
--p strand-specific-reverse /
--gtf /data/NICHD-core0/references/human/gencode-v28/annotation/human_gencode-v28.gtf --java-mem-size=8G
-```
-
-### The Qualimap report
-
-The Qualimap report in HTML format should be present in the `results/qualimap` directory. To view this report you need a web browser, so you would need to transfer it over to your laptop. You can do so by Connecting to Server again.
-
-However, you don't need to do that. We generated this report on a subset of data, to get a better idea of the metrics let's **take a look at the report of the full dataset for `Mov_oe_1`**, available [in this zipped folder](https://www.dropbox.com/scl/fi/t3t41hjubytbce6d9g29h/Mov10_oe_1_fulldata_qualimap.zip?rlkey=aum3nw3jym3t4f3l31p6564jn&dl=1). Please download and unzip the folder; find the HTML report within and open it in your browser.
-
-#### **Read alignment summary**
-
-The first few numbers listed in the report are the mapping statistics. Qualimap also computes counts by assigning reads to genes and [reports associated statistics](http://qualimap.conesalab.org/doc_html/analysis.html#id7). For example it computes the following:
-
--   the number of reads aligned to genes
-
--   number of ambiguous alignments (reads matching several genes)
-
--   number of alignments without any feature (intronic and intergenic)
-
-<img src="../img/qualimap_read_alignment.png" width="700"/>
-
-> -   The percentage of mapped reads is a global indicator of the overall sequencing accuracy. We expect between 70-90% of reads to be mapped for the human genome.
-> -   Expect a small fraction of reads to be mapping equally well to multiple regions in the genome (‘multi-mapping reads’).
-> -   The count related metrics are not as relevant to us since we have quantified with Salmon at the transcript level.
-
-#### **Genomic Origin of Reads: Exon, Intron or Intergenic Region?**
-
-This section reports how many alignments fall into exonic, intronic and intergenic regions along with a number of intronic/intergenic alignments overlapping exons. Exonic region includes 5’UTR,protein coding region and 3’UTR region. This information is summarized in table in addition to a pie chart as shown below.
-
-<img src="../img/qualimap_genomic_feature.png" width="700"/>
-
-> -   Even if you have high genomic mapping rate for all samples, check to see where the reads are mapping. Expect a high proportion of reads mapping to exonic regions (\> 60%) and lower intronic mapping rates (20 -30%).
-> -   A higher intronic mapping rate is expected for rRNA removal compared to polyA selection. The intronic reads likely originate from immature transcripts which include either full-length pre-mRNA molecules or nascent transcripts where the RNA polymerase has not yet attached to the 3′ end of the gene.
-> -   A roughly equal distribution of reads mapping to intronic, exonic and intergenic regions suggests that there is DNA contamination.
-> -   Ribosomal RNA (rRNA) constitutes a large majority of the RNA species in any total RNA preparation. Despite depletion methods, you can never achieve complete rRNA removal. Even with Poly-A enrichment a small percentage of ribosomal RNA can stick to the enrichment beads non-specifically. Excess ribosomal content (\> 2%) will normally have to be filtered out so that differences in rRNA mapped reads across samples do not affect alignment rates and skew subsequent normalization of the data.
-
-#### **Transcript coverage profile**
-
-The profile provides ratios between mean coverage at the 5’ region, the 3’ region and the whole transcript. Coverage plots are generated for all genes total, and also for the 500 highest-expressed and 500 lowest-expressed genes separately.
-
--   **5’ bias**: the ratio between mean coverage at the 5’ region (first 100bp) and the whole transcript
--   **3’ bias**: is the ratio between mean coverage at the 3’ region (last 100bp) and the whole transcript
--   **5’-3’ bias**: is the ratio between both biases.
-
-<p align="center">
-
-<img src="../img/qualimap_transcript_coverage.png" width="700"/>
-
-</p>
-
-<p align="center">
-
-<img src="../img/qualimap_coverage_profile.png" width="700"/>
-
-</p>
-
-> -   In a perfect sequencing experiment you would expect to see a 5'-3' bias ratio of 1 with low coverage at both ends of the transcript. This would suggest no bias is present.
-> -   It is well-documented that libraries prepared with polyA selection can lead to high expression in 3' region (3' bias). At least [one study](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-6-r86) shows the reverse effect for rRNA removal.
-> -   If reads primarily accumulate at the 3’ end of transcripts in poly(A)-selected samples, this might indicate low RNA quality in the starting material.
-
-#### **Junction Analysis**
-
-Qualimap also reports the total number of reads mapping to splice junctions and the 10 most frequent junction rates. The pie chart shows analysis of junction positions in spliced alignments.
-
--   Known category represents percentage of alignments where both junction sides are known.
--   Partly known represents alignments where only one junction side is known.
--   All other alignments with junctions are marked as Novel.
-
-<p align="center">
-
-<img src="../img/qualimap_junctions.png" width="700"/>
-
-</p>
-
-> Other tools like [RNASeQC](https://software.broadinstitute.org/cancer/cga/rna-seqc) will plot figures that can help evaluate **GC content bias**. This is also an important aspect of QC, as low/high GC content regions will tend to have low coverage.
-
-------------------------------------------------------------------------
-
-## Summary
-
-Taken together, these metrics give us some insight into the quality of our samples and help us in identifying any biases present in our data. The conclusions derived from these QC results may indicate that we need to correct for these biases and so you may want to go back and modify the parameters for Salmon (mapping) accordingly.
-
-------------------------------------------------------------------------
-
-*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
+1.  Create a `reference_genome` subdirectory of your `/Bspc-training/$USER/rnaseq` directory. Create a `ref_notes.txt` file in there to answer the next question.
+2.  Find a GTF file, either on a consortium webpage or in a Biowulf STAR index directory, that corresponds with your chosen genome version. In the text file, make note of the full Biowulf directory paths or `wget` commands you will use to download the GTF and FASTA files.
+3.  If necessary - use `wget` to obtain these files in your `reference_genome` directory.
+4.  Once those are downloaded (or you have the full paths from Biowulf), modify the genome index script for your use case. You will likely have to modify the paths to the genome files. DO NOT ACTUALLY RUN THIS.
+5.  Something where they create frequency table of different genome features (gene, exon etc.) like Dr. Dale did last Friday for their own GTFs?
