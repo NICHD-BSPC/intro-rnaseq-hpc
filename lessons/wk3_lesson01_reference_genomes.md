@@ -112,76 +112,35 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/genc
 | 3             | feature type                                                    | gene, transcript, exon etc.                                 |
 | 4             | genomic start location                                          | 1-based integer                                             |
 | 5             | genomic end location                                            | integer                                                     |
-| 6             | score (not used)                                                | N/A                                                         |
+| 6             | score (not used)                                                | .                                                           |
 | 7             | genomic strand                                                  | +, -                                                        |
-| 8             | genomic phase                                                   | 0, 1, 2                                                     |
+| 8             | genomic phase                                                   | 0, 1, 2, .                                                  |
 | 9             | additional values, stored as key pairs, separated by semicolons | For example: gene_type 'protein_coding'; gene_name "C2CD4C" |
 
-Now that we know what type of information is inside the GTF file, let's use the commands we have learned so far to answer a simple question about our data: **how many unique exons are present on chromosome 1 using `chr1-hg19_genes.gtf`?**
-
-To determine the number of unique exons on chromosome 1, we are going to perform a series of steps as shown below. In this exercise, you need to figure out the command line for each step.
-
-1.  Extract only the genomic coordinates of exon features
-2.  Subset dataset to only keep genomic coordinates
-3.  Remove duplicate exons
-4.  Count the total number of exons
-
-Your end goal is to have a single line of code, wherein you have strung together multiple commands using the pipe operator. But, we recommend that you do it in a stepwise manner as detailed below.
-
-#### 1. Extract only the genomic coordinates of exon features
-
-We only want the exons (not CDS or start_codon features), so let's use `grep` to search for the word "exon". You should do sanity check on the first few lines of the output of `grep` by piping the result to the `head` command. ***Report the command you have at this stage.***
-
-#### 2. Subset the extracted information from step 1 to only keep genomic coordinates
-
-We will define the uniqueness of an exon by its genomic coordinates, both start and end. Therefore, from the step 1 output, we need to keep 4 columns (chr, start, stop, and strand) to find the total number of unique exons. The column numbers you want are 1, 4, 5, and 7.
-
-You can use `cut` to extract those columns from the output of step 1. ***Report the command you have at this stage.***
-
-At this point, the first few lines should look like this:
+Here is what a few lines of that look like in practice:
 
 ```         
-chr1    14362   14829   -
-chr1    14970   15038   -
-chr1    15796   15947   -
-chr1    16607   16765   -
-chr1    16858   17055   -
+chr19   HAVANA   gene   405438   409170   .   -   .   gene_id "ENSG00000183186.7"; gene_type "protein_coding"; gene_name "C2CD4C"; level 2; havana_gene "OTTHUMG00000180534.3";
+chr19   HAVANA   transcript   405438   409170   .   -   .   gene_id "ENSG00000183186.7"; transcript_id "ENST00000332235.7"; gene_type "protein_coding"; gene_name "C2CD4C"; transcript_type "protein_coding"; transcript_name "C2CD4C-001"; level 2; protein_id "ENSP00000328677.4"; transcript_support_level "2"; tag "basic"; tag "appris_principal_1"; tag "CCDS"; ccdsid "CCDS45890.1"; havana_gene "OTTHUMG00000180534.3"; havana_transcript "OTTHUMT00000451789.3";
 ```
 
-#### 3. Remove duplicate exons
+Let's see what kind of features are annotated for the study's gene of interest Mov10 Helicase (`MOV10`), which is on Chromosome 1.
 
-Now, we need to remove those exons that show up multiple times for different transcripts. We can use the `sort` command with the `-u` option. ***Report the command you have at this stage.***
+``` bash
+$ grep "MOV10" gencode.v47.primary_assembly.annotation.gtf | wc -l
+$ 772 # Does this seem like a biologically reasonable number? 
+```
 
-Do you see a change in how the sorting has changed? By default the `sort` command will sort and what you can't see here is that it has removed the duplicates. We will use step 4 to check if this step worked.
+Taking a peek at the results using `less` or something like `grep "MOV10" gencode.v47.primary_assembly.annotation.gtf | tail -n 5` , we see some results for a different gene with a similar name: `MOV101L` on `chr22`.
 
-#### 4. Count the total number of exons
-
-First, check how many lines we would have without using `sort -u` by piping the output to `wc -l`.
-
-Now, to count how many unique exons are on chromosome 1, we will add back the `sort -u` and pipe the output to `wc -l`. Do you observe a difference in number of lines?
-
-***Report the command you have at this stage and the number of lines you see with and without the `sort -u`.***
-
-<details>
-
-<summary><b><i>Answers</i></b></summary>
-
-<p><i>Question 1</i><br> <code>grep exon chr1-hg19_genes.gtf \| head</code><br></p>
-
-<p><i>Question 2</i><br> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| head</code><br></p>
-
-<p><i>Question 3</i><br> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| sort -u \| head</code><br></p>
-
-<p><i>Question 4</i><br> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| wc -l</code><br> The output returns 37,213 lines.<br> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| sort -u \| wc -l</code><br> The output returns 22,769 lines, indicating that repetitive lines have been removed.<br></p>
-
-</details>
+How do we
 
 ## Create a genome index with STAR
 
-Before we set up a script, let's explore the
+Before we set up a script, let's explore the possible versions of STAR are on Biowulf.
 
 ``` bash
-$ module load star
+$ module spider star
 ```
 
 The basic options to **generate genome indices** using STAR are as follows:
