@@ -55,15 +55,39 @@ rnaseq
 
 ## Finding Reference Genomes
 
-As mentioned above, we need to identify the relevant reference genome and an associated annotation file. [According to NHGRI](https://www.genome.gov/genetics-glossary/Human-Genome-Reference-Sequence), a reference genome (or reference assembly) is an accepted representation of the human genome sequence that is used as a standard for comparison to DNA/RNA sequences generated other studies. Having this standard genome assembly allows authors to
+As mentioned above, we need to identify the relevant reference genome and an associated annotation file.
+
+#### Reference Consortia
+
+[According to NHGRI](https://www.genome.gov/genetics-glossary/Human-Genome-Reference-Sequence), a reference genome (or reference assembly) is an accepted representation of the human genome sequence that is used as a standard for comparison to DNA/RNA sequences generated other studies. Having this standard genome assembly allows researchers to "speak the same language" when it comes to genomic locations and features.
 
 > **Discussion**: As of February 2025, NCBI hosts [1,831 human genome assemblies](https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=9606). How do we pick a genome to serve as reference for an organism? What qualities make for a good reference genome? Who makes these decisions?
 
-For humans and several other model organisms, the authority for
+For humans and several other model organisms, the research community makes use of a well-vetted and standardized assembly from the [Reference Genome Consortium](https://www.ncbi.nlm.nih.gov/grc). There are other organism-specific consortia doing annotation and assembly such as [FlyBase](https://flybase.org/) for Drosophila.
 
-How do we know which one of these assemblies and annotation files is right for my organism?
+As of this writing, the most recent version of this genome is known as `GRCH38.p14`, which is the 38th major "build" (released in 2013) of the assembly, and the 14th update, of this build (released in 2022). These new builds and updates represent corrections and updates to our knowledge of the content and structure of the human genome. This [YouTube video](https://www.youtube.com/watch?v=DeZTPCOKZrg) is a nice introduction to some of the genome assembly nomenclature and compares several versions of the human reference.
 
-Once we have identified files we are interested in, we use `wget` , which is a built-in piece of software that downloads files stored at HTTP, HTTPS, FTP and FTPS addresses.
+#### Sources of annotation 
+
+Briefly, genome annotation is the process of inferring the identity and location of functional elements, like genes, on an assembled genome. As you can probably imagine, this is crucial for making sense of any sequencing projects!
+
+As is the case for assemblies, major annotation efforts are conducted by research consortia, such as [ENCODE](https://www.encodeproject.org/help/project-overview/), which was started and funded by NHGRI:
+
+> The goal of ENCODE is to build a comprehensive parts list of functional elements in the human genome, including elements that act at the protein and RNA levels, and regulatory elements that control cells and circumstances in which a gene is active. The discovery and annotation of gene elements is accomplished primarily by sequencing a diverse range of RNA sources, comparative genomics, integrative bioinformatic methods, and human curation.
+
+A look at the landing page for the [current GENCODE human genome](https://www.gencodegenes.org/human/) shows us a number of different GTF and FASTA files we could download - *which one is most relevant for mapping with STAR?*
+
+#### Obtaining Reference Genome Files
+
+Luckily for us, the developers of STAR make pretty specific recommendations for us on page 6 of the [STAR manual](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf):
+
+> GENCODE: files marked with PRI (primary) strongly recommended for mouse and human
+
+The PRI files contain the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes, which STAR cannot make use of during mapping.
+
+So, from that page, find the
+
+Once we have those URLS handy, we use `wget` , which is a built-in piece of software that downloads files stored at HTTP, HTTPS, FTP and FTPS addresses. These are the commands I used to download these files into our shared space:
 
 ``` bash
 # DO NOT RUN - I have already downloaded this file for us
@@ -74,8 +98,6 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh
 # DO NOT RUN - I have already downloaded this file for us
 $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.primary_assembly.annotation.gtf.gz
 ```
-
-It contains the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes.
 
 ## The GTF Format
 
@@ -151,8 +173,6 @@ $ module load star/2.7.6a
 For this workshop we have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices (it takes a while and requires a lot of memory). The index can be found in `/data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28`
 
 The command to create an index can be found in the job submission script we have linked [here](../scripts/star_genome_index.run)
-
-> **NOTE:** By default the latest human genome build, GRCh38, contains information about alternative alleles for various locations on the genome. If using this version of the GRCh38 genome then it is advisable to use the HISAT2 aligner as it is able to utilize this information during the alignment. There is a version of GRCh38 available that does not have these alleles represented, which is the appropriate version to use with STAR. This is because STAR does not have the functionality to appropriately deal with the presence of alternate alleles as yet.
 
 The basic options to **generate genome indices** using STAR are as follows:
 
