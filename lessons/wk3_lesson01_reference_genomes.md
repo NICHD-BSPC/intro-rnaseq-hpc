@@ -166,15 +166,13 @@ Now, to count how many unique exons are on chromosome 1, we will add back the `s
 
 ## Create a genome index with STAR
 
-To use the STAR aligner, load the module:
+To use the STAR aligner. Explore
 
 ``` bash
-$ module load star/2.7.6a 
+$ module load star
 ```
 
 For this workshop we have generated the genome indices for you, so that we don't get held up waiting on the generation of the indices (it takes a while and requires a lot of memory). The index can be found in `/data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28`
-
-The command to create an index can be found in the job submission script we have linked [here](../scripts/star_genome_index.run)
 
 The basic options to **generate genome indices** using STAR are as follows:
 
@@ -198,24 +196,22 @@ Within `vim` we now add our shebang line, the SLURM directives, and our STAR com
 ``` bash
 #!/bin/bash
 
-#SBATCH -p short        # partition name
-#SBATCH -t 0-2:00       # hours:minutes runlimit after which job will be killed
-#SBATCH -n 6        # number of cores requested -- this needs to be greater than or equal to the number of cores you plan to use to run your job
-#SBATCH --mem 16G
-#SBATCH --job-name STAR_index       # Job name
-#SBATCH -o %j.out           # File to which standard out will be written
-#SBATCH -e %j.err       # File to which standard err will be written
+#SBATCH --partition=quick #quick partition
+#SBATCH --time=04:00:00 # time limit
+#SBATCH --cpus-per-task=8 # number of cores
+#SBATCH --mem=48g # requested memory
+#SBATCH --job-name grch38_star_index # Job name
+#SBATCH -o %j.out # File to which standard output will be written
+#SBATCH -e %j.err # File to which standard error will be written
+#SBATCH --mail-type=BEGIN,END
 
-cd /n/scratch2/username/
+# load most recent STAR module 
+module load STAR
 
-module load gcc/6.2.0 star/2.5.2b
+# Change directory to where the data is
+cd /data/changes/reference_genomes/human_GRCh38
 
-STAR --runThreadN 6 \
---runMode genomeGenerate \
---genomeDir chr1_hg38_index \
---genomeFastaFiles /n/groups/hbctraining/intro_rnaseq_hpc/reference_data_ensembl38/Homo_sapiens.GRCh38.dna.chromosome.1.fa \
---sjdbGTFfile /n/groups/hbctraining/intro_rnaseq_hpc/reference_data_ensembl38/Homo_sapiens.GRCh38.92.gtf \
---sjdbOverhang 99
+STAR --runThreadN 8 --runMode genomeGenerate --genomeDir /data/changes/reference_genomes/human_GRCh38 --genomeFastaFiles /data/changes/reference_genomes/GRCh38.primary_assembly.genome.fa --sjdbGTFfile /data/changes/reference_genomes/gencode.v47.primary_assembly.annotation.gtf --sjdbOverhang 99
 ```
 
 ``` bash
@@ -224,7 +220,7 @@ $ sbatch ~/rnaseq/scripts/genome_index.run
 
 ## Genome Indices on Biowulf
 
-Going right to the source to download the
+Going right to the source to download the GTF Files is
 
 A quick note on shared databases for human and other commonly used model organisms. The O2 cluster has a designated directory at `/n/groups/shared_databases/` in which there are files that can be accessed by any user. These files contain, but are not limited to, genome indices for various tools, reference sequences, tool specific data, and data from public databases, such as NCBI and PDB. So when using a tool that requires a reference of sorts, it is worth taking a quick look here because chances are it's already been taken care of for you.
 
