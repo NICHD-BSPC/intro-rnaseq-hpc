@@ -61,16 +61,29 @@ Then the seeds are stitched together based on the best alignment for the read (s
 
 ![STAR_step5](../img/alignment_STAR_step5.png){alt="STAR_step5"}
 
-## Sinteractive with scratch space
-
-#### Aligning reads
+## Aligning reads: Interactive
 
 Since we already have the reference index ready, we can move on to aligning reads to the genome.
 
-Create an output directory for our alignment files:
+First, we can open another interactive session. Note that we are requesting a good deal more memory (30 gigs), and CPUS (12). Mapping reads to a big, eukaryotic genome is We are also adding a new parameter: `gres=lscratch:1`.
 
 ``` bash
-$ cd ~/rnaseq/raw_data
+$ sinteractive --cpus-per-task=12 --mem=30g --gres=lscratch:1
+```
+
+Each Biowulf node has a directly attached disk containing a `lscratch` filesystem. Note that this space is not backed up, and thus, users should use it only as temporary space while running a job. Once the job exits, you will no longer have access to `/lscratch` on the node. See [Using Local Disk](https://hpc.nih.gov/docs/userguide.html#local) in the Biowulf User Guide for more info.
+
+It is recommended that you allocate 6x the compressed input fastq size of lscratch if we are producing a sorted BAM file (see below). More details about running STAR on Biowulf can be found on the [Biowulf STAR software page](It is recommended that you allocate 6x the compressed input fastq size of lscratch - see more details and even more about running STAR on the Biowulf STAR software page.).
+
+``` bash
+# Double-checking the size of the FASTQ input file. It is 73MB. I rounded up from 73MB*6 to set our lscratch to roughly 1GB. 
+ls -lh /data/BSPC-training/$USER/rnaseq/raw_data/Mov10_oe_1.subset.fq
+```
+
+Next, move into our `raw_data` and create an output directory for our alignment files:
+
+``` bash
+$ cd /data/Bspc-training/$USER/rnaseq/raw_data
 
 $ mkdir ../results/STAR
 ```
@@ -86,45 +99,21 @@ The basic options for aligning reads to the genome using STAR are:
 
 Listed below are additional parameters that we will use in our command:
 
--   `--outSAMtype`: output filetype (SAM default), but also produce a BAM that has been sorted by genomic coordinated
+-   `--outSAMtype`: output filetype (SAM default), but also produce a BAM that has been sorted by genomic coordinates, which is what will be needed for downstream analyses.
 -   `--outSAMunmapped`: what to do with unmapped reads
 
 > **NOTE:** Note that "**STAR’s default parameters are optimized for mammalian genomes.** Other species may require significant modifications of some alignment parameters; in particular, the maximum and minimum intron sizes have to be reduced for organisms with smaller introns" [[1](http://bioinformatics.oxfordjournals.org/content/early/2012/10/25/bioinformatics.bts635.full.pdf+html)].
 
-The full command is provided below for you to copy paste into your terminal. If you want to manually enter the command, it is advisable to first type out the full command in a text editor (i.e. [Sublime Text](http://www.sublimetext.com/) or [Notepad++](https://notepad-plus-plus.org/)) on your local machine and then copy paste into the terminal. This will make it easier to catch typos and make appropriate changes.
+The full command is provided below for you to copy paste into your terminal. If you want to manually enter the command, it is advisable to first type out the full command in a on your local machine and then copy paste into the terminal. This will make it easier to catch typos and make appropriate changes.
 
 ``` bash
 # assumes you are in raw_data directory
-$ STAR --genomeDir /data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28 \
---runThreadN 6 \
---readFilesIn Mov10_oe_1.subset.fq \
---outFileNamePrefix ../results/STAR/Mov10_oe_1_ \
---outSAMtype BAM SortedByCoordinate \
---outSAMunmapped Within \
---outSAMattributes Standard 
+$ STAR --genomeDir /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38 --runThreadN 10 --readFilesIn Mov10_oe_1.subset.fq --outFileNamePrefix ../results/STAR/Mov10_oe_1_ --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard 
 ```
 
-Since this will take longer with a full-size human reference genome, let's submit an SBATCH script:
+Mapping the full, non-subsetted samples will take much more time, so this is a good use case for submitting an SBATCH script - which is what you'll do for your assignment!
 
 ``` bash
-#!/bin/bash
-
-#SBATCH --partition=quick
-#SBATCH --time=03:00:00       # time limit
-#SBATCH --cpus-per-task=6        # number of cores
-#SBATCH --mem=32g   # requested memory
-#SBATCH --job-name salmon_in_serial      # Job name
-#SBATCH -o %j.out           # File to which standard output will be written
-#SBATCH -e %j.err       # File to which standard error will be written
-#SBATCH --mail-type=BEGIN,END
-
-# Load Salmon module
-module load star/2.7.6a
-
-# Change directory to where the data is
-cd /data/NICHD-core0/test/changes/rc_training/rnaseq/raw_data
-
-STAR --genomeDir /data/NICHD-core0/references/human/gencode-v28/genome/star/human_gencode-v28 --runThreadN 6 --readFilesIn Mov10_oe_1.subset.fq --outFileNamePrefix ../results/STAR/Mov10_oe_1_ --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard 
 ```
 
 #### STAR output
@@ -196,11 +185,13 @@ qualimap rnaseq -outdir results/qualimap/Mov10_oe_1 -a proportional /
 -gtf /data/NICHD-core0/references/human/gencode-v28/annotation/human_gencode-v28.gtf --java-mem-size=8G
 ```
 
+#### **In-class exercise:** 
+
+Modify the above script to map the `Irrel_kd_1.subset.fq` sample to the reference genome. You can use the up arrow to so you don't need to type out the whole command again.
+
 ### The Qualimap report
 
 The Qualimap report in HTML format should be present in the `results/qualimap` directory. To view this report you need a web browser, so you would need to transfer it over to your laptop. You can do so by Connecting to Server again.
-
-However, you don't need to do that. We generated this report on a subset of data, to get a better idea of the metrics let's **take a look at the report of the full dataset for `Mov_oe_1`**, available [in this zipped folder](https://www.dropbox.com/scl/fi/t3t41hjubytbce6d9g29h/Mov10_oe_1_fulldata_qualimap.zip?rlkey=aum3nw3jym3t4f3l31p6564jn&dl=1). Please download and unzip the folder; find the HTML report within and open it in your browser.
 
 #### **Read alignment summary**
 
@@ -273,12 +264,33 @@ Qualimap also reports the total number of reads mapping to splice junctions and 
 
 ## Summary
 
-Taken together, these metrics give us some insight into the quality of our samples and help us in identifying any biases present in our data. The conclusions derived from these QC results may indicate that we need to correct for these biases and so you may want to go back and modify the parameters for Salmon (mapping) accordingly.
+Taken together, these metrics give us some insight into the quality of our samples and help us in identifying any biases present in our data. The conclusions derived from these QC results may indicate that we need to correct for these biases by changing mapping parameters or performing other analyses.
 
 ------------------------------------------------------------------------
 
-*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
+## Assignment 
 
-------------------------------------------------------------------------
+1.  Modify the following script template to create the FASTQ files in /data/Bspc-training/shared/rnaseq_jan2025.
 
-*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
+    ``` bash
+    #!/bin/bash
+    #SBATCH --gres=lscratch: #designate lscratch spage
+    #SBATCH --partition=quick
+    #SBATCH --time=3:00:00     # time limit
+    #SBATCH --cpus-per-task=       # number of cores
+    #SBATCH --mem=   # requested memory
+    #SBATCH --job-name salmon_in_serial      # Job name
+    #SBATCH -o %j.out           # File to which standard output will be written
+    #SBATCH -e %j.err       # File to which standard error will be written
+    #SBATCH --mail-type=BEGIN,END
+
+    # Load STAR
+    module load
+
+    # Change directory to where the data is
+    cd 
+
+    STAR --genomeDir --runThreadN --readFilesIn --outFileNamePrefix --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard  
+    ```
+
+2.  In an
