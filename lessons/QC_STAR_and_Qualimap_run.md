@@ -1,7 +1,7 @@
 ---
 title: "QC with STAR and Qualimap"
-author: "Meeta Mistry, Mary Piper, Modified by Sally Chang at NICHD"
-date: January 8th, 2024
+author: "Harvard HPC Staff, Modified by Sally Chang at NICHD"
+date: Last Modifed February 2025
 ---
 
 Approximate time: 50 minutes
@@ -12,11 +12,9 @@ Approximate time: 50 minutes
 -   Running an alignment tool to generate BAM files
 -   Running Qualimap to compute metrics on alignment files
 
-## Quality Control for Alignment Data - edit this section so it doesn't mention Salmon
+## Aligning Reads to a Genome
 
-After running Salmon, we now have transcript-level abundance estimates for each of our samples. When Salmon performs the quasi-alignment, internally the algorithm knows the location(s) to which each read is assigned, however this information is not shared with the user. **In order for us to make an assessment on the quality of the mapping we need genomic coordinate information for where each read maps**. Since this is not part of the Salmon output we will need to use a genome alignment tools to **generate a BAM file**. The BAM file will be used as input to a tool called [Qualimap](http://qualimap.bioinfo.cipf.es/doc_html/intro.html) which computes various quality metrics such as DNA or rRNA contamination, 5'-3' biases, and coverage biases.
-
-<img src="../img/full_workflow_qualimap_2019.png"/>
+**In order for us to test for differential expression we need to gain information we will gain genomic coordinate information for where each read maps** by aligning it to the reference genome to produce a BAM file. We will also **assess the quality of the mapping** by using the BAM file as input to a tool called [Qualimap](http://qualimap.bioinfo.cipf.es/doc_html/intro.html) which computes various quality metrics such as DNA or rRNA contamination, 5'-3' biases, and coverage biases.
 
 ## Alignment file format: SAM/BAM
 
