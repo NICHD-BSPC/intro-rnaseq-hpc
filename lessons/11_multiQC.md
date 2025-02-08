@@ -57,7 +57,7 @@ We are going to run MultiQC on the following 4 outputs from our workflow:
 
 -   `.zip` files from FastQC
 -   `.Log.final.out` files from STAR
--   `.qualimap` files from Qualimap
+-   files from Qualimap
 
 To create a more meaningful report to look at we thought it best to run MultiQC on the full dataset instead of the subset we have been working with so far. We have run each of the tools mentioned above on the full dataset and stored the result in the directory `/data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc`. We will point to these files as input for our MultiQC analysis.
 
@@ -69,16 +69,14 @@ To run MultiQC, we can provide it two inputs at a minimum:
 > **NOTE:** MultiQC has additional parameters we could include; use `multiqc -h` to find out more.
 
 ``` bash
-$ multiqc -n multiqc_report_rnaseq /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/fastqc/*zip /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/STAR/*Log.final.out /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/qualimap/*.qualimap
+$ multiqc -n multiqc_report_rnaseq /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/fastqc/*zip /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/STAR/*Log.final.out /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/qualimap/*
 ```
 
 > **NOTE**: You will see the progress of analysis printed out on the terminal as the tool runs. If you want to save this output into a log file (for future reference), you can use `2>` operator to redirect it to a file. For example, at the end of script, add `2> log.txt`. `2>`redirects the output of so-called standard error.
 
 It takes a couple of minutes to generate the MultiQC report. The report provides nice visualizations across samples, which is very useful to determine consistency and to identify problematic samples.
 
-The output of MultiQC is one HTML file (`multiqc_report_rnaseq.html`) and a data folder. Transfer the interactive HTML report over to your laptop using **FileZilla**, and visualize the outputs of the four tools we used to generate the report.
-
-> *For a refresher on using Filezilla, please refer back to our [FastQC assessment lesson](07_qc_fastqc_assessment.md).*
+The output of MultiQC is one HTML file (`multiqc_report_rnaseq.html`) and a data folder. Transfer the interactive HTML report over to your laptop using `scp` or the locally mounted server option.
 
 ## Assessing the quality control metrics
 
@@ -104,7 +102,7 @@ Using `Configure Columns` button, we are going to choose the following columns:
 
 </p>
 
-In the above image, the description column is helpful in interpretating the table. Upon perusal of the table, we can see input from FastQC, STAR, Qualimap and salmon. For example, the total number of raw reads is given in the `M Seqs` column on the far right of the table.
+In the above image, the description column is helpful in interpreting the table. Upon perusal of the table, we can see input from FastQC, STAR, Qualimap and salmon. For example, the total number of raw reads is given in the `M Seqs` column on the far right of the table.
 
 STAR provides information about *uniquely mapping reads* in the `%Aligned` column. A good quality sample will have **at least 75% of the reads uniquely mapped**. Once the value starts to drop below 60%, it's advisable to start troubleshooting. Low number of uniquely mapping reads means that more reads are mapped to multiple locations.
 
@@ -147,3 +145,7 @@ We can also identify possible contamination of our samples by inspecting the per
 </p>
 
 Generally speaking, in a good library, we expect over 60% of reads to be mapped to exons for mouse or human organisms. For other organisms, the percentage depends on how well the genome is annotated.
+
+## Assignment 
+
+Examine the MultiQC report and make the following observations:
