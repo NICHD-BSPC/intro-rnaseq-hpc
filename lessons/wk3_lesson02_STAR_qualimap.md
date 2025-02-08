@@ -47,11 +47,11 @@ This sequential searching of only the unmapped portions of reads underlies the e
 
 **If STAR does not find an exact matching sequence** for each part of the read due to mismatches or indels, the previous MMPs will be extended.
 
-![STAR_step3](../img/alignment_STAR_step3.png){alt="STAR_step3"}
+![STAR_step3](../img/alignment_STAR_step3.png)
 
 **If extension does not give a good alignment**, then the poor quality or adapter sequence (or other contaminating sequence) will be soft clipped.
 
-![STAR_step4](../img/alignment_STAR_step4.png){alt="STAR_step4"}
+![STAR_step4](../img/alignment_STAR_step4.png)
 
 #### Clustering, stitching, and scoring
 
@@ -59,21 +59,21 @@ The separate seeds are stitched together to create a complete read by first clus
 
 Then the seeds are stitched together based on the best alignment for the read (scoring based on mismatches, indels, gaps, etc.).
 
-![STAR_step5](../img/alignment_STAR_step5.png){alt="STAR_step5"}
+![STAR_step5](../img/alignment_STAR_step5.png)
 
 ## Aligning reads: Interactive
 
 Since we already have the reference index ready, we can move on to aligning reads to the genome.
 
-First, we can open another interactive session. Note that we are requesting a good deal more memory (30 gigs), and CPUS (12). Mapping reads to a big, eukaryotic genome is We are also adding a new parameter: `gres=lscratch:1`.
+First, we can open another interactive session. Note that we are requesting a good deal more memory (24 gigs), and CPUS (12). Mapping reads to a big, eukaryotic genome is We are also adding a new parameter: `gres=lscratch:1`.
 
 ``` bash
-$ sinteractive --cpus-per-task=12 --mem=30g --gres=lscratch:1
+$ sinteractive --cpus-per-task=12 --mem=24g --gres=lscratch:1
 ```
 
 Each Biowulf node has a directly attached disk containing a `lscratch` filesystem. Note that this space is not backed up, and thus, users should use it only as temporary space while running a job. Once the job exits, you will no longer have access to `/lscratch` on the node. See [Using Local Disk](https://hpc.nih.gov/docs/userguide.html#local) in the Biowulf User Guide for more info.
 
-It is recommended that you allocate 6x the compressed input fastq size of lscratch if we are producing a sorted BAM file (see below). More details about running STAR on Biowulf can be found on the [Biowulf STAR software page](It is recommended that you allocate 6x the compressed input fastq size of lscratch - see more details and even more about running STAR on the Biowulf STAR software page.).
+It is recommended that you allocate 6x the compressed input fastq size of lscratch if we are producing a sorted BAM file (see below). More details about running STAR on Biowulf can be found on the [Biowulf STAR software page](It%20is%20recommended%20that%20you%20allocate%206x%20the%20compressed%20input%20fastq%20size%20of%20lscratch%20-%20see%20more%20details%20and%20even%20more%20about%20running%20STAR%20on%20the%20Biowulf%20STAR%20software%20page.).
 
 ``` bash
 # Double-checking the size of the FASTQ input file. It is 73MB. I rounded up from 73MB*6 to set our lscratch to roughly 1GB. 
@@ -108,20 +108,17 @@ The full command is provided below for you to copy paste into your terminal. If 
 
 ``` bash
 # assumes you are in raw_data directory
-$ STAR --genomeDir /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38 --runThreadN 10 --readFilesIn Mov10_oe_1.subset.fq --outFileNamePrefix ../results/STAR/Mov10_oe_1_ --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard 
+$ STAR --genomeDir /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38 --runThreadN 10 --readFilesIn Mov10_oe_1.subset.fq --outFileNamePrefix ../results/STAR/Mov10_oe_1_subset --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard 
 ```
 
-Mapping the full, non-subsetted samples will take much more time, so this is a good use case for submitting an SBATCH script - which is what you'll do for your assignment!
-
-``` bash
-```
+Mapping the full, non-subsetted samples will take much more time, so this is a good use case for submitting an SBATCH script.
 
 #### STAR output
 
-After running our single FASTQ file through the STAR aligner, you should have a number of output files in the `~/rnaseq/results/STAR` directory. Let's take a quick look at some of the files that were generated and explore their content.
+After running our single FASTQ file through the STAR aligner, you should have a number of output files in your `/rnaseq/results/STAR` directory. Let's take a quick look at some of the files that were generated and explore their content.
 
 ``` bash
-$ cd ~/rnaseq/results/STAR
+$ cd ../rnaseq/results/STAR
     
 $ ls -lh
 ```
@@ -140,14 +137,14 @@ You should have **5 output files** plus a single `.tmp` directory for the Mov10_
 
 Alignment data files frequently contain biases that are introduced by sequencing technologies and/or during sample preparation. Therefore, one of the fundamental requirement during analysis of these data is to perform quality control. In this way, we get an idea of **how well our reads align to the reference** and **how well data fit with the expected outcome**.
 
-We will take the BAM file we generated in the previous step and use it as input to Qualimap which computes various quality metrics such as DNA or rRNA contamination, 5'-3' biases, and coverage biases.
+We *could* take the BAM file we generated in the previous step and use it as input to Qualimap which computes various quality metrics such as DNA or rRNA contamination, 5'-3' biases, and coverage biases.
 
 To **run Qualimap**, change directories to the `rnaseq` folder and make a `qualimap` folder inside the `results` directory:
 
 ``` bash
-$ cd ~/rnaseq
+$ cd /data/Bspc-training/$USER/rnaseq #if you aren't already there 
 
-$ mkdir -p results/qualimap
+$ mkdir -p results/qualimap #check out mkdir's man page. What does -p do? 
 ```
 
 By default, Qualimap will try to open a GUI to run Qualimap, so we need to run the `unset DISPLAY` command:
@@ -162,7 +159,7 @@ We also need to load the qualimap module:
 $ module load qualimap/2.2.1
 ```
 
-Now we are ready to run Qualimap on our BAM file! There are different tools or modules available through Qualimap, and the [documentation website](http://qualimap.bioinfo.cipf.es/doc_html/command_line.html) details the tools and options available. We are interested in the `rnaseq` tool. To see the arguments available for this tool we can search the help:
+Now we are ready to run Qualimap on our BAM file! There are different tools or modules available through Qualimap, and the [documentation website](http://qualimap.bioinfo.cipf.es/doc_html/command_line.html) details the tools and options available. We are interested in the `rnaseq` tool. To see the arguments available for this tool we can look at `help`.
 
 ``` bash
 $ qualimap rnaseq 
@@ -178,20 +175,13 @@ We will be running Qualimap with the following specifications:
 -   `--java-mem-size=`: set Java memory
 
 ``` bash
-# assuming you are running the script from /results
-qualimap rnaseq -outdir results/qualimap/Mov10_oe_1 -a proportional /
--bam STAR/Mov10_oe_1_Aligned.sortedByCoord.out.bam /
--p strand-specific-reverse /
--gtf /data/NICHD-core0/references/human/gencode-v28/annotation/human_gencode-v28.gtf --java-mem-size=8G
+# assuming you are running the script from /results - change directory to get there, if needed 
+qualimap rnaseq -outdir qualimap/Mov10_oe_1 -a proportional -bam STAR/Mov10_oe_1_Aligned.sortedByCoord.out.bam -p strand-specific-reverse -gtf /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf --java-mem-size=8G
 ```
-
-#### **In-class exercise:** 
-
-Modify the above script to map the `Irrel_kd_1.subset.fq` sample to the reference genome. You can use the up arrow to so you don't need to type out the whole command again.
 
 ### The Qualimap report
 
-The Qualimap report in HTML format should be present in the `results/qualimap` directory. To view this report you need a web browser, so you would need to transfer it over to your laptop. You can do so by Connecting to Server again.
+The Qualimap report in HTML format should be present in the `results/qualimap` directory. To view this report you need a web browser, so you would need to transfer it over to your laptop. You can do so by Connecting to Server again or using `scp`. **But as we saw with our FASTQC exercise, calculating these for the small subset is not representative of our whole library, so we are going to walk through these results for a full sample. You can open up the full HTML report.**
 
 #### **Read alignment summary**
 
@@ -203,17 +193,16 @@ The first few numbers listed in the report are the mapping statistics. Qualimap 
 
 -   number of alignments without any feature (intronic and intergenic)
 
-![](../img/qualimap_read_alignment.png){width="700"}
+![](images/qualimap_reads_table.png)
 
 > -   The percentage of mapped reads is a global indicator of the overall sequencing accuracy. We expect between 70-90% of reads to be mapped for the human genome.
 > -   Expect a small fraction of reads to be mapping equally well to multiple regions in the genome (‘multi-mapping reads’).
-> -   The count related metrics are not as relevant to us since we have quantified with Salmon at the transcript level.
 
 #### **Genomic Origin of Reads: Exon, Intron or Intergenic Region?**
 
 This section reports how many alignments fall into exonic, intronic and intergenic regions along with a number of intronic/intergenic alignments overlapping exons. Exonic region includes 5’UTR,protein coding region and 3’UTR region. This information is summarized in table in addition to a pie chart as shown below.
 
-![](../img/qualimap_genomic_feature.png){width="700"}
+![](images/qualimap1_FULL_reads_genomic_origin.png)
 
 > -   Even if you have high genomic mapping rate for all samples, check to see where the reads are mapping. Expect a high proportion of reads mapping to exonic regions (\> 60%) and lower intronic mapping rates (20 -30%).
 > -   A higher intronic mapping rate is expected for rRNA removal compared to polyA selection. The intronic reads likely originate from immature transcripts which include either full-length pre-mRNA molecules or nascent transcripts where the RNA polymerase has not yet attached to the 3′ end of the gene.
@@ -228,15 +217,15 @@ The profile provides ratios between mean coverage at the 5’ region, the 3’ r
 -   **3’ bias**: is the ratio between mean coverage at the 3’ region (last 100bp) and the whole transcript
 -   **5’-3’ bias**: is the ratio between both biases.
 
+|            |      |
+|------------|------|
+| 5' bias    | 0.7  |
+| 3' bias    | 0.59 |
+| 5'-3' bias | 1.01 |
+
 <p align="center">
 
-![](../img/qualimap_transcript_coverage.png){width="700"}
-
-</p>
-
-<p align="center">
-
-![](../img/qualimap_coverage_profile.png){width="700"}
+![](images/qualimap2_coverage_profile_along.png)
 
 </p>
 
@@ -254,7 +243,7 @@ Qualimap also reports the total number of reads mapping to splice junctions and 
 
 <p align="center">
 
-![](../img/qualimap_junctions.png){width="700"}
+![](images/qualimap4_junction_analysis.png)
 
 </p>
 
@@ -264,33 +253,37 @@ Qualimap also reports the total number of reads mapping to splice junctions and 
 
 ## Summary
 
-Taken together, these metrics give us some insight into the quality of our samples and help us in identifying any biases present in our data. The conclusions derived from these QC results may indicate that we need to correct for these biases by changing mapping parameters or performing other analyses.
+Taken together, these metrics give us some insight into the quality of our samples and help us in identifying any biases present in our data. The conclusions derived from these QC results may indicate that we need to correct for these biases by changing mapping parameters for performing other analyses.
 
 ------------------------------------------------------------------------
 
-## Assignment 
+## Assignment
 
-1.  Modify the following script template to create the FASTQ files in /data/Bspc-training/shared/rnaseq_jan2025.
+Copy and paste and then use VIM to modify the following script template to map the full `/data/Bspc-training/shared/rnaseq_jan2025/Irrel_kd_1.fq` sample as if you were running it from your `/scripts` directory. Save it in `/scripts` as `Irrel_kd_1_STAR.sh` . *This will require you to convert some aspects of our interactive STAR command to a SBATCH script - a very common task in bioinformatics when we want to scale something up!*
 
-    ``` bash
-    #!/bin/bash
-    #SBATCH --gres=lscratch: #designate lscratch spage
-    #SBATCH --partition=quick
-    #SBATCH --time=3:00:00     # time limit
-    #SBATCH --cpus-per-task=       # number of cores
-    #SBATCH --mem=   # requested memory
-    #SBATCH --job-name salmon_in_serial      # Job name
-    #SBATCH -o %j.out           # File to which standard output will be written
-    #SBATCH -e %j.err       # File to which standard error will be written
-    #SBATCH --mail-type=BEGIN,END
+Let me know when this is ready but **DO NOT RUN THIS, we don't have space for everyone to have full-sized BAM files - I have them pre-generated for other analyses - this is to have you practice choosing these mapping parameters.**
 
-    # Load STAR
-    module load
+``` bash
+#!/bin/bash
+#SBATCH --gres=lscratch: #designate lscratch space based on size of input FASTQ file
+#SBATCH --partition=quick
+#SBATCH --time=3:00:00     # time limit
+#SBATCH --cpus-per-task=       # number of cores
+#SBATCH --mem=   # requested memory
+#SBATCH --job-name salmon_in_serial      # Job name
+#SBATCH -o .out           # File to which standard output will be written
+#SBATCH -e .err       # File to which standard error will be written
+#SBATCH --mail-type=BEGIN,END
 
-    # Change directory to where the data is
-    cd 
+# Load STAR same star version we used above
+module load 
 
-    STAR --genomeDir --runThreadN --readFilesIn --outFileNamePrefix --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard  
-    ```
+# Fill in the blanks! 
+STAR --genomeDir --runThreadN --readFilesIn --outFileNamePrefix --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard --outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp
+```
 
-2.  In an
+**Some hints:**
+
+-   `--outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp` is already set for you, so you don't need to modify this. You may want to check out the STAR Biowulf page to understand what this is doing.
+
+-   Make sure there is a relationship between the number of CPUs you request and the number of actual threads you set.
