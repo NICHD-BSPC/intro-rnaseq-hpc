@@ -176,7 +176,7 @@ We will be running Qualimap with the following specifications:
 
 ``` bash
 # assuming you are running the script from /results - change directory to get there, if needed 
-qualimap rnaseq -outdir results/qualimap/Mov10_oe_1 -a proportional -bam STAR/Mov10_oe_1_Aligned.sortedByCoord.out.bam -p strand-specific-reverse -gtf /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf --java-mem-size=8G
+qualimap rnaseq -outdir qualimap/Mov10_oe_1 -a proportional -bam STAR/Mov10_oe_1_Aligned.sortedByCoord.out.bam -p strand-specific-reverse -gtf /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf --java-mem-size=8G
 ```
 
 ### The Qualimap report
@@ -259,23 +259,31 @@ Taken together, these metrics give us some insight into the quality of our sampl
 
 ## Assignment
 
-1.  Copy and paste and then use VIM to modify the following script template to map the full XXXX sample. Save it in `/scripts` as . **DO NOT RUN THIS, we don't have space for everyone to have full-sized BAM files - I have them pre-generated for other analyses - this is to have you practice choosing these mapping parameters.**
+Copy and paste and then use VIM to modify the following script template to map the full `/data/Bspc-training/shared/rnaseq_jan2025/Irrel_kd_1.fq` sample as if you were running it from your `/scripts` directory. Save it in `/scripts` as `Irrel_kd_1_STAR.sh` . *This will require you to convert some aspects of our interactive STAR command to a SBATCH script - a very common task in bioinformatics when we want to scale something up!*
 
-    ``` bash
-    #!/bin/bash
-    #SBATCH --gres=lscratch: #designate lscratch space based on size of input FASTQ file
-    #SBATCH --partition=quick
-    #SBATCH --time=3:00:00     # time limit
-    #SBATCH --cpus-per-task=       # number of cores
-    #SBATCH --mem=   # requested memory
-    #SBATCH --job-name salmon_in_serial      # Job name
-    #SBATCH -o .out           # File to which standard output will be written
-    #SBATCH -e .err       # File to which standard error will be written
-    #SBATCH --mail-type=BEGIN,END
+Let me know when this is ready but **DO NOT RUN THIS, we don't have space for everyone to have full-sized BAM files - I have them pre-generated for other analyses - this is to have you practice choosing these mapping parameters.**
 
-    # Load STAR same star version we used above
-    module load 
+``` bash
+#!/bin/bash
+#SBATCH --gres=lscratch: #designate lscratch space based on size of input FASTQ file
+#SBATCH --partition=quick
+#SBATCH --time=3:00:00     # time limit
+#SBATCH --cpus-per-task=       # number of cores
+#SBATCH --mem=   # requested memory
+#SBATCH --job-name salmon_in_serial      # Job name
+#SBATCH -o .out           # File to which standard output will be written
+#SBATCH -e .err       # File to which standard error will be written
+#SBATCH --mail-type=BEGIN,END
 
-    # Fill in the blanks! 
-    STAR --genomeDir --runThreadN --readFilesIn --outFileNamePrefix --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard  
-    ```
+# Load STAR same star version we used above
+module load 
+
+# Fill in the blanks! 
+STAR --genomeDir --runThreadN --readFilesIn --outFileNamePrefix --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard --outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp
+```
+
+**Some hints:**
+
+-   `--outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp` is already set for you, so you don't need to modify this. You may want to check out the STAR Biowulf page to understand what this is doing.
+
+-   Make sure there is a relationship between the number of CPUs you request and the number of actual threads you set.
