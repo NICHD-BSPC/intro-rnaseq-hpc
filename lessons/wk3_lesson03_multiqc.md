@@ -1,7 +1,7 @@
 ---
 title: MultiQC
-authors: Radhika Khetani, Mary Piper, Jihe Liu, Meeta Mistry (Edited by Sally Chang @ NICHD)
-Date: Edits starting Oct 10, 2024
+authors: Created by Harvard HPC Staff, Modified by Sally Chang @ NICHD
+Date: Last edited February 2025
 ---
 
 Approximate time: 30 minutes
@@ -29,12 +29,12 @@ Manually tracking these metrics is tedious and error-prone. Many tools can help 
 
 In this lesson, we will be using MultiQC to aggregate results from several tools and generates a single HTML report with plots to visualize and compare QC metrics between the samples.
 
-MultiQC can generate this report from 96 different bioinformatics tools, and these tools span various NGS analyses, e.g., basic QC, RNA-seq, ChIP-seq, variant calling, genome annotation, etc. We are going to use it to aggregate information from the results of [FastQC](http://multiqc.info/docs/#fastqc), [STAR](http://multiqc.info/docs/#star), [Qualimap](http://multiqc.info/docs/#qualimap), and [salmon](http://multiqc.info/docs/#salmon). MultiQC can parse the information from **specific output files** of these tools.
+MultiQC can generate this report from 96 different bioinformatics tools, and these tools span various NGS analyses, e.g., basic QC, RNA-seq, ChIP-seq, variant calling, genome annotation, etc. We are going to use it to aggregate information from the results of [FastQC](http://multiqc.info/docs/#fastqc), [STAR](http://multiqc.info/docs/#star), and [Qualimap](http://multiqc.info/docs/#qualimap). MultiQC can parse the information from **specific output files** of these tools.
 
 Start by creating a directory for our output called `multiqc_report`:
 
 ``` bash
-$ cd ~/rnaseq/
+$ cd /data/Bspc-training/$USER/rnaseq #if needed
 
 $ mkdir results/multiqc_report
 ```
@@ -45,19 +45,11 @@ Then navigate into that directory:
 $ cd results/multiqc_report
 ```
 
-Next, load the three modules needed to run MultiQC: `gcc`, `python`, `multiqc`.
+Next, load MultiQC. The default version is fine but make sure to note what version it is!
 
 ``` bash
-$ cd results/multiqc_report
-
 $ module load multiqc #loads v1.22 right now 
 ```
-
-------------------------------------------------------------------------
-
-**Exercise**
-
-How did we know which modules to load in addition to multiqc?
 
 ------------------------------------------------------------------------
 
@@ -65,12 +57,9 @@ We are going to run MultiQC on the following 4 outputs from our workflow:
 
 -   `.zip` files from FastQC
 -   `.Log.final.out` files from STAR
--   `.qualimap` files from Qualimap
--   `.salmon` directories from salmon
+-   files from Qualimap
 
-To create a more meaningful report to look at we thought it best to run MultiQC on the full dataset instead of the subset we have been working with so far. We have run each of the tools mentioned above on the full dataset and stored the result in the directory `/n/groups/hbctraining/rna-seq_2019_02/snapshots/full_dataset_results`. We will point to these files as input for our MultiQC analysis.
-
-***I will run pipeline on full samples soon so that we have equivalent files.***
+To create a more meaningful report to look at we thought it best to run MultiQC on the full dataset instead of the subset we have been working with so far. We have run each of the tools mentioned above on the full dataset and stored the result in the directory `/data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc`. We will point to these files as input for our MultiQC analysis.
 
 To run MultiQC, we can provide it two inputs at a minimum:
 
@@ -80,20 +69,14 @@ To run MultiQC, we can provide it two inputs at a minimum:
 > **NOTE:** MultiQC has additional parameters we could include; use `multiqc -h` to find out more.
 
 ``` bash
-$ multiqc -n multiqc_report_rnaseq \
-/n/groups/hbctraining/rna-seq_2019_02/snapshots/full_dataset_results/fastqc/*zip \
-/n/groups/hbctraining/rna-seq_2019_02/snapshots/full_dataset_results/STAR/*Log.final.out \
-/n/groups/hbctraining/rna-seq_2019_02/snapshots/full_dataset_results/qualimap/* \
-/n/groups/hbctraining/rna-seq_2019_02/snapshots/full_dataset_results/salmon/*salmon
+$ multiqc -n multiqc_report_rnaseq /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/fastqc/*zip /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/STAR/*Log.final.out /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/qualimap/*
 ```
 
 > **NOTE**: You will see the progress of analysis printed out on the terminal as the tool runs. If you want to save this output into a log file (for future reference), you can use `2>` operator to redirect it to a file. For example, at the end of script, add `2> log.txt`. `2>`redirects the output of so-called standard error.
 
 It takes a couple of minutes to generate the MultiQC report. The report provides nice visualizations across samples, which is very useful to determine consistency and to identify problematic samples.
 
-The output of MultiQC is one HTML file (`multiqc_report_rnaseq.html`) and a data folder. Transfer the interactive HTML report over to your laptop using **FileZilla**, and visualize the outputs of the four tools we used to generate the report.
-
-> *For a refresher on using Filezilla, please refer back to our [FastQC assessment lesson](07_qc_fastqc_assessment.md).*
+The output of MultiQC is one HTML file (`multiqc_report_rnaseq.html`) and a data folder. Transfer the interactive HTML report over to your laptop using `scp` or the locally mounted server option.
 
 ## Assessing the quality control metrics
 
@@ -119,7 +102,7 @@ Using `Configure Columns` button, we are going to choose the following columns:
 
 </p>
 
-In the above image, the description column is helpful in interpretating the table. Upon perusal of the table, we can see input from FastQC, STAR, Qualimap and salmon. For example, the total number of raw reads is given in the `M Seqs` column on the far right of the table.
+In the above image, the description column is helpful in interpreting the table. Upon perusal of the table, we can see input from FastQC, STAR, Qualimap and salmon. For example, the total number of raw reads is given in the `M Seqs` column on the far right of the table.
 
 STAR provides information about *uniquely mapping reads* in the `%Aligned` column. A good quality sample will have **at least 75% of the reads uniquely mapped**. Once the value starts to drop below 60%, it's advisable to start troubleshooting. Low number of uniquely mapping reads means that more reads are mapped to multiple locations.
 
@@ -132,8 +115,6 @@ The 'STAR: Alignment Scores' plot visually represents this mapping information. 
 </p>
 
 > NOTE: The thresholds suggested above will vary depending on the organism that you are working with. Much of what is discussed here is in the context of working with human or mouse data. For example, 75% of mapped reads holds true only if the genome is good or mature. For badly assembled genomes, we may not observe a high mapping rate, even if the actual sequences from the sample are good.
-
-Salmon also provides a `%Aligned` column representing the percent of mapped reads. The percentage from Salmon is different from that of STAR, because STAR is based on the alignment to genome reference, while Salmon is based on the alignment to transcriptome reference. Since we will be using the salmon abundance estimates for downstream analysis, these numbers are particularly important for our analysis.
 
 ### Complexity
 
@@ -165,18 +146,6 @@ We can also identify possible contamination of our samples by inspecting the per
 
 Generally speaking, in a good library, we expect over 60% of reads to be mapped to exons for mouse or human organisms. For other organisms, the percentage depends on how well the genome is annotated.
 
-### Fragment length distribution
+## Assignment 
 
-The auxiliary directory generated from Salmon will contain a file called `fld.gz`. This file contains an approximation of the observed fragment length distribution. This is more meaningful for paired-end data, where the length can be estimated based on the location from both ends of the fragment. These plots can be compared to our expectations based on our knowledge of the size selection step performed during the library preparation stage.
-
-> **NOTE:** For single end data (which is what we have), Salmon reports a fixed insert length distribution. Therefore, the values are identical for all samples, and we only observe one distribution curve in the plot.
-
-<p align="center">
-
-<img src="../img/salmon_plot_multiqc.png" width="600"/>
-
-</p>
-
-------------------------------------------------------------------------
-
-*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
+Examine the MultiQC report and make the following observations:
