@@ -193,17 +193,16 @@ The first few numbers listed in the report are the mapping statistics. Qualimap 
 
 -   number of alignments without any feature (intronic and intergenic)
 
-![](../img/qualimap_read_alignment.png){width="700"}
+![](images/qualimap_reads_table.png)
 
 > -   The percentage of mapped reads is a global indicator of the overall sequencing accuracy. We expect between 70-90% of reads to be mapped for the human genome.
 > -   Expect a small fraction of reads to be mapping equally well to multiple regions in the genome (‘multi-mapping reads’).
-> -   The count related metrics are not as relevant to us since we have quantified with Salmon at the transcript level.
 
 #### **Genomic Origin of Reads: Exon, Intron or Intergenic Region?**
 
 This section reports how many alignments fall into exonic, intronic and intergenic regions along with a number of intronic/intergenic alignments overlapping exons. Exonic region includes 5’UTR,protein coding region and 3’UTR region. This information is summarized in table in addition to a pie chart as shown below.
 
-![](../img/qualimap_genomic_feature.png){width="700"}
+![](images/qualimap1_FULL_reads_genomic_origin.png)
 
 > -   Even if you have high genomic mapping rate for all samples, check to see where the reads are mapping. Expect a high proportion of reads mapping to exonic regions (\> 60%) and lower intronic mapping rates (20 -30%).
 > -   A higher intronic mapping rate is expected for rRNA removal compared to polyA selection. The intronic reads likely originate from immature transcripts which include either full-length pre-mRNA molecules or nascent transcripts where the RNA polymerase has not yet attached to the 3′ end of the gene.
@@ -218,15 +217,15 @@ The profile provides ratios between mean coverage at the 5’ region, the 3’ r
 -   **3’ bias**: is the ratio between mean coverage at the 3’ region (last 100bp) and the whole transcript
 -   **5’-3’ bias**: is the ratio between both biases.
 
+|            |      |
+|------------|------|
+| 5' bias    | 0.7  |
+| 3' bias    | 0.59 |
+| 5'-3' bias | 1.01 |
+
 <p align="center">
 
-![](../img/qualimap_transcript_coverage.png){width="700"}
-
-</p>
-
-<p align="center">
-
-![](../img/qualimap_coverage_profile.png){width="700"}
+![](images/qualimap2_coverage_profile_along.png)
 
 </p>
 
@@ -244,7 +243,7 @@ Qualimap also reports the total number of reads mapping to splice junctions and 
 
 <p align="center">
 
-![](../img/qualimap_junctions.png){width="700"}
+![](images/qualimap4_junction_analysis.png)
 
 </p>
 
