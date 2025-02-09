@@ -67,7 +67,7 @@ For humans and several other model organisms, the research community makes use o
 
 As of this writing, the most recent version of this genome is known as `GRCH38.p14`, which is the 38th major "build" (released in 2013) of the assembly, and the 14th update, of this build (released in 2022). These new builds and updates represent corrections and updates to our knowledge of the content and structure of the human genome. This [YouTube video](https://www.youtube.com/watch?v=DeZTPCOKZrg) is a nice introduction to some of the genome assembly nomenclature and compares several versions of the human reference.
 
-#### Sources of annotation 
+#### Sources of annotation
 
 Briefly, genome annotation is the process of inferring the identity and location of functional elements, like genes, on an assembled genome. As you can probably imagine, this is crucial for making sense of any sequencing projects!
 
@@ -108,7 +108,7 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/genc
 **The GTF (Gene Transfer Format) file** is a *tab-delimited* file arranged in a very specific manner to store info about gene structure. The ENCODE [data format page](https://www.gencodegenes.org/pages/data_format.html) specifies that the columns of a GTF provided by that consortia are as follows:
 
 | Column Number | Content                                                         | Format                                                      |
-|--------------|-----------------------------|-----------------------------|
+|------------------|---------------------------|---------------------------|
 | 1             | chromosome name                                                 | chr1, chr2 etc.                                             |
 | 2             | annotation source                                               | ENSEMBL, HAVANA                                             |
 | 3             | feature type                                                    | gene, transcript, exon etc.                                 |
@@ -126,7 +126,7 @@ chr19   HAVANA   gene   405438   409170   .   -   .   gene_id "ENSG00000183186.7
 chr19   HAVANA   transcript   405438   409170   .   -   .   gene_id "ENSG00000183186.7"; transcript_id "ENST00000332235.7"; gene_type "protein_coding"; gene_name "C2CD4C"; transcript_type "protein_coding"; transcript_name "C2CD4C-001"; level 2; protein_id "ENSP00000328677.4"; transcript_support_level "2"; tag "basic"; tag "appris_principal_1"; tag "CCDS"; ccdsid "CCDS45890.1"; havana_gene "OTTHUMG00000180534.3"; havana_transcript "OTTHUMT00000451789.3";
 ```
 
-### Refresher about, `grep`  `cut` and `sort`
+### Refresher about, `grep` `cut` and `sort`
 
 Given our understanding of splice isoforms, we know that a given exon can be part of 2 or more different transcripts generated from the same gene. In a GTF file, this exon will be represented multiple times, once for each transcript (or splice isoform).
 
@@ -148,11 +148,11 @@ $ cut -f 1,4 GRCh38.primary_assembly.genome.fa | head
 ##contact: gencode-help@ebi.ac.uk
 ##format: gtf
 ##date: 2024-07-19
-chr1	11121
-chr1	11121
-chr1	11121
-chr1	12010
-chr1	12613
+chr1    11121
+chr1    11121
+chr1    11121
+chr1    12010
+chr1    12613
 ```
 
 > The `cut` command assumes our data columns are separated by tabs (i.e. tab-delimited). Since GTFs are a tab-delimited file, so the default `cut` command works for us. However, data can be separated by other types of delimiters like "," or ";". If your data is not tab delimited, there is an argument you can add to your `cut` command, `-d` to specify the delimiter (e.g. `-d ","` with a .csv file).
@@ -171,7 +171,7 @@ $ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf  | wc -l
 
 <summary><b><i>Click here to check your output</i></b></summary>
 
-<p>Your command should have returned 4117652 lines...but how many do we need to subtract for that header? </p>
+<p>Your command should have returned 4117652 lines...but how many do we need to subtract for that header?</p>
 
 </details>
 
@@ -187,7 +187,7 @@ $ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf | sort -u | wc -l
 
 <summary><b><i>Click here to check your output</i></b></summary>
 
-<p>Your command should have returned 796,720 lines. But again, does this include those header comment lines? </p>
+<p>Your command should have returned 796,720 lines. But again, does this include those header comment lines?</p>
 
 </details>
 
@@ -294,14 +294,14 @@ $ -rw-rw----+ 1 changes Bspc-training 1.2K Feb  6 11:32 chrLength.txt
 
 ## Genome Indices on Biowulf
 
-Going right to the source to download the GTF and FASTA is a great way of makign sure you are using the most up-to-date version.
+Going right to the source to download the GTF and FASTA is a great way of making sure you are using the most up-to-date version.
 
 However, Biowulf also provides centrally-maintained [scientific reference databases](https://hpc.nih.gov/refdb/index.php) for users, which includes many pre-generated genome indices for various alignment software.
 
 According to that page, STAR indices are all kept in a directory: `/fdb/STAR_indices`, which contains the following files and subdirectories:
 
 ```         
-00init.sh  01build.sh		03check_repo.sh  2.6.1c  2.7.10b  2.7.3a  2.7.8a  refdb.yml 00lib.sh   02dedup_existing.sh	2.5.4 2.7.0f  2.7.11b  2.7.6a  2.7.9a  repo
+00init.sh  01build.sh       03check_repo.sh  2.6.1c  2.7.10b  2.7.3a  2.7.8a  refdb.yml 00lib.sh   02dedup_existing.sh  2.5.4 2.7.0f  2.7.11b  2.7.6a  2.7.9a  repo
 ```
 
 Navigating further into 2.7.11b (indices built using the most recent version of STAR on Biowulf), we can eventually get to the ENCODE human genome versions:
@@ -315,19 +315,26 @@ drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_45
 
 Looking into this folder, you can see a number of index files as well as the input GTF and FASTQ files used.
 
-## Exercise: 
+**Generally speaking, STAR indices for each version of STAR available on Biowulf are stored in:**
+
+-   **`/fdb/STAR_indices/[STAR VERSION]`**
+
+-   **`/fdb/STAR_current`**`→ /fdb/STAR_indices/[current default STAR version]`
+
+Keep in mind the lack of backwards compatibility between some versions of STAR!
+
+## Exercise:
 
 Note that the most recent Gencode annotations they have are for `release_45`, whereas the up-to-date version we used earlier are from Release 47.
 
 -   Does it like there is a `STAR 2.7.11b` index available for a recent release on Biowulf somewhere in `/fdb/STAR_indices`? You may need to check both in both the Gencode and UCSC subfolders.
 -   If not - look in the `/fdb/STAR_indices/2.7.10b` directory. This slightly older version of STAR has more pre-prepared indices. If you find a relevant index folder - report the full path to that directory.
 
-## Assignment 
+## Assignment
 
 Looking at recent publications or talking to your labmates - what is the most recent major genome build for your organism used by your research community? For example `GRCh38` for human - sometimes abbreviated to `hg38` by providers such as UCSC.
 
 1.  Create a `reference_genome` subdirectory of your `/Bspc-training/$USER/rnaseq` directory. Create a `ref_notes.txt` file in there to answer the next question.
-2.  Find a GTF file, either on a consortium webpage or in a Biowulf STAR index directory, that corresponds with your chosen genome version. In the text file, make note of the full Biowulf directory paths or `wget` commands you will use to download the GTF and FASTA files.
-3.  If necessary - use `wget` to obtain these files in your `reference_genome` directory.
-4.  Once those are downloaded (or you have the full paths from Biowulf), modify the genome index script for your use case. You will likely have to modify the paths to the genome files. DO NOT ACTUALLY RUN THIS.
-5.  Something where they create frequency table of different genome features (gene, exon etc.) like Dr. Dale did last Friday for their own GTFs?
+2.  Find a **GTF file**, in a Biowulf STAR index directory, that corresponds with your chosen genome version. In the text file, make note of the full Biowulf directory paths or `wget` commands you will use to download the GTF and FASTA files.
+3.  Once you have the full paths from Biowulf, modify the genome index script for your use case. You will likely have to modify the paths to the genome files.
+4.  Create a frequency table of different genome features (gene, exon etc.) like Dr. Dale did last Friday for your own GTF.
