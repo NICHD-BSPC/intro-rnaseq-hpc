@@ -1,6 +1,6 @@
 ---
 title: "SAM/BAM file and assessing quality "
-author: 
+author: Harvard HPC Staff, Adapted by Sally Chang @ NICHD
 date: Last modified February 2025
 ---
 
