@@ -13,6 +13,8 @@ duration: 45 minutes
 -   Open and look at the report(s) you generated using
 -   Optionally, transfer one of the HTML files to your local computer using `scp`
 
+Slides from the Tuesday lecture are available [here](../lectures/NICHD_RNASeq_week2_intro.pdf)
+
 ## Quality Control of FASTQ files
 
 The first step in the RNA-Seq workflow is to take the FASTQ files received from the sequencing facility and assess the quality of the sequence reads.
