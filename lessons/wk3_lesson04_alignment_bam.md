@@ -11,7 +11,7 @@ date: Last modified February 2025
 
 ## Assessing alignment quality
 
-After running our single FASTQ file through the STAR aligner, you should have noticed a number of output files in the `~/unix_workshop/rnaseq/results/STAR` directory. Let's take a quick look at some of the files that were generated and explore the content of some of them.
+After running our single FASTQ file through the STAR aligner, you should have noticed a number of output files in the `rnaseq/results/STAR` directory. Let's take a quick look at some of the files that were generated and explore the content of some of them.
 
 ```         
 $ cd ~/rnaseq/results/STAR
@@ -54,12 +54,14 @@ Following the header is the **alignment section**. Each line that follows corres
 
 An example read mapping is displayed above. *Note that the example above spans two lines, but in the file it is a single line.* Let's go through the fields one at a time. First, you have the read name (`QNAME`), followed by a `FLAG`
 
+> DISCUSSION: Is the first BAM read ID the same as the first FASTQ read ID? Why or why not?
+
 The `FLAG` value that is displayed can be translated into information about the mapping.
 
 | Flag |                Description                |
 |-----:|:-----------------------------------------:|
-|    1 |              read is mapped               |
-|    2 |     read is mapped as part of a pair      |
+|    1 |              read is paired               |
+|    2 |     read is mapped in proper pair      |
 |    4 |             read is unmapped              |
 |    8 |             mate is unmapped              |
 |   16 |            read reverse strand            |
@@ -69,10 +71,11 @@ The `FLAG` value that is displayed can be translated into information about the 
 |  256 |           not primary alignment           |
 |  512 | read fails platform/vendor quality checks |
 | 1024 |     read is PCR or optical duplicate      |
+| 2048 | supplementary alignment |
 
 -   For a given alignment, each of these flags are either **on or off** indicating the condition is **true or false**.
 -   The `FLAG` is a combination of all of the individual flags (from the table above) that are true for the alignment
--   The beauty of the flag values is that any combination of flags can only result in one sum.
+-   The beauty of the flag values is that **any given combination of flags can only result in one sum**.
 
 In our example we have a number that exist in the table, making it relatively easy to translate. But suppose our read alignment has a flag of 163 -- what does this translate to? It is the sum of 4 different flags:
 
@@ -87,6 +90,20 @@ Which tells us that:
 
 **There are tools that help you translate the bitwise flag, for example [this one from Picard](https://broadinstitute.github.io/picard/explain-flags.html)**
 
+Technically, bitwise flags are binary numbers (here, 11 digits for the 11 items in the table) where each position represents yes/no for the respective item.
+
+```
+00000000101
+       ^^^^
+       |||| read is paired (add 1 if true)
+       ||| read is mapped as part of pair (add 2 if true)
+       || read is unmapped (add 4 if true)
+       | mate is unmapped (add 8 if true)
+       ... and so on
+```
+
+When [reading binary](https://www.lifewire.com/how-to-read-binary-4692830), `00000000101` is `5` -- there's no other combination of true/false (1s and 0s) that could give us a value of 5, so this must be a paired read that is unmapped. Storing a digit in decimal character (like "5") is more space-efficient than storing the 11-character full binary representation.
+
 Moving along the fields of the SAM file, we then have `RNAME` which is the reference sequence name. The example read is from chromosome 1 which explains why we see 'chr1'. `POS` refers to the 1-based leftmost position of the alignment. `MAPQ` is giving us the alignment quality, the scale of which will depend on the aligner being used.
 
 `CIGAR` is a sequence of letters and numbers that represent the *edits or operations* required to match the read to the reference. The letters are operations that are used to indicate which bases align to the reference (i.e. match, mismatch, deletion, insertion), and the numbers indicate the associated base lengths for each 'operation'.
@@ -98,7 +115,12 @@ Moving along the fields of the SAM file, we then have `RNAME` which is the refer
 |         D |      deletion from reference      |
 |         N | skipped region from the reference |
 
-Suppose our read has a CIGAR string of `50M3I80M2D` which translates to: \* 50 matches or mismatches \* 3 bp insertion \* 80 matches/mismatches \* 2 bp deletion
+Suppose our read has a CIGAR string of `50M3I80M2D` which translates to:
+
+* 50 matches or mismatches
+* 3 bp insertion
+* 80 matches/mismatches
+* 2 bp deletion
 
 Now to the remaning fields in our SAM file:
 
@@ -123,9 +145,9 @@ $ module load samtools
 
 ### Viewing the SAM file
 
-Now that we have learned so much about the SAM file format, let's use `samtools` to take a quick peek at our own files. The output we had requested from STAR was a BAM file. The problem is the BAM file is binary and not human-readable. Using the `view` command within `samtools` we can easily convert the BAM into something that we can understand. You will be returned to screen the entire SAM file, and so we can either write to file, or pipe this to the `less` command so we can scroll through it.
+Now that we have learned so much about the SAM file format, let's use `samtools` to take a quick peek at our own files. The output we had requested from STAR was a BAM file. The problem is the BAM file is binary and not human-readable. Using the `view` command within `samtools` we can easily convert the BAM into something that we can understand -- and pipe to other command line tools! You will be returned to screen the entire SAM file, and so we can either write to file, or pipe this to the `less` command so we can scroll through it.
 
-We are assuming you are in `$ cd /data/Bspc-training/$USER /rnaseq/results/STAR` for the following commands.
+We are assuming you are in `/data/Bspc-training/$USER/rnaseq/results/STAR` for the following commands.
 
 ```         
 $ samtools view -h Mov10_oe_1_Aligned.sortedByCoord.out.bam > Mov10_oe_1_Aligned.sortedByCoord.out.sam
@@ -146,15 +168,19 @@ $ head Mov10_oe_1_Aligned.sortedByCoord.out.sam
 @SQ	SN:chr9	LN:138394717
 ```
 
+> NOTE: what did `-h` do? How would you find out?
+
 ### Filtering the SAM qfile
 
-Now we know that we have all of this information for each of the reads -- wouldn't it be useful to summarize and filter based on selected criteria? Suppose we wanted to set a **threshold on mapping quality**. For example, we want to know how many reads aligned with a quality score higher than 30. To do this, we can combine the `view` command with additional flags `q 30` and `-c` (to count):
+Now we know that we have all of this information for each of the reads -- wouldn't it be useful to summarize and filter based on selected criteria? Suppose we wanted to set a **threshold on mapping quality**. For example, we want to know how many reads aligned with a quality score higher than 30. To do this, we can combine the `view` command with additional flags `-q 30` and `-c` (to count):
 
 ```         
 $ samtools view -q 30 -c Mov10_oe_1_Aligned.sortedByCoord.out.bam
 ```
 
-*How many of reads have a mapping quality of 30 or higher?*
+> NOTE: mapping quality is the aligner's estimate on how accurate the alignment is. Low MAPQ indicates multimappers. However, it is not always clear what to use as a threhsold, as [this post describes](http://www.acgt.me/blog/2014/12/16/understanding-mapq-scores-in-sam-files-does-37-42).
+
+*How many of reads have a mapping quality of 30 or higher? What are the different quality scores you observe in the file?*
 
 We can also **apply filters to select reads based on where they fall within the `FLAG` categories**. Remember that the bitwise flags are like boolean values. If the flag exists, the statement is true. Similar to when filtering by quality we need to use the `samtools view` command, however this time use the `-F` or `-f` flags.
 
@@ -171,7 +197,7 @@ $ samtools view -F 4 -c Mov10_oe_1_Aligned.sortedByCoord.out.bam
 
 ### Indexing the BAM file
 
-To perform some functions (i.e. subsetting, visualization) on the BAM file, an index is required. Think of an index located at the back of a textbook. When you are interested in a particular subject area you look for the keyword in the index and identify the pages that contain the relevant information. Similaril indexing the BAM file aims to achieve fast retrieval of alignments overlapping a specified region without going through the whole alignment file. In order to index a BAM file, it must first be sorted by the reference ID and then the leftmost coordinate, which can also be done with `samtools`. However, in our case we had included a parameter in our STAR alignment run so we know our BAM files are already sorted.
+To perform some functions (i.e. subsetting, visualization) on the BAM file, an index is required. Think of an index located at the back of a textbook. When you are interested in a particular subject area you look for the keyword in the index and identify the pages that contain the relevant information. Similarly, indexing the BAM file aims to achieve fast retrieval of alignments overlapping a specified region without going through the whole alignment file. In order to index a BAM file, it must first be sorted by the reference ID and then the leftmost coordinate, which can also be done with `samtools`. However, in our case we had included a parameter in our STAR alignment run so we know our BAM files are already sorted.
 
 To index the BAM file we use the `index` command. **This may take a while and actually require you use a SBATCH script, so you only need to do this when you plan to do the bonus visualization step.**
 
@@ -179,7 +205,7 @@ To index the BAM file we use the `index` command. **This may take a while and ac
 $ samtools index Mov10_oe_1_Aligned.sortedByCoord.out.bam
 ```
 
-This will create an index in the same directory as the BAM file, which will be identical to the input file in name but with an added extension of `.bai`.
+This will create an index in the same directory as the BAM file, which will be identical to the input file in name but with an added extension of `.bai`. By convention, tools that need BAM index expect the index to be named after its respective BAM file but with a `.bai` extension.
 
 ------------------------------------------------------------------------
 
@@ -201,9 +227,9 @@ To view these files you can either
 
 `Mov10_oe_1_Aligned.sortedByCoord.out.bam`, `Mov10_oe_1_Aligned.sortedByCoord.out.bam.bai`
 
-2.  Use Biowulf's [HPC On Demand](https://hpcondemand.nih.gov/) tool which provides convenient web interfaces to your interactive Biowulf applications, while allowing you access to all of your files on Biowulf. We will be making use of this during the. We are going to make use of this for RStudio in weeks 5-8.
+2.  Use Biowulf's [HPC On Demand](https://hpcondemand.nih.gov/) tool which provides convenient web interfaces to your interactive Biowulf applications, while allowing you access to all of your files on Biowulf. We will be making use of this for RStudio in weeks 5-8.
 
-    You may need to copy over your `bam` and `bai` files over to your /data/\$USER area on Biowulf for this to work.
+    You may need to copy over your `bam` and `bai` files over to your `/data/$USER` area on Biowulf for this to work.
 
 ### Visualize
 
