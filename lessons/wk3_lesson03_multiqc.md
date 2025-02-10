@@ -102,7 +102,7 @@ Using `Configure Columns` button, we are going to choose the following columns:
 
 </p>
 
-In the above image, the description column is helpful in interpreting the table. Upon perusal of the table, we can see input from FastQC, STAR, Qualimap and salmon. For example, the total number of raw reads is given in the `M Seqs` column on the far right of the table.
+In the above image, the description column is helpful in interpreting the table. Upon perusal of the table, we can see input from FastQC, STAR, and Qualimap. For example, the total number of raw reads is given in the `M Seqs` column on the far right of the table.
 
 STAR provides information about *uniquely mapping reads* in the `%Aligned` column. A good quality sample will have **at least 75% of the reads uniquely mapped**. Once the value starts to drop below 60%, it's advisable to start troubleshooting. Low number of uniquely mapping reads means that more reads are mapped to multiple locations.
 

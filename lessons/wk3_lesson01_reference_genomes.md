@@ -57,15 +57,19 @@ rnaseq
 
 As mentioned above, we need to identify the relevant reference genome and an associated annotation file.
 
+
 #### Reference Consortia
 
-[According to NHGRI](https://www.genome.gov/genetics-glossary/Human-Genome-Reference-Sequence), a reference genome (or reference assembly) is an accepted representation of the human genome sequence that is used as a standard for comparison to DNA/RNA sequences generated other studies. Having this standard genome assembly allows researchers to "speak the same language" when it comes to genomic locations and features.
+[According to NHGRI](https://www.genome.gov/genetics-glossary/Human-Genome-Reference-Sequence), a reference genome (or reference assembly) is an accepted representation of the human genome sequence that is used as a standard for comparison to DNA/RNA sequences generated other studies. Having this standard genome assembly allows researchers to "speak the same language" when it comes to genomic locations and features. While this is a great idea in theory, in practice there is disagreement on chromosome nomenclature across provider.
 
 > **Discussion**: As of February 2025, NCBI hosts [1,831 human genome assemblies](https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=9606). How do we pick a genome to serve as reference for an organism? What qualities make for a good reference genome? Who makes these decisions?
 
 For humans and several other model organisms, the research community makes use of a well-vetted and standardized assembly from the [Reference Genome Consortium](https://www.ncbi.nlm.nih.gov/grc). There are other organism-specific consortia doing annotation and assembly such as [FlyBase](https://flybase.org/) for Drosophila.
 
 As of this writing, the most recent version of this genome is known as `GRCH38.p14`, which is the 38th major "build" (released in 2013) of the assembly, and the 14th update, of this build (released in 2022). These new builds and updates represent corrections and updates to our knowledge of the content and structure of the human genome. This [YouTube video](https://www.youtube.com/watch?v=DeZTPCOKZrg) is a nice introduction to some of the genome assembly nomenclature and compares several versions of the human reference.
+
+**Not all reference genomes are the same.** In general, the sequences are usually identical but very often the chromosome nomenclature will differ. For example, the UCSC Genome Brower usually has chromosomes prefixed by a `chr` (e.g., `chr1`) while Ensembl often does not (e.g., `1`). Even for human, there is a surprising amount of confusion. See [this blog post from 2017 by Heng Li](https://lh3.github.io/2017/11/13/which-human-reference-genome-to-use) (the author of bwa, samtools, seqtk, and others) for the subtleties of different assemblies. Those details matter a lot for variant calling, but for RNA-seq we don't need to be quite as careful.
+
 
 #### Sources of annotation
 
@@ -83,7 +87,7 @@ Luckily for us, the developers of STAR make pretty specific recommendations for 
 
 > GENCODE: files marked with PRI (primary) strongly recommended for mouse and human.
 
-The PRI files contain the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes, which STAR cannot make use of during mapping. For other organisms, this might be annotations for
+The PRI files contain the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes, which STAR cannot make use of during mapping.
 
 So, from that page, find the following listings and copy the links for the `PRI` GTF file and the FASTA for `Genome sequence, primary assembly`.
 
@@ -101,11 +105,11 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/genc
 
 **IMPORTANT NOTE:** Due to differences in formatting and gene/chromosome names between versions and consortia, it is recommended you use GTFs and FASTAs from the SAME version and SAME provider (i.e. ENCODE) for analyses.
 
-**OTHER IMPORTANT NOTE:** For organisms not on GENCODE, Ensembl, UCSC or an organism-specific databases, like FlyBase, are another good choice.
+**OTHER IMPORTANT NOTE:** For organisms not on GENCODE: Ensembl, UCSC or an organism-specific databases, like FlyBase, are another good choice.
 
 ## A note about the GTF Format
 
-**The GTF (Gene Transfer Format) file** is a *tab-delimited* file arranged in a very specific manner to store info about gene structure. The ENCODE [data format page](https://www.gencodegenes.org/pages/data_format.html) specifies that the columns of a GTF provided by that consortia are as follows:
+**The [GTF](https://web.archive.org/web/20031212200757/http://genes.cse.wustl.edu/GTF2.html) (Gene Transfer Format) file** is a *tab-delimited* file arranged in a very specific manner to store info about gene structure. The ENCODE [data format page](https://www.gencodegenes.org/pages/data_format.html) specifies that the columns of a GTF provided by that consortia are as follows:
 
 | Column Number | Content                                                         | Format                                                      |
 |------------------|---------------------------|---------------------------|
@@ -117,7 +121,7 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/genc
 | 6             | score (not used)                                                | .                                                           |
 | 7             | genomic strand                                                  | +, -                                                        |
 | 8             | genomic phase                                                   | 0, 1, 2, .                                                  |
-| 9             | additional values, stored as key pairs, separated by semicolons | For example: gene_type 'protein_coding'; gene_name "C2CD4C" |
+| 9             | additional values, stored as key pairs, separated by semicolons. May have spaces and/or quotes | For example: gene_type 'protein_coding'; gene_name "C2CD4C" |
 
 Here is what a few lines of that look like in practice:
 
@@ -171,7 +175,7 @@ $ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf  | wc -l
 
 <summary><b><i>Click here to check your output</i></b></summary>
 
-<p>Your command should have returned 4117652 lines...but how many do we need to subtract for that header?</p>
+<p>Your command should have returned 4117652 lines...but how many do we need to subtract for that header? What command could you add that would remove the header?</p>
 
 </details>
 
@@ -327,7 +331,7 @@ Keep in mind the lack of backwards compatibility between some versions of STAR!
 
 Note that the most recent Gencode annotations they have are for `release_45`, whereas the up-to-date version we used earlier are from Release 47.
 
--   Does it like there is a `STAR 2.7.11b` index available for a recent release on Biowulf somewhere in `/fdb/STAR_indices`? You may need to check both in both the Gencode and UCSC subfolders.
+-   Does it look like there is a `STAR 2.7.11b` index available for a recent release on Biowulf somewhere in `/fdb/STAR_indices`? You may need to check both in both the Gencode and UCSC subfolders.
 -   If not - look in the `/fdb/STAR_indices/2.7.10b` directory. This slightly older version of STAR has more pre-prepared indices. If you find a relevant index folder - report the full path to that directory.
 
 ## Assignment
@@ -335,6 +339,6 @@ Note that the most recent Gencode annotations they have are for `release_45`, wh
 Looking at recent publications or talking to your labmates - what is the most recent major genome build for your organism used by your research community? For example `GRCh38` for human - sometimes abbreviated to `hg38` by providers such as UCSC.
 
 1.  Create a `reference_genome` subdirectory of your `/Bspc-training/$USER/rnaseq` directory. Create a `ref_notes.txt` file in there to answer the next question.
-2.  Find a **GTF file**, in a Biowulf STAR index directory, that corresponds with your chosen genome version. In the text file, make note of the full Biowulf directory paths or `wget` commands you will use to download the GTF and FASTA files.
+2.  Find a **GTF file**, in a Biowulf STAR index directory, that corresponds with your chosen genome version. In the text file, make note of the full Biowulf directory paths or `wget` commands you will use to download the GTF and FASTA files. If you need to download the file, run the wget command(s) in this `reference_genome` directory.
 3.  Once you have the full paths from Biowulf, modify the genome index script for your use case. You will likely have to modify the paths to the genome files.
 4.  Create a frequency table of different genome features (gene, exon etc.) like Dr. Dale did last Friday for your own GTF.
