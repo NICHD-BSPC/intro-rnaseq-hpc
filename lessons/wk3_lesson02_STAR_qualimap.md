@@ -20,7 +20,7 @@ To determine where on the human genome our reads originated from, we will align 
 
 ## Alignment file format: SAM/BAM
 
-The **Sequence Alignment Map format** (SAM) file is **a tab-delimited text file that contains all information from the FASTQ file, with additional fields containing alignment information for each read**. Specifically, we can obtain the genomic coordinates of where each read maps to in the genome and the quality of that mapping. A **BAM file is the binary, compressed version of the SAM file**. It is significantly smaller in size and is usually the file format requested for by downstream tools that require alignment data as input. The paper by [Heng Li et al](http://bioinformatics.oxfordjournals.org/content/25/16/2078.full) provides a lot more detail on the specification, and we will go into detail in the next lesson about how to
+The **Sequence Alignment Map format** (SAM) file is **a tab-delimited text file that contains all information from the FASTQ file, with additional fields containing alignment information for each read**. Specifically, we can obtain the genomic coordinates of where each read maps to in the genome and the quality of that mapping. A **BAM file is the binary, compressed version of the SAM file**. It is significantly smaller in size and is usually the file format requested for by downstream tools that require alignment data as input. The paper by [Heng Li et al](http://bioinformatics.oxfordjournals.org/content/25/16/2078.full) provides a lot more detail on the specification, and we will go into detail in the next lesson. 
 
 ![SAM1](../img/sam_bam.png)
 
@@ -205,7 +205,7 @@ qualimap rnaseq -outdir qualimap/Mov10_oe_1 -a proportional -bam STAR/Mov10_oe_1
 
 ### The Qualimap report
 
-The Qualimap report in HTML format should be present in the `results/qualimap` directory. To view this report you need a web browser, so you would need to transfer it over to your laptop. You can do so by Connecting to Server again or using `scp`. **But as we saw with our FASTQC exercise, calculating these for the small subset is not representative of our whole library, so we are going to walk through these results for a full sample. You can open up the full HTML report.**
+The Qualimap report in HTML format should be present in the `results/qualimap` directory. To view this report you need a web browser, so you would need to transfer it over to your laptop. You can do so by Connecting to Server again or using `scp`. **But as we saw with our FASTQC exercise, calculating these for the small subset is not representative of our whole library, so we are going to walk through these results for a full sample. You can open up the [full HTML report](../data/Mov10_oe1_full_qualimapReport.html).**
 
 #### **Read alignment summary**
 
