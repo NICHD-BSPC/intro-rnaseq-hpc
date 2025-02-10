@@ -226,7 +226,7 @@ The first few numbers listed in the report are the mapping statistics. Qualimap 
 
 This section reports how many alignments fall into exonic, intronic and intergenic regions along with a number of intronic/intergenic alignments overlapping exons. Exonic region includes 5’UTR,protein coding region and 3’UTR region. This information is summarized in table in addition to a pie chart as shown below.
 
-![](images/qualimap1_FULL_reads_genomic_origin.png)
+![Genomic origin](../img/qualimap1_FULL_reads_genomic_origin.png)
 
 > -   Even if you have high genomic mapping rate for all samples, check to see where the reads are mapping. Expect a high proportion of reads mapping to exonic regions (\> 60%) and lower intronic mapping rates (20 -30%).
 > -   A higher intronic mapping rate is expected for rRNA removal compared to polyA selection. The intronic reads likely originate from immature transcripts which include either full-length pre-mRNA molecules or nascent transcripts where the RNA polymerase has not yet attached to the 3′ end of the gene.
@@ -249,7 +249,7 @@ The profile provides ratios between mean coverage at the 5’ region, the 3’ r
 
 <p align="center">
 
-![](images/qualimap2_coverage_profile_along.png)
+![coverage profile along transcript](../img/qualimap2_coverage_profile_along.png)
 
 </p>
 
@@ -267,7 +267,7 @@ Qualimap also reports the total number of reads mapping to splice junctions and 
 
 <p align="center">
 
-![](images/qualimap4_junction_analysis.png)
+![junction analysis](../img/qualimap4_junction_analysis.png)
 
 </p>
 
