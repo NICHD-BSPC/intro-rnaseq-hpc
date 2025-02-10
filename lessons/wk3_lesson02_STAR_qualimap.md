@@ -226,7 +226,7 @@ The first few numbers listed in the report are the mapping statistics. Qualimap 
 
 This section reports how many alignments fall into exonic, intronic and intergenic regions along with a number of intronic/intergenic alignments overlapping exons. Exonic region includes 5’UTR,protein coding region and 3’UTR region. This information is summarized in table in addition to a pie chart as shown below.
 
-![Genomic origin](../img/qualimap1_FULL_reads_genomic_origin.png)
+![genomic_origin](../img/qualimap1_FULL_reads_genomic_origin.png)
 
 > -   Even if you have high genomic mapping rate for all samples, check to see where the reads are mapping. Expect a high proportion of reads mapping to exonic regions (\> 60%) and lower intronic mapping rates (20 -30%).
 > -   A higher intronic mapping rate is expected for rRNA removal compared to polyA selection. The intronic reads likely originate from immature transcripts which include either full-length pre-mRNA molecules or nascent transcripts where the RNA polymerase has not yet attached to the 3′ end of the gene.
@@ -247,11 +247,8 @@ The profile provides ratios between mean coverage at the 5’ region, the 3’ r
 | 3' bias    | 0.59 |
 | 5'-3' bias | 1.01 |
 
-<p align="center">
 
 ![coverage profile along transcript](../img/qualimap2_coverage_profile_along.png)
-
-</p>
 
 > -   In a perfect sequencing experiment you would expect to see a 5'-3' bias ratio of 1 with low coverage at both ends of the transcript. This would suggest no bias is present.
 > -   It is well-documented that libraries prepared with polyA selection can lead to high expression in 3' region (3' bias). At least [one study](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-6-r86) shows the reverse effect for rRNA removal.
@@ -265,11 +262,9 @@ Qualimap also reports the total number of reads mapping to splice junctions and 
 -   Partly known represents alignments where only one junction side is known.
 -   All other alignments with junctions are marked as Novel.
 
-<p align="center">
 
 ![junction analysis](../img/qualimap4_junction_analysis.png)
 
-</p>
 
 > Other tools like [RNASeQC](https://software.broadinstitute.org/cancer/cga/rna-seqc) will plot figures that can help evaluate **GC content bias**. This is also an important aspect of QC, as low/high GC content regions will tend to have low coverage.
 
