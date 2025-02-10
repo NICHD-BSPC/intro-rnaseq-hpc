@@ -76,7 +76,7 @@ $ multiqc -n multiqc_report_rnaseq /data/Bspc-training/shared/rnaseq_jan2025/res
 
 It takes a couple of minutes to generate the MultiQC report. The report provides nice visualizations across samples, which is very useful to determine consistency and to identify problematic samples.
 
-The output of MultiQC is one HTML file (`multiqc_report_rnaseq.html`) and a data folder. Transfer the interactive HTML report over to your laptop using `scp` or the locally mounted server option.
+The output of MultiQC is one HTML file (`multiqc_report_rnaseq.html`) and a data folder. Transfer the interactive HTML report over to your laptop using `scp` or the locally mounted server option. You can also download the output HTML file [here](../data/multiqc_report_rnaseq_ALL_samples.html) to follow along. 
 
 ## Assessing the quality control metrics
 
@@ -148,4 +148,4 @@ Generally speaking, in a good library, we expect over 60% of reads to be mapped 
 
 ## Assignment 
 
-Examine the MultiQC report and make the following observations:
+Examine the MultiQC report and in a `multiqc_notes.txt` file, briefly note two observations you can make about our data now that we can view all six files side-by-side. 

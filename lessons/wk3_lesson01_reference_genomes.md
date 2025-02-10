@@ -337,13 +337,31 @@ Keep in mind the lack of backwards compatibility between some versions of STAR!
 Note that the most recent Gencode annotations they have are for `release_45`, whereas the up-to-date version we used earlier are from Release 47.
 
 -   Does it look like there is a `STAR 2.7.11b` index available for a recent release on Biowulf somewhere in `/fdb/STAR_indices`? You may need to check both in both the Gencode and UCSC subfolders.
--   If not - look in the `/fdb/STAR_indices/2.7.10b` directory. This slightly older version of STAR has more pre-prepared indices. If you find a relevant index folder - report the full path to that directory.
+-   If not - look in the `/fdb/STAR_indices/2.7.10b` directory or other, older directories. This slightly older version of STAR has more pre-prepared indices. If you find a relevant index folder - report the full path to that directory.
 
 ## Assignment
 
-Looking at recent publications or talking to your labmates - what is the most recent major genome build for your organism used by your research community? For example `GRCh38` for human - sometimes abbreviated to `hg38` by providers such as UCSC.
+By looking at recent publications, talking to your labmates etc. - what is the most recent major genome build for your organism used by your research community? For example `GRCh38` for human - sometimes abbreviated to `hg38` by providers such as UCSC.
 
-1.  Create a `reference_genome` subdirectory of your `/Bspc-training/$USER/rnaseq` directory. Create a `ref_notes.txt` file in there to answer the next question.
-2.  Find a **GTF file**, in a Biowulf STAR index directory, that corresponds with your chosen genome version. In the text file, make note of the full Biowulf directory paths or `wget` commands you will use to download the GTF and FASTA files. If you need to download the file, run the wget command(s) in this `reference_genome` directory.
-3.  Once you have the full paths from Biowulf, modify the genome index script for your use case. You will likely have to modify the paths to the genome files.
-4.  Create a frequency table of different genome features (gene, exon etc.) like Dr. Dale did last Friday for your own GTF.
+1.  Create a `reference_genome` subdirectory of your `/Bspc-training/$USER/rnaseq` directory. Create a `ref_notes.txt` file in there to answer the next questions.
+2.  Find a **GTF file**, in a Biowulf STAR index directory, that corresponds with your chosen genome version. OR if necessary, use `wget` to download the GTF file you identify from a consortium website. *Post in the main `rnaseq_jan2025` channel if you need help with this!*
+3.   In the text file, make note of: the name of your organism, the genone build you would use, and the full Biowulf directory paths or `wget` commands you used to download the GTF and FASTA files.
+
+## BONUS PRACTICE ASSIGNMENT: 
+
+A few Fridays ago, we demonstrated how to create a frequency table of different **feature types** from a GTF file using a combination of commands like `cut`, `grep` and `uniq`. The result ended up looking like this:
+
+```         
+gene  78724
+transcript 4038715
+exon 3651434
+CDS 1872631
+UTR 664938
+start_codon 99382
+stop_codon 93628
+Selenocysteine 130
+```
+
+Using a combination of commands like `cut`, `grep` and `uniq` - can you figure out how to create a table like this for the GTF file you found? **Store the results in another text file along with the command you used!**
+
+Hint: The end of [Week 1 Lesson 04](https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson04_searching_files.html) gives some great examples of how to build more complicated commands from those individual BASH commands.
