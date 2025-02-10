@@ -4,7 +4,7 @@ author: "Harvard HPC Staff, Modified by Sally Chang at NICHD"
 date: Last Modifed February 2025
 ---
 
-Approximate time: 50 minutes
+Approximate time: 45 minutes
 
 ## Learning Objectives:
 
