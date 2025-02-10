@@ -54,12 +54,14 @@ Following the header is the **alignment section**. Each line that follows corres
 
 An example read mapping is displayed above. *Note that the example above spans two lines, but in the file it is a single line.* Let's go through the fields one at a time. First, you have the read name (`QNAME`), followed by a `FLAG`
 
+> DISCUSSION: Is the first BAM read ID the same as the first FASTQ read ID? Why or why not?
+
 The `FLAG` value that is displayed can be translated into information about the mapping.
 
 | Flag |                Description                |
 |-----:|:-----------------------------------------:|
-|    1 |              read is mapped               |
-|    2 |     read is mapped as part of a pair      |
+|    1 |              read is paired               |
+|    2 |     read is mapped in proper pair      |
 |    4 |             read is unmapped              |
 |    8 |             mate is unmapped              |
 |   16 |            read reverse strand            |
@@ -69,6 +71,7 @@ The `FLAG` value that is displayed can be translated into information about the 
 |  256 |           not primary alignment           |
 |  512 | read fails platform/vendor quality checks |
 | 1024 |     read is PCR or optical duplicate      |
+| 2048 | supplementary alignment |
 
 -   For a given alignment, each of these flags are either **on or off** indicating the condition is **true or false**.
 -   The `FLAG` is a combination of all of the individual flags (from the table above) that are true for the alignment
@@ -86,6 +89,20 @@ Which tells us that:
 4.  this read is the second of the pair
 
 **There are tools that help you translate the bitwise flag, for example [this one from Picard](https://broadinstitute.github.io/picard/explain-flags.html)**
+
+Technically, bitwise flags are binary numbers (here, 11 digits for the 11 items in the table) where each position represents yes/no for the respective item.
+
+```
+00000000101
+       ^^^^
+       |||| read is paired (add 1 if true)
+       ||| read is mapped as part of pair (add 2 if true)
+       || read is unmapped (add 4 if true)
+       | mate is unmapped (add 8 if true)
+       ... and so on
+```
+
+When [reading binary](https://www.lifewire.com/how-to-read-binary-4692830), `00000000101` is `5` -- there's no other combination of true/false (1s and 0s) that could give us a value of 5, so this must be a paired read that is unmapped. Storing a digit in decimal character (like "5") is more space-efficient than storing the 11-character full binary representation.
 
 Moving along the fields of the SAM file, we then have `RNAME` which is the reference sequence name. The example read is from chromosome 1 which explains why we see 'chr1'. `POS` refers to the 1-based leftmost position of the alignment. `MAPQ` is giving us the alignment quality, the scale of which will depend on the aligner being used.
 
@@ -151,6 +168,8 @@ $ head Mov10_oe_1_Aligned.sortedByCoord.out.sam
 @SQ	SN:chr9	LN:138394717
 ```
 
+> NOTE: what did `-h` do? How would you find out?
+
 ### Filtering the SAM qfile
 
 Now we know that we have all of this information for each of the reads -- wouldn't it be useful to summarize and filter based on selected criteria? Suppose we wanted to set a **threshold on mapping quality**. For example, we want to know how many reads aligned with a quality score higher than 30. To do this, we can combine the `view` command with additional flags `-q 30` and `-c` (to count):
@@ -158,6 +177,8 @@ Now we know that we have all of this information for each of the reads -- wouldn
 ```         
 $ samtools view -q 30 -c Mov10_oe_1_Aligned.sortedByCoord.out.bam
 ```
+
+> NOTE: mapping quality is the aligner's estimate on how accurate the alignment is. Low MAPQ indicates multimappers. However, it is not always clear what to use as a threhsold, as [this post describes](http://www.acgt.me/blog/2014/12/16/understanding-mapq-scores-in-sam-files-does-37-42).
 
 *How many of reads have a mapping quality of 30 or higher? What are the different quality scores you observe in the file?*
 

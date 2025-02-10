@@ -130,6 +130,9 @@ chr19   HAVANA   gene   405438   409170   .   -   .   gene_id "ENSG00000183186.7
 chr19   HAVANA   transcript   405438   409170   .   -   .   gene_id "ENSG00000183186.7"; transcript_id "ENST00000332235.7"; gene_type "protein_coding"; gene_name "C2CD4C"; transcript_type "protein_coding"; transcript_name "C2CD4C-001"; level 2; protein_id "ENSP00000328677.4"; transcript_support_level "2"; tag "basic"; tag "appris_principal_1"; tag "CCDS"; ccdsid "CCDS45890.1"; havana_gene "OTTHUMG00000180534.3"; havana_transcript "OTTHUMT00000451789.3";
 ```
 
+> NOTE:
+>  [GFF](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md) is a similar format, with some subtle differences. If you can only find a GFF, usually the tool will support it (though you may need an additional flag). Also, many GTF files don't exactly follow the [specification](https://web.archive.org/web/20031212200757/http://genes.cse.wustl.edu/GTF2.html). [This page](https://agat.readthedocs.io/en/latest/gxf.html) gives a well-researched historical overview of the subtle differences and how they have changed over time.
+
 ### Refresher about, `grep` `cut` and `sort`
 
 Given our understanding of splice isoforms, we know that a given exon can be part of 2 or more different transcripts generated from the same gene. In a GTF file, this exon will be represented multiple times, once for each transcript (or splice isoform).
@@ -200,6 +203,8 @@ You can practice chaining together these skills in the GTF Exercise in Week 1 Le
 ------------------------------------------------------------------------
 
 ## Create a genome index with STAR
+
+We will be using STAR for aligning reads to the genome. Aligners like STAR need an **index** in order to align reads efficiently. An index is a computationally-efficient data structure created from a FASTA file -- it turns out to be unreasonably computationally expensive to try to match reads to the text FASTA file, so this preparation step is required. It only has to be done once for each FASTA file.
 
 Before we set up a script, let's explore the possible versions of STAR on Biowulf.
 
