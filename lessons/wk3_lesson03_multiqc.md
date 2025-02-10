@@ -148,4 +148,4 @@ Generally speaking, in a good library, we expect over 60% of reads to be mapped 
 
 ## Assignment 
 
-Examine the MultiQC report and make the following observations:
+Examine the MultiQC report and in a `multiqc_notes.txt` file, briefly note two observations you can make about our data now that we can view all six files side-by-side. 
