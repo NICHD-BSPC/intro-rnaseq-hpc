@@ -32,3 +32,19 @@
 -   [Running FASTQC Using Job Submission](../lessons/wk2_lesson03_fastqc_sbatch.md) (Assignment at the end of the page)
 -   [FASTQC Assessment](../lessons/wk2_lesson04_fastqc_assessment.md) 50 minutes (contains Assignment) 
 -   [Experimental Design](../lessons/wk2_lesson05_experimental_design.md) ~30 minutes of reading, ~30 minutes of assignment. **Note: This assignment can be done any time between now and the end of Week 4**
+
+------------------------------------------------------------------------
+
+## Week 3
+
+**In-Person** 
+-  [Reference Genomes and Genome Indices](../lessons/wk3_lesson01_reference_genomes.md) Assignment at end of page
+-  [Mapping with STAR and Viewing Results](../lessons/wk3_lesson02_STAR_qualimap.md) Assignment at end of page
+
+**Asynchronous**
+
+-  [MultiQC for organizing results](../lessons/wk3_lesson03_multiqc.md) ~30 minutes, Assignment at end of page
+-  [SAM/BAM format for mapping results](../lessons/wk3_lesson04_alignment_bam.md)
+-  [Experimental Design](../lessons/wk2_lesson05_experimental_design.md) ~30 minutes of reading, ~30 minutes of assignment. **Note: This assignment can be done any time between now and the end of Week 4**
+
+------------------------------------------------------------------------
