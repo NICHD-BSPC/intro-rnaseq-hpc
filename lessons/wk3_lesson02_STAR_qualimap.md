@@ -20,13 +20,13 @@ To determine where on the human genome our reads originated from, we will align 
 
 ## Alignment file format: SAM/BAM
 
-The **Sequence Alignment Map format** (SAM) file is **a tab-delimited text file that contains all information from the FASTQ file, with additional fields containing alignment information for each read**. Specifically, we can obtain the genomic coordinates of where each read maps to in the genome and the quality of that mapping. A **BAM file is the binary, compressed version of the SAM file**. It is significantly smaller in size and is usually the file format requested for by downstream tools that require alignment data as input. The paper by [Heng Li et al](http://bioinformatics.oxfordjournals.org/content/25/16/2078.full) provides a lot more detail on the specification, and we will go into detail in the next lesson. 
+The **Sequence Alignment Map format** (SAM) file is **a tab-delimited text file that contains all information from the FASTQ file, with additional fields containing alignment information for each read**. Specifically, we can obtain the genomic coordinates of where each read maps to in the genome and the quality of that mapping. A **BAM file is the binary, compressed version of the SAM file**. It is significantly smaller in size and is usually the file format requested for by downstream tools that require alignment data as input. The paper by [Heng Li et al](http://bioinformatics.oxfordjournals.org/content/25/16/2078.full) provides a lot more detail on the specification, and we will go into detail in the next lesson about how to work with SAM/BAM files.
 
 ![SAM1](../img/sam_bam.png)
 
 ## In Brief: STAR Alignment Strategy
 
-STAR is shown to have high accuracy and outperforms other aligners by more than a factor of 50 in mapping speed, but it is memory intensive. The algorithm achieves this highly efficient mapping by performing a two-step process:
+STAR is shown to have high accuracy and outperforms other aligners by more than a factor of 50 in mapping speed (depending on the comparison done), but it is memory intensive. The algorithm achieves this highly efficient mapping by performing a two-step process:
 
 1.  Seed searching
 2.  Clustering, stitching, and scoring
@@ -53,6 +53,8 @@ This sequential searching of only the unmapped portions of reads underlies the e
 
 ![STAR_step4](../img/alignment_STAR_step4.png)
 
+When aligning reads yourself, you don't need to know all of these details -- it's just good to have a sense of what is going on when running a tool!
+
 #### Clustering, stitching, and scoring
 
 The separate seeds are stitched together to create a complete read by first clustering the seeds together based on proximity to a set of 'anchor' seeds, or seeds that are not multi-mapping.
@@ -65,30 +67,32 @@ Then the seeds are stitched together based on the best alignment for the read (s
 
 Since we already have the reference index ready, we can move on to aligning reads to the genome.
 
-First, we can open another interactive session. Note that we are requesting a good deal more memory (24 gigs), and CPUS (12). Mapping reads to a big, eukaryotic genome is We are also adding a new parameter: `gres=lscratch:1`.
+First, we can open another interactive session. Note that we are requesting a good deal more memory (24 GB), and CPUS (12). Mapping reads to a big, eukaryotic genome consumes lots of memory because the index needs to be loaded into memory.
+
+We are also adding a new parameter: `gres=lscratch:1`.
 
 ``` bash
 $ sinteractive --cpus-per-task=12 --mem=24g --gres=lscratch:1
 ```
 
-Each Biowulf node has a directly attached disk containing a `lscratch` filesystem. Note that this space is not backed up, and thus, users should use it only as temporary space while running a job. Once the job exits, you will no longer have access to `/lscratch` on the node. See [Using Local Disk](https://hpc.nih.gov/docs/userguide.html#local) in the Biowulf User Guide for more info.
+Each Biowulf node has a directly attached disk containing a `lscratch` filesystem which is intended to be used as ephemeral, temporary space just for the duration of a job. Note that this space is not backed up, and thus, users should use it only as temporary space while running a job. Once the job exits, you will no longer have access to `/lscratch` on the node. See [Using Local Disk](https://hpc.nih.gov/docs/userguide.html#local) in the Biowulf User Guide for more info.
 
-It is recommended that you allocate 6x the compressed input fastq size of lscratch if we are producing a sorted BAM file (see below). More details about running STAR on Biowulf can be found on the [Biowulf STAR software page](It%20is%20recommended%20that%20you%20allocate%206x%20the%20compressed%20input%20fastq%20size%20of%20lscratch%20-%20see%20more%20details%20and%20even%20more%20about%20running%20STAR%20on%20the%20Biowulf%20STAR%20software%20page.).
+It is recommended that you allocate 6x the compressed input fastq size of lscratch if we are producing a sorted BAM file (see below). More details about running STAR on Biowulf can be found on the [Biowulf STAR software page](https://hpc.nih.gov/apps/STAR.html).
 
 ``` bash
 # Double-checking the size of the FASTQ input file. It is 73MB. I rounded up from 73MB*6 to set our lscratch to roughly 1GB. 
 ls -lh /data/BSPC-training/$USER/rnaseq/raw_data/Mov10_oe_1.subset.fq
 ```
 
-Next, move into our `raw_data` and create an output directory for our alignment files:
+Next, move into our `rnaseq` directory and create an output directory for our alignment files:
 
 ``` bash
-$ cd /data/Bspc-training/$USER/rnaseq/raw_data
+$ cd /data/Bspc-training/$USER/rnaseq
 
-$ mkdir ../results/STAR
+$ mkdir results/STAR
 ```
 
-For now, we're going to work on just one sample to set up our workflow. To start we will use the first replicate in the Mov10 over-expression group, `Mov10_oe_1.subset.fq`. Details on STAR and its functionality can be found in the [user manual](https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf); we encourage you to peruse through to get familiar with all available options.
+For now, we're going to work on just one sample to set up our workflow. To start we will use the first replicate in the Mov10 over-expression group, `Mov10_oe_1.subset.fq`. Details on STAR and its functionality can be found in the [user manual](https://raw.githubusercontent.com/alexdobin/STAR/master/doc/STARmanual.pdf); we encourage you to peruse through to get familiar with all available options. Warning, it's 63 pages!
 
 The basic options for aligning reads to the genome using STAR are:
 
@@ -104,7 +108,21 @@ Listed below are additional parameters that we will use in our command:
 
 > **NOTE:** Note that "**STAR’s default parameters are optimized for mammalian genomes.** Other species may require significant modifications of some alignment parameters; in particular, the maximum and minimum intron sizes have to be reduced for organisms with smaller introns" [[1](http://bioinformatics.oxfordjournals.org/content/early/2012/10/25/bioinformatics.bts635.full.pdf+html)].
 
-The full command is provided below for you to copy paste into your terminal. If you want to manually enter the command, it is advisable to first type out the full command in a on your local machine and then copy paste into the terminal. This will make it easier to catch typos and make appropriate changes.
+Section 3.3.2 of the STAR manual lists options that the ENCODE consortium has used:
+
+```bash
+--outFilterType BySJout     # reduces the number of 'spurious' junctions
+--outFilterMultimapNmax 20  # max number of multiple alignments allowed for a read: if exceeded, the read is considered unmapped
+--alignSJoverhangMin 8      # minimum overhang for unannotated junctions
+--alignSJDBoverhangMin 1    # minimum overhang for annotated junctions
+--outFilterMismatchNmax 999 # maximum number of mismatches per pair, large number switches off this filter
+--outFilterMismatchNoverReadLmax 0.04 # max number of mismatches per pair relative to read length: for 2x100b, max number of mismatches is 0.04*200=8 for the paired read
+--alignIntronMin 20         # minimum intron length
+--alignIntronMax 1000000    # maximum intron length
+--alignMatesGapMax 1000000  # maximum genomic distance between mates
+```
+
+The full command is provided below for you to copy paste into your terminal. If you want to manually enter the command, it is advisable to first type out the full command in a on your local machine and then copy paste into the terminal. This will make it easier to catch typos and make appropriate changes. You can also use `vim` to write this in a text file. You can run the script on the interactive node, and once you're convinced that it runs well on example data, you can just change the filename to the full-size data and submit the job with `sbatch`
 
 ``` bash
 # assumes you are in raw_data directory
@@ -119,7 +137,7 @@ After running our single FASTQ file through the STAR aligner, you should have a 
 
 ``` bash
 $ cd ../rnaseq/results/STAR
-    
+
 $ ls -lh
 ```
 
@@ -130,6 +148,8 @@ You should have **5 output files** plus a single `.tmp` directory for the Mov10_
 -   `Log.out` - a running log from STAR, with information about the run
 -   `Log.progress.out` - job progress with the number of processed reads, % of mapped reads etc., updated every \~1 minute
 -   `SJ.out.tab` - high confidence collapsed splice junctions in tab-delimited format. Only junctions supported by uniquely mapping reads are reported
+
+> NOTE: For any tool you run, you should get into the habit of seeing what it creates. Use `less`, `grep`, and other commands you've learned to inspect the output. Often there is all sorts of interesting information in there that may not be otherwise documented anywhere.
 
 ## Mapping statistics
 
@@ -144,6 +164,9 @@ The log file provides information on reads that 1) mapped uniquely, 2) reads tha
 -   As an example, a good quality sample will have **at least 75% of the reads uniquely mapped**. Once values start to drop lower than 60% it's advisable to start troubleshooting. The lower the number of uniquely mapping reads means the higher the number of reads that are mapping to multiple locations. It is best to keep this number low because multi-mappers are not included when we start counting reads
 
 > NOTE: The thresholds suggested above will vary depending on the organism that you are working with. Much of what is discussed here is in the context of working with human or mouse data. For example, 75% of mapped reads holds true only if the genome is good or mature. For badly assembled genomes we may not observe a high mapping rate, even if the actual sequence sample is good.
+
+> NOTE: **multimappers** are reads that could have come from multiple places in the genome, but we don't have enough information to know for sure. For example, reads coming from repetitive elements will be multimapping. Other examples are gene duplication events (like the [teleost fish duplication event](https://pubmed.ncbi.nlm.nih.gov/25092473/) that you'll need to consider if working with zebrafish) or similar genes (like the collagen or tubulin families). It's possible that increasing the read length would allow us to identify a unique mapping location, but not always.
+
 
 ------------------------------------------------------------------------
 
@@ -171,11 +194,13 @@ $ cd /data/Bspc-training/$USER/rnaseq #if you aren't already there
 $ mkdir -p results/qualimap #check out mkdir's man page. What does -p do? 
 ```
 
-By default, Qualimap will try to open a GUI to run Qualimap, so we need to run the `unset DISPLAY` command:
+By default, Qualimap will try to open a GUI (graphical user interface) to run Qualimap, so we need to run the `unset DISPLAY` command:
 
 ``` bash
 $ unset DISPLAY
 ```
+
+> NOTE: technically, `$DISPLAY` is an environment variable like `$USER` or `$PATH`. Unsetting it (and referring to the name of the variable without the `$`) makes it go away. Turns out `qualimap` looks for this variable to decide wther to run in GUI mode.
 
 We also need to load the qualimap module:
 
@@ -202,6 +227,10 @@ We will be running Qualimap with the following specifications:
 # assuming you are running the script from /results - change directory to get there, if needed 
 qualimap rnaseq -outdir qualimap/Mov10_oe_1 -a proportional -bam STAR/Mov10_oe_1_Aligned.sortedByCoord.out.bam -p strand-specific-reverse -gtf /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf --java-mem-size=8G
 ```
+
+> NOTE: Notice the arguments to qualimap always use a *single* `-` (e.g., `-outdir`) unlike STAR which used *two* (e.g., `--outFileNamePrefix`). Not really any reason for this, just tool author preferences. You should always read the manual to know how to specify arguments.
+
+> NOTE: Read the qualimap help for the version you're using. The best way to do this is to read the command-line help. Websites are convenient to read, but they may not match what you're actually running.
 
 ### The Qualimap report
 
