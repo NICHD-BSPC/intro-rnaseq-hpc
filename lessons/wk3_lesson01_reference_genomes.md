@@ -112,7 +112,7 @@ $ wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/genc
 **The [GTF](https://web.archive.org/web/20031212200757/http://genes.cse.wustl.edu/GTF2.html) (Gene Transfer Format) file** is a *tab-delimited* file arranged in a very specific manner to store info about gene structure. The ENCODE [data format page](https://www.gencodegenes.org/pages/data_format.html) specifies that the columns of a GTF provided by that consortia are as follows:
 
 | Column Number | Content                                                         | Format                                                      |
-|------------------|---------------------------|---------------------------|
+|-------------------|---------------------------|---------------------------|
 | 1             | chromosome name                                                 | chr1, chr2 etc.                                             |
 | 2             | annotation source                                               | ENSEMBL, HAVANA                                             |
 | 3             | feature type                                                    | gene, transcript, exon etc.                                 |
@@ -138,7 +138,7 @@ chr19   HAVANA   transcript   405438   409170   .   -   .   gene_id "ENSG0000018
 Given our understanding of splice isoforms, we know that a given exon can be part of 2 or more different transcripts generated from the same gene. In a GTF file, this exon will be represented multiple times, once for each transcript (or splice isoform).
 
 ``` bash
-$ grep "PLEKHN1" GRCh38.primary_assembly.genome.fa | head -n 5
+$ grep "PLEKHN1" /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf | head -n 5
 ```
 
 **`cut` is a command that extracts columns from files.**
@@ -146,7 +146,7 @@ $ grep "PLEKHN1" GRCh38.primary_assembly.genome.fa | head -n 5
 We will use `cut` with the `-f` argument to specify which specific fields or columns from the dataset we want to extract. Let's say we want to get the 1st column (chromosome number) and the 4th column (starting genomic position) from `chr1-hg19_genes.gtf` file, we can say:
 
 ``` bash
-$ cut -f 1,4 GRCh38.primary_assembly.genome.fa | head
+$ cut -f 1,4 /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf  | head
 ```
 
 ```         
@@ -164,12 +164,32 @@ chr1    12613
 
 > The `cut` command assumes our data columns are separated by tabs (i.e. tab-delimited). Since GTFs are a tab-delimited file, so the default `cut` command works for us. However, data can be separated by other types of delimiters like "," or ";". If your data is not tab delimited, there is an argument you can add to your `cut` command, `-d` to specify the delimiter (e.g. `-d ","` with a .csv file).
 
+The output of `cut` doesn't seem very useful yet as you still have the header lines (that start with \##). How do we disregard those?
+
+#### Grep -v : Reverse grep
+
+The `-v` option is shorthand for **`--invert-match`**, which selects all the lines that DO NOT have matches to your pattern. We can chain it together with the `cut` command using a pipe:
+
+``` bash
+$ grep -v /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf | cut -f 1,4 | head -n 5
+```
+
+```         
+chr1	11121
+chr1	11121
+chr1	11121
+chr1	12010
+chr1	12613
+```
+
+#### Sort 
+
 **`sort` is a command used to sort the contents of a file in a particular order.** It has arguments that let you pick which column to sort by (`-k`), what kind of sorting you want to do (numeric `n`) and also if the result of the sorting should only return unique (`-u`) values. These are just 2 of the many features of the sort command.
 
 Let's do a quick test of how the `-u` argument returns only unique lines (and remove duplicates).
 
 ``` bash
-$ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf  | wc -l
+$ grep "##" -v /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf | cut -f 1,4 | wc -l 
 ```
 
 *How many lines are returned to you?*
@@ -178,14 +198,13 @@ $ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf  | wc -l
 
 <summary><b><i>Click here to check your output</i></b></summary>
 
-<p>Your command should have returned 4117652 lines...but how many do we need to subtract for that header? What command could you add that would remove the header?</p>
-
+<p>Your command should have returned 4117647 lines</p>
 </details>
 
 Now apply the `sort -u` command before counting the lines.
 
 ``` bash
-$ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf | sort -u | wc -l
+$ grep "##" -v /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf | cut -f 1,4 | sort -u | wc -l 
 ```
 
 *How many lines do you see now?*
@@ -194,7 +213,7 @@ $ cut -f 1,4 gencode.v47.primary_assembly.annotation.gtf | sort -u | wc -l
 
 <summary><b><i>Click here to check your output</i></b></summary>
 
-<p>Your command should have returned 796,720 lines. But again, does this include those header comment lines?</p>
+<p>Your command should have returned 796,715 lines</p>
 
 </details>
 
@@ -348,9 +367,9 @@ By looking at recent publications, talking to your labmates etc. - what is the m
 
 1.  Create a `reference_genome` subdirectory of your `/Bspc-training/$USER/rnaseq` directory. Create a `ref_notes.txt` file in there to answer the next questions.
 2.  Find a **GTF file**, in a Biowulf STAR index directory, that corresponds with your chosen genome version. OR if necessary, use `wget` to download the GTF file you identify from a consortium website. *Post in the main `rnaseq_jan2025` channel if you need help with this!*
-3.   In the text file, make note of: the name of your organism, the genone build you would use, and the full Biowulf directory paths or `wget` commands you used to download the GTF and FASTA files.
+3.  In the text file, make note of: the name of your organism, the genone build you would use, and the full Biowulf directory paths or `wget` commands you used to download the GTF and FASTA files.
 
-## BONUS PRACTICE ASSIGNMENT: 
+## BONUS PRACTICE ASSIGNMENT:
 
 A few Fridays ago, we demonstrated how to create a frequency table of different **feature types** from a GTF file using a combination of commands like `cut`, `grep` and `uniq`. The result ended up looking like this:
 
