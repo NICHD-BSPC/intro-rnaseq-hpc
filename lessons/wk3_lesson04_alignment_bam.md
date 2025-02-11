@@ -11,10 +11,14 @@ date: Last modified February 2025
 
 ## Assessing alignment quality
 
-After running our single FASTQ file through the STAR aligner, you should have noticed a number of output files in the `rnaseq/results/STAR` directory. Let's take a quick look at some of the files that were generated and explore the content of some of them.
+After running our single **subset** FASTQ file through the STAR aligner, you should have noticed a number of output files in the `rnaseq/results/STAR` directory. Let's take a quick look at some of the files that were generated and explore the content of some of them.
+
+``` bash
+$ sinteractive --mem=4g --cpus-per-task=2 #make sure you are on an interactive node with a bit of memory
+```
 
 ```         
-$ cd ~/rnaseq/results/STAR
+$ cd /data/$USER/rnaseq/results/STAR 
 
 $ ls -lh
 ```
@@ -50,18 +54,18 @@ VN: program version
 
 Following the header is the **alignment section**. Each line that follows corresponds to alignment information for a single read. Each alignment line has **11 mandatory fields for essential mapping information** and a variable number of other fields for aligner specific information.
 
-![SAM1](../img/sam_bam.png)
+![](../img/sam_bam.png)
 
 An example read mapping is displayed above. *Note that the example above spans two lines, but in the file it is a single line.* Let's go through the fields one at a time. First, you have the read name (`QNAME`), followed by a `FLAG`
 
-> DISCUSSION: Is the first BAM read ID the same as the first FASTQ read ID? Why or why not?
+> DISCUSSION: Is the first BAM read ID the same as the first input FASTQ read ID? Why or why not?
 
 The `FLAG` value that is displayed can be translated into information about the mapping.
 
 | Flag |                Description                |
 |-----:|:-----------------------------------------:|
 |    1 |              read is paired               |
-|    2 |     read is mapped in proper pair      |
+|    2 |       read is mapped in proper pair       |
 |    4 |             read is unmapped              |
 |    8 |             mate is unmapped              |
 |   16 |            read reverse strand            |
@@ -71,7 +75,7 @@ The `FLAG` value that is displayed can be translated into information about the 
 |  256 |           not primary alignment           |
 |  512 | read fails platform/vendor quality checks |
 | 1024 |     read is PCR or optical duplicate      |
-| 2048 | supplementary alignment |
+| 2048 |          supplementary alignment          |
 
 -   For a given alignment, each of these flags are either **on or off** indicating the condition is **true or false**.
 -   The `FLAG` is a combination of all of the individual flags (from the table above) that are true for the alignment
@@ -92,7 +96,7 @@ Which tells us that:
 
 Technically, bitwise flags are binary numbers (here, 11 digits for the 11 items in the table) where each position represents yes/no for the respective item.
 
-```
+```         
 00000000101
        ^^^^
        |||| read is paired (add 1 if true)
@@ -117,10 +121,10 @@ Moving along the fields of the SAM file, we then have `RNAME` which is the refer
 
 Suppose our read has a CIGAR string of `50M3I80M2D` which translates to:
 
-* 50 matches or mismatches
-* 3 bp insertion
-* 80 matches/mismatches
-* 2 bp deletion
+-   50 matches or mismatches
+-   3 bp insertion
+-   80 matches/mismatches
+-   2 bp deletion
 
 Now to the remaning fields in our SAM file:
 
@@ -135,47 +139,62 @@ Finally, you have the data from the original FASTQ file stored for each read. Th
 [SAMtools](http://samtools.sourceforge.net/) is a tool that provides alot of functionality in dealing with SAM files. SAMtools utilities include, but are not limited to, viewing, sorting, filtering, merging, and indexing alignments in the SAM format. In this lesson we will explore a few of these utilities on our alignment files. To use this we need to load the module.
 
 ``` bash
-$ sinteractive --mem=4g --cpus-per-task=2 #make sure you are on an interactive node with a bit of memory
-```
-
-``` bash
 # loaded default version 1.21 
 $ module load samtools
 ```
 
 ### Viewing the SAM file
 
+**Note**: My output BAM file run on the subset of data is `Mov10_oe_1_subsetAligned.sortedByCoord.out.bam` . Yours might be slightly different if you used a different prefix while mapping, so make sure to double check what your output is called and adjust the commands below if neede
+
 Now that we have learned so much about the SAM file format, let's use `samtools` to take a quick peek at our own files. The output we had requested from STAR was a BAM file. The problem is the BAM file is binary and not human-readable. Using the `view` command within `samtools` we can easily convert the BAM into something that we can understand -- and pipe to other command line tools! You will be returned to screen the entire SAM file, and so we can either write to file, or pipe this to the `less` command so we can scroll through it.
 
 We are assuming you are in `/data/Bspc-training/$USER/rnaseq/results/STAR` for the following commands.
 
 ```         
-$ samtools view -h Mov10_oe_1_Aligned.sortedByCoord.out.bam > Mov10_oe_1_Aligned.sortedByCoord.out.sam
+$ samtools view -h Mov10_oe_1_subsetAligned.sortedByCoord.out.bam > Mov10_oe_1_subsetAligned.sortedByCoord.out.sam
 ```
 
 ``` bash
-$ head Mov10_oe_1_Aligned.sortedByCoord.out.sam
+$ head Mov10_oe_1_subsetAligned.sortedByCoord.out.sam
 
-@HD	VN:1.4	SO:coordinate
-@SQ	SN:chr1	LN:248956422
-@SQ	SN:chr2	LN:242193529
-@SQ	SN:chr3	LN:198295559
-@SQ	SN:chr4	LN:190214555
-@SQ	SN:chr5	LN:181538259
-@SQ	SN:chr6	LN:170805979
-@SQ	SN:chr7	LN:159345973
-@SQ	SN:chr8	LN:145138636
-@SQ	SN:chr9	LN:138394717
+@HD VN:1.4  SO:coordinate
+@SQ SN:chr1 LN:248956422
+@SQ SN:chr2 LN:242193529
+@SQ SN:chr3 LN:198295559
+@SQ SN:chr4 LN:190214555
+@SQ SN:chr5 LN:181538259
+@SQ SN:chr6 LN:170805979
+@SQ SN:chr7 LN:159345973
+@SQ SN:chr8 LN:145138636
+@SQ SN:chr9 LN:138394717
 ```
 
 > NOTE: what did `-h` do? How would you find out?
 
-### Filtering the SAM qfile
+So, these first 10 lines aren't super interesting, as it is just listing the names of the input sequences (in this case, chromosomes of the input genome) and their lengths. Let's try `tail` for what some human-readable lines of actual SAM-formatted data look like:
+
+``` bash
+HWI-ST330:304:H045HADXX:2:2212:4026:94975	4	*	0	0	*	*	0	0	GTTTGGTGATGAACTGGGGGTCATAGCCATTGGGGCCCTGCTTATACAAGGAGTTGTAGGCGAGCAGGCGCTCTAGCAGAGAGTAGCCAAGTCCATGCTT	@@@DDDDDDHDDD<EB>E@CC?F?D>3?3?F**067?6C#############################################################	NH:i:0	HI:i:0	AS:i:18	nM:i:2	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:6059:95943	4	*	0	0	*	*	0	0	CCCGACTCCCCGGGTCCCAGGAGGTCCCAGAGGACAGTGGGTGGGAAGTAACCCACAATGCTGGTCTTACAGTAGATGTGGAGTTCATAGCTTTCACCGG	??;B?)@AFDDFD128??CCDGD0)?99?*8?(?##################################################################	NH:i:0	HI:i:0	AS:i:21	nM:i:7	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:7648:96498	4	*	0	0	*	*	0	0	GCCTCATCGATGAAGATGTGTGTGAAGTGATCGATGGGAAACTGGGCTGACACCAACCTGCTGGCAGCGATGAGGGTGGCAATTAAGACCCGATATTGCT	;@@DDDADDFF<D<:AA<A@EB3A43<2<?+CF@;?D3D*):?*?FG9:9B3818=BF##########################################	NH:i:0	HI:i:0	AS:i:53	nM:i:3	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:15028:97450	4	*	0	0	*	*	0	0	GGGGCACCCGGTATATCCCCCGTTTTCTTTACAGAACTCCAGGAACGTTTTCCAGTCTGGGTCGTGGCCTAGGAGGAGGGGGTTGCCCACTACGATGAGC	;<@DFFDDFD>FDGHG@CFF6?GHGH4B*:*??9*98B##############################################################	NH:i:0	HI:i:0	AS:i:38	nM:i:3	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:18192:97569	4	*	0	0	*	*	0	0	CCAGATTTGCGATCTTCATTCCATACAGCATGGAGGAGAAGCCAGGGGCAGGGGTCCCATAGCTGGGCTTGAAGTCGTGGTTGTAAATCGTCCGCAGCCG	=@@BDFFFF<FF8BEFE<FHGCFHE?@<++1:8:8CB13BBD;008(('70/';54?9=.7.;@?@==35>B@###########################	NH:i:0	HI:i:0	AS:i:57	nM:i:3	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:2976:98041	4	*	0	0	*	*	0	0	CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGAGATTCTGGGGACGGCGGGGGCCCGAGGGTGGGGGGGTGAGTTTCCTCCGACCTTTG	?;;DDD:BD4CDBEE1EBACEEEE3:CCCDDD@6).0/B=B@##########################################################	NH:i:0	HI:i:0	AS:i:36	nM:i:4	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:8908:98487	4	*	0	0	*	*	0	0	CCGGCTGCCGAGGGTCTCCTGCCAGTGCCAGCTGACATCCGGCATTGACCGGTTACTTGCCAACCATCAGTCCTGCTGTGTCCACCACACTCTCAGGCAC	@<@AA@<12@?FA8CEFE3CFE3**:0000B69B##################################################################	NH:i:0	HI:i:0	AS:i:30	nM:i:7	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:11799:98450	4	*	0	0	*	*	0	0	CGCTCTCCACATGCTCCCTCTGATGCCAGACTTTTTTTTTTTTTTTTTTAAGGTCTTATCATTTTAATCGGTTTTAATGATTATTTCTCATCTGCAAGGT	?@7?B?D3ADFHDHEEEGEFHIBHGG<CGCEHHIGIADFHGFDCB#######################################################	NH:i:0	HI:i:0	AS:i:46	nM:i:2	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:5156:99689	4	*	0	0	*	*	0	0	ATAGCTTTCACCGGGGCCCAGTGGGCAGGGCAGGTCCTGTTCTCCATGGTAGAAGACAAACTGGGGCGGCCAGCACAGTGGGAATAGGTGAGTGAAGGAG	<@@?DAD<F<DDF1)11811:DD9)):0)?;?####################################################################	NH:i:0	HI:i:0	AS:i:22	nM:i:4	uT:A:1
+HWI-ST330:304:H045HADXX:2:2212:15671:100398	4	*	0	0	*	*	0	0	TGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGGGATTCTGGTGACGGCGGGGCCCCGCGGCGGAGGGGCTGGGGTTCCTCCGACCCTGGGGCA	?@@DDDDDFC:DCFGA@?+C3?EHE)?D0@)8?###################################################################	NH:i:0	HI:i:0	AS:i:35	nM:i:9	uT:A:1
+```
+
+### Filtering the SAM file
 
 Now we know that we have all of this information for each of the reads -- wouldn't it be useful to summarize and filter based on selected criteria? Suppose we wanted to set a **threshold on mapping quality**. For example, we want to know how many reads aligned with a quality score higher than 30. To do this, we can combine the `view` command with additional flags `-q 30` and `-c` (to count):
 
 ```         
-$ samtools view -q 30 -c Mov10_oe_1_Aligned.sortedByCoord.out.bam
+$ samtools view -q 30 -c Mov10_oe_1_subsetAligned.sortedByCoord.out.sam
+
+275951
 ```
 
 > NOTE: mapping quality is the aligner's estimate on how accurate the alignment is. Low MAPQ indicates multimappers. However, it is not always clear what to use as a threhsold, as [this post describes](http://www.acgt.me/blog/2014/12/16/understanding-mapq-scores-in-sam-files-does-37-42).
@@ -189,10 +208,11 @@ We can also **apply filters to select reads based on where they fall within the 
 
 ```         
 ## This will tell us how many reads are unmapped
-$ samtools view -f 4 -c Mov10_oe_1_Aligned.sortedByCoord.out.bam
+$ samtools view -f 4 -c Mov10_oe_1_subsetAligned.sortedByCoord.out.bam
+
 
 ## This should give us the remaining reads that do not have this flag set (i.e reads that are mapped)
-$ samtools view -F 4 -c Mov10_oe_1_Aligned.sortedByCoord.out.bam
+$ samtools view -F 4 -c Mov10_oe_1_subsetAligned.sortedByCoord.out.bam
 ```
 
 ### Indexing the BAM file
@@ -202,14 +222,14 @@ To perform some functions (i.e. subsetting, visualization) on the BAM file, an i
 To index the BAM file we use the `index` command. **This may take a while and actually require you use a SBATCH script, so you only need to do this when you plan to do the bonus visualization step.**
 
 ``` bash
-$ samtools index Mov10_oe_1_Aligned.sortedByCoord.out.bam
+$ samtools index Mov10_oe_1_subsetAligned.sortedByCoord.out.bam
 ```
 
 This will create an index in the same directory as the BAM file, which will be identical to the input file in name but with an added extension of `.bai`. By convention, tools that need BAM index expect the index to be named after its respective BAM file but with a `.bai` extension.
 
 ------------------------------------------------------------------------
 
-## **ASSIGNMENT:** 
+## **ASSIGNMENT:**
 
 The STAR log file for `Mov10_oe_1` indicated that there were a certain number of reads mapping to multiple locations. When this happens, one of these alignments is considered primary and all the other alignments have the secondary alignment flag set in the SAM records. **Use `samtools` and your knowledge of [bitwise flags](https://github.com/hbc/NGS_Data_Analysis_Course/blob/master/sessionII/lessons/03_alignment_quality.md#bitwise-flags-explained) to find count how many secondary reads there are for `Mov10_oe_1`.**
 
