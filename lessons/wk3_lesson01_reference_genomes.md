@@ -322,7 +322,10 @@ drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_39
 drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_45
 ```
 
-Looking into this folder, you can see a number of index files as well as the input GTF and FASTQ files used.
+**Looking into this `release_45` we see a few important things:**
+- A number of subdirectories with names like `genes-100/`. These are the actual genome index directories, categorized by read length! Remember how we had to set that `--sjdbOverhang 99` parameter? 
+- `genes.gtf` and other files used to actually create the indicies
+- `slurm-21952863.out` and similar. These are logs from when Biowulf staff created these indices. You can check out what actual command they used. 
 
 **Generally speaking, STAR indices for each version of STAR available on Biowulf are stored in:**
 
@@ -330,7 +333,7 @@ Looking into this folder, you can see a number of index files as well as the inp
 
 -   **`/fdb/STAR_current`**`→ /fdb/STAR_indices/[current default STAR version]`
 
-Keep in mind the lack of backwards compatibility between some versions of STAR!
+Keep in mind the lack of backwards compatibility between some versions of STAR! 
 
 ## Exercise:
 
