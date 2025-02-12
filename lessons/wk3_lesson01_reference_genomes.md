@@ -358,7 +358,7 @@ Keep in mind the lack of backwards compatibility between some versions of STAR!
 
 Note that the most recent Gencode annotations they have are for `release_45`, whereas the up-to-date version we used earlier are from Release 47.
 
--   Does it look like there is a `STAR 2.7.11b` index available for a recent release on Biowulf somewhere in `/fdb/STAR_indices`? You may need to check both in both the Gencode and UCSC subfolders.
+-   Does it look like there is a `STAR 2.7.11b` index available for release_47 of GENCODE annotations available on Biowulf somewhere in `/fdb/STAR_indices`? You may need to check both in both the Gencode and UCSC subfolders.
 -   If not - look in the `/fdb/STAR_indices/2.7.10b` directory or other, older directories. This slightly older version of STAR has more pre-prepared indices. If you find a relevant index folder - report the full path to that directory.
 
 ## Assignment
