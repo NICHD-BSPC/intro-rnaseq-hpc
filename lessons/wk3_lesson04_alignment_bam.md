@@ -94,7 +94,7 @@ Which tells us that:
 
 **There are tools that help you translate the bitwise flag, for example [this one from Picard](https://broadinstitute.github.io/picard/explain-flags.html)**
 
-Technically, bitwise flags are binary numbers (here, 11 digits for the 11 items in the table) where each position represents yes/no for the respective item.
+Technically, bitwise flags are binary numbers (here, 11 digits for the 12 items in the table) where each position represents yes/no for the respective item.
 
 ```         
 00000000101
@@ -106,7 +106,7 @@ Technically, bitwise flags are binary numbers (here, 11 digits for the 11 items 
        ... and so on
 ```
 
-When [reading binary](https://www.lifewire.com/how-to-read-binary-4692830), `00000000101` is `5` -- there's no other combination of true/false (1s and 0s) that could give us a value of 5, so this must be a paired read that is unmapped. Storing a digit in decimal character (like "5") is more space-efficient than storing the 11-character full binary representation.
+When [reading binary](https://www.lifewire.com/how-to-read-binary-4692830), `00000000101` is `5` -- there's no other combination of true/false (1s and 0s) that could give us a value of 5, so this must be a paired read that is unmapped. Storing a digit in decimal character (like "5") is more space-efficient than storing the 12-character full binary representation on every line.
 
 Moving along the fields of the SAM file, we then have `RNAME` which is the reference sequence name. The example read is from chromosome 1 which explains why we see 'chr1'. `POS` refers to the 1-based leftmost position of the alignment. `MAPQ` is giving us the alignment quality, the scale of which will depend on the aligner being used.
 
