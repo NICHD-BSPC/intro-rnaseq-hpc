@@ -16,12 +16,12 @@ This will ensure that you run every sample with the exact same parameters, and w
 
 ### Start an interactive session
 
-We will be working with an interactive session with 6 cores.
+We will be working with an interactive session has enough memory, CPUs and scratch space to run all of the commands we have run in the whole course up to this point!
 
-> If you have a session with fewer cores then `exit` out of your current interactive session and start a new one with `-c 6`.
+Remember from Week 3 Lesson 02 that the aligning step using STAR seemed to be the most memory intensive and required scratch space to be designated.
 
 ``` bash
-$ srun --pty -p interactive -t 0-3:00 -c 6 --mem 8G --reservation=HBC3 /bin/bash
+$ sinteractive --cpus-per-task=12 --mem=48g --gres=lscratch:1
 ```
 
 ### More Flexibility with variables
@@ -55,14 +55,14 @@ We will be using this concept in our automation script, wherein we will accept t
 
 ### Writing the automation script!
 
-We will start writing the script on our laptops using a simple text editor like Sublime Text or Notepad++. Let's being with the shebang line and a `cd` command so that our results are all written on `/n/scratch/`.
+We will start writing the script on our laptops using a simple text editor. Let's begin with the shebang line and a `cd` command so that our results are all written on `/n/scratch/`.
 
 ``` bash
 #!/bin/bash/
 
-# change directories to /n/scratch/ so that all the analysis is stored there.
+# change directories to your course directory so that all the analysis is stored there and we can write all paths relative to this directory.
 
-cd /n/scratch/users/r/$USER/rnaseq_hbc-workshop/
+cd /data/Bspc-training/$USER/rnaseq
 ```
 
 **We want users to input the path to the fastq file as input to the shell script.** To make this happen, we will use the `${1}` positional parameter variable within the script.
@@ -96,7 +96,7 @@ samplename=`basename ${fq} .subset.fq`
 echo "Sample name is ${samplename}"           
 ```
 
-> **Remember `basename`?**
+> **Intro to `basename`**
 >
 > 1.  the `basename` command: this command takes a path or a name and trims away all the information before the last `/` and if you specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path *"\~/rnaseq/raw_data/Mov10_oe_1.subset.fq"*, `basename ${fq} .subset.fq` will output "Mov10_oe_1".
 > 2.  to assign the value of the `basename` command to the `samplename` variable, we encapsulate the `basename...` command in backticks. This syntax is necessary for assigning the output of a command to a variable.
