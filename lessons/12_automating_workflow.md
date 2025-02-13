@@ -1,7 +1,7 @@
 ---
 title: "Automating the RNA-seq workflow"
-author: "Meeta Mistry, Radhika Khetani, Mary Piper, Jihe Liu, Edited by Sally Chang @ NICHD"
-date: "Editing on October 15th, 2024"
+author: "Harvard HPC Staff, Sally Chang @ NICHD"
+date: "Last Edited February 2025"
 ---
 
 ## Learning Objectives:
@@ -13,65 +13,6 @@ date: "Editing on October 15th, 2024"
 Once you have optimized all the tools and parameters using a single sample (likely using an interactive session), you can write a script to run the whole workflow on all the samples in parallel.
 
 This will ensure that you run every sample with the exact same parameters, and will enable you to keep track of all the tools and their versions. In addition, the script is like a lab notebook; in the future, you (or your colleagues) can go back and check the workflow for methods, which enables efficiency and reproducibility.
-
-### Using "scratch space"
-
-Before we get started, let's talk a little bit about how data are stored on O2. O2, like many clusters, has several different storage options; each of which has different amounts of space available, and is differently backed up. One filesystem is the `/n/scratch/` space. This directory has a lot of shared disk space available, but the files are not backed up and they will be deleted if left "untouched" for more than 30 days. **This is akin to the /scratch/user space on Biowulf, which is not available from a compute node. I will need to adjust this part of the lesson entirely based on what Biowulf recommends. Get students in the practice of writing to /lscratch?**
-
-By design `/n/scratch/` is to be used for intermediate files that are created during any analysis. An example is in the schematic below.
-
-<p align="center">
-
-<img src="../img/scratch3_best-practice.png" width="600"/>
-
-</p>
-
-Today, we are going to learn how to use the `/n/scratch/` storage location as we work on automating our workflow ([More information about scratch space on O2](https://harvardmed.atlassian.net/wiki/spaces/O2/pages/2652045313/Scratch+Storage). We will be maintaining our data in our (backed up) home directories, but all of the output files will be in scratch space. When we are done, we can copy over only those output files that are essential.
-
-#### Not relevant for Biowulf: Creating a folder in `/n/scratch/`
-
-To get started let's create a folder for ourselves in `/n/scratch/` first. We can do so by running the existing script `/n/cluster/bin/scratch_create_directory.sh` from a login node.
-
-``` bash
-$ sh /n/cluster/bin/scratch_create_directory.sh
-```
-
-When you press enter you will see:
-
-```         
-Do you want to create a scratch directory under /n/scratch/users? [y/N]>
-```
-
-Please say `y`. Next, it will display the guidelines for this folder and ask you to verify that you have read them:
-
-```         
-Do you want to create a scratch directory under /n/scratch/users? [y/N]> y
-
-By typing 'YES' I will comply with HMS RC guidelines for using Scratch.
-I also confirm that I understand that files in my scratch directory WILL NOT BE BACKED UP IN ANY WAY.
-I also understand that 45 DAYS after I last modify a given file or directory in my scratch directory,
-it will be DELETED with NO POSSIBILITY of retrieval.
-
-I understand HMS RC guidelines for using Scratch: 
-```
-
-Please answer `Yes` or `yes` here, once you do you will get some additional information and your command prompt back.
-
-```         
-Your scratch directory was created at /n/scratch/users/r/rc_training01.
-This has a limit of 25TiB of storage and 2.5 million files.
-You can check your scratch quota using the quota-v2 command.
-```
-
-Great, now we all have created a work directory for ourselves in the `/n/scratch/` storage space!
-
-Let's go ahead and create a folder within our `/n/scratch/` storage space for the results of our analysis.
-
-``` bash
-mkdir /n/scratch/users/r/$USER/rnaseq_hbc-workshop
-```
-
-When we create our script, we will make sure that all of the analysis output gets saved in the `/n/scratch/users/r/$USER/rnaseq_hbc-workshop` folder.
 
 ### Start an interactive session
 
