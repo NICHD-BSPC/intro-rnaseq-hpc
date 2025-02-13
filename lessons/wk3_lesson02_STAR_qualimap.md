@@ -90,6 +90,9 @@ Next, move into our `rnaseq` directory and create an output directory for our al
 $ cd /data/Bspc-training/$USER/rnaseq
 
 $ mkdir results/STAR
+
+$ #remember to load STAR again
+module load STAR/2.7.11b
 ```
 
 For now, we're going to work on just one sample to set up our workflow. To start we will use the first replicate in the Mov10 over-expression group, `Mov10_oe_1.subset.fq`. Details on STAR and its functionality can be found in the [user manual](https://raw.githubusercontent.com/alexdobin/STAR/master/doc/STARmanual.pdf); we encourage you to peruse through to get familiar with all available options. Warning, it's 63 pages!
@@ -105,12 +108,13 @@ Listed below are additional parameters that we will use in our command:
 
 -   `--outSAMtype`: output filetype (SAM default), but also produce a BAM that has been sorted by genomic coordinates, which is what will be needed for downstream analyses.
 -   `--outSAMunmapped`: what to do with unmapped reads
+-   `--outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp` make use of our temporary output directory in lscratch that we requested
 
 > **NOTE:** Note that "**STAR’s default parameters are optimized for mammalian genomes.** Other species may require significant modifications of some alignment parameters; in particular, the maximum and minimum intron sizes have to be reduced for organisms with smaller introns" [[1](http://bioinformatics.oxfordjournals.org/content/early/2012/10/25/bioinformatics.bts635.full.pdf+html)].
 
 Section 3.3.2 of the STAR manual lists options that the ENCODE consortium has used:
 
-```bash
+``` bash
 --outFilterType BySJout     # reduces the number of 'spurious' junctions
 --outFilterMultimapNmax 20  # max number of multiple alignments allowed for a read: if exceeded, the read is considered unmapped
 --alignSJoverhangMin 8      # minimum overhang for unannotated junctions
@@ -122,14 +126,21 @@ Section 3.3.2 of the STAR manual lists options that the ENCODE consortium has us
 --alignMatesGapMax 1000000  # maximum genomic distance between mates
 ```
 
-The full command is provided below for you to copy paste into your terminal. If you want to manually enter the command, it is advisable to first type out the full command in a on your local machine and then copy paste into the terminal. This will make it easier to catch typos and make appropriate changes. You can also use `vim` to write this in a text file. You can run the script on the interactive node, and once you're convinced that it runs well on example data, you can just change the filename to the full-size data and submit the job with `sbatch`
+For our purposes, we will mostly stick with default parameters. The full command is provided below for you to copy paste into your terminal.
 
 ``` bash
 # assumes you are in raw_data directory
-$ STAR --genomeDir /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38 --runThreadN 10 --readFilesIn Mov10_oe_1.subset.fq --outFileNamePrefix ../results/STAR/Mov10_oe_1_subset --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard 
+$ STAR --genomeDir /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38 \
+--runThreadN 10 --readFilesIn Mov10_oe_1.subset.fq \ 
+--outFileNamePrefix ../results/STAR/Mov10_oe_1_subset --outSAMtype BAM SortedByCoordinate \
+--outSAMunmapped Within --outSAMattributes Standard --outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp
 ```
 
-Mapping the full, non-subsetted samples will take much more time, so this is a good use case for submitting an SBATCH script.
+**Note about writing long commands:**
+
+If you want to manually enter the command, it is advisable to first type out the full command in a on your local machine and then copy paste into the terminal. This will make it easier to catch typos and make appropriate changes. You can also use `vim` to write this in a text file. You can run the script on the interactive node, and once you're convinced that it runs well on example data, you can just change the filename to the full-size data and submit the job with `sbatch` . *If you are writing in a text editor, you can break up your long command with `\` between portions of the command and it will still run as if it were on one long line*.
+
+**If you were to align the full, non-subsetted samples will take much more time, so that would be a good use case for submitting an SBATCH script (see Assignment!)**.
 
 #### STAR output
 
@@ -151,6 +162,12 @@ You should have **5 output files** plus a single `.tmp` directory for the Mov10_
 
 > NOTE: For any tool you run, you should get into the habit of seeing what it creates. Use `less`, `grep`, and other commands you've learned to inspect the output. Often there is all sorts of interesting information in there that may not be otherwise documented anywhere.
 
+### Uh oh - what if my STAR command is "killed"?
+
+In class, a few of us saw the alarming word `KILLED` after letting our STAR command run for a few minutes. This wording is actually a message from Biowulf saying that the process you are running has been terminated. The most common cause of this message is that the memory used by your process has exceeded the memory requested.
+
+You can check out the your [Biowulf User Dashboard](https://hpcnihapps.cit.nih.gov/auth/dashboard/) (under the Job Status tab) to see if that is the case! In class, we simply exited the current interactive job and started a new one with at least 32g of memory. *Remember to change back into your correct working directory and load STAR again after getting a new interactive node!*
+
 ## Mapping statistics
 
 Having completed the alignment, the first thing we want to know is how well did our reads align to the reference. Rather than looking at each read alignment, it can be more useful to evaluate statistics that give a general overview for the sample. One of the output files from the STAR aligner contains mapping statistics, let's take a closer look at one of those files. We'll use the `less` command which allows us to scroll through it easily:
@@ -166,7 +183,6 @@ The log file provides information on reads that 1) mapped uniquely, 2) reads tha
 > NOTE: The thresholds suggested above will vary depending on the organism that you are working with. Much of what is discussed here is in the context of working with human or mouse data. For example, 75% of mapped reads holds true only if the genome is good or mature. For badly assembled genomes we may not observe a high mapping rate, even if the actual sequence sample is good.
 
 > NOTE: **multimappers** are reads that could have come from multiple places in the genome, but we don't have enough information to know for sure. For example, reads coming from repetitive elements will be multimapping. Other examples are gene duplication events (like the [teleost fish duplication event](https://pubmed.ncbi.nlm.nih.gov/25092473/) that you'll need to consider if working with zebrafish) or similar genes (like the collagen or tubulin families). It's possible that increasing the read length would allow us to identify a unique mapping location, but not always.
-
 
 ------------------------------------------------------------------------
 
@@ -276,7 +292,6 @@ The profile provides ratios between mean coverage at the 5’ region, the 3’ r
 | 3' bias    | 0.59 |
 | 5'-3' bias | 1.01 |
 
-
 ![coverage profile along transcript](../img/qualimap2_coverage_profile_along.png)
 
 > -   In a perfect sequencing experiment you would expect to see a 5'-3' bias ratio of 1 with low coverage at both ends of the transcript. This would suggest no bias is present.
@@ -291,9 +306,7 @@ Qualimap also reports the total number of reads mapping to splice junctions and 
 -   Partly known represents alignments where only one junction side is known.
 -   All other alignments with junctions are marked as Novel.
 
-
 ![junction analysis](../img/qualimap4_junction_analysis.png)
-
 
 > Other tools like [RNASeQC](https://software.broadinstitute.org/cancer/cga/rna-seqc) will plot figures that can help evaluate **GC content bias**. This is also an important aspect of QC, as low/high GC content regions will tend to have low coverage.
 
