@@ -4,7 +4,7 @@ author: Harvard HPC Staff, adapted by Sally Chang @ NICHD
 date: Last Modified February 2025
 ---
 
-Approximate time: 75 minutes
+Approximate time: 50 minutes
 
 ## Learning Objectives:
 
@@ -61,7 +61,7 @@ $ mkdir results/counts
 Rather than using the subset BAM file we generated in the last lesson, we will be using the BAMs generated from mapping the full input FASTQs against the full human genome. Those are stored in:
 
 ``` bash
-$ /data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/STAR/
+$ /data/Bspc-training/shared/rnaseq_jan2025/results_for_counting
 ```
 
 featureCounts is available as part of the `subread` module on Biowulf. Load this module using the following:
@@ -91,17 +91,42 @@ and the following are the values for the required parameters:
 
 `-a  /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf`required option for specifying path to GTF
 
-`-o /rnaseq/results/counts/mov10_all_featurecounts.txt`:required option for specifying path to, and name of the text output (count matrix)
+`-o results/counts/mov10_all_featurecounts.txt`:required option for specifying path to, and name of the text output (count matrix)
 
-`/data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/STAR/*.bam`:the list of all the bam files we want to collect count information for. In this case, all of the samples for the whole experiment!
+`/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/*.bam`:the list of all the bam files we want to collect count information for. In this case, all of the samples for the whole experiment!
 
 Let's run this now (assuming we are in our `/rnaseq` directories):
 
 ``` bash
 $ featureCounts -T 4 -s 2 \ 
 -a /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf \
-  -o /results/counts/mov10_all_featurecounts.txt \
-/data/Bspc-training/shared/rnaseq_jan2025/results_for_multiqc/STAR/*.bam
+  -o results/counts/mov10_all_featurecounts.txt \
+/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/*.bam
+```
+
+You should see lots of informative text such the block below, which confirms that the data are reverse-stranded and single end. Furthermore, you learn things such as the fact that about 68% of alignments are assigned to genes.
+
+```         
+Process BAM file Irrel_kd_1Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Single-end reads are included.                                          ||
+||    Total alignments : 42072421                                             ||
+||    Successfully assigned alignments : 28681404 (68.2%)                     ||
+||    Running time : 0.21 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Irrel_kd_2Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Single-end reads are included.                                          ||
+||    Total alignments : 35976606                                             ||
+||    Successfully assigned alignments : 24434907 (67.9%)                     ||
+||    Running time : 0.18 minutes                                             ||
+||                                                                            ||
+|| Process BAM file Irrel_kd_3Aligned.sortedByCoord.out.bam...                ||
+||    Strand specific : reversely stranded                                    ||
+||    Single-end reads are included.                                          ||
+||    Total alignments : 28143823                                             ||
+||    Successfully assigned alignments : 18879568 (67.1%)                     ||
+||    Running time : 0.14 minutes   
 ```
 
 > If you wanted to collect the information that is on the screen as the job runs, you can modify the command and add the `2>` redirection at the end. This type of redirection will collect all the information from the terminal/screen into a file.
@@ -122,27 +147,50 @@ $ featureCounts -T 4 -s 2 \
 The output of this tool is 2 files, *a count matrix* and *a summary file* that tabulates how many the reads were "assigned" or counted and the reason they remained "unassigned". Let's take a look at the summary file:
 
 ``` bash
-$ less results/counts/Mov10_featurecounts.txt.summary
+$ less results/counts/mov10_all_featurecounts.txt.summary
 ```
 
 Now let's look at the count matrix:
 
 ``` bash
-$ less results/counts/Mov10_featurecounts.txt
+$ less results/counts/mov10_all_featurecounts.txt
 ```
 
-##### Cleaning up the featureCounts matrix
+From page 36 of the [subread package manual](https://subread.sourceforge.net/SubreadUsersGuide.pdf), some help interpreting what is going on in our FeatureCounts table:
+
+> The read count table includes annotation columns (‘Geneid’, ‘Chr’, ‘Start’, ‘End’, ‘Strand’ and ‘Length’) and data columns (eg. read counts for genes for each library). When counting reads to meta-features (eg. genes) columns ‘Chr’, ‘Start’, ‘End’ and ‘Strand’ may each contain multiple values (separated by semi-colons), which correspond to individual features included in the same meta-feature.
+>
+> Column ‘Length’ always contains one single value which is the total number of non-overlapping bases included in a meta-feature (or a feature), regardless of counting at meta-feature level or feature level. When counting RNA-seq reads to genes, the ‘Length’ column typically contains the total number of non-overlapping bases in exons belonging to the same gene for each gene.
+
+## Cleaning up the featureCounts matrix
 
 There is information about the genomic coordinates and the length of the gene, we don't need this for the next step, so we are going to extract the columns that we are interested in.
 
 ``` bash
-$ cut -f1,7,8,9,10,11,12 results/counts/Mov10_featurecounts.txt > results/counts/Mov10_featurecounts.Rmatrix.txt
+$ cut -f1,7,8,9,10,11,12 results/counts/mov10_all_featurecounts.txt > results/counts/mov10_all_featurecounts.Rmatrix.txt
 ```
 
-The next step is to clean it up a little further by modifying the header line (we could also do this in R, or in a GUI text editor):
+This looks like a little bit more like a count matrix, but need to clean it up a little further by modifying the header line to get rid of those long file names:
+
+```         
+$ head results/counts/mov10_all_featurecounts.Rmatrix.txt
+
+# Program:featureCounts v2.0.6; Command:"featureCounts" "-T" "4" "-s" "2" "-a" "/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf" "-o" "results/counts/mov10_all_featurecounts.txt" "/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Irrel_kd_1Aligned.sortedByCoord.out.bam" "/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Irrel_kd_2Aligned.sortedByCoord.out.bam" "/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Irrel_kd_3Aligned.sortedByCoord.out.bam" "/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Mov10_oe_1Aligned.sortedByCoord.out.bam" "/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Mov10_oe_2Aligned.sortedByCoord.out.bam" "/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Mov10_oe_3Aligned.sortedByCoord.out.bam" 
+Geneid  /data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Irrel_kd_1Aligned.sortedByCoord.out.bam  /data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Irrel_kd_2Aligned.sortedByCoord.out.bam  /data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Irrel_kd_3Aligned.sortedByCoord.out.bam  /data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Mov10_oe_1Aligned.sortedByCoord.out.bam  /data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Mov10_oe_2Aligned.sortedByCoord.out.bam  /data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/Mov10_oe_3Aligned.sortedByCoord.out.bam
+ENSG00000290825.2   0   0   0   0   0   1
+ENSG00000223972.6   0   0   0   0   0   0
+ENSG00000310526.1   82  86  65  119 106 52
+ENSG00000227232.6   0   0   0   0   0   0
+ENSG00000278267.1   0   0   0   0   0   0
+ENSG00000243485.6   0   2   1   0   3   3
+ENSG00000284332.1   0   0   0   0   0   0
+ENSG00000237613.3   0   0   0   0   0   0
+```
+
+We are going to use Vim, but we could also do this in R, or in a GUI text editor, or using other CLI tools like `sed`.
 
 ``` bash
-$ vim results/counts/Mov10_featurecounts.Rmatrix.txt
+$ vim results/counts/mov10_all_featurecounts.Rmatrix.txt
 ```
 
 Vim has nice shortcuts for cleaning up the header of our file using the following steps:
@@ -151,13 +199,30 @@ Vim has nice shortcuts for cleaning up the header of our file using the followin
 
 2.  Remove the first line by typing: `dd` (in command mode).
 
-3.  Remove the file name following the sample name by typing: `:%s/_Aligned.sortedByCoord.out.bam//g` (in command mode).
+3.  Remove the file name following the sample name by typing: `:%s/Aligned.sortedByCoord.out.bam//g` (in command mode).
 
-4.  Remove the path leading up to the file name by typing: `:%s/\/home\/username\/unix_lesson\/rnaseq\/results\/STAR\/bams\///g` (in command mode).
+4.  Remove the path leading up to the file name by typing: `:%s/\/data\/Bspc-training\/shared\/rnaseq_jan2025\/results_for_counting\///g` (in command mode).Note that we have a `\` preceding each `/`, which tells vim that we are not using the `/` as part of our search and replace command, but instead the `/` is part of the pattern that we are replacing. This is called *escaping* the `/`.
 
-    > Note that we have a `\` preceding each `/`, which tells vim that we are not using the `/` as part of our search and replace command, but instead the `/` is part of the pattern that we are replacing. This is called *escaping* the `/`.
+5.  Remember to save and exit: `:wq`
 
-### Note on counting PE data
+6.  Use `head` to confirm that the output is clean as expected!
+
+``` bash
+$ head results/counts/mov10_all_featurecounts.Rmatrix.txt
+
+Geneid	Irrel_kd_1	Irrel_kd_2	Irrel_kd_3	Mov10_oe_1	Mov10_oe_2	Mov10_oe_3
+ENSG00000290825.2	0	0	0	0	0	1
+ENSG00000223972.6	0	0	0	0	0	0
+ENSG00000310526.1	82	86	65	119	106	52
+ENSG00000227232.6	0	0	0	0	0	0
+ENSG00000278267.1	0	0	0	0	0	0
+ENSG00000243485.6	0	2	1	0	3	3
+ENSG00000284332.1	0	0	0	0	0	0
+ENSG00000237613.3	0	0	0	0	0	0
+ENSG00000308361.1	0	0	0	0	0	0
+```
+
+## Note on counting PE data
 
 For paired-end (PE) data, the bam file contains information about whether both read1 and read2 mapped and if they were at roughly the correct distance from each other, that is to say if they were "properly" paired. For most counting tools, **only properly paired reads are considered by default, and each read pair is counted only once as a single "fragment"**.
 
