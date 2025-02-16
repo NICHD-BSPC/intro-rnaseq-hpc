@@ -194,13 +194,13 @@ echo "Finished FASTQC: ${samplename}"
 **STAR**:
 
 ``` bash
-
-
 echo "Mapping: ${samplename}"
 
 # Run STAR
-STAR --runThreadN ${cores} --genomeDir ${genome} --readFilesIn ${fq} --outFileNamePrefix ${align_out} --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard ADD TEMP DIRECTORY
+STAR --runThreadN ${cores} --genomeDir ${genome} --readFilesIn ${fq} --outFileNamePrefix ${align_out} --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard --outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp
+```
 
+``` bash
 echo "Running Qualimap: ${samplename}"
 
 # Run Qualimap
@@ -255,14 +255,15 @@ Below is what this second script (`rnaseq_analysis_on_allfiles.slurm`) would loo
 
 ``` bash
 #!/bin/bash
-
-#SBATCH -p medium       # partition name
-#SBATCH -t 0-6:00       # hours:minutes runlimit after which job will be killed
-#SBATCH -c 6        # number of cores requested -- this needs to be greater than or equal to the number of cores you plan to use to run your job
-#SBATCH --mem 8G
-#SBATCH --job-name STAR_mov10       # Job name
-#SBATCH -o %j.out           # File to which standard out will be written
-#SBATCH -e %j.err       # File to which standard err will be written
+#SBATCH --gres=lscratch: #designate lscratch space based on size of input FASTQ file
+#SBATCH --partition=quick
+#SBATCH --time=3:00:00     # time limit
+#SBATCH --cpus-per-task=       # number of cores
+#SBATCH --mem=   # requested memory
+#SBATCH --job-name salmon_in_serial      # Job name
+#SBATCH -o .out           # File to which standard output will be written
+#SBATCH -e .err       # File to which standard error will be written
+#SBATCH --mail-type=BEGIN,END
 
 # this `for` loop, will take the fastq files as input and run the script for all of them one after the other. 
 for fq in ~/rnaseq/raw_data/*.fq
