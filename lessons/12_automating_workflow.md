@@ -53,7 +53,7 @@ Note that `$1`, which you may have seen before, is actually a short form of `${1
 
 We will be using this concept in our automation script, wherein we will accept the full or relative path to a file as input.
 
-### Writing the automation script!
+## Writing the automation script: Setting up variables
 
 We will start writing the script on our laptops using a simple text editor such as TextEdit. Let's begin with the shebang line and a `cd` command so that our results are all written in our directory.
 
@@ -123,7 +123,7 @@ Next we'll initialize 2 more variables named `genome` and `gtf`, these will cont
 # directory with the genome index files + name of the gene annotation file
 
 genome=/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/
-gtf=/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gt
+gtf=/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf
 ```
 
 We'll create output directories, but with the `-p` option. This will make sure that `mkdir` will create the directory only if it does not exist, and it won't throw an error if it does exist.
@@ -149,7 +149,7 @@ align_out_bam=results/STAR_auto/${samplename}_Aligned.sortedByCoord.out.bam
 qualimap_out=results/qualimap_auto/${samplename}.qualimap
 ```
 
-### Keeping track of tool versions
+## Keeping track of tool versions
 
 All of our variables are now staged. Next, let's make sure all the modules are loaded. This is also a good way to keep track of the versions of tools that you are using in the script:
 
@@ -157,17 +157,14 @@ All of our variables are now staged. Next, let's make sure all the modules are l
 # set up the software environment (use version numbers)
 
 module load fastqc/0.12.1
-module load gcc/6.2.0  
-module load star/2.5.4a
-module load samtools/1.15.1
-module load java/jdk-1.8u112
+module load STAR/2.7.11b
 module load qualimap/2.2.1
-unset DISPLAY
+unset DISPLAY #so qualimap doesn't try to render results on the command line
 ```
 
 ### Preparing for future debugging
 
-In the script, it is a good idea to use `echo` for debugging. `echo` basically displays the string of characters specified within the quotations. When you have strategically place `echo` commands specifying what stage of the analysis is next, in case of failure you can determine the last `echo` statement displayed to troubleshoot the script.
+In the script, it is a good idea to use `echo` for debugging. `echo` basically displays the string of characters specified within the quotations. When you have strategically place `echo` commands specifying what stage of the analysis is next, in case of failure you can determine the last `echo` statement displayed to troubleshoot the script. For example:
 
 ``` bash
 echo "Processing file ${fq}"
@@ -177,13 +174,27 @@ echo "Processing file ${fq}"
 >
 > `set -x` is a debugging tool that will make bash display the command before executing it. In case of an issue with the commands in the shell script, this type of debugging lets you quickly pinpoint the step that is throwing an error. Often, tools will display the error that caused the program to stop running, so keep this in mind for times when you are running into issues where this is not available. You can turn this functionality off by saying `set +x`
 
-### Running the tools
+## Running the tools using variables
+
+Now that we have established all of our variables, now we can use them in the context of running the three tools: FASTQC, STAR and Qualimap.
+
+**Running FASTQC:**
+
+Remember that FASTQC needs the following arguments, which we can now fill with variables that we set up above: Output directory, number of threads to use, list of input file(s).
 
 ``` bash
 echo "Starting FASTQC: ${samplename}"
 
 # Run FastQC and move output to the appropriate folder
-fastqc -o ${fastqc_out} ${fq}
+fastqc -o ${fastqc_out} -t ${cores} ${fq} 
+
+echo "Finished FASTQC: ${samplename}"
+```
+
+**STAR**:
+
+``` bash
+
 
 echo "Mapping: ${samplename}"
 
@@ -218,19 +229,17 @@ It is okay to specify this after everything else is set up, since you will have 
 To transfer the contents of the script from your laptop to Biowulf, you can copy and paste the contents into a new file called `rnaseq_analysis_on_input_file.sh` using `vim`.
 
 ``` bash
-$ cd ~/rnaseq/scripts/
+$ cd /data/rnaseq/scripts/
 
 $ vim rnaseq_analysis_on_input_file.sh 
 ```
 
 > *Alternatively, you can save the script on your computer and transfer it to your `/rnaseq/scripts/` directory using the mounted directory system or `scp`*
 
-We should all have an interactive session with 12 cores, so we can run the script as follows from the `~/rnaseq/` directory:
+We should all have an interactive session with 12 cores, so we can run the script as follows from your `/rnaseq/` directory:
 
 ``` bash
-$ cd ~/rnaseq/     
-
-$ sh scripts/rnaseq_analysis_on_input_file.sh ~/rnaseq/raw_data/Mov10_oe_1.subset.fq
+$ sh scripts/rnaseq_analysis_on_input_file.sh /data/Bspc-training/$USER/rnaseq/raw_data/Mov10_oe_1.subset.fq
 ```
 
 ## Running the script to submit jobs in parallel to the Slurm scheduler
@@ -242,7 +251,7 @@ To run the above script **"in serial"** for all of the files on a worker node vi
 1.  **Slurm directives** at the **beginning** of the script. This is so that the scheduler knows what resources we need in order to run our job on the compute node(s).
 2.  a **`for`** loop that iterates through and runs the above script for all the fastq files.
 
-Below is what this second script (`rnaseq_analysis_on_allfiles.slurm`) would look like :
+Below is what this second script (`rnaseq_analysis_on_allfiles.slurm`) would look like BUT DON'T RUN THIS :
 
 ``` bash
 #!/bin/bash
@@ -275,7 +284,7 @@ How would you run `rnaseq_analysis_on_allfiles.slurm`, i.e. the above script?
 
 ------------------------------------------------------------------------
 
-## Parallelizing the analysis for efficiency
+## Parallelizing the analysis for efficiency - convert to SWARM
 
 Parallelization will save you a lot of time with real (large) datasets. To parallelize our analysis, we will still need to write a second script that will call the script we just wrote that takes a fastq file as input (rnaseq_analysis_on_input_file.sh). We will still use a `for` loop, but we will be creating a regular shell script and we will be specifying the Slurm directives differently.
 
