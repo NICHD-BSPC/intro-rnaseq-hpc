@@ -18,7 +18,7 @@ This will ensure that you run every sample with the exact same parameters, and w
 
 We will be working with an interactive session has enough memory, CPUs and scratch space to run all of the commands we have run in the whole course up to this point!
 
-Remember from Week 3 Lesson 02 that the aligning step using STAR seemed to be the most memory intensive and required scratch space to be designated.
+Remember from Week 3 Lesson 02 that the aligning step using STAR seemed to be the most memory intensive and required scratch space to be designated:
 
 ``` bash
 $ sinteractive --cpus-per-task=12 --mem=48g --gres=lscratch:1
@@ -55,7 +55,7 @@ We will be using this concept in our automation script, wherein we will accept t
 
 ### Writing the automation script!
 
-We will start writing the script on our laptops using a simple text editor. Let's begin with the shebang line and a `cd` command so that our results are all written on `/n/scratch/`.
+We will start writing the script on our laptops using a simple text editor such as TextEdit. Let's begin with the shebang line and a `cd` command so that our results are all written in our directory.
 
 ``` bash
 #!/bin/bash/
@@ -90,7 +90,7 @@ Next, we want to extract the name of the sample from `${fq}` which contains the 
 We can obtain the sample name by using the `basename` command on the `${fq}` (or `${1}`) variable, and save it in a new variable called `samplename`.
 
 ``` bash
-# grab base of filename for naming outputs
+# grab base of filename for naming outputs for your script PUT THIS IN YOUR SCRIPT
 
 samplename=`basename ${fq} .subset.fq`
 echo "Sample name is ${samplename}"           
@@ -98,51 +98,55 @@ echo "Sample name is ${samplename}"
 
 > **Intro to `basename`**
 >
-> 1.  the `basename` command: this command takes a path or a name and trims away all the information before the last `/` and if you specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path *"\~/rnaseq/raw_data/Mov10_oe_1.subset.fq"*, `basename ${fq} .subset.fq` will output "Mov10_oe_1".
+> 1.  the `basename` command: this command takes a path or a name and trims away all the information before the last `/` and if you specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path */data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq* `basename ${fq} .subset.fq` will output "Mov10_oe_1".
 > 2.  to assign the value of the `basename` command to the `samplename` variable, we encapsulate the `basename...` command in backticks. This syntax is necessary for assigning the output of a command to a variable.
+
+``` bash
+# basename demo, run on the command line do not put in your script
+$ fq=/data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq
+$ echo $fq
+$ samplename=`basename ${fq} .subset.fq`
+$ echo "Sample name is ${samplename}"
+```
 
 Next we want to specify how many cores the script should use to run the analysis. This provides us with an easy way to modify the script to run with more or fewer cores without have to replace the number within all commands where cores are specified.
 
 ``` bash
-# specify the number of cores to use
+# specify the number of cores to use. For an initial value, match the number to the interactive node we just started.
 
-cores=6
+cores=12
 ```
 
-Next we'll initialize 3 more variables named `genome`, `transcriptome` and `gtf`, these will contain the paths to where the reference files are stored. This makes it easier to modify the script for when you want to use a different genome, i.e. you'll just have to change the contents of these variable at the beginning of the script.
+Next we'll initialize 2 more variables named `genome` and `gtf`, these will contain the paths to where the reference files are stored. This makes it easier to modify the script for when you want to use a different genome, i.e. you'll just have to change the contents of these variables at the beginning of the script.
 
 ``` bash
-# directory with the genome and transcriptome index files + name of the gene annotation file
+# directory with the genome index files + name of the gene annotation file
 
-genome=/n/groups/hbctraining/intro_rnaseq_hpc/reference_data_ensembl38/ensembl38_STAR_index
-transcriptome=/n/groups/hbctraining/rna-seq_2019_02/reference_data/salmon_index
-gtf=/n/groups/hbctraining/intro_rnaseq_hpc/reference_data_ensembl38/Homo_sapiens.GRCh38.92.1.gtf
+genome=/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/
+gtf=/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gt
 ```
 
 We'll create output directories, but with the `-p` option. This will make sure that `mkdir` will create the directory only if it does not exist, and it won't throw an error if it does exist.
 
 ``` bash
 # make all of the output directories
-# The -p option means mkdir will create the whole path if it 
-# does not exist and refrain from complaining if it does exist
+# The -p option means mkdir will create the whole path if it does not exist and refrain from complaining if it does exist
+# Let's add the suffix "auto" to the names to differentiate it from the other output folders we already have
 
-mkdir -p results/fastqc/
-mkdir -p results/STAR/
-mkdir -p results/qualimap/
-mkdir -p results/salmon/
+mkdir -p results/fastqc_auto/
+mkdir -p results/STAR_auto/
+mkdir -p results/qualimap_auto/
 ```
 
 Now that we have already created our output directories, we can now specify variables with the path to those directories both for convenience but also to make it easier to see what is going on in a long command.
 
 ``` bash
-# set up output filenames and locations
+# set up output filenames and locations. 
 
-fastqc_out=results/fastqc/
-align_out=results/STAR/${samplename}_
-align_out_bam=results/STAR/${samplename}_Aligned.sortedByCoord.out.bam
-qualimap_out=results/qualimap/${samplename}.qualimap
-salmon_out=results/salmon/${samplename}.salmon
-salmon_mappings=results/salmon/${samplename}_salmon.out
+fastqc_out=results/fastqc_auto/
+align_out=results/STAR_auto/${samplename}_
+align_out_bam=results/STAR_auto/${samplename}_Aligned.sortedByCoord.out.bam
+qualimap_out=results/qualimap_auto/${samplename}.qualimap
 ```
 
 ### Keeping track of tool versions
@@ -158,7 +162,6 @@ module load star/2.5.4a
 module load samtools/1.15.1
 module load java/jdk-1.8u112
 module load qualimap/2.2.1
-module load salmon/1.8.0
 unset DISPLAY
 ```
 
@@ -177,14 +180,17 @@ echo "Processing file ${fq}"
 ### Running the tools
 
 ``` bash
-echo "Starting QC for ${samplename}"
+echo "Starting FASTQC: ${samplename}"
 
 # Run FastQC and move output to the appropriate folder
 fastqc -o ${fastqc_out} ${fq}
 
+echo "Mapping: ${samplename}"
 
 # Run STAR
-STAR --runThreadN ${cores} --genomeDir ${genome} --readFilesIn ${fq} --outFileNamePrefix ${align_out} --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard
+STAR --runThreadN ${cores} --genomeDir ${genome} --readFilesIn ${fq} --outFileNamePrefix ${align_out} --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard ADD TEMP DIRECTORY
+
+echo "Running Qualimap: ${samplename}"
 
 # Run Qualimap
 qualimap rnaseq \
@@ -194,18 +200,6 @@ qualimap rnaseq \
 -p strand-specific-reverse \
 -gtf ${gtf} \
 --java-mem-size=8G
-
-# Run salmon
-
-echo "Starting Salmon run for ${samplename}"
-
-salmon quant -i ${transcriptome} \
--p ${cores} \
--l A \
--r ${fq} \
--o ${salmon_out} \
---seqBias \
---useVBOpt
 ```
 
 ### Last addition to the script
@@ -213,7 +207,7 @@ salmon quant -i ${transcriptome} \
 It is best practice to have the script **usage** specified at the top any script. This should have information such that when your future self, or a co-worker, uses the script they know what it will do and what input(s) are needed. For our script, we should have the following lines of comments right at the top after `#!/bin/bash/`:
 
 ``` bash
-# This script takes a fastq file of RNA-seq data, runs FastQC, STAR, Qualimap and Salmon.
+# This script takes a fastq file of RNA-seq data, runs FastQC, STAR and Qualimap
 # USAGE: sh rnaseq_analysis_on_input_file.sh <name of fastq file>
 ```
 
@@ -221,7 +215,7 @@ It is okay to specify this after everything else is set up, since you will have 
 
 ### Saving and running script
 
-To transfer the contents of the script from your laptop to O2, you can copy and paste the contents into a new file called `rnaseq_analysis_on_input_file.sh` using `vim`.
+To transfer the contents of the script from your laptop to Biowulf, you can copy and paste the contents into a new file called `rnaseq_analysis_on_input_file.sh` using `vim`.
 
 ``` bash
 $ cd ~/rnaseq/scripts/
@@ -229,9 +223,9 @@ $ cd ~/rnaseq/scripts/
 $ vim rnaseq_analysis_on_input_file.sh 
 ```
 
-> *Alternatively, you can save the script on your computer and transfer it to `~/rnaseq/scripts/` using FileZilla.*
+> *Alternatively, you can save the script on your computer and transfer it to your `/rnaseq/scripts/` directory using the mounted directory system or `scp`*
 
-We should all have an interactive session with 6 cores, so we can run the script as follows from the `~/rnaseq/` directory:
+We should all have an interactive session with 12 cores, so we can run the script as follows from the `~/rnaseq/` directory:
 
 ``` bash
 $ cd ~/rnaseq/     
@@ -248,7 +242,7 @@ To run the above script **"in serial"** for all of the files on a worker node vi
 1.  **Slurm directives** at the **beginning** of the script. This is so that the scheduler knows what resources we need in order to run our job on the compute node(s).
 2.  a **`for`** loop that iterates through and runs the above script for all the fastq files.
 
-Below is what this second script (`rnaseq_analysis_on_allfiles.slurm`) would look like $$DO NOT RUN THIS$$:
+Below is what this second script (`rnaseq_analysis_on_allfiles.slurm`) would look like :
 
 ``` bash
 #!/bin/bash
