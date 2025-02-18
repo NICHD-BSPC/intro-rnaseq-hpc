@@ -55,12 +55,15 @@ We will be using this concept in our automation script, wherein we will accept t
 
 ## Writing the automation script: Setting up variables
 
-We will start writing the script on our laptops using a simple text editor such as TextEdit. Let's begin with the shebang line and a `cd` command so that our results are all written in our directory.
+We're about to do substantial editing of a file. Use vim if you're comfortable with it (e.g., `vim run_rnaseq.sh`); otherwise use another text editor on your laptop and you can paste it into vim later.
+
+Let's begin with the shebang line and a `cd` command to make paths more convenient to write:
 
 ``` bash
 #!/bin/bash/
 
-# change directories to your course directory so that all the analysis is stored there and we can write all paths relative to this directory.
+# change directories to your course directory so that all the analysis is
+# stored there and we can write all paths relative to this directory.
 
 cd /data/Bspc-training/$USER/rnaseq
 ```
@@ -70,18 +73,19 @@ cd /data/Bspc-training/$USER/rnaseq
 Since `${1}` will store the path to the fastq file, including the file name, we will be referring to it every time we need to specify the fastq file in any commands. We could just use the variable `${1}`, but that is not an intuitive variable name for a fastq file, is it? So we want to create a new variable called `fq` and copy the contents of `${1}` into it.
 
 ``` bash
-# initialize a variable with an intuitive name to store the name of the input fastq file
+# we're expecting the first argument to be a fastq file, so copy it to a more
+# clearly-named variable
 
-fq=$1
+fq=${1}
 ```
 
-In the rest of the script, we can now call the fastq file using `${fq}` instead of `${1}`!
+In the rest of the script, we can now call the fastq file using `${fq}` instead of `${1}`, which will make our code easier to understand and debug.
 
 > When we set up variables we do not use the `$` before it, but when we *use the variable*, we always have to have the `$` before it. \>
 >
 > For example:
 >
-> initializing the `fq` variable =\> `fq=$1`
+> initializing the `fq` variable =\> `fq=${1}`
 >
 > using the `fq` variable =\> `fastqc ${fq}`
 
@@ -92,29 +96,31 @@ We can obtain the sample name by using the `basename` command on the `${fq}` (or
 ``` bash
 # grab base of filename for naming outputs for your script PUT THIS IN YOUR SCRIPT
 
-samplename=`basename ${fq} .subset.fq`
+samplename=$(basename ${fq} .subset.fq)
 echo "Sample name is ${samplename}"           
 ```
 
 > **Intro to `basename`**
 >
-> 1.  the `basename` command: this command takes a path or a name and trims away all the information before the last `/` and if you specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path */data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq* `basename ${fq} .subset.fq` will output "Mov10_oe_1".
-> 2.  to assign the value of the `basename` command to the `samplename` variable, we encapsulate the `basename...` command in backticks. This syntax is necessary for assigning the output of a command to a variable.
+> 1. the `basename` command: this command takes a path or a name and trims away all the information before the last `/`. If you also specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path `*/data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq*`, then `basename ${fq} .subset.fq` will output `Mov10_oe_1`.
+> 2. We encapsulate the `basename...` command in `$(...)` which is called command substitution. It places the results of the command into the variable.
 
 ``` bash
-# basename demo, run on the command line do not put in your script
+# basename demo. Run on the command line to inspect; do not put in your script
 $ fq=/data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq
 $ echo $fq
-$ samplename=`basename ${fq} .subset.fq`
+$ samplename=$(basename ${fq} .subset.fq)
 $ echo "Sample name is ${samplename}"
 ```
 
 Next we want to specify how many cores the script should use to run the analysis. This provides us with an easy way to modify the script to run with more or fewer cores without have to replace the number within all commands where cores are specified.
 
+Here, we take advantage of the fact that [Slurm creates environment variables](https://slurm.schedmd.com/sbatch.html#SECTION_OUTPUT-ENVIRONMENT-VARIABLES) for us when a job starts; we'll use the one that indicates how many CPUs we asked for.
+
 ``` bash
 # specify the number of cores to use. For an initial value, match the number to the interactive node we just started.
 
-cores=12
+cores=${SLURM_CPUS_PER_TASK}
 ```
 
 Next we'll initialize 2 more variables named `genome` and `gtf`, these will contain the paths to where the reference files are stored. This makes it easier to modify the script for when you want to use a different genome, i.e. you'll just have to change the contents of these variables at the beginning of the script.
@@ -126,7 +132,7 @@ genome=/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/
 gtf=/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf
 ```
 
-We'll create output directories, but with the `-p` option. This will make sure that `mkdir` will create the directory only if it does not exist, and it won't throw an error if it does exist.
+We'll create output directories, but with the `-p` option. This will make sure that `mkdir` will create the directory only if it does not exist, it won't throw an error if it does exist, and even if we make a nested directory
 
 ``` bash
 # make all of the output directories
@@ -197,7 +203,15 @@ echo "Finished FASTQC: ${samplename}"
 echo "Mapping: ${samplename}"
 
 # Run STAR
-STAR --runThreadN ${cores} --genomeDir ${genome} --readFilesIn ${fq} --outFileNamePrefix ${align_out} --outSAMtype BAM SortedByCoordinate --outSAMunmapped Within --outSAMattributes Standard --outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp
+STAR \
+  --runThreadN ${cores} \
+  --genomeDir ${genome} \
+  --readFilesIn ${fq} \
+  --outFileNamePrefix ${align_out} \
+  --outSAMtype BAM SortedByCoordinate \
+  --outSAMunmapped Within \
+  --outSAMattributes Standard \
+  --outTmpDir=/lscratch/$SLURM_JOB_ID/STARtmp
 ```
 
 ``` bash
@@ -205,12 +219,12 @@ echo "Running Qualimap: ${samplename}"
 
 # Run Qualimap
 qualimap rnaseq \
--outdir ${qualimap_out} \
--a proportional \
--bam ${align_out_bam} \
--p strand-specific-reverse \
--gtf ${gtf} \
---java-mem-size=8G
+  -outdir ${qualimap_out} \
+  -a proportional \
+  -bam ${align_out_bam} \
+  -p strand-specific-reverse \
+  -gtf ${gtf} \
+  --java-mem-size=8G
 ```
 
 ### Last addition to the script
@@ -223,6 +237,8 @@ It is best practice to have the script **usage** specified at the top any script
 ```
 
 It is okay to specify this after everything else is set up, since you will have most clarity about the script only once it is fully done.
+
+Additional helpful notes might be what the user should expect in terms of output file and directories.
 
 ### Saving and running script
 
@@ -248,7 +264,7 @@ The above script will run in an interactive session **one file at a time**. But 
 
 To run the above script **"in serial"** for all of the files on a worker node via the job scheduler, we can create a separate submission script that will need 2 components:
 
-1.  **Slurm directives** at the **beginning** of the script. This is so that the scheduler knows what resources we need in order to run our job on the compute node(s).
+1.  **Slurm directives** at the **beginning** of the script. This is so that the scheduler knows what resources we need in order to run our job on the compute node(s) so we don't need to specify them from the command line.
 2.  a **`for`** loop that iterates through and runs the above script for all the fastq files.
 
 Below is what this second script (`rnaseq_analysis_on_allfiles.slurm`) would look like BUT DON'T RUN THIS :
@@ -305,7 +321,7 @@ This script loops through the same files as in the previous (demo) script, but t
 for fq in ~/rnaseq/raw_data/*.fq
 do
 
-sbatch -p short -t 0-2:00 -c 6 --job-name rnaseq-workflow --mem 8G --wrap="sh ~/rnaseq/scripts/rnaseq_analysis_on_input_file.sh ${fq}"
+sbatch -c 6 --job-name rnaseq-workflow --mem 8G --wrap="sh ~/rnaseq/scripts/rnaseq_analysis_on_input_file.sh ${fq}"
 sleep 1 # wait 1 second between each job submission
   
 done
