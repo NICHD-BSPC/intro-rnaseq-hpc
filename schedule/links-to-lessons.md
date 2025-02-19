@@ -48,3 +48,9 @@
 -  [Experimental Design](../lessons/wk2_lesson05_experimental_design.md) ~30 minutes of reading, ~30 minutes of assignment. **Note: This assignment can be done any time between now and the end of Week 4**
 
 ------------------------------------------------------------------------
+
+## Week 4: 
+-  [Counting RNAseq Reads](../wk4_lesson01_counting_reads.md) ~50 minutes, in-class
+-  [Experimental Design](../lessons/wk2_lesson05_experimental_design.md) ~30 minutes of reading, ~30 minutes of assignment. **Note: This assignment is now due by Tuesday of Week 5** 
+
+------------------------------------------------------------------------
