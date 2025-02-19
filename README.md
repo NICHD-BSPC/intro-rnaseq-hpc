@@ -29,7 +29,8 @@ Note: Links to weekly lessons will be provided several days in advance in the ta
 | [Week 1](schedule/links-to-lessons.md#week-1) | Introduction to the command line and logging into Biowulf |
 | [Week 2](schedule/links-to-lessons.md#week-2) | Scientific software on Biowulf, quality control of sequence data, experimental design|
 | [Week 3](schedule/links-to-lessons.md#week-3) | Reference genomes, theory and practice of mapping RNAseq reads to a reference, Mapping QC|
-| Week 4                                 | Theory and practice of counting RNAseq reads, automating workflows|
+| [Week 4](schedule/links-to-lessons.md#week-4) | Theory and practice of counting RNAseq reads|
+| Week 5 | Automation of the RNAseq workflow, transition to RStudio for differential expression analyses | 
 
 The material for Weeks 5-9, covering downstream analyses once you have read counts, will be contained in a separate course website. 
 
