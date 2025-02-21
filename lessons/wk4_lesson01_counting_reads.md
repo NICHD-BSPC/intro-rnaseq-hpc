@@ -15,7 +15,7 @@ Approximate time: 50 minutes
 
 <img src="../img/counts-workflow.png" width="400"/>
 
-Once we have our reads aligned to the genome, the next step is to count how many reads have mapped to each gene. There are many tools that can use BAM files as input and output the number of reads (counts) associated with each feature of interest (genes, exons, transcripts, etc.). Two commonly used counting tools are [featureCounts](http://bioinf.wehi.edu.au/featureCounts/) and [htseq-count](http://www-huber.embl.de/users/anders/HTSeq/doc/count.html).
+Once we have our reads aligned to the genome, the next step is to count how many reads have mapped to each gene. There are many tools that can use BAM files as input and output the number of reads (counts) associated with each feature of interest (genes, exons, transcripts, etc.). Two commonly used counting tools are [featureCounts](https://subread.sourceforge.net/featureCounts.html) and [htseq-count](http://www-huber.embl.de/users/anders/HTSeq/doc/count.html).
 
 -   By default, the above tools only report the "raw" counts of reads that **map to a single location** (uniquely mapping) and are best at counting at the **gene level**. Essentially, total read count associated with a gene (*meta-feature*) = the sum of reads associated with each of the exons (*feature*) that "belong" to that gene.
 
@@ -37,7 +37,7 @@ These are the "raw" counts and will be used in statistical programs downstream f
 
 ### Counting using featureCounts
 
-Today, we will be using the [featureCounts](http://bioinf.wehi.edu.au/featureCounts/) tool to get the *gene* counts. We picked this tool because it is accurate, fast and is relatively easy to use. It counts reads that map to a single location (uniquely mapping) and follows the scheme in the figure below for assigning reads to a gene/exon.
+Today, we will be using the [featureCounts](https://subread.sourceforge.net/featureCounts.html) tool to get the *gene* counts. We picked this tool because it is accurate, fast and is relatively easy to use. It counts reads that map to a single location (uniquely mapping) and follows the scheme in the figure below for assigning reads to a gene/exon.
 
 <img src="../img/union.png" width="300"/>
 
