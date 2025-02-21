@@ -105,10 +105,10 @@ and the following are the values for the required parameters:
 Let's run this now (assuming we are in our `rnaseq` directories):
 
 ``` bash
-$ featureCounts -T 4 -s 2 \ 
+$ featureCounts -T 4 -s 2 \
 -a /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf \
-  -o results/counts/mov10_all_featurecounts.txt \
-  /data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/*.bam
+-o results/counts/mov10_all_featurecounts.txt \
+/data/Bspc-training/shared/rnaseq_jan2025/results_for_counting/*.bam
 ```
 
 > Discussion: backslash line continuation in bash for more convenient listing of commands
