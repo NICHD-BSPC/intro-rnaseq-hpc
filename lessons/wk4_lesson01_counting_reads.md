@@ -11,6 +11,9 @@ Approximate time: 50 minutes
 -   understand how counting tools work
 -   generate a count matrix using featureCounts
 
+## Slides
+Here are the slides from Friday, including discussion of strandedness: [Week 4 Slides](../lectures/week4_readcounts_intro.pdf)
+
 ## Counting reads as a measure of gene expression
 
 <img src="../img/counts-workflow.png" width="400"/>
