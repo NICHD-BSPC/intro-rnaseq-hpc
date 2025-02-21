@@ -212,7 +212,11 @@ Vim has nice shortcuts for cleaning up the header of our file using the followin
 
 3.  Remove the file name following the sample name by typing: `:%s/Aligned.sortedByCoord.out.bam//g` (in normal mode, which will enter text in Vim's command line at the bottom).
 
-4.  Remove the path leading up to the file name by typing: `:%s/\/data\/Bspc-training\/shared\/rnaseq_jan2025\/results_for_counting\///g` (in normal mode). Note that we have a `\` preceding each `/`, which tells vim that we are not using the `/` as part of our search and replace command, but instead the `/` is part of the pattern that we are replacing. This is called *escaping* the `/`.
+4.  Remove the path leading up to the file name by typing:
+```
+:%s/\/data\/Bspc-training\/shared\/rnaseq_jan2025\/results_for_counting\///g
+```
+(in normal mode). Note that we have a `\` preceding each `/`, which tells vim that we are not using the `/` as part of our search and replace command, but instead the `/` is part of the pattern that we are replacing. This is called *escaping* the `/`.
 
 5.  Remember to save and exit: `:wq`
 
