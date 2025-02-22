@@ -6,9 +6,16 @@ date: "Last Edited February 2025"
 
 ## Learning Objectives:
 
+-   Learn some principles of automation
 -   Create a reusable and efficient workflow for RNA-seq data analysis using shell scripts
 
-## Automating the analysis path from Sequence reads to Count matrix
+## Pre-Class Discussion:
+
+-   Why automate? What are the benefits of automation?
+
+-   What are some tasks - in lab, data analysis or elsewhere in life - that you would like to automate?
+
+## Automating the analysis path to mapped reads
 
 Once you have optimized all the tools and parameters using a single sample (likely using an interactive session), you can write a script to run the whole workflow on all the samples in parallel.
 
@@ -49,7 +56,7 @@ Note that `$1`, which you may have seen before, is actually a short form of `${1
 
 *There can be virtually unlimited numbers of inputs to a shell script, but it is wise to only have a few inputs to avoid errors and confusion when running a script that used positional parameters.*
 
-> [This is an example of a simple script that used the concept of positional parameters and the associated variables](http://steve-parker.org/sh/eg/var3.sh.txt). You should try this script out after the class to get a better handle on positional parameters for shell scripting. You can also learn more about positional parameters [here](https://hbctraining.github.io/Training-modules/Intermediate_shell/lessons/positional_params.html)
+> [This is an example of a simple script that used the concept of positional parameters and the associated variables](http://steve-parker.org/sh/eg/var3.sh.txt). You should try this script out after the class to get a better handle on positional parameters for shell scripting. You can also learn more about positional parameters [here](https://hbctraining.github.io/Training-modules/Accelerate_with_automation/lessons/positional_params.html).
 
 We will be using this concept in our automation script, wherein we will accept the full or relative path to a file as input.
 
@@ -102,8 +109,8 @@ echo "Sample name is ${samplename}"
 
 > **Intro to `basename`**
 >
-> 1. the `basename` command: this command takes a path or a name and trims away all the information before the last `/`. If you also specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path `*/data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq*`, then `basename ${fq} .subset.fq` will output `Mov10_oe_1`.
-> 2. We encapsulate the `basename...` command in `$(...)` which is called command substitution. It places the results of the command into the variable.
+> 1.  the `basename` command: this command takes a path or a name and trims away all the information before the last `/`. If you also specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path `*/data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq*`, then `basename ${fq} .subset.fq` will output `Mov10_oe_1`.
+> 2.  We encapsulate the `basename...` command in `$(...)` which is called command substitution. It places the results of the command into the variable.
 
 ``` bash
 # basename demo. Run on the command line to inspect; do not put in your script
