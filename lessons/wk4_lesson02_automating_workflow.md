@@ -15,6 +15,8 @@ date: "Last Edited February 2025"
 
 -   What are some tasks - in lab, data analysis or elsewhere in life - that you would like to automate?
 
+-   What are some things to watch out for when automating?
+
 ## Automating the analysis path to mapped reads
 
 Once you have optimized all the tools and parameters using a single sample (likely using an interactive session), you can write a script to run the whole workflow on all the samples in parallel.
