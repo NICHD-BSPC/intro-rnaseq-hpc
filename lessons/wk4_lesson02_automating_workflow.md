@@ -66,6 +66,8 @@ We will be using this concept in our automation script, wherein we will accept t
 
 We're about to do substantial editing of a file. Use vim if you're comfortable with it (e.g., `vim run_rnaseq.sh`); otherwise use another text editor on your laptop and you can paste it into vim later.
 
+**Hint**: To edit this script using TextEdit, make sure to go to `Format -> Make Plain Text` to make sure no unnecessary formatting is added. Similar options should exist in other basic text editors.
+
 Let's begin with the shebang line and a `cd` command to make paths more convenient to write:
 
 ``` bash
@@ -270,6 +272,8 @@ $ sh scripts/rnaseq_analysis_on_input_file.sh /data/Bspc-training/$USER/rnaseq/r
 ```
 
 ## BONUS EXERCISE: Take advantage of wildcards
+
+Remember how we were able to run programs at
 
 ## Running the script to submit jobs in parallel to the Slurm scheduler
 
