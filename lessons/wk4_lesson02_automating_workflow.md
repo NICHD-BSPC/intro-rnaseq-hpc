@@ -263,9 +263,9 @@ $ cd /data/rnaseq/scripts/
 $ vim rnaseq_analysis_on_input_file.sh 
 ```
 
-> *Alternatively, you can save the script on your computer and transfer it to your `/rnaseq/scripts/` directory using the mounted directory system or `scp`*
+> *Alternatively, you can save the script on your computer and transfer it to your `/rnaseq/scripts/` directory using the mounted directory system or `scp`*. I'll use this as an opportunity to demo both ways of transferring the file.
 
-We should all have an interactive session with 12 cores, so we can run the script as follows from your `/rnaseq/` directory:
+We should all have an interactive session with 12 cores, so we can run the script as follows from your `rnaseq/` directory:
 
 ``` bash
 $ sh scripts/rnaseq_analysis_on_input_file.sh /data/Bspc-training/$USER/rnaseq/raw_data/Mov10_oe_1.subset.fq
@@ -273,7 +273,7 @@ $ sh scripts/rnaseq_analysis_on_input_file.sh /data/Bspc-training/$USER/rnaseq/r
 
 ## BONUS EXERCISE: Take advantage of wildcards
 
-Remember how we were able to run programs at
+Remember how we were able to run programs one whole directory at a time using wildcards like `*.fq` ? How could we re-write the script above to take a **whole directory** of FASTQ files as input?
 
 ## Running the script to submit jobs in parallel to the Slurm scheduler
 
