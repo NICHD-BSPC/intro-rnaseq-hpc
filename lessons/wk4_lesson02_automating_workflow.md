@@ -88,7 +88,7 @@ Since `${1}` will store the path to the fastq file, including the file name, we 
 fq=${1}
 ```
 
-In the rest of the script, we can now call the fastq file using `${fq}` instead of `${1}`, which will make our code easier to understand and debug.
+In the rest of the script, we can now call the fastq file using `${fq}` instead of `${1}`, which will make our code easier to understand and debug. Here is [much more about BASH variables](https://www.howtogeek.com/442332/how-to-work-with-variables-in-bash/)!
 
 > When we set up variables we do not use the `$` before it, but when we *use the variable*, we always have to have the `$` before it. \>
 >
@@ -234,6 +234,8 @@ qualimap rnaseq \
   -p strand-specific-reverse \
   -gtf ${gtf} \
   --java-mem-size=8G
+
+echo "Done running Qualimap: ${samplename}"
 ```
 
 ### Last addition to the script
@@ -266,6 +268,8 @@ We should all have an interactive session with 12 cores, so we can run the scrip
 ``` bash
 $ sh scripts/rnaseq_analysis_on_input_file.sh /data/Bspc-training/$USER/rnaseq/raw_data/Mov10_oe_1.subset.fq
 ```
+
+## BONUS EXERCISE: Take advantage of wildcards
 
 ## Running the script to submit jobs in parallel to the Slurm scheduler
 
