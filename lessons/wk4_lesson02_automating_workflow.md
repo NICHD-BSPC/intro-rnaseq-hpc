@@ -314,7 +314,7 @@ Note: Learn more about loops in BASH from this Harvard HPC workshop.
 
 ------------------------------------------------------------------------
 
-**Exercise**
+**Thought Exercise:**
 
 How would you actually run `rnaseq_analysis_on_allfiles.slurm`, i.e. the above script?
 
@@ -330,7 +330,7 @@ To further parallelize our analysis, we will need two ingredients:
 
 -   A script that uses a `for` loop to specify Slurm parameters and submits a Slurm command that calls `analysis.sh` workflow to run on each of the samples. We will call this one `sbatch_loop.sh`.
 
--   These scripts can be found in the
+-   These scripts can be found in `/data/Bspc-training/shared/rnaseq_jan2025/scripts` and can be copied into your `rnaseq/` directory for use. However, **you do not need to run these right now in class**.
 
 ### First, we will look through the `analysis.sh` script: 
 
