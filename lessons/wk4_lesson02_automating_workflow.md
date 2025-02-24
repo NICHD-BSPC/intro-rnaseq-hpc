@@ -490,13 +490,22 @@ Now we have successfully created scripts that will submit Biowulf jobs for you i
 
 ## Swarm and Slurm Arrays
 
-> Alternatively, this could also be done using a ***Slurm array***, which lets you submit a collection of similar jobs easily and quickly. You can learn more about Slurm arrays [here](https://hbctraining.github.io/Training-modules/Intermediate_shell/lessons/arrays_in_slurm.html).
+Alternatively, this could also be done using a ***Slurm array***, which lets you submit a collection of similar jobs easily and quickly. In particular, Biowulf uses a tool called swarm which is a convenience wrapper for the Slurm **`sbatch --array`** command. Read more about [Swarm on Biowulf](https://hpc.nih.gov/apps/swarm.html) here.
 
-Use `vim` to start a new shell script called `rnaseq_analysis_on_allfiles-for_slurm.sh`:
+In short:
 
-``` bash
-$ vim rnaseq_analysis_on_allfiles_for-slurm.sh
-```
+> Swarm is a script designed to simplify submitting a group of commands to the Biowulf cluster. Some programs do not scale well or can't use distributed memory. Other programs may be 'embarrassingly parallel', in that many independent jobs need to be run. These programs are well suited to running 'swarms of jobs'. The swarm script simplifies these computational problems
+>
+> Swarm reads a list of command lines (termed "commands" or "processes") from a swarm command file (termed the "swarmfile"), then automatically submits those commands to the batch system to execute. Command lines in the swarmfile should appear just as they would be entered on a Linux command line. Swarm encapsulates each command line in a single temporary command script, then submits all command scripts to the Biowulf cluster as a [Slurm job array](http://slurm.schedmd.com/job_array.html). By default, swarm runs one command per core on a node, making optimum use of a node.
+
+If you are interested, the [Biowulf training page](https://hpc.nih.gov/training/intro_biowulf/) has a number of tutorials about Slurm, starting with :
+
+**Introduction to the Swarm utility**\
+[Video](https://www.youtube.com/watch?v=VDWNpeYx4do) (15 mins)\
+References: [Swarm documentation](https://hpc.nih.gov/apps/swarm.html)\
+Hands-On: [submit a swarm of jobs](https://hpc.nih.gov/training/intro_biowulf/hands-on-swarm.html)
+
+------------------------------------------------------------------------
 
 ## Assignment
 
