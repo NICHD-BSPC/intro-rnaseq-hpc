@@ -310,38 +310,48 @@ done
 
 **Note:** If you create and run the above script, or something similar to it, i.e. with Slurm directives at the top, you should give the script name `.run` or `.slurm` as the extension. This will make it obvious that it is meant to submit jobs to the Slurm scheduler.
 
+Note: Learn more about loops in BASH from this Harvard HPC workshop.
+
 ------------------------------------------------------------------------
 
 **Exercise**
 
-How would you run `rnaseq_analysis_on_allfiles.slurm`, i.e. the above script?
+How would you actually run `rnaseq_analysis_on_allfiles.slurm`, i.e. the above script?
 
 ------------------------------------------------------------------------
 
-## Parallelizing the analysis for efficiency - convert to SWARM
+## Parallellizing the analysis for efficiency
 
-Parallelization will save you a lot of time with real (large) datasets. To parallelize our analysis, we will still need to write a second script that will call the script we just wrote that takes a fastq file as input (rnaseq_analysis_on_input_file.sh). We will still use a `for` loop, but we will be creating a regular shell script and we will be specifying the Slurm directives differently.
+**In the script above, each analysis is still running in serial on a single interactive node, which doesn't take advantage of Biowulf's capacity.**
 
-> Alternatively, this could also be done using a ***Slurm array***, which lets you submit a collection of similar jobs easily and quickly. You can learn more about Slurm arrays [here](https://hbctraining.github.io/Training-modules/Intermediate_shell/lessons/arrays_in_slurm.html).
+To further parallelize our analysis, we will need two ingredients:
 
-Use `vim` to start a new shell script called `rnaseq_analysis_on_allfiles-for_slurm.sh`:
+-    A script (like the one we just wrote) that takes a single fastq file as input, such as the one we wrote together - we will call this `analysis.sh` . *For simplicity, we are only going to run FASTQC on the samples.*
 
-``` bash
-$ vim rnaseq_analysis_on_allfiles_for-slurm.sh
-```
+-   A script that uses a `for` loop to specify Slurm parameters and submits a Slurm command that calls `analysis.sh` workflow to run on each of the samples. We will call this one `sbatch_loop.sh`.
 
-This script loops through the same files as in the previous (demo) script, but the command being submitted within the `for` loop is `sbatch` with Slurm directives specified on the same line:
+-   These scripts can be found in the
+
+**Note that these scripts represent only one possible solution**
+
+### First, we will look through the `analysis.sh` script: 
 
 ``` bash
 #! /bin/bash
 
-for fq in ~/rnaseq/raw_data/*.fq
-do
+#SBATCH --cpus-per-task=1
 
-sbatch -c 6 --job-name rnaseq-workflow --mem 8G --wrap="sh ~/rnaseq/scripts/rnaseq_analysis_on_input_file.sh ${fq}"
-sleep 1 # wait 1 second between each job submission
-  
-done
+module load fastqc/0.12.1
+
+fq=${1}
+samplename=$(basename ${fq} .subset.fq)
+cores=${SLURM_CPUS_PER_TASK}
+fastqc_out="results/fastqc"
+mkdir -p ${fastqc_out}
+
+echo "$(date) FastQC on ${fq}..."
+fastqc -o ${fastqc_out} ${fq}
+echo "$(date) finished."
 ```
 
 > Please note that after the `sbatch` directives the command `sh ~/rnaseq/scripts/rnaseq_analysis_on_input_file.sh ${fq}` is in quotes.
@@ -356,9 +366,7 @@ What you should see on the output of your screen would be the jobIDs that are re
 You can use `O2sacct` to check progress. And we can check if there are any additional files in our analysis folder.
 
 ``` bash
-$ O2sacct
-
-$ ls -l /n/scratch/users/r/$USER/rnaseq_hbc-workshop/
+$ squeue -u $USER
 ```
 
 Don't forget about the `scancel` command, should something go wrong and you need to cancel your jobs.
@@ -366,5 +374,21 @@ Don't forget about the `scancel` command, should something go wrong and you need
 > **NOTE:** All job schedulers are similar, but not the same. Once you understand how one works, you can transition to another one without too much trouble. They all have their pros and cons which are considered by the system administrators when picking one for a given HPC environment. Some examples of other job schedulers are LSF, SGE, PBS/Torque.
 
 ------------------------------------------------------------------------
+
+## Swarm and Slurm Arrays
+
+> Alternatively, this could also be done using a ***Slurm array***, which lets you submit a collection of similar jobs easily and quickly. You can learn more about Slurm arrays [here](https://hbctraining.github.io/Training-modules/Intermediate_shell/lessons/arrays_in_slurm.html).
+
+Use `vim` to start a new shell script called `rnaseq_analysis_on_allfiles-for_slurm.sh`:
+
+``` bash
+$ vim rnaseq_analysis_on_allfiles_for-slurm.sh
+```
+
+## Discussion
+
+What
+
+## Assignment
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
