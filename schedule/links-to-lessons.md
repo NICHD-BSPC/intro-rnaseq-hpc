@@ -54,3 +54,7 @@
 -  [Experimental Design](../lessons/wk2_lesson05_experimental_design.md) ~30 minutes of reading, ~30 minutes of assignment. **Note: This assignment is now due by Tuesday of Week 5** 
 
 ------------------------------------------------------------------------
+
+## Week 5: 
+- [Automating the RNAseq workflow](../lessons/wk4_lesson02_automating_workflow.md) 60 minutes in class, ~30-45 minutes of assignment
+- [Experimental Design](../lessons/wk2_lesson05_experimental_design.md) ~30 minutes of reading, ~30 minutes of assignment. **Note: This assignment is now due end of Week 5** 
