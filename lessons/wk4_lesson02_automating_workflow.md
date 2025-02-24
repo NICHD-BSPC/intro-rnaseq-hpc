@@ -507,6 +507,24 @@ Hands-On: [submit a swarm of jobs](https://hpc.nih.gov/training/intro_biowulf/ha
 
 ------------------------------------------------------------------------
 
-## Assignment
+## Assignment: Automate featureCounts
+
+One tool that we didn't incorporate into our scripts yet was featureCounts. For this assignment, create a script to do that, which:
+
+-   Is in your `/scripts` directory and is called `feature_counts_on_input_file.sh`
+
+-   Is based on the `rnaseq_analysis_on_input_file.sh` we wrote above
+
+-   It should run on ONE subset Bam input file, such as `/data/Bspc-training/$USER/rnaseq/results/STAR/Mov10_oe_1_subsetAligned.sortedbyCoord.out.bam`
+
+-   This will require you to modify that script to take care of things such loading the `subread` module, specifying a new output directory, using `basename` to create consistent naming, and a positional argument to specify the input BAM file. *You many need to look back at next week to recall the featureCounts syntax.*
+
+**Then, once this works, as an optional BONUS, go ahead and try making this work for more than one sample at a time, by either doing**:
+
+-    `analysis` and `sbatch_loop` scripts like we did above (note that if you do this option you'll get individual sample count matrices you would later need to merge, but don't worry about that for now)
+
+-   Taking advantage of the fact that featureCounts can run on a directory of BAMs using the \*.bam wildcard. In this case your scripts input would be a directory name, rather than just one BAM file.
+
+------------------------------------------------------------------------
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
