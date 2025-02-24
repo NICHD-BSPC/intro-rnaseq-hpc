@@ -314,7 +314,7 @@ Note: Learn more about loops in BASH from this Harvard HPC workshop.
 
 ------------------------------------------------------------------------
 
-**Exercise**
+**Thought Exercise:**
 
 How would you actually run `rnaseq_analysis_on_allfiles.slurm`, i.e. the above script?
 
@@ -330,65 +330,201 @@ To further parallelize our analysis, we will need two ingredients:
 
 -   A script that uses a `for` loop to specify Slurm parameters and submits a Slurm command that calls `analysis.sh` workflow to run on each of the samples. We will call this one `sbatch_loop.sh`.
 
--   These scripts can be found in the
-
-**Note that these scripts represent only one possible solution**
+-   These scripts can be found in `/data/Bspc-training/shared/rnaseq_jan2025/scripts` and can be copied into your `rnaseq/` directory for use. However, **you do not need to run these right now in class**.
 
 ### First, we will look through the `analysis.sh` script: 
 
 ``` bash
 #! /bin/bash
+# Note that this script assumes you are in /data/Bspc-training/$USER 
 
+#Set a slurm directive that we won't need to modify
 #SBATCH --cpus-per-task=1
 
+# Load any needed modules
 module load fastqc/0.12.1
 
+# What do these lines of code do? 
 fq=${1}
 samplename=$(basename ${fq} .subset.fq)
 cores=${SLURM_CPUS_PER_TASK}
-fastqc_out="results/fastqc"
+
+# What about these lines of code? Note I am naming my results directory something new to not overwrite previous results
+fastqc_out="results/fastqc_test"
 mkdir -p ${fastqc_out}
 
+# What do these lines of code do? 
 echo "$(date) FastQC on ${fq}..."
 fastqc -o ${fastqc_out} ${fq}
 echo "$(date) finished."
 ```
 
-> Please note that after the `sbatch` directives the command `sh ~/rnaseq/scripts/rnaseq_analysis_on_input_file.sh ${fq}` is in quotes.
+### Examining the SBATCH loop script
 
 ``` bash
-$ cd ~/rnaseq/scripts/
-$ sh rnaseq_analysis_on_allfiles_for-slurm.sh
+#!/bin/bash
+
+for fastq in raw_data/*.fq; do
+  samplename=$(basename ${fastq} .subset.fq)
+  sbatch \
+    --error "slurm-${samplename}-%j.err" \
+    --job-name ${samplename} \
+    --output "slurm-${samplename}-%j.out" \
+    analysis.sh ${fastq} 
+  sleep 1
+done
 ```
 
-What you should see on the output of your screen would be the jobIDs that are returned from the scheduler for each of the jobs that your script submitted.
+### Running the script
 
-You can use `O2sacct` to check progress. And we can check if there are any additional files in our analysis folder.
+``` bash
+$ cd /data/Bspc-training/$USER/rnaseq
+$ sh sbatch_loop.sh
+```
+
+What you should see on the output of your screen would be the jobIDs that are returned from the scheduler for each of the jobs that your script submitted, such as:
+
+```         
+48961649
+48961656
+48961663
+48961670
+48961675
+48961682
+```
+
+You can use `squeue` to check your jobs, but it may be hard to catch them before they finish:
 
 ``` bash
 $ squeue -u $USER
 ```
 
-Don't forget about the `scancel` command, should something go wrong and you need to cancel your jobs.
+And using `ls -lrt` , we can see that there are now new log files in our current directory:
+
+```         
+-rw-rw----+ 1 changes Bspc-training  993 Feb 24 11:20  slurm-Irrel_kd_2-48961656.err
+-rw-rw----+ 1 changes Bspc-training  159 Feb 24 11:20  slurm-Irrel_kd_2-48961656.out
+-rw-rw----+ 1 changes Bspc-training  993 Feb 24 11:20  slurm-Irrel_kd_3-48961663.err
+-rw-rw----+ 1 changes Bspc-training  993 Feb 24 11:20  slurm-Mov10_oe_3-48961682.err
+-rw-rw----+ 1 changes Bspc-training  159 Feb 24 11:20  slurm-Mov10_oe_3-48961682.out
+-rw-rw----+ 1 changes Bspc-training  993 Feb 24 11:20  slurm-Irrel_kd_1-48961649.err
+-rw-rw----+ 1 changes Bspc-training  159 Feb 24 11:20  slurm-Irrel_kd_1-48961649.out
+-rw-rw----+ 1 changes Bspc-training  993 Feb 24 11:20  slurm-Mov10_oe_1-48961670.err
+-rw-rw----+ 1 changes Bspc-training  159 Feb 24 11:20  slurm-Irrel_kd_3-48961663.out
+-rw-rw----+ 1 changes Bspc-training  159 Feb 24 11:20  slurm-Mov10_oe_1-48961670.out
+-rw-rw----+ 1 changes Bspc-training  993 Feb 24 11:20  slurm-Mov10_oe_2-48961675.err
+-rw-rw----+ 1 changes Bspc-training  159 Feb 24 11:20  slurm-Mov10_oe_2-48961675.out
+```
+
+Check out the contents of these files. The `.err` files will contain the progress reporting form `fastqc`:
+
+```         
+$ less slurm-Irrel_kd_2-48961656.err
+
+[+] Loading singularity  4.1.5  on cn0051 
+[+] Loading fastqc  0.12.1 
+[+] Loading STAR  2.7.11b 
+Started analysis of Irrel_kd_2.subset.fq
+Approx 5% complete for Irrel_kd_2.subset.fq
+Approx 10% complete for Irrel_kd_2.subset.fq
+Approx 15% complete for Irrel_kd_2.subset.fq
+Approx 20% complete for Irrel_kd_2.subset.fq
+Approx 25% complete for Irrel_kd_2.subset.fq
+Approx 30% complete for Irrel_kd_2.subset.fq
+Approx 35% complete for Irrel_kd_2.subset.fq
+Approx 40% complete for Irrel_kd_2.subset.fq
+Approx 45% complete for Irrel_kd_2.subset.fq
+Approx 50% complete for Irrel_kd_2.subset.fq
+Approx 55% complete for Irrel_kd_2.subset.fq
+Approx 60% complete for Irrel_kd_2.subset.fq
+Approx 65% complete for Irrel_kd_2.subset.fq
+Approx 70% complete for Irrel_kd_2.subset.fq
+Approx 75% complete for Irrel_kd_2.subset.fq
+Approx 80% complete for Irrel_kd_2.subset.fq
+Approx 85% complete for Irrel_kd_2.subset.fq
+Approx 90% complete for Irrel_kd_2.subset.fq
+Approx 95% complete for Irrel_kd_2.subset.fq
+```
+
+And the `.out` files will contain the "all clear" messages from FASTQ and the messages we set up with the date and time:
+
+```         
+$ less slurm-Irrel_kd_2-48961656.out
+
+Mon Feb 24 11:20:42 EST 2025 FastQC on raw_data/Irrel_kd_2.subset.fq...
+null
+Analysis complete for Irrel_kd_2.subset.fq
+Mon Feb 24 11:20:46 EST 2025 finished.
+```
+
+And finally - double check that `results/fastqc_test` contains the output files we expect:
+
+```         
+$ ls -lh results/fastqc_test/
+total 6.7M
+-rw-rw----+ 1 changes Bspc-training 640K Feb 24 11:31 Irrel_kd_1.subset_fastqc.html
+-rw-rw----+ 1 changes Bspc-training 486K Feb 24 11:31 Irrel_kd_1.subset_fastqc.zip
+-rw-rw----+ 1 changes Bspc-training 640K Feb 24 11:31 Irrel_kd_2.subset_fastqc.html
+-rw-rw----+ 1 changes Bspc-training 486K Feb 24 11:31 Irrel_kd_2.subset_fastqc.zip
+-rw-rw----+ 1 changes Bspc-training 640K Feb 24 11:31 Irrel_kd_3.subset_fastqc.html
+-rw-rw----+ 1 changes Bspc-training 488K Feb 24 11:31 Irrel_kd_3.subset_fastqc.zip
+-rw-rw----+ 1 changes Bspc-training 647K Feb 24 11:31 Mov10_oe_1.subset_fastqc.html
+-rw-rw----+ 1 changes Bspc-training 509K Feb 24 11:31 Mov10_oe_1.subset_fastqc.zip
+-rw-rw----+ 1 changes Bspc-training 644K Feb 24 11:31 Mov10_oe_2.subset_fastqc.html
+-rw-rw----+ 1 changes Bspc-training 503K Feb 24 11:31 Mov10_oe_2.subset_fastqc.zip
+-rw-rw----+ 1 changes Bspc-training 650K Feb 24 11:31 Mov10_oe_3.subset_fastqc.html
+-rw-rw----+ 1 changes Bspc-training 516K Feb 24 11:31 Mov10_oe_3.subset_fastqc.zip
+```
 
 > **NOTE:** All job schedulers are similar, but not the same. Once you understand how one works, you can transition to another one without too much trouble. They all have their pros and cons which are considered by the system administrators when picking one for a given HPC environment. Some examples of other job schedulers are LSF, SGE, PBS/Torque.
+
+#### Discussion
+
+Now we have successfully created scripts that will submit Biowulf jobs for you in an automated fashion, we can think about ways to improve our script(s):
+
+-   What other parameters could we supply, either to tools like FASTQC
+
+-   What other approaches might there be to automating these processes?
 
 ------------------------------------------------------------------------
 
 ## Swarm and Slurm Arrays
 
-> Alternatively, this could also be done using a ***Slurm array***, which lets you submit a collection of similar jobs easily and quickly. You can learn more about Slurm arrays [here](https://hbctraining.github.io/Training-modules/Intermediate_shell/lessons/arrays_in_slurm.html).
+Alternatively, this could also be done using a ***Slurm array***, which lets you submit a collection of similar jobs easily and quickly. In particular, Biowulf uses a tool called swarm which is a convenience wrapper for the Slurm **`sbatch --array`** command. Read more about [Swarm on Biowulf](https://hpc.nih.gov/apps/swarm.html) here.
 
-Use `vim` to start a new shell script called `rnaseq_analysis_on_allfiles-for_slurm.sh`:
+In short:
 
-``` bash
-$ vim rnaseq_analysis_on_allfiles_for-slurm.sh
-```
+> Swarm is a script designed to simplify submitting a group of commands to the Biowulf cluster. Some programs do not scale well or can't use distributed memory. Other programs may be 'embarrassingly parallel', in that many independent jobs need to be run. These programs are well suited to running 'swarms of jobs'. The swarm script simplifies these computational problems
+>
+> Swarm reads a list of command lines (termed "commands" or "processes") from a swarm command file (termed the "swarmfile"), then automatically submits those commands to the batch system to execute. Command lines in the swarmfile should appear just as they would be entered on a Linux command line. Swarm encapsulates each command line in a single temporary command script, then submits all command scripts to the Biowulf cluster as a [Slurm job array](http://slurm.schedmd.com/job_array.html). By default, swarm runs one command per core on a node, making optimum use of a node.
 
-## Discussion
+If you are interested, the [Biowulf training page](https://hpc.nih.gov/training/intro_biowulf/) has a number of tutorials about Slurm, starting with :
 
-What
+**Introduction to the Swarm utility**\
+[Video](https://www.youtube.com/watch?v=VDWNpeYx4do) (15 mins)\
+References: [Swarm documentation](https://hpc.nih.gov/apps/swarm.html)\
+Hands-On: [submit a swarm of jobs](https://hpc.nih.gov/training/intro_biowulf/hands-on-swarm.html)
 
-## Assignment
+------------------------------------------------------------------------
+
+## Assignment: Automate featureCounts
+
+One tool that we didn't incorporate into our scripts yet was featureCounts. For this assignment, create a script to do that, which:
+
+-   Is in your `/scripts` directory and is called `feature_counts_on_input_file.sh`
+
+-   Is based on the `rnaseq_analysis_on_input_file.sh` we wrote above
+
+-   It should run on ONE subset Bam input file, such as `/data/Bspc-training/$USER/rnaseq/results/STAR/Mov10_oe_1_subsetAligned.sortedbyCoord.out.bam`
+
+-   This will require you to modify that script to take care of things such loading the `subread` module, specifying a new output directory, using `basename` to create consistent naming, and a positional argument to specify the input BAM file. *You many need to look back at next week to recall the featureCounts syntax.*
+
+**Then, once this works, as an optional BONUS, go ahead and try making this work for more than one sample at a time, by either doing**:
+
+-    `analysis` and `sbatch_loop` scripts like we did above (note that if you do this option you'll get individual sample count matrices you would later need to merge, but don't worry about that for now)
+
+-   Taking advantage of the fact that featureCounts can run on a directory of BAMs using the \*.bam wildcard. In this case your scripts input would be a directory name, rather than just one BAM file.
+
+------------------------------------------------------------------------
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
