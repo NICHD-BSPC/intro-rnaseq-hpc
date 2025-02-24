@@ -6,9 +6,18 @@ date: "Last Edited February 2025"
 
 ## Learning Objectives:
 
+-   Learn some principles of automation
 -   Create a reusable and efficient workflow for RNA-seq data analysis using shell scripts
 
-## Automating the analysis path from Sequence reads to Count matrix
+## Pre-Class Discussion:
+
+-   Why automate? What are the benefits of automation?
+
+-   What are some tasks - in lab, data analysis or elsewhere in life - that you would like to automate?
+
+-   What are some things to watch out for when automating?
+
+## Automating the analysis path to mapped reads
 
 Once you have optimized all the tools and parameters using a single sample (likely using an interactive session), you can write a script to run the whole workflow on all the samples in parallel.
 
@@ -49,13 +58,15 @@ Note that `$1`, which you may have seen before, is actually a short form of `${1
 
 *There can be virtually unlimited numbers of inputs to a shell script, but it is wise to only have a few inputs to avoid errors and confusion when running a script that used positional parameters.*
 
-> [This is an example of a simple script that used the concept of positional parameters and the associated variables](http://steve-parker.org/sh/eg/var3.sh.txt). You should try this script out after the class to get a better handle on positional parameters for shell scripting. You can also learn more about positional parameters [here](https://hbctraining.github.io/Training-modules/Intermediate_shell/lessons/positional_params.html)
+> [This is an example of a simple script that used the concept of positional parameters and the associated variables](http://steve-parker.org/sh/eg/var3.sh.txt). You should try this script out after the class to get a better handle on positional parameters for shell scripting. You can also learn more about positional parameters [here](https://hbctraining.github.io/Training-modules/Accelerate_with_automation/lessons/positional_params.html).
 
 We will be using this concept in our automation script, wherein we will accept the full or relative path to a file as input.
 
 ## Writing the automation script: Setting up variables
 
 We're about to do substantial editing of a file. Use vim if you're comfortable with it (e.g., `vim run_rnaseq.sh`); otherwise use another text editor on your laptop and you can paste it into vim later.
+
+**Hint**: To edit this script using TextEdit, make sure to go to `Format -> Make Plain Text` to make sure no unnecessary formatting is added. Similar options should exist in other basic text editors.
 
 Let's begin with the shebang line and a `cd` command to make paths more convenient to write:
 
@@ -79,7 +90,7 @@ Since `${1}` will store the path to the fastq file, including the file name, we 
 fq=${1}
 ```
 
-In the rest of the script, we can now call the fastq file using `${fq}` instead of `${1}`, which will make our code easier to understand and debug.
+In the rest of the script, we can now call the fastq file using `${fq}` instead of `${1}`, which will make our code easier to understand and debug. Here is [much more about BASH variables](https://www.howtogeek.com/442332/how-to-work-with-variables-in-bash/)!
 
 > When we set up variables we do not use the `$` before it, but when we *use the variable*, we always have to have the `$` before it. \>
 >
@@ -102,8 +113,8 @@ echo "Sample name is ${samplename}"
 
 > **Intro to `basename`**
 >
-> 1. the `basename` command: this command takes a path or a name and trims away all the information before the last `/`. If you also specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path `*/data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq*`, then `basename ${fq} .subset.fq` will output `Mov10_oe_1`.
-> 2. We encapsulate the `basename...` command in `$(...)` which is called command substitution. It places the results of the command into the variable.
+> 1.  the `basename` command: this command takes a path or a name and trims away all the information before the last `/`. If you also specify the string to clear away at the end, it will do that as well. In this case, if the variable `${fq}` contains the path `*/data/Bspc-training/changes/rnaseq/raw_data/Mov10_oe_1.subset.fq*`, then `basename ${fq} .subset.fq` will output `Mov10_oe_1`.
+> 2.  We encapsulate the `basename...` command in `$(...)` which is called command substitution. It places the results of the command into the variable.
 
 ``` bash
 # basename demo. Run on the command line to inspect; do not put in your script
@@ -225,6 +236,8 @@ qualimap rnaseq \
   -p strand-specific-reverse \
   -gtf ${gtf} \
   --java-mem-size=8G
+
+echo "Done running Qualimap: ${samplename}"
 ```
 
 ### Last addition to the script
@@ -250,13 +263,17 @@ $ cd /data/rnaseq/scripts/
 $ vim rnaseq_analysis_on_input_file.sh 
 ```
 
-> *Alternatively, you can save the script on your computer and transfer it to your `/rnaseq/scripts/` directory using the mounted directory system or `scp`*
+> *Alternatively, you can save the script on your computer and transfer it to your `/rnaseq/scripts/` directory using the mounted directory system or `scp`*. I'll use this as an opportunity to demo both ways of transferring the file.
 
-We should all have an interactive session with 12 cores, so we can run the script as follows from your `/rnaseq/` directory:
+We should all have an interactive session with 12 cores, so we can run the script as follows from your `rnaseq/` directory:
 
 ``` bash
 $ sh scripts/rnaseq_analysis_on_input_file.sh /data/Bspc-training/$USER/rnaseq/raw_data/Mov10_oe_1.subset.fq
 ```
+
+## BONUS EXERCISE: Take advantage of wildcards
+
+Remember how we were able to run programs one whole directory at a time using wildcards like `*.fq` ? How could we re-write the script above to take a **whole directory** of FASTQ files as input?
 
 ## Running the script to submit jobs in parallel to the Slurm scheduler
 
@@ -293,38 +310,48 @@ done
 
 **Note:** If you create and run the above script, or something similar to it, i.e. with Slurm directives at the top, you should give the script name `.run` or `.slurm` as the extension. This will make it obvious that it is meant to submit jobs to the Slurm scheduler.
 
+Note: Learn more about loops in BASH from this Harvard HPC workshop.
+
 ------------------------------------------------------------------------
 
 **Exercise**
 
-How would you run `rnaseq_analysis_on_allfiles.slurm`, i.e. the above script?
+How would you actually run `rnaseq_analysis_on_allfiles.slurm`, i.e. the above script?
 
 ------------------------------------------------------------------------
 
-## Parallelizing the analysis for efficiency - convert to SWARM
+## Parallellizing the analysis for efficiency
 
-Parallelization will save you a lot of time with real (large) datasets. To parallelize our analysis, we will still need to write a second script that will call the script we just wrote that takes a fastq file as input (rnaseq_analysis_on_input_file.sh). We will still use a `for` loop, but we will be creating a regular shell script and we will be specifying the Slurm directives differently.
+**In the script above, each analysis is still running in serial on a single interactive node, which doesn't take advantage of Biowulf's capacity.**
 
-> Alternatively, this could also be done using a ***Slurm array***, which lets you submit a collection of similar jobs easily and quickly. You can learn more about Slurm arrays [here](https://hbctraining.github.io/Training-modules/Intermediate_shell/lessons/arrays_in_slurm.html).
+To further parallelize our analysis, we will need two ingredients:
 
-Use `vim` to start a new shell script called `rnaseq_analysis_on_allfiles-for_slurm.sh`:
+-    A script (like the one we just wrote) that takes a single fastq file as input, such as the one we wrote together - we will call this `analysis.sh` . *For simplicity, we are only going to run FASTQC on the samples.*
 
-``` bash
-$ vim rnaseq_analysis_on_allfiles_for-slurm.sh
-```
+-   A script that uses a `for` loop to specify Slurm parameters and submits a Slurm command that calls `analysis.sh` workflow to run on each of the samples. We will call this one `sbatch_loop.sh`.
 
-This script loops through the same files as in the previous (demo) script, but the command being submitted within the `for` loop is `sbatch` with Slurm directives specified on the same line:
+-   These scripts can be found in the
+
+**Note that these scripts represent only one possible solution**
+
+### First, we will look through the `analysis.sh` script: 
 
 ``` bash
 #! /bin/bash
 
-for fq in ~/rnaseq/raw_data/*.fq
-do
+#SBATCH --cpus-per-task=1
 
-sbatch -c 6 --job-name rnaseq-workflow --mem 8G --wrap="sh ~/rnaseq/scripts/rnaseq_analysis_on_input_file.sh ${fq}"
-sleep 1 # wait 1 second between each job submission
-  
-done
+module load fastqc/0.12.1
+
+fq=${1}
+samplename=$(basename ${fq} .subset.fq)
+cores=${SLURM_CPUS_PER_TASK}
+fastqc_out="results/fastqc"
+mkdir -p ${fastqc_out}
+
+echo "$(date) FastQC on ${fq}..."
+fastqc -o ${fastqc_out} ${fq}
+echo "$(date) finished."
 ```
 
 > Please note that after the `sbatch` directives the command `sh ~/rnaseq/scripts/rnaseq_analysis_on_input_file.sh ${fq}` is in quotes.
@@ -339,9 +366,7 @@ What you should see on the output of your screen would be the jobIDs that are re
 You can use `O2sacct` to check progress. And we can check if there are any additional files in our analysis folder.
 
 ``` bash
-$ O2sacct
-
-$ ls -l /n/scratch/users/r/$USER/rnaseq_hbc-workshop/
+$ squeue -u $USER
 ```
 
 Don't forget about the `scancel` command, should something go wrong and you need to cancel your jobs.
@@ -349,5 +374,21 @@ Don't forget about the `scancel` command, should something go wrong and you need
 > **NOTE:** All job schedulers are similar, but not the same. Once you understand how one works, you can transition to another one without too much trouble. They all have their pros and cons which are considered by the system administrators when picking one for a given HPC environment. Some examples of other job schedulers are LSF, SGE, PBS/Torque.
 
 ------------------------------------------------------------------------
+
+## Swarm and Slurm Arrays
+
+> Alternatively, this could also be done using a ***Slurm array***, which lets you submit a collection of similar jobs easily and quickly. You can learn more about Slurm arrays [here](https://hbctraining.github.io/Training-modules/Intermediate_shell/lessons/arrays_in_slurm.html).
+
+Use `vim` to start a new shell script called `rnaseq_analysis_on_allfiles-for_slurm.sh`:
+
+``` bash
+$ vim rnaseq_analysis_on_allfiles_for-slurm.sh
+```
+
+## Discussion
+
+What
+
+## Assignment
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
