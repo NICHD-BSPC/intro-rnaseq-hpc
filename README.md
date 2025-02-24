@@ -30,9 +30,7 @@ Note: Links to weekly lessons will be provided several days in advance in the ta
 | [Week 2](schedule/links-to-lessons.md#week-2) | Scientific software on Biowulf, quality control of sequence data, experimental design|
 | [Week 3](schedule/links-to-lessons.md#week-3) | Reference genomes, theory and practice of mapping RNAseq reads to a reference, Mapping QC|
 | [Week 4](schedule/links-to-lessons.md#week-4) | Theory and practice of counting RNAseq reads|
-| Week 5 | Automation of the RNAseq workflow, transition to RStudio for differential expression analyses | 
-
-The material for Weeks 5-9, covering downstream analyses once you have read counts, will be contained in a separate course website. 
+| [Week 5](schedule/links-to-lessons.md#week-5) | Automation of the RNAseq workflow, transition to RStudio for differential expression analyses | 
 
 ### Course communication: 
 * For any content questions: We will be using the `rnaseq_jan2025` Slack channel under the Bioinformatics @NICHD workspace. Posting your questions in this channel is great, as multiple staff and fellow students will be able to respond. Also, you probably aren't the only one with that question!
