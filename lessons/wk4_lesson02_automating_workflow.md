@@ -515,13 +515,13 @@ One tool that we didn't incorporate into our scripts yet was featureCounts. For 
 
 -   It should run on ONE subset Bam input file, such as `/data/Bspc-training/$USER/rnaseq/results/STAR/Mov10_oe_1_subsetAligned.sortedbyCoord.out.bam`
 
--   This will require you to modify that script to take care of things such loading the `subread` module, specifying a new output directory, using `basename` to create consistent naming, and a positional argument to specify the input BAM file. *You many need to look back at next week to recall the featureCounts syntax.*
+-   This will require you to modify that script to take care of things such loading the `subread` module, specifying a new output directory, using `basename` to create consistent naming, and a positional argument to specify the input BAM file. *You many need to look back at last week's material to recall the featureCounts syntax.*
 
 **Then, once this works, as an optional BONUS, go ahead and try making this work for more than one sample at a time, by either doing**:
 
--    `analysis` and `sbatch_loop` scripts like we did above (note that if you do this option you'll get individual sample count matrices you would later need to merge, but don't worry about that for now)
+-    `analysis` and `sbatch_loop` scripts like we did above. Note that if you do this option you'll get individual sample count matrices you would later need to merge, but don't worry about that for the purposes of this script. 
 
--   Taking advantage of the fact that featureCounts can run on a directory of BAMs using the \*.bam wildcard. In this case your scripts input would be a directory name, rather than just one BAM file.
+-   Taking advantage of the fact that featureCounts can run on a directory of BAMs using the \*.bam wildcard. In this case your script's input would be a directory name, rather than just one BAM file.
 
 ------------------------------------------------------------------------
 
