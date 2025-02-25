@@ -249,8 +249,6 @@ It is best practice to have the script **usage** specified at the top any script
 # USAGE: sh rnaseq_analysis_on_input_file.sh <name of fastq file>
 ```
 
-It is okay to specify this after everything else is set up, since you will have most clarity about the script only once it is fully done.
-
 Additional helpful notes might be what the user should expect in terms of output file and directories.
 
 ### Saving and running script
@@ -482,7 +480,7 @@ total 6.7M
 
 Now we have successfully created scripts that will submit Biowulf jobs for you in an automated fashion, we can think about ways to improve our script(s):
 
--   What other parameters could we supply, either to tools like FASTQC
+-   What other parameters could we supply, either to tools like STAR or as SLURM directives?
 
 -   What other approaches might there be to automating these processes?
 
