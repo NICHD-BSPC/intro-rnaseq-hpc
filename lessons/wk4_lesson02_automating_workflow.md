@@ -263,7 +263,7 @@ $ cd /data/rnaseq/scripts/
 $ vim rnaseq_analysis_on_input_file.sh 
 ```
 
-> *Alternatively, you can save the script on your computer and transfer it to your `/rnaseq/scripts/` directory using the mounted directory system or `scp`*. I'll use this as an opportunity to demo both ways of transferring the file.
+> *Alternatively, you can save the script on your computer and transfer it to your `/rnaseq/scripts/` directory using the mounted directory system or `scp`*. I'll use this as an opportunity to demo both the copy and paste and the `scp` options.
 
 We should all have an interactive session with 12 cores, so we can run the script as follows from your `rnaseq/` directory:
 
