@@ -16,6 +16,22 @@ Approximate time: 45 minutes
 -   Familiarize various components of RStudio.
 -   Employ variables in R.
 
+## What this lesson is NOT
+
+In this course we are NOT going to be giving a comprehensive
+introduction to all of the awesome things that R and RStudio can do.
+Rather, we are going to be learning just enough to accomplish our goal
+of differential expression analysis.
+
+If you do want to learn more, this lesson is taken from [a
+workshop](https://hbctraining.github.io/Intro-to-R-flipped/) from
+Harvard HPC, which is a extremely comprehensive. We hope to offer an
+NICHD version of this workshop in the near future!
+
+There is also a [BSPC training
+page](https://nichd-bspc.github.io/training/r.html) full of links to
+R-related learning resources.
+
 ## What is R?
 
 The common misconception is that R is a programming language but in fact
@@ -553,6 +569,26 @@ suggestions you should keep in mind:
     and
     [Google's](http://web.stanford.edu/class/cs109l/unrestricted/resources/google-style.html).
 
+## Best practices
+
+Before we move on to more complex concepts and getting familiar with the
+language, we want to point out a few things about best practices when
+working with R which will help you stay organized in the long run:
+
+-   Code and workflow are more reproducible if we can document
+    everything that we do. Our end goal is not just to "do stuff", but
+    to do it in a way that anyone can easily and exactly replicate our
+    workflow and results. **All code should be written in the script
+    editor and saved to file, rather than working in the console.**
+-   The **R console** should be mainly used to inspect objects, test a
+    function or get help.
+-   Use `#` signs to comment. **Comment liberally** in your R scripts.
+    This will help future you and other collaborators know what each
+    line of code (or code block) was meant to do. Anything to the right
+    of a `#` is ignored by R. *A shortcut for this is*
+    <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> if you want to comment
+    an entire chunk of text.
+
 ## Interacting with data in R
 
 R is commonly used for handling big data, and so it only makes sense
@@ -562,7 +598,8 @@ familiarize ourselves with the data.
 
 ### Adding files to your working directory
 
-Since we are on Biowulf, we can simply copy our files into our diretory!
+Since we are on Biowulf, we can simply copy our files into our
+directory!
 
 1.  Move over to our Terminal tab (hiding next to the Console tab in the
     bottom right corner window). This allows us to use a Bash-based
@@ -575,8 +612,6 @@ Since we are on Biowulf, we can simply copy our files into our diretory!
     commands:
 
     ``` bash
-    $ cp /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/counts.rpkm.csv .
-
     $ cp /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mouse_exp_design.csv .
     ```
 
@@ -587,8 +622,6 @@ The files should appear in your Files Pane!
 If you were on your local computer using RStudio, you would do something
 like the following to get the data into your working directory:
 
-> -   Download the **practice counts file** by right clicking on [this
->     link](https://raw.githubusercontent.com/hbc/NGS_Data_Analysis_Course/master/sessionII/data/counts.rpkm.csv)
 > -   Download **the practice metadata file** using [this
 >     link](https://github.com/hbc/NGS_Data_Analysis_Course/raw/master/sessionII/data/mouse_exp_design.csv)
 >
@@ -597,26 +630,11 @@ like the following to get the data into your working directory:
 > Choose `~/Desktop/Intro-to-R/data` as the destination of the file. You
 > should now see the file appear in your working directory.
 
-### The dataset
+### The dataset: metadata
 
-In this example dataset, we have collected whole brain samples from 12
-mice and want to evaluate expression differences between them. The
-expression data represents normalized count data obtained from
-RNA-sequencing of the 12 brain samples. This data is stored in a comma
-separated values (CSV) file as a 2-dimensional matrix, with **each row
-corresponding to a gene and each column corresponding to a sample**.
-
-<p align="center">
-
-<img src="../img/counts_view.png" width="900"/>
-
-</p>
-
-### The metadata
-
-We have another file in which we identify **information about the data**
-or **metadata**. Our metadata is also stored in a CSV file. In this
-file, each row corresponds to a sample and each column contains some
+We a file in which we identify **information about the data** or
+**metadata**. Our metadata is also stored in a CSV file. In this file,
+each row corresponds to a sample and each column contains some
 information about each sample.
 
 The first column contains the row names, and **note that these are
@@ -697,27 +715,154 @@ quotations; in our case that is `mouse_exp_design.csv`***.
 > for gene names), you will want to make sure that
 > `stringsAsFactors = FALSE`.
 
-## Best practices
+### Create a data frame by reading in the file
 
-Before we move on to more complex concepts and getting familiar with the
-language, we want to point out a few things about best practices when
-working with R which will help you stay organized in the long run:
+At this point, please check the extension for the `mouse_exp_design`
+file within your `data` folder. You will have to type it accordingly
+within the `read.csv()` function.
 
--   Code and workflow are more reproducible if we can document
-    everything that we do. Our end goal is not just to "do stuff", but
-    to do it in a way that anyone can easily and exactly replicate our
-    workflow and results. **All code should be written in the script
-    editor and saved to file, rather than working in the console.**
--   The **R console** should be mainly used to inspect objects, test a
-    function or get help.
--   Use `#` signs to comment. **Comment liberally** in your R scripts.
-    This will help future you and other collaborators know what each
-    line of code (or code block) was meant to do. Anything to the right
-    of a `#` is ignored by R. *A shortcut for this is*
-    <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> if you want to comment
-    an entire chunk of text.
+> `read.csv` is not fussy about extensions for plain text files, so even
+> though the file we are reading in is a comma-separated value file, it
+> will be read in properly even with a `.txt` extension.
+
+Let's read in the `mouse_exp_design` file and create a new data frame
+called `metadata`.
+
+``` r
+metadata <- read.csv(file="mouse_exp_design.csv")
+```
+
+> **NOTE:** RStudio supports the automatic completion of code using the
+> <kbd>Tab</kbd> key. This is especially helpful for when reading in
+> files to ensure the correct file path. The tab completion feature also
+> provides a shortcut to listing objects, and inline help for functions.
+> **Tab completion is your friend!** We encourage you to use it whenever
+> possible.
+
+Go to your Global environment and click on the name of the data frame
+you just created. When you do this the metadata table will pop up on the
+top left hand corner of RStudio, right next to the R script.
+
+You should see a subtle coloring (blue-gray) of the first row and first
+column, the rest of the table will have a white background. This is
+because your first row and first columns have different properties than
+the rest of the table, they are the names of the rows and columns
+respectively.
+
+Earlier we noted that the file we just read in had column names (first
+row of values) and how `read.csv()` deals with "headers". In addition to
+column headers, `read.csv()` also assumes that the first column contains
+the row names.
+
+> Row names and column names are really handy when subsetting data
+> structures and they are also helpful to identify samples or genes. We
+> almost always use them with data frames.
+
+## Inspecting data structures
+
+There are a wide selection of base functions in R that are useful for
+inspecting your data and summarizing it. Let's use the `metadata` file
+that we created to test out data inspection functions.
+
+Take a look at the dataframe by typing out the variable name `metadata`
+and pressing return; the variable contains information describing the
+samples in our study. Each row holds information for a single sample,
+and the columns contain categorical information about the sample
+`genotype`(WT or KO), `celltype` (typeA or typeB), and
+`replicate number` (1,2, or 3).
+
+Suppose we had a larger file, we might not want to display all the
+contents in the console. Instead we could check the top (the first 6
+lines) of this `data.frame` using the function `head()`:
+
+``` r
+head(metadata)
+```
+
+### List of functions for data inspection
+
+Below is a non-exhaustive list of functions to get a sense of the
+content/structure of data. The list has been divided into functions that
+work on all types of objects, some that work only on vectors/factors (1
+dimensional objects), and others that work on data frames and matrices
+(2 dimensional objects).
+
+We have some exercises below that will allow you to gain more
+familiarity with these. You will definitely be using some of them in the
+next few homework sections.
+
+-   All data structures - content display:
+    -   **`str()`:** compact display of data contents (similar to what
+        you see in the Global environment)
+    -   **`class()`:** displays the data type for vectors (e.g.
+        character, numeric, etc.) and data structure for dataframes,
+        matrices, lists
+    -   **`summary()`:** detailed display of the contents of a given
+        object, including descriptive statistics, frequencies
+    -   **`head()`:** prints the first 6 entries (elements for 1-D
+        objects, rows for 2-D objects)
+    -   **`tail()`:** prints the last 6 entries (elements for 1-D
+        objects, rows for 2-D objects)
+-   Vector and factor variables:
+    -   **`length()`:** returns the number of elements in a vector or
+        factor
+-   Dataframe and matrix variables:
+    -   **`dim()`:** returns dimensions of the dataset (number_of_rows,
+        number_of_columns) [Note, row numbers will always be displayed
+        before column numbers in R]
+    -   **`nrow()`:** returns the number of rows in the dataset
+    -   **`ncol()`:** returns the number of columns in the dataset
+    -   **`rownames()`:** returns the row names in the dataset
+    -   **`colnames()`:** returns the column names in the dataset
+
+**Exercise**: For the next few minutes, try some of these commands on
+the `metadata` data frame.
 
 ------------------------------------------------------------------------
+
+## Closing your HPC on Demand Session
+
+1.  Make sure you have saved all relevant commands in the script you
+    have a created - for example, please make sure you copy down the
+    commands that you used to read in our files.
+2.  Go to File -\> Quit Session
+3.  Answer "Save" to "Save workspace..." question. This will allow you
+    to pick up right where you left off.
+4.  Once the window refreshes, you can "Close Project" to make sure
+    everything is saved.
+5.  Go back to the [HPC On
+    Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/) dashboard if
+    you closed that tab, and click "Cancel" to relinquish these
+    resources back to Biowulf.
+
+## Assignment: Set up for next week
+
+Using HPC on Demand and following the instructions above in the RStudio
+Project section, create another RStudio project:
+
+-   This RStudio project should also be created as a subdirectory of
+    `/data/Bspc-training/YOUR_USERNAME/rnaseq/`
+
+-   The project should be called `DEanalysis`
+
+-   Once you have set this up, copy the following files into the new
+    `DEanalysis` directory:
+
+    -   Count data:
+
+        ``` bash
+        /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mov10_AllSamples_featurecounts.Rmatrix.txt
+        ```
+
+    -   Experimental metadata:
+
+        ``` bash
+        /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mov10_AllSamples_metadata.txt
+        ```
+
+**To submit your assignment**: Message me a screenshot on Slack of your
+RStudio interface showing that you are in your new `DEanalysis`
+directory and that the two files are visible in your Files Pane.
 
 *This lesson has been developed by members of the teaching team at the
 [Harvard Chan Bioinformatics Core
