@@ -7,7 +7,7 @@ editor_options:
     wrap: 72
 ---
 
-Approximate time: 45 minutes
+Approximate time: 90 minutes
 
 ## Learning Objectives
 
