@@ -121,23 +121,24 @@ from a previous version of this workshop that was not on HPC on Demand.*
 2.  Go to the `File` menu and select `New Project`.
 3.  In the `New Project` window, choose `New Directory`. Then, choose
     `New Project`. Name your new directory `Intro-to-R` and then "Create
-    the project as subdirectory of:" the Desktop (or location of your
-    choice).
-4.  Click on `Create Project`.
-
-<p align="center">
-
-<img src="../img/Opening_Project.gif" width="900"/>
-
-</p>
-
-5.  After your project is completed, if the project does not
-    automatically open in RStudio, then go to the `File` menu, select
-    `Open Project`, and choose `Intro-to-R.Rproj`.
-6.  When RStudio opens, you will see three panels in the window.
-7.  Go to the `File` menu and select `New File`, and select `R Script`.
-8.  Go to the `File` menu and select `Save As...`, type `Intro-to-R.R`
-    and select `Save`
+    the project as subdirectory of:"
+4.  Click Browse, then click the three horizontal dots at the top-right
+    corner of the finder window window. You may be in a different
+    default location then this window, so don't worry. We will be fixing
+    this in the next step.
+5.  When the "Go To Folder" window pops up, enter the path to your
+    `/data/Bspc-training/username` directory, using your actual username
+6.  Select `rnaseq` from the list of directories and click "Choose".
+7.  Your "New Project Wizard" screen should now look like this - Click
+    on `Create Project`.
+8.  RStudio should reload with the project open, but if the project does
+    not automatically open in RStudio, then go to the `File` menu,
+    select `Open Project`, and choose `Intro-to-R.Rproj`.
+9.  When RStudio opens, you will see three panels in the window.
+10. Go to the `File` menu and select `New File`, and select `R Script`.
+11. Go to the `File` menu and select `Save As...`, type `Intro-to-R` and
+    select `Save` . R will automatically give the script the `.R` file
+    extension.
 
 <p align="center">
 
