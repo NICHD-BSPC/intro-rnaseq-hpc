@@ -332,7 +332,7 @@ run:
 
 ```         
 # Intro to R Lesson
-# Feb 16th, 2016
+# Feb 28th, 2025
 
 # Interacting with R
 
@@ -351,7 +351,7 @@ Alternatively, you can run by simply pressing the `Ctrl` and
 
 <p align="center">
 
-<img src="../img/Run_script_2.gif" width="700"/>
+<img src="../img/Run_script_2.gif" width="507"/>
 
 </p>
 
@@ -562,23 +562,40 @@ familiarize ourselves with the data.
 
 ### Adding files to your working directory
 
-You can access the files we need for this workshop using the links
-provided below. If you right click on the link, and "Save link as..".
-Choose `~/Desktop/Intro-to-R/data` as the destination of the file. You
-should now see the file appear in your working directory. **We will
-discuss these files a bit later in the lesson.**
+Since we are on Biowulf, we can simply copy our files into our diretory!
 
--   Download the **normalized counts file** by right clicking on [this
-    link](https://raw.githubusercontent.com/hbc/NGS_Data_Analysis_Course/master/sessionII/data/counts.rpkm.csv)
--   Download **metadata file** using [this
-    link](https://github.com/hbc/NGS_Data_Analysis_Course/raw/master/sessionII/data/mouse_exp_design.csv)
--   Download the **functional analysis output file** using [this
-    link](https://github.com/hbctraining/Training-modules/blob/master/Tidyverse_ggplot2/data/gprofiler_results_Mov10oe.csv?raw=true)
+1.  Move over to our Terminal tab (hiding next to the Console tab in the
+    bottom right corner window). This allows us to use a Bash-based
+    command line just like we do normally on Biowulf. It even sees if we
+    are on an interactive node!
 
-> *NOTE:* If the files download automatically to some other location on
-> your laptop, you can move them to the your working directory using
-> your file explorer or finder (outside RStudio), or navigating to the
-> files in the `Files` tab of the bottom right panel of RStudio
+    ![](images/rstudio_terminal_cp.png){width="400"}
+
+2.  You can `cp` as we have before, so go ahead and run the following
+    commands:
+
+    ``` bash
+    $ cp /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/counts.rpkm.csv .
+
+    $ cp /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mouse_exp_design.csv .
+    ```
+
+The files should appear in your Files Pane!
+
+![](images/new_files_in_pane.png){width="341"}
+
+If you were on your local computer using RStudio, you would do something
+like the following to get the data into your working directory:
+
+> -   Download the **practice counts file** by right clicking on [this
+>     link](https://raw.githubusercontent.com/hbc/NGS_Data_Analysis_Course/master/sessionII/data/counts.rpkm.csv)
+> -   Download **the practice metadata file** using [this
+>     link](https://github.com/hbc/NGS_Data_Analysis_Course/raw/master/sessionII/data/mouse_exp_design.csv)
+>
+> You can access the files we need for this workshop using the links
+> provided below. If you right click on the link, and "Save link as..".
+> Choose `~/Desktop/Intro-to-R/data` as the destination of the file. You
+> should now see the file appear in your working directory.
 
 ### The dataset
 
@@ -620,17 +637,9 @@ remaining columns?*
 R is particularly good at handling this type of **categorical data**.
 Rather than simply storing this information as text, the data is
 represented in a specific data structure which allows the user to sort
-and manipulate the data in a quick and efficient manner. We will discuss
-this in more detail as we go through the different lessons in R!
+and manipulate the data in a quick and efficient manner.
 
-### The functional analysis results
-
-We will be using the results of the functional analysis to learn about
-packages/functions from the [Tidyverse suite of integrated
-packages](https://www.tidyverse.org/packages/). These packages are
-designed to work together to make common data science operations like
-data wrangling, tidying, reading/writing, parsing, and visualizing, more
-user-friendly.
+## Reading in Data
 
 ## Best practices
 
