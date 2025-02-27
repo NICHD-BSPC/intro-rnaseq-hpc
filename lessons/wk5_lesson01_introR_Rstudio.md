@@ -84,7 +84,8 @@ your files on Biowulf.
 ready to connect your badge to your computer, in order to use HPC on
 Demand.**
 
-1.  Go to: <https://hpcondemand.nih.gov/pun/sys/dashboard/>
+1.  Go to: <https://hpcondemand.nih.gov/pun/sys/dashboard/>. You will be
+    asked to insert your badge and enter your PIN.
 
 2.  Click the **RStudio Server** button.
 
@@ -96,26 +97,25 @@ Demand.**
     -   6GB of allocated memory
     -   Allocated Scratch: 10 GB
     -   Leave the R Version as default
-    -   Starting directory: `/data/Bspc-training/$USER/rnaseq/` . This
-        will make sure we start in your home rnaseq workspace for this
-        course.
+    -   Starting directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq/`
+        . Note that you need to add your
 
 4.  Your job will queue, but within a few minutes, the page will update
     to give you these options:
 
-    ![](images/connect_to_rstudio_server.png){width="387"}
+    ![](images/rstudio_server_button.png){width="270"}
 
 5.  Go ahead and click on the big blue **Connect to RStudio Server**
     button! You will see an interface that looks generally like this:
 
-    ![RStudio
-    interface](../img/Rstudio_interface.png){alt="RStudio interface"
-    width="439"}
+    ![](../img/Rstudio_interface.png){alt="RStudio interface"
+    width="367"}
 
 ## Creating a new project directory in RStudio
 
 Let's create a new project directory for our "Introduction to R" lesson
-today.
+today. *Note that images may differ slightly from your own - they are
+from a previous version of this workshop that was not on HPC on Demand.*
 
 1.  Open RStudio
 2.  Go to the `File` menu and select `New Project`.
