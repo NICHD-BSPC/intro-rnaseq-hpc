@@ -324,12 +324,6 @@ Let's test it out:
 3 + 5
 ```
 
-<p align="center">
-
-<img src="../img/Console.png" width="400"/>
-
-</p>
-
 ### Script editor
 
 Best practice is to enter the commands in the **script editor**, and
@@ -510,11 +504,6 @@ You can also view information on the variable by looking in your
 `Environment` window in the upper right-hand corner of the RStudio
 interface.
 
-<p align="center">
-
-<img src="../img/Environment.png" width="300"/>
-
-</p>
 
 Now we can reference these buckets by name to perform mathematical
 operations on the values contained within. What do you get in the
