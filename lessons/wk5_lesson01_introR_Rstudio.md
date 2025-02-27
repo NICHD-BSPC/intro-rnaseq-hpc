@@ -16,6 +16,22 @@ Approximate time: 45 minutes
 -   Familiarize various components of RStudio.
 -   Employ variables in R.
 
+## What this lesson is NOT
+
+In this course we are NOT going to be giving a comprehensive
+introduction to all of the awesome things that R and RStudio can do.
+Rather, we are going to be learning just enough to accomplish our goal
+of differential expression analysis.
+
+If you do want to learn more, this lesson is taken from [a
+workshop](https://hbctraining.github.io/Intro-to-R-flipped/) from
+Harvard HPC, which is a extremely comprehensive. We hope to offer an
+NICHD version of this workshop in the near future!
+
+There is also a [BSPC training
+page](https://nichd-bspc.github.io/training/r.html) full of links to
+R-related learning resources.
+
 ## What is R?
 
 The common misconception is that R is a programming language but in fact
@@ -332,7 +348,7 @@ run:
 
 ```         
 # Intro to R Lesson
-# Feb 16th, 2016
+# Feb 28th, 2025
 
 # Interacting with R
 
@@ -351,7 +367,7 @@ Alternatively, you can run by simply pressing the `Ctrl` and
 
 <p align="center">
 
-<img src="../img/Run_script_2.gif" width="700"/>
+<img src="../img/Run_script_2.gif" width="507"/>
 
 </p>
 
@@ -553,85 +569,6 @@ suggestions you should keep in mind:
     and
     [Google's](http://web.stanford.edu/class/cs109l/unrestricted/resources/google-style.html).
 
-## Interacting with data in R
-
-R is commonly used for handling big data, and so it only makes sense
-that we learn about R in the context of some kind of relevant data.
-Let's take a few minutes to add files to the folders we created and
-familiarize ourselves with the data.
-
-### Adding files to your working directory
-
-You can access the files we need for this workshop using the links
-provided below. If you right click on the link, and "Save link as..".
-Choose `~/Desktop/Intro-to-R/data` as the destination of the file. You
-should now see the file appear in your working directory. **We will
-discuss these files a bit later in the lesson.**
-
--   Download the **normalized counts file** by right clicking on [this
-    link](https://raw.githubusercontent.com/hbc/NGS_Data_Analysis_Course/master/sessionII/data/counts.rpkm.csv)
--   Download **metadata file** using [this
-    link](https://github.com/hbc/NGS_Data_Analysis_Course/raw/master/sessionII/data/mouse_exp_design.csv)
--   Download the **functional analysis output file** using [this
-    link](https://github.com/hbctraining/Training-modules/blob/master/Tidyverse_ggplot2/data/gprofiler_results_Mov10oe.csv?raw=true)
-
-> *NOTE:* If the files download automatically to some other location on
-> your laptop, you can move them to the your working directory using
-> your file explorer or finder (outside RStudio), or navigating to the
-> files in the `Files` tab of the bottom right panel of RStudio
-
-### The dataset
-
-In this example dataset, we have collected whole brain samples from 12
-mice and want to evaluate expression differences between them. The
-expression data represents normalized count data obtained from
-RNA-sequencing of the 12 brain samples. This data is stored in a comma
-separated values (CSV) file as a 2-dimensional matrix, with **each row
-corresponding to a gene and each column corresponding to a sample**.
-
-<p align="center">
-
-<img src="../img/counts_view.png" width="900"/>
-
-</p>
-
-### The metadata
-
-We have another file in which we identify **information about the data**
-or **metadata**. Our metadata is also stored in a CSV file. In this
-file, each row corresponds to a sample and each column contains some
-information about each sample.
-
-The first column contains the row names, and **note that these are
-identical to the column names in our expression data file above**
-(albeit, in a slightly different order). The next few columns contain
-information about our samples that allow us to categorize them. For
-example, the second column contains genotype information for each
-sample. Each sample is classified in one of two categories: Wt (wild
-type) or KO (knockout). *What types of categories do you observe in the
-remaining columns?*
-
-<p align="center">
-
-<img src="../img/metadata_view.png" width="400"/>
-
-</p>
-
-R is particularly good at handling this type of **categorical data**.
-Rather than simply storing this information as text, the data is
-represented in a specific data structure which allows the user to sort
-and manipulate the data in a quick and efficient manner. We will discuss
-this in more detail as we go through the different lessons in R!
-
-### The functional analysis results
-
-We will be using the results of the functional analysis to learn about
-packages/functions from the [Tidyverse suite of integrated
-packages](https://www.tidyverse.org/packages/). These packages are
-designed to work together to make common data science operations like
-data wrangling, tidying, reading/writing, parsing, and visualizing, more
-user-friendly.
-
 ## Best practices
 
 Before we move on to more complex concepts and getting familiar with the
@@ -652,7 +589,280 @@ working with R which will help you stay organized in the long run:
     <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd> if you want to comment
     an entire chunk of text.
 
+## Interacting with data in R
+
+R is commonly used for handling big data, and so it only makes sense
+that we learn about R in the context of some kind of relevant data.
+Let's take a few minutes to add files to the folders we created and
+familiarize ourselves with the data.
+
+### Adding files to your working directory
+
+Since we are on Biowulf, we can simply copy our files into our
+directory!
+
+1.  Move over to our Terminal tab (hiding next to the Console tab in the
+    bottom right corner window). This allows us to use a Bash-based
+    command line just like we do normally on Biowulf. It even sees if we
+    are on an interactive node!
+
+    ![](images/rstudio_terminal_cp.png){width="400"}
+
+2.  You can `cp` as we have before, so go ahead and run the following
+    commands:
+
+    ``` bash
+    $ cp /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mouse_exp_design.csv .
+    ```
+
+The files should appear in your Files Pane!
+
+![](images/new_files_in_pane.png){width="341"}
+
+If you were on your local computer using RStudio, you would do something
+like the following to get the data into your working directory:
+
+> -   Download **the practice metadata file** using [this
+>     link](https://github.com/hbc/NGS_Data_Analysis_Course/raw/master/sessionII/data/mouse_exp_design.csv)
+>
+> You can access the files we need for this workshop using the links
+> provided below. If you right click on the link, and "Save link as..".
+> Choose `~/Desktop/Intro-to-R/data` as the destination of the file. You
+> should now see the file appear in your working directory.
+
+### The dataset: metadata
+
+We a file in which we identify **information about the data** or
+**metadata**. Our metadata is also stored in a CSV file. In this file,
+each row corresponds to a sample and each column contains some
+information about each sample.
+
+The first column contains the row names, and **note that these are
+identical to the column names in our expression data file above**
+(albeit, in a slightly different order). The next few columns contain
+information about our samples that allow us to categorize them. For
+example, the second column contains genotype information for each
+sample. Each sample is classified in one of two categories: Wt (wild
+type) or KO (knockout). *What types of categories do you observe in the
+remaining columns?*
+
+<p align="center">
+
+<img src="../img/metadata_view.png" width="291"/>
+
+</p>
+
+R is particularly good at handling this type of **categorical data**.
+Rather than simply storing this information as text, the data is
+represented in a specific data structure which allows the user to sort
+and manipulate the data in a quick and efficient manner.
+
+## Reading in Data
+
+So, now we have our files in our working directory! But...how do we get
+them into R?
+
+### The `read.csv()` function
+
+First, check the arguments for the function using the `?` to ensure that
+you are entering all the information appropriately:
+
+``` r
+?read.csv
+```
+
+The first thing you will notice is that you've pulled up the
+documentation for `read.table()`, this is because that is the parent
+function and all the other functions are in the same family.
+
+The next item on the documentation page is the function **Description**,
+which specifies that the output of this set of functions is going to be
+a **data frame** - "*Reads a file in table format and **creates a data
+frame from it**, with cases corresponding to lines and variables to
+fields in the file.*"
+
+In usage, all of the arguments listed for `read.table()` are the default
+values for all of the family members unless otherwise specified for a
+given function. Let's take a look at 2 examples:
+
+ 1. **The separator** -in the case of `read.table()` it is `sep = ""`
+(space or tab), whereas for `read.csv()` it is `sep = ","` (a comma).
+
+2\. **The `header`** - This argument refers to the column headers that
+may (`TRUE`) or may not (`FALSE`) exist **in the plain text file you are
+reading in**. In the case of `read.table()` it is `header = FALSE` (by
+default, it assumes you do not have column names) \* whereas for
+`read.csv()` it is `header = TRUE` (by default, it assumes that all your
+columns have names listed).
+
+***The take-home from the "Usage" section for `read.csv()` is that it
+has one mandatory argument, the path to the file and filename in
+quotations; in our case that is `mouse_exp_design.csv`***.
+
+> #### The `stringsAsFactors` argument
+>
+> Note that the `read.table {utils}` family of functions has an argument
+> called `stringsAsFactors`, which by default is set to FALSE (you can
+> double check this by searching the Help tab for `read.table` or
+> running `?read.table` in the console).
+>
+> If `stringsAsFactors = TRUE`, any function in this family of functions
+> will coerce `character` columns in the data you are reading in to
+> `factor` columns (i.e., coerce from `vector` to `factor`) in the
+> resulting data frame.
+>
+> If you want to maintain the `character vector` data structure (e.g.,
+> for gene names), you will want to make sure that
+> `stringsAsFactors = FALSE`.
+
+### Create a data frame by reading in the file
+
+At this point, please check the extension for the `mouse_exp_design`
+file within your `data` folder. You will have to type it accordingly
+within the `read.csv()` function.
+
+> `read.csv` is not fussy about extensions for plain text files, so even
+> though the file we are reading in is a comma-separated value file, it
+> will be read in properly even with a `.txt` extension.
+
+Let's read in the `mouse_exp_design` file and create a new data frame
+called `metadata`.
+
+``` r
+metadata <- read.csv(file="mouse_exp_design.csv")
+```
+
+> **NOTE:** RStudio supports the automatic completion of code using the
+> <kbd>Tab</kbd> key. This is especially helpful for when reading in
+> files to ensure the correct file path. The tab completion feature also
+> provides a shortcut to listing objects, and inline help for functions.
+> **Tab completion is your friend!** We encourage you to use it whenever
+> possible.
+
+Go to your Global environment and click on the name of the data frame
+you just created. When you do this the metadata table will pop up on the
+top left hand corner of RStudio, right next to the R script.
+
+You should see a subtle coloring (blue-gray) of the first row and first
+column, the rest of the table will have a white background. This is
+because your first row and first columns have different properties than
+the rest of the table, they are the names of the rows and columns
+respectively.
+
+Earlier we noted that the file we just read in had column names (first
+row of values) and how `read.csv()` deals with "headers". In addition to
+column headers, `read.csv()` also assumes that the first column contains
+the row names.
+
+> Row names and column names are really handy when subsetting data
+> structures and they are also helpful to identify samples or genes. We
+> almost always use them with data frames.
+
+## Inspecting data structures
+
+There are a wide selection of base functions in R that are useful for
+inspecting your data and summarizing it. Let's use the `metadata` file
+that we created to test out data inspection functions.
+
+Take a look at the dataframe by typing out the variable name `metadata`
+and pressing return; the variable contains information describing the
+samples in our study. Each row holds information for a single sample,
+and the columns contain categorical information about the sample
+`genotype`(WT or KO), `celltype` (typeA or typeB), and
+`replicate number` (1,2, or 3).
+
+Suppose we had a larger file, we might not want to display all the
+contents in the console. Instead we could check the top (the first 6
+lines) of this `data.frame` using the function `head()`:
+
+``` r
+head(metadata)
+```
+
+### List of functions for data inspection
+
+Below is a non-exhaustive list of functions to get a sense of the
+content/structure of data. The list has been divided into functions that
+work on all types of objects, some that work only on vectors/factors (1
+dimensional objects), and others that work on data frames and matrices
+(2 dimensional objects).
+
+We have some exercises below that will allow you to gain more
+familiarity with these. You will definitely be using some of them in the
+next few homework sections.
+
+-   All data structures - content display:
+    -   **`str()`:** compact display of data contents (similar to what
+        you see in the Global environment)
+    -   **`class()`:** displays the data type for vectors (e.g.
+        character, numeric, etc.) and data structure for dataframes,
+        matrices, lists
+    -   **`summary()`:** detailed display of the contents of a given
+        object, including descriptive statistics, frequencies
+    -   **`head()`:** prints the first 6 entries (elements for 1-D
+        objects, rows for 2-D objects)
+    -   **`tail()`:** prints the last 6 entries (elements for 1-D
+        objects, rows for 2-D objects)
+-   Vector and factor variables:
+    -   **`length()`:** returns the number of elements in a vector or
+        factor
+-   Dataframe and matrix variables:
+    -   **`dim()`:** returns dimensions of the dataset (number_of_rows,
+        number_of_columns) [Note, row numbers will always be displayed
+        before column numbers in R]
+    -   **`nrow()`:** returns the number of rows in the dataset
+    -   **`ncol()`:** returns the number of columns in the dataset
+    -   **`rownames()`:** returns the row names in the dataset
+    -   **`colnames()`:** returns the column names in the dataset
+
+**Exercise**: For the next few minutes, try some of these commands on
+the `metadata` data frame.
+
 ------------------------------------------------------------------------
+
+## Closing your HPC on Demand Session
+
+1.  Make sure you have saved all relevant commands in the script you
+    have a created - for example, please make sure you copy down the
+    commands that you used to read in our files.
+2.  Go to File -\> Quit Session
+3.  Answer "Save" to "Save workspace..." question. This will allow you
+    to pick up right where you left off.
+4.  Once the window refreshes, you can "Close Project" to make sure
+    everything is saved.
+5.  Go back to the [HPC On
+    Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/) dashboard if
+    you closed that tab, and click "Cancel" to relinquish these
+    resources back to Biowulf.
+
+## Assignment: Set up for next week
+
+Using HPC on Demand and following the instructions above in the RStudio
+Project section, create another RStudio project:
+
+-   This RStudio project should also be created as a subdirectory of
+    `/data/Bspc-training/YOUR_USERNAME/rnaseq/`
+
+-   The project should be called `DEanalysis`
+
+-   Once you have set this up, copy the following files into the new
+    `DEanalysis` directory:
+
+    -   Count data:
+
+        ``` bash
+        /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mov10_AllSamples_featurecounts.Rmatrix.txt
+        ```
+
+    -   Experimental metadata:
+
+        ``` bash
+        /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mov10_AllSamples_metadata.txt
+        ```
+
+**To submit your assignment**: Message me a screenshot on Slack of your
+RStudio interface showing that you are in your new `DEanalysis`
+directory and that the two files are visible in your Files Pane.
 
 *This lesson has been developed by members of the teaching team at the
 [Harvard Chan Bioinformatics Core
