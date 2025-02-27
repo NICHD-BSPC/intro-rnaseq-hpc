@@ -72,6 +72,46 @@ terminal.
 -   Platform agnostic
 -   Open source
 
+## Logging on to Biowulf's HPC On Demand
+
+HPC OnDemand provides convenient web interfaces to your interactive
+Biowulf applications, such as RStudio, IGV and Jupyter notebooks. Some
+of the major advantages of using HPC on Demand is that these apps will
+run on the computing power of Biowulf and you will have direct access to
+your files on Biowulf.
+
+**Please note that you will need to be on campus Wifi or VPN, and be
+ready to connect your badge to your computer, in order to use HPC on
+Demand.**
+
+1.  Go to: <https://hpcondemand.nih.gov/pun/sys/dashboard/>
+
+2.  Click the **RStudio Server** button.
+
+3.  Adjust values as needed. We will get in the habit of requesting a
+    little extra working memory for downstream analyses:
+
+    -   Pick a reasonable number of hours (2 for class, for example)
+    -   6 CPUS
+    -   6GB of allocated memory
+    -   Allocated Scratch: 10 GB
+    -   Leave the R Version as default
+    -   Starting directory: `/data/Bspc-training/$USER/rnaseq/` . This
+        will make sure we start in your home rnaseq workspace for this
+        course.
+
+4.  Your job will queue, but within a few minutes, the page will update
+    to give you these options:
+
+    ![](images/connect_to_rstudio_server.png){width="387"}
+
+5.  Go ahead and click on the big blue **Connect to RStudio Server**
+    button! You will see an interface that looks generally like this:
+
+    ![RStudio
+    interface](../img/Rstudio_interface.png){alt="RStudio interface"
+    width="439"}
+
 ## Creating a new project directory in RStudio
 
 Let's create a new project directory for our "Introduction to R" lesson
@@ -210,7 +250,7 @@ When finished, your working directory should look like:
 
 <p align="center">
 
-<img src="../img/Complete_wd_setup.png" width="400"/>
+<img src="../img/Complete_wd_setup.png" width="284"/>
 
 </p>
 
@@ -354,7 +394,7 @@ In addition to some of the shortcuts described earlier in this lesson,
 we have listed a few more that can be helpful as you work in RStudio.
 
 | key                                           | action                                                     |
-|------------------------------|-----------------------------------------|
+|-------------------------------|-----------------------------------------|
 | <kbd>Ctrl</kbd>+<kbd>Enter</kbd>              | Run command from script editor in console                  |
 | <kbd>ESC</kbd>                                | Escape the current command to return to the command prompt |
 | <kbd>Ctrl</kbd>+<kbd>1</kbd>                  | Move cursor from console to script editor                  |
