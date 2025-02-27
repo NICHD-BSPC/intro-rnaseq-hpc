@@ -630,7 +630,7 @@ remaining columns?*
 
 <p align="center">
 
-<img src="../img/metadata_view.png" width="400"/>
+<img src="../img/metadata_view.png" width="291"/>
 
 </p>
 
@@ -640,6 +640,62 @@ represented in a specific data structure which allows the user to sort
 and manipulate the data in a quick and efficient manner.
 
 ## Reading in Data
+
+So, now we have our files in our working directory! But...how do we get
+them into R?
+
+### The `read.csv()` function
+
+First, check the arguments for the function using the `?` to ensure that
+you are entering all the information appropriately:
+
+``` r
+?read.csv
+```
+
+The first thing you will notice is that you've pulled up the
+documentation for `read.table()`, this is because that is the parent
+function and all the other functions are in the same family.
+
+The next item on the documentation page is the function **Description**,
+which specifies that the output of this set of functions is going to be
+a **data frame** - "*Reads a file in table format and **creates a data
+frame from it**, with cases corresponding to lines and variables to
+fields in the file.*"
+
+In usage, all of the arguments listed for `read.table()` are the default
+values for all of the family members unless otherwise specified for a
+given function. Let's take a look at 2 examples:
+
+ 1. **The separator** -in the case of `read.table()` it is `sep = ""`
+(space or tab), whereas for `read.csv()` it is `sep = ","` (a comma).
+
+2\. **The `header`** - This argument refers to the column headers that
+may (`TRUE`) or may not (`FALSE`) exist **in the plain text file you are
+reading in**. In the case of `read.table()` it is `header = FALSE` (by
+default, it assumes you do not have column names) \* whereas for
+`read.csv()` it is `header = TRUE` (by default, it assumes that all your
+columns have names listed).
+
+***The take-home from the "Usage" section for `read.csv()` is that it
+has one mandatory argument, the path to the file and filename in
+quotations; in our case that is `mouse_exp_design.csv`***.
+
+> #### The `stringsAsFactors` argument
+>
+> Note that the `read.table {utils}` family of functions has an argument
+> called `stringsAsFactors`, which by default is set to FALSE (you can
+> double check this by searching the Help tab for `read.table` or
+> running `?read.table` in the console).
+>
+> If `stringsAsFactors = TRUE`, any function in this family of functions
+> will coerce `character` columns in the data you are reading in to
+> `factor` columns (i.e., coerce from `vector` to `factor`) in the
+> resulting data frame.
+>
+> If you want to maintain the `character vector` data structure (e.g.,
+> for gene names), you will want to make sure that
+> `stringsAsFactors = FALSE`.
 
 ## Best practices
 
