@@ -118,19 +118,36 @@ today. *Note that images may differ slightly from your own - they are
 from a previous version of this workshop that was not on HPC on Demand.*
 
 1.  Open RStudio
+
 2.  Go to the `File` menu and select `New Project`.
+
 3.  In the `New Project` window, choose `New Directory`. Then, choose
     `New Project`. Name your new directory `Intro-to-R` and then "Create
     the project as subdirectory of:"
+
+    ![](images/choose_directory_name.png){width="354"}
+
 4.  Click Browse, then click the three horizontal dots at the top-right
     corner of the finder window window. You may be in a different
     default location then this window, so don't worry. We will be fixing
     this in the next step.
+
+    ![](images/browse_other_directories.png){width="429"}
+
 5.  When the "Go To Folder" window pops up, enter the path to your
     `/data/Bspc-training/username` directory, using your actual username
+
+    ![](images/enter_correct_directory_rstudio.png){width="349"}
+
 6.  Select `rnaseq` from the list of directories and click "Choose".
+
+![](images/choose_rnaseq_directory_rstudio.png){width="331"}
+
 7.  Your "New Project Wizard" screen should now look like this - Click
     on `Create Project`.
+
+![](images/complete_rstudio_project_wizard.png){width="281"}
+
 8.  RStudio should reload with the project open, but if the project does
     not automatically open in RStudio, then go to the `File` menu,
     select `Open Project`, and choose `Intro-to-R.Rproj`.
@@ -148,7 +165,7 @@ from a previous version of this workshop that was not on HPC on Demand.*
 
 The RStudio interface should now look like the screenshot below.
 
-![RStudio interface](../img/Rstudio_interface.png)
+![RStudio interface](../img/Rstudio_interface.png){width="412"}
 
 ### What is a project in RStudio?
 
@@ -214,7 +231,7 @@ from the **Files/Plots/Packages/Help** window.
 
 <p align="center">
 
-<img src="../img/Get_wd.png" width="400"/>
+<img src="../img/Get_wd.png" width="318"/>
 
 </p>
 
