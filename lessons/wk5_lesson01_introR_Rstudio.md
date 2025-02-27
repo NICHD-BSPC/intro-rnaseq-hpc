@@ -118,11 +118,12 @@ Demand.**
 
 4.  Your job will queue, but within a few minutes, the page will update
     to give you these options:
+    
+    <img src="../img/rstudio_server_button.png" alt="button to launch studio when server is ready" width="400"/>
 
-    ![](images/rstudio_server_button.png){width="270"}
-
-5.  Go ahead and click on the big blue **Connect to RStudio Server**
+6.  Go ahead and click on the big blue **Connect to RStudio Server**
     button! You will see an interface that looks generally like this:
+
 
     ![](../img/Rstudio_interface.png){alt="RStudio interface"
     width="367"}
@@ -141,28 +142,26 @@ from a previous version of this workshop that was not on HPC on Demand.*
     `New Project`. Name your new directory `Intro-to-R` and then "Create
     the project as subdirectory of:"
 
-    ![](images/choose_directory_name.png){width="354"}
+     <img src="../img/choose_directory_name.png" alt="choosing directory for new RStudio project" width="400"/>
 
-4.  Click Browse, then click the three horizontal dots at the top-right
+5.  Click Browse, then click the three horizontal dots at the top-right
     corner of the finder window window. You may be in a different
     default location then this window, so don't worry. We will be fixing
     this in the next step.
 
-    ![](images/browse_other_directories.png){width="429"}
+    <img src="../img/browse_other_directories.png" alt="browse other directorie for project" width="400"/>
 
-5.  When the "Go To Folder" window pops up, enter the path to your
+6.  When the "Go To Folder" window pops up, enter the path to your
     `/data/Bspc-training/username` directory, using your actual username
 
-    ![](images/enter_correct_directory_rstudio.png){width="349"}
+8.  Select `rnaseq` from the list of directories and click "Choose".
 
-6.  Select `rnaseq` from the list of directories and click "Choose".
-
-![](images/choose_rnaseq_directory_rstudio.png){width="331"}
+    <img src="../img/choose_rnaseq_directory_rstudio.png" alt="choose your rnaseq directory" width="400"/>
 
 7.  Your "New Project Wizard" screen should now look like this - Click
     on `Create Project`.
 
-![](images/complete_rstudio_project_wizard.png){width="281"}
+<img src="../img/complete_rstudio_project_wizard.png" alt="completed RStudio project wizard window" width="400"/>
 
 8.  RStudio should reload with the project open, but if the project does
     not automatically open in RStudio, then go to the `File` menu,
@@ -178,10 +177,6 @@ from a previous version of this workshop that was not on HPC on Demand.*
 <img src="../img/Opening_RScript.gif" width="900"/>
 
 </p>
-
-The RStudio interface should now look like the screenshot below.
-
-![RStudio interface](../img/Rstudio_interface.png){width="412"}
 
 ### What is a project in RStudio?
 
@@ -595,9 +590,9 @@ directory!
     command line just like we do normally on Biowulf. It even sees if we
     are on an interactive node!
 
-    ![](images/rstudio_terminal_cp.png){width="400"}
+    <img src="../img/rstudio_terminal_cp.png" alt="example of copy command in Rstudio terminal" width="400"/>
 
-2.  You can `cp` as we have before, so go ahead and run the following
+3.  You can `cp` as we have before, so go ahead and run the following
     commands:
 
     ``` bash
@@ -606,7 +601,7 @@ directory!
 
 The files should appear in your Files Pane!
 
-![](images/new_files_in_pane.png){width="341"}
+  <img src="../img/new_files_in_pane.png" alt="new files in files pane" width="400"/>
 
 If you were on your local computer using RStudio, you would do something
 like the following to get the data into your working directory:
@@ -833,9 +828,9 @@ Project section, create another RStudio project:
     `/data/Bspc-training/YOUR_USERNAME/rnaseq/`
 
 -   The project should be called `DEanalysis`
-
+-   Create `data/`, `results/` and a `figures` directory within your main project directory. 
 -   Once you have set this up, copy the following files into the new
-    `DEanalysis` directory:
+    `DEanalysis` directory, in the `data/` directory:
 
     -   Count data:
 
