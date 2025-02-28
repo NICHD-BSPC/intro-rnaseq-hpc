@@ -6,12 +6,6 @@ date: "October 18, 2019"
 edited date: "November 13th, 2024"
 ---
 
-------------------------------------------------------------------------
-
-[Previous Lesson](02_DGE_count_normalization.md)
-
-------------------------------------------------------------------------
-
 Approximate time: 80 minutes
 
 ## Learning Objectives
@@ -27,7 +21,7 @@ The next step in the DESeq2 workflow is QC, which includes sample-level and gene
 
 <p align="center">
 
-<img src="../img/de_workflow_salmon_qc.png" width="400"/>
+![](images/deseq_workflow_normalization_2018.png){width="398"}
 
 </p>
 
@@ -295,13 +289,5 @@ Overall, we observe pretty high correlations across the board ( \> 0.999) sugges
 **Exercise:**
 
 -   Modify three aspects of your heatmap and share with the class!
-
-------------------------------------------------------------------------
-
-[Next Lesson](04a_design_formulas.md)
-
-------------------------------------------------------------------------
-
-------------------------------------------------------------------------
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
