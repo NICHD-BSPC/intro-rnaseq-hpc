@@ -1,8 +1,7 @@
 ---
 title: "Hypothesis testing and multiple testing"
-author: "Meeta Mistry, Radhika Khetani, Mary Piper"
-edited: "Sally Chang at NICHD: November 14th, 2024"
-date: "June 2nd, 2020"
+author: "Harvard HPC Staff, Adapted by Sally Chang @ NICHD"
+date: "Last Modified February 2025""
 ---
 
 Approximate time: 60 minutes
