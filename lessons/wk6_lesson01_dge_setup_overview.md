@@ -67,29 +67,44 @@ Before we get into the details of the analysis, let's start by:
 
 -   Now save the file as `de_script.R`.
 
-## Loading libraries
+## Loading and Installing libraries
 
 For this analysis we will be using several R packages, some which have been installed from CRAN and others from Bioconductor. To use these packages (and the functions contained within them), we need to **load the libraries.** Add the following to your script and don't forget to comment liberally!
 
+Note that these package names are all case sensitive, and you can load packages interactively in the **Packages** tab of our Files Pane window.
+
 ``` r
 ## Setup
-### Bioconductor and CRAN libraries used
+### Bioconductor and CRAN libraries used - already installed on Biowulf 
 library(tidyverse)
 library(RColorBrewer)
 library(DESeq2)
 library(pheatmap)
+```
+
+On the other hand, there is one package, `DEGreport`, that is likely not installed for you here. To install it, load `BiocManager` (part of BioConductor), then run BiocManager's `install()` function for the only package not already installed by default in our interactive RStudio session:
+
+``` r
+# You don't need to add this to your script
+library(BiocManager)
+install("DEGreport")
+```
+
+Then, use `library` again to load the package we just installed:
+
+``` r
 library(DEGreport)
 ```
 
-### Loading data
+## Loading data
 
 To load the data into our current environment, we will be using the `read.table` function. We need to provide the path to each file and also specify arguments to let R know that we have a header (`header = T`) and the first column is our row names (`row.names =1`). By default the function expects tab-delimited files, which is what we have.
 
 ``` r
 ## Load in data
-data <- read.table("data/Mov10_full_counts.txt", header=T, row.names=1) 
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1) 
 
-meta <- read.table("meta/Mov10_full_meta.txt", header=T, row.names=1)
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
 ```
 
 Use `class()` to inspect our data and make sure we are working with data frames:
@@ -99,6 +114,8 @@ Use `class()` to inspect our data and make sure we are working with data frames:
 class(meta)
 class(data)
 ```
+
+**Exercise**: What are some other commands we can do to make sure `meta` and `data` are the expected structure and dimensions?
 
 ### Viewing data
 
