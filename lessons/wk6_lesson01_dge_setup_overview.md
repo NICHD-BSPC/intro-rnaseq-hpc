@@ -67,29 +67,44 @@ Before we get into the details of the analysis, let's start by:
 
 -   Now save the file as `de_script.R`.
 
-## Loading libraries
+## Loading and Installing libraries
 
 For this analysis we will be using several R packages, some which have been installed from CRAN and others from Bioconductor. To use these packages (and the functions contained within them), we need to **load the libraries.** Add the following to your script and don't forget to comment liberally!
 
+Note that these package names are all case sensitive, and you can load packages interactively in the **Packages** tab of our Files Pane window.
+
 ``` r
 ## Setup
-### Bioconductor and CRAN libraries used
+### Bioconductor and CRAN libraries used - already installed on Biowulf 
 library(tidyverse)
 library(RColorBrewer)
 library(DESeq2)
 library(pheatmap)
+```
+
+On the other hand, there is one package, `DEGreport`, that is likely not installed for you here. To install it, load `BiocManager` (part of BioConductor), then run BiocManager's `install()` function for the only package not already installed by default in our interactive RStudio session:
+
+``` r
+# You don't need to add this to your script
+library(BiocManager)
+install("DEGreport")
+```
+
+Then, use `library` again to load the package we just installed:
+
+``` r
 library(DEGreport)
 ```
 
-### Loading data
+## Loading data
 
 To load the data into our current environment, we will be using the `read.table` function. We need to provide the path to each file and also specify arguments to let R know that we have a header (`header = T`) and the first column is our row names (`row.names =1`). By default the function expects tab-delimited files, which is what we have.
 
 ``` r
 ## Load in data
-data <- read.table("data/Mov10_full_counts.txt", header=T, row.names=1) 
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1) 
 
-meta <- read.table("meta/Mov10_full_meta.txt", header=T, row.names=1)
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
 ```
 
 Use `class()` to inspect our data and make sure we are working with data frames:
@@ -99,6 +114,8 @@ Use `class()` to inspect our data and make sure we are working with data frames:
 class(meta)
 class(data)
 ```
+
+**Exercise**: What are some other commands we can do to make sure `meta` and `data` are the expected structure and dimensions?
 
 ### Viewing data
 
@@ -117,7 +134,7 @@ So what does this count data actually represent? The count data used for differe
 
 With differential expression analysis, we are looking for genes that change in expression between two or more groups (defined in the metadata) - case vs. control - correlation of expression with some variable or clinical outcome
 
-**Why does it not work to identify differentially expressed gene by ranking the genes by how different they are between the two groups (based on fold change values)?**
+**Why does it not work to identify differentially expressed genes simply by ranking the genes by how different they are between the two groups (based on fold change values)?**
 
 <img src="../img/foldchange_heatmap.png" width="200"/>
 
@@ -133,7 +150,9 @@ The goal of differential expression analysis is to determine, for each gene, whe
 
 ### RNA-seq count distribution
 
-To determine the appropriate statistical model, we need information about the distribution of counts. To get an idea about how RNA-seq counts are distributed, let's plot the counts for a single sample, 'Mov10_oe_1':
+To determine the appropriate statistical model, we need information about the distribution of counts. To get an idea about how RNA-seq counts are distributed, let's plot the counts for a single sample, 'Mov10_oe_1'. To do so, we are going to be using a REALLY useful visualization package called `ggplot2` (landing page for [ggplot2](https://ggplot2.tidyverse.org/)).
+
+**Discussion**: Although we aren't going to talk about ggplot commands *in depth* in this course, you can probably figure out what some parts of this command are doing. What is `x = Mov10_oe_1` doing? What about `xlab` and `ylab`?
 
 ``` r
 ggplot(data) +
@@ -142,7 +161,7 @@ ggplot(data) +
   ylab("Number of genes")
 ```
 
-<img src="../img/deseq_counts_distribution.png" width="400"/>
+![](images/raw_expression_counts.png)
 
 If we zoom in close to zero, we can see a large number of genes with counts of zero:
 
@@ -154,7 +173,7 @@ ggplot(data) +
    ylab("Number of genes")
 ```
 
-<img src="../img/deseq_counts_distribution_zoomed.png" width="400"/>
+![](images/zoomed_expression_counts.png)
 
 These images illustrate some common features of RNA-seq count data, including a **low number of counts associated with a large proportion of genes**, and a long right tail due to the **lack of any upper limit for expression**. Unlike microarray data, which has a dynamic range maximum limited due to when the probes max out, there is no limit of maximum expression for RNA-seq data. Due to the differences in these technologies, the statistical models used to fit the data are different between the two methods.
 
@@ -185,7 +204,7 @@ The model that fits best, given this type of variability between replicates, is 
 
 #### How do I know if my data should be modeled using the Poisson distribution or Negative Binomial distribution?
 
-If it's count data, it should fit the negative binomial, as discussed previously. However, it can be helpful to plot the *mean versus the variance* of your data. *Remember for the Poisson model, mean = variance, but for NB, mean \< variance.*
+If it is count data, it should fit the negative binomial, as discussed previously. However, it can be helpful to plot the *mean versus the variance* of your data. *Remember for the Poisson model, mean = variance, but for NB, mean \< variance.*
 
 Run the following code to plot the *mean versus variance* for the 'Mov10 overexpression' replicates:
 
@@ -201,7 +220,7 @@ ggplot(df) +
         scale_x_log10()
 ```
 
-<img src="../img/deseq_mean_vs_variance.png" width="600"/>
+![](images/mean_versus_variance.png)
 
 Note that in the above figure, the variance across replicates tends to be greater than the mean (red line), especially for genes with large mean expression levels. *This is a good indication that our data do not fit the Poisson distribution and we need to account for this increase in variance using the Negative Binomial model (i.e. Poisson will underestimate variability leading to an increase in false positive DE genes).*
 
@@ -221,9 +240,7 @@ To model counts appropriately when performing a differential expression analysis
 
 Many studies describing comparisons between these methods show that while there is some agreement, there is also much variability between tools. **Additionally, there is no one method that performs optimally under all conditions ([Soneson and Dleorenzi, 2013](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-91)).**
 
-![deg1](../img/deg_methods1.png)
-
-![deg1](../img/deg_methods2.png)
+![](../img/deg_methods1.png)
 
 **We will be using [DESeq2](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) for the DE analysis, and the analysis steps with DESeq2 are shown in the flowchart below in green**. DESeq2 first normalizes the count data to account for differences in library sizes and RNA composition between samples. Then, we will use the normalized counts to make some plots for QC at the gene and sample level. The final step is to use the appropriate functions from the DESeq2 package to perform the differential expression analysis.
 
@@ -236,6 +253,10 @@ vignette("DESeq2")
 ```
 
 This is very convenient, as it provides a wealth of information at your fingertips! Be sure to use this as you need during the workshop.
+
+## Assignment
+
+Create another R script (also saved to this `DEanalysis` directory) where you modify the three plots we made for the `Mov10_oe_1` samples to look a the count distribution for the sample `Irrel_kd_3`. Save these images to `figures/` as PNG files.
 
 ------------------------------------------------------------------------
 
