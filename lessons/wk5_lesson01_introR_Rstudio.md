@@ -279,7 +279,7 @@ When finished, your working directory should look like:
 
 <p align="center">
 
-<img src="../img/Complete_wd_setup.png" width="284"/>
+<img src="../img/complete_wd_setup.png" width="284"/>
 
 </p>
 
