@@ -134,7 +134,7 @@ So what does this count data actually represent? The count data used for differe
 
 With differential expression analysis, we are looking for genes that change in expression between two or more groups (defined in the metadata) - case vs. control - correlation of expression with some variable or clinical outcome
 
-**Why does it not work to identify differentially expressed gene by ranking the genes by how different they are between the two groups (based on fold change values)?**
+**Why does it not work to identify differentially expressed genes simply by ranking the genes by how different they are between the two groups (based on fold change values)?**
 
 <img src="../img/foldchange_heatmap.png" width="200"/>
 
@@ -150,7 +150,9 @@ The goal of differential expression analysis is to determine, for each gene, whe
 
 ### RNA-seq count distribution
 
-To determine the appropriate statistical model, we need information about the distribution of counts. To get an idea about how RNA-seq counts are distributed, let's plot the counts for a single sample, 'Mov10_oe_1':
+To determine the appropriate statistical model, we need information about the distribution of counts. To get an idea about how RNA-seq counts are distributed, let's plot the counts for a single sample, 'Mov10_oe_1'. To do so, we are going to be using a REALLY useful visualization package called `ggplot2` (landing page for [ggplot2](https://ggplot2.tidyverse.org/)).
+
+**Discussion**: Although we aren't going to talk about ggplot commands *in depth* in this course, you can probably figure out what some parts of this command are doing. What is `x = Mov10_oe_1` doing? What about `xlab` and `ylab`?
 
 ``` r
 ggplot(data) +
@@ -202,7 +204,7 @@ The model that fits best, given this type of variability between replicates, is 
 
 #### How do I know if my data should be modeled using the Poisson distribution or Negative Binomial distribution?
 
-If it's count data, it should fit the negative binomial, as discussed previously. However, it can be helpful to plot the *mean versus the variance* of your data. *Remember for the Poisson model, mean = variance, but for NB, mean \< variance.*
+If it is count data, it should fit the negative binomial, as discussed previously. However, it can be helpful to plot the *mean versus the variance* of your data. *Remember for the Poisson model, mean = variance, but for NB, mean \< variance.*
 
 Run the following code to plot the *mean versus variance* for the 'Mov10 overexpression' replicates:
 
