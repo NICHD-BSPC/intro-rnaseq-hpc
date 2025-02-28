@@ -49,11 +49,7 @@ The authors are investigating interactions between various genes involved in Fra
 
 ## Setting up
 
-Before we get into the details of the analysis, let's get started by opening up RStudio and setting up a new project for this analysis.
-
-1.  Go to the `File` menu and select `New Project`.
-2.  In the `New Project` window, choose `New Directory`. Then, choose `Empty Project`. Name your new directory `DEanalysis` and then "Create the project as subdirectory of:" the Desktop (or location of your choice).
-3.  The new project should automatically open in RStudio.
+Before we get into the details of the analysis, let's get started by opening up RStudio using HPC on Demand and
 
 To check whether or not you are in the correct working directory, use `getwd()`. The path `Desktop/DEanalysis` should be returned to you in the console. Within your working directory use the `New folder` button in the bottom right panel to create three new directories: `data`, `meta` and `results`. Remember the key to a good analysis is keeping organized from the start!
 
@@ -72,7 +68,7 @@ Finally, we need to grab the files that we will be working with for the analysis
 -   Save the [full counts matrix](https://raw.githubusercontent.com/hbc/NGS_Data_Analysis_Course/master/sessionIII/data/Mov10_full_counts.txt) file in the `data` directory.
 -   Save the [full metadata table](https://raw.githubusercontent.com/hbc/NGS_Data_Analysis_Course/master/sessionIII/data/Mov10_full_meta.txt) file in the `meta` directory.
 
-### Loading libraries
+## Loading libraries
 
 For this analysis we will be using several R packages, some which have been installed from CRAN and others from Bioconductor. To use these packages (and the functions contained within them), we need to **load the libraries.** Add the following to your script and don't forget to comment liberally!
 
