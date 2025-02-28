@@ -161,7 +161,7 @@ ggplot(data) +
   ylab("Number of genes")
 ```
 
-<img src="../img/deseq_counts_distribution.png" width="400"/>
+![](images/raw_expression_counts.png)
 
 If we zoom in close to zero, we can see a large number of genes with counts of zero:
 
@@ -240,9 +240,7 @@ To model counts appropriately when performing a differential expression analysis
 
 Many studies describing comparisons between these methods show that while there is some agreement, there is also much variability between tools. **Additionally, there is no one method that performs optimally under all conditions ([Soneson and Dleorenzi, 2013](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-91)).**
 
-![deg1](../img/deg_methods1.png)
-
-![deg1](../img/deg_methods2.png)
+![](../img/deg_methods1.png)
 
 **We will be using [DESeq2](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) for the DE analysis, and the analysis steps with DESeq2 are shown in the flowchart below in green**. DESeq2 first normalizes the count data to account for differences in library sizes and RNA composition between samples. Then, we will use the normalized counts to make some plots for QC at the gene and sample level. The final step is to use the appropriate functions from the DESeq2 package to perform the differential expression analysis.
 
@@ -255,6 +253,10 @@ vignette("DESeq2")
 ```
 
 This is very convenient, as it provides a wealth of information at your fingertips! Be sure to use this as you need during the workshop.
+
+## Assignment
+
+Create another R script (also saved to this `DEanalysis` directory) where you modify the three plots we made for the `Mov10_oe_1` samples to look a the count distribution for the sample `Irrel_kd_3`. Save these images to `figures/` as PNG files.
 
 ------------------------------------------------------------------------
 
