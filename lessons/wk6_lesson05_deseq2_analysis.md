@@ -33,7 +33,7 @@ We completed the entire workflow for the differential gene expression analysis w
 
 <p align="center">
 
-<img src="../img/deseq2_workflow_separate.png" width="500"/>
+![](images/deseq2_workflow_separate_2018.png)
 
 </p>
 

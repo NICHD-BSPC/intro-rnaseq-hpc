@@ -1,9 +1,7 @@
 ---
 title: "Gene-level differential expression analysis with DESeq2"
-author: "Meeta Mistry, Radhika Khetani, Mary Piper"
-edited: "Sally Chang at NICHD"
-date: "Wednesday, May 27th, 2020"
-edited date: "November 14th, 2024"
+author: "Harvard HPC Staff, Adapted by Sally Chang @ NICHD"
+Last Edited: February 2025
 ---
 
 Approximate time: 30 minutes
@@ -29,7 +27,7 @@ Differential expression analysis with DESeq2 involves multiple steps as displaye
 
 <p align="center">
 
-<img src="../img/de_workflow_salmon_deseq1.png" width="500"/>
+![](images/deseq_workflow1.png)
 
 </p>
 
