@@ -1,9 +1,7 @@
 ---
 title: "QC methods for DE analysis using DESeq2"
-author: "Meeta Mistry, Radhika Khetani, Mary Piper"
-edited: "Sally Chang at NICHD"
-date: "October 18, 2019"
-edited date: "November 13th, 2024"
+author: "Harvard HPC Staff, adapted by Sally Chang at NICHD"
+date: "Last modified March 2025"
 ---
 
 Approximate time: 80 minutes
@@ -61,9 +59,11 @@ These unsupervised clustering methods are run using **log2 transformed normalize
 
 Principal Component Analysis (PCA) is a technique used to emphasize variation and bring out strong patterns in a dataset (dimensionality reduction). This is a very important technique used in the QC and analysis of both bulk and single-cell RNAseq data.
 
-To better understand how it works, **please go through [this YouTube video from StatQuest](https://www.youtube.com/watch?v=_UVHneBUBW0) that explains PCA**. Alternatively, we have **prepared a [PCA lesson](principal_component_analysis.md)**. After you have gone through the material, please proceed with the interpretation section below.
+To better understand how it works you can go through **[this YouTube video from StatQuest](https://www.youtube.com/watch?v=_UVHneBUBW0) that explains PCA, or a Harvard HPC lesson on [PCA.](https://github.com/hbctraining/Intro-to-DGE/blob/master/lessons/principal_component_analysis.md)**
 
-------------------------------------------------------------------------
+To quote from the [Wikipedia entry on PCA](https://en.wikipedia.org/wiki/Principal_component_analysis):
+
+> The data is [linearly transformed](https://en.wikipedia.org/wiki/Linear_map "Linear map") onto a new [coordinate system](https://en.wikipedia.org/wiki/Coordinate_system "Coordinate system") such that the directions (principal components) capturing the largest variation in the data (in our case, gene expression values) can be easily identified.
 
 ------------------------------------------------------------------------
 
@@ -124,10 +124,6 @@ It's great that we have been able to identify the sources of variation for both 
 Worrisome about this plot is that we see two samples that do not cluster with the correct strain. This would indicate a likely **sample swap** and should be investigated to determine whether these samples are indeed the labeled strains. If we found there was a switch, we could swap the samples in the metadata. However, if we think they are labeled correctly or are unsure, we could just remove the samples from the dataset.
 
 Still we haven't found if `treatment` is a major source of variation after `strain` and `sex`. So, we explore PC3 and PC4 to see if `treatment` is driving the variation represented by either of these PCs.
-
-``` r
-# Code block for customizing plot to visualize PC3 and PC4 instead
-```
 
 <p align="center">
 
@@ -191,7 +187,7 @@ plotPCA(rld, intgroup="sampletype")
 
 <p align="center">
 
-<img src="../img/PCA_salmon.png" width="650"/>
+![](images/mov10_pca.png)
 
 </p>
 
@@ -259,7 +255,7 @@ You will notice that they match the names we have given our samples in the metad
 Let's plot the heatmap!
 
 ``` r
-### Load pheatmap package
+### Load pheatmap package - it might already be loaded from the last lesson. 
 library(pheatmap)
 
 ### Plot heatmap using the correlation matrix and the metadata object
@@ -270,7 +266,7 @@ When you plot using `pheatmap()` the hierarchical clustering information is used
 
 <p align="center">
 
-<img src="../img/pheatmap_salmon.png" width="650"/>
+![](images/mov10_default_heatmap.png)
 
 </p>
 
@@ -286,8 +282,10 @@ Overall, we observe pretty high correlations across the board ( \> 0.999) sugges
 >
 > Curious about all of the available [color palettes offered by the RColorBrewer package](http://www.r-graph-gallery.com/38-rcolorbrewers-palettes/)? Try typing in your console `display.brewer.all()` and see what happens!
 
-**Exercise:**
+**Discussion**: What other variables would you have collected info for and added to our metadata to look for batch (and other off-target) effects?
 
--   Modify three aspects of your heatmap and share with the class!
+## **ASSIGNMENT:**
+
+-   Modify three aspects of your heatmap and send me a screenshot and the code snippet that you used to create the plot.
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
