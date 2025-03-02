@@ -187,7 +187,7 @@ plotPCA(rld, intgroup="sampletype")
 
 <p align="center">
 
-<img src="../img/PCA_salmon.png" width="650"/>
+![](images/mov10_pca.png)
 
 </p>
 
@@ -266,7 +266,7 @@ When you plot using `pheatmap()` the hierarchical clustering information is used
 
 <p align="center">
 
-<img src="../img/pheatmap_salmon.png" width="650"/>
+![](images/mov10_default_heatmap.png)
 
 </p>
 
