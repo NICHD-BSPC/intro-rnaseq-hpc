@@ -1,7 +1,7 @@
 ---
 title: "Count normalization with DESeq2"
-author: "Meeta Mistry, Radhika Khetani, Mary Piper"
-date: "April 26, 2017"
+author: "Harvard HPC Staff, Adapted by Sally Chang @ NICHD"
+date: "Last Modified March 2025"
 ---
 
 Approximate time: 60 minutes
