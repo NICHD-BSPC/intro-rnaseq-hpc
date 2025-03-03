@@ -41,11 +41,14 @@ The authors are investigating interactions between various genes involved in Fra
 
 > **MOV10**, is a putative RNA helicase that is also associated with **FMRP** in the context of the microRNA pathway.
 
-**The hypothesis [the paper](http://www.ncbi.nlm.nih.gov/pubmed/25464849) is testing is that FMRP and MOV10 associate and regulate the translation of a subset of RNAs.**
+The hypothesis [the paper](http://www.ncbi.nlm.nih.gov/pubmed/25464849) is testing is that FMRP and MOV10 associate with and participate in miRNA-mediated regulation of the translation of a subset of RNAs. One part of the study identified mRNAs bound to MOV10; the RNA-seq part we are working with here explores the effect of knockdown or overexpression of MOV10 on steady-state mRNA as a result of this miRNA-mediated regulation.
 
 <img src="../img/mov10-model.png" width="400"/>
 
-**Our questions:** \* What patterns of expression can we identify with the loss or gain of MOV10? \* Are there any genes shared between the two conditions?
+**Our questions:**
+
+* What patterns of expression can we identify with the loss or gain of MOV10?
+* Are there any genes shared between the two conditions?
 
 ## Setting up
 
@@ -53,7 +56,7 @@ The authors are investigating interactions between various genes involved in Fra
 
 Before we get into the details of the analysis, let's start by:
 
--    Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
+-   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
 
 -   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
 
@@ -61,8 +64,8 @@ Before we get into the details of the analysis, let's start by:
 
 -   Go to the `File` menu and select `New File`, then select `R Script`. This should open up a script editor in the top left hand corner. This is where we will be typing and saving all commands required for this analysis. In the script editor type in header lines:
 
-```         
-## Gene-level differential expression analysis using DESeq2
+```r
+# Gene-level differential expression analysis using DESeq2
 ```
 
 -   Now save the file as `de_script.R`.
@@ -71,38 +74,46 @@ Before we get into the details of the analysis, let's start by:
 
 For this analysis we will be using several R packages, some which have been installed from CRAN and others from Bioconductor. To use these packages (and the functions contained within them), we need to **load the libraries.** Add the following to your script and don't forget to comment liberally!
 
-Note that these package names are all case sensitive, and you can load packages interactively in the **Packages** tab of our Files Pane window.
+It's good practice to load all needed libraries at the top of your script. Often, you don't know ahead of time which you may need, so as you develop code you'll often incrementally add more libraries to the top of the script.
+
+Note that these package names are all case sensitive, and you can load packages interactively in the **Packages** tab of our Files Pane window. However, it is best practice to have your code load the libraries so that it is clearly documented.
 
 ``` r
-## Setup
-### Bioconductor and CRAN libraries used - already installed on Biowulf 
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
 library(tidyverse)
 library(RColorBrewer)
 library(DESeq2)
 library(pheatmap)
 ```
 
-On the other hand, there is one package, `DEGreport`, that is likely not installed for you here. To install it, load `BiocManager` (part of BioConductor), then run BiocManager's `install()` function for the only package not already installed by default in our interactive RStudio session:
+There is one package we need, `DEGreport`, that is likely not installed for you here. To install it, load `BiocManager` (part of BioConductor), then run BiocManager's `install()` function for the only package not already installed by default in our interactive RStudio session:
 
 ``` r
-# You don't need to add this to your script
+# You don't need to add this to your script.
+# It only needs to be done once.
 library(BiocManager)
 install("DEGreport")
 ```
 
-Then, use `library` again to load the package we just installed:
+On Biowulf, this installs to your user data directory, specifically in `/data/$USER/rhel8/$R_VERSION`, which you can find by running `find.package("DEGreport")`. Once it is installed there (and for this version of R that you're using, currently 4.4), you don't need to do this again.
+
+Then, add this line in your script to load the package we just installed:
 
 ``` r
 library(DEGreport)
 ```
 
+
 ## Loading data
 
-To load the data into our current environment, we will be using the `read.table` function. We need to provide the path to each file and also specify arguments to let R know that we have a header (`header = T`) and the first column is our row names (`row.names =1`). By default the function expects tab-delimited files, which is what we have.
+To load the data into our current environment, we will be using the `read.table` function. We need to provide the path to each file and also specify arguments to let R know that we have a header (`header = T`) and the first column is our row names (`row.names=1`). By default, the function expects tab-delimited files, which is what we have.
+
+We will load in the featureCounts matrix and the metadata table into data frames (technically, R `data.frame` objects but we'll call them data frames here).
 
 ``` r
-## Load in data
-data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1) 
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
 
 meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
 ```
@@ -110,7 +121,7 @@ meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
 Use `class()` to inspect our data and make sure we are working with data frames:
 
 ``` r
-### Check classes of the data we just brought in
+# Check classes of the data we just brought in
 class(meta)
 class(data)
 ```
@@ -126,13 +137,15 @@ View(meta)
 View(data)
 ```
 
+Note: if you're using command-line R, `View` won't work because it's graphical. Instead, use `head`, `str`, or `glimpse`.
+
 ## Differential gene expression analysis overview
 
-So what does this count data actually represent? The count data used for differential expression analysis represents the number of sequence reads that originated from a particular gene. The higher the number of counts, the more reads associated with that gene, and the assumption that there was a higher level of expression of that gene in the sample.
+So what does this count data actually represent? The count data used for differential expression analysis represents the number of sequence reads that originated from a particular gene. The higher the number of counts, the more reads associated with that gene, and the assumption that there was a higher level of expression of that gene in the sample compared to other samples.
 
 <img src="../img/deseq_counts_overview.png" width="600"/>
 
-With differential expression analysis, we are looking for genes that change in expression between two or more groups (defined in the metadata) - case vs. control - correlation of expression with some variable or clinical outcome
+With differential expression analysis, we are looking for genes that change in expression between two or more groups (defined in the metadata) - case vs. control - or correlation of expression with some variable or clinical outcome
 
 **Why does it not work to identify differentially expressed genes simply by ranking the genes by how different they are between the two groups (based on fold change values)?**
 
@@ -150,7 +163,7 @@ The goal of differential expression analysis is to determine, for each gene, whe
 
 ### RNA-seq count distribution
 
-To determine the appropriate statistical model, we need information about the distribution of counts. To get an idea about how RNA-seq counts are distributed, let's plot the counts for a single sample, 'Mov10_oe_1'. To do so, we are going to be using a REALLY useful visualization package called `ggplot2` (landing page for [ggplot2](https://ggplot2.tidyverse.org/)).
+To determine the appropriate statistical model, we need information about the distribution of counts. To get an idea about how RNA-seq counts are distributed, let's plot the counts for a single sample, 'Mov10_oe_1'. To do so, we are going to be using a REALLY useful visualization package called `ggplot2` (see [landing page for ggplot2](https://ggplot2.tidyverse.org/)).
 
 **Discussion**: Although we aren't going to talk about ggplot commands *in depth* in this course, you can probably figure out what some parts of this command are doing. What is `x = Mov10_oe_1` doing? What about `xlab` and `ylab`?
 
@@ -167,7 +180,7 @@ If we zoom in close to zero, we can see a large number of genes with counts of z
 
 ``` r
 ggplot(data) +
-   geom_histogram(aes(x = Mov10_oe_1), stat = "bin", bins = 200) + 
+   geom_histogram(aes(x = Mov10_oe_1), stat = "bin", bins = 200) +
    xlim(-5, 500)  +
    xlab("Raw expression counts") +
    ylab("Number of genes")
@@ -183,13 +196,15 @@ These images illustrate some common features of RNA-seq count data, including a 
 
 Count data is often modeled using the **binomial distribution**, which can give you the **probability of getting a number of heads upon tossing a coin a number of times**. However, not all count data can be fit with the binomial distribution. The binomial is based on discrete events and used in situations when you have a certain number of cases.
 
-When **the number of cases is very large (i.e. people who buy lottery tickets), but the probability of an event is very small (probability of winning)**, the **Poisson distribution** is used to model these types of count data. The Poisson is similar to the binomial, but is based on continuous events. [Details provided by Rafael Irizarry in the EdX class.](https://youtu.be/fxtB8c3u6l8)
+When **the number of cases is very large (i.e. people who buy lottery tickets), but the probability of an event is very small (probability of winning)**, the **Poisson distribution** is used to model these types of count data. The Poisson is similar to the binomial, but where the binomial is restricted to a number of trials, the Poisson is used when any number of trials can occur. [Details provided by Rafael Irizarry in the EdX class.](https://youtu.be/fxtB8c3u6l8)
 
-**With RNA-Seq data, a very large number of RNAs are represented and the probability of pulling out a particular transcript is very small**. Thus, it would be an appropriate situation to use the Poisson distribution. However, a unique property of this distribution is that the mean == variance. Realistically, with RNA-Seq data there is always some biological variation present across the replicates (within a sample class). Genes with larger average expression levels will tend to have larger observed variances across replicates.
+**With RNA-Seq data, a very large number of RNAs are represented and the probability of pulling out a particular transcript is very small**. Thus, it would be an appropriate situation to use the Poisson distribution. However, a unique property of the Poisson distribution is that the mean == variance. Realistically, with RNA-Seq data there is always some biological variation present across the replicates (within a sample class). Genes with larger average expression levels will tend to have larger observed variances across replicates.
 
-If the proportions of mRNA stayed exactly constant between the biological replicates for each sample class, we could expect Poisson distribution (where mean == variance). [A nice description of this concept is presented by Rafael Irizarry in the EdX class](https://youtu.be/HK7WKsL3c2w). But this doesn't happen in practice, and so the Poisson distribution is only considered appropriate for a single biological sample.
+If the proportions of mRNA stayed exactly constant between the biological replicates for each sample class, we could expect Poisson distribution (where mean == variance). [A nice description of this concept is presented by Rafael Irizarry in the EdX class](https://youtu.be/HK7WKsL3c2w). But when we look at *actual* RNA-seq counts, this doesn't happen. In fact, we see *more* variance than we would expect if RNA-seq counts truly followed a Poisson distribution.
 
-The model that fits best, given this type of variability between replicates, is the Negative Binomial (NB) model. Essentially, **the NB model is a good approximation for data where the mean \< variance**, as is the case with RNA-Seq count data.
+It turns out that the distribution that that fits best, given this type of variability between replicates, is the Negative Binomial (NB) distribution. Essentially, **the NB model is a good approximation for data where the mean \< variance**, as is the case with RNA-Seq count data.
+
+Technically, a Poisson is the same as a NB with zero dispersion. As you increase the dispersion parameter for an NB, it describes an increasingly variable distribution. A big part of differential expression involves figuring out what dispersion parameter to use for a gene so that we can get this underlying distribution.
 
 <img src="../img/deseq_nb.png" width="400"/>
 
@@ -209,24 +224,26 @@ If it is count data, it should fit the negative binomial, as discussed previousl
 Run the following code to plot the *mean versus variance* for the 'Mov10 overexpression' replicates:
 
 ``` r
-mean_counts <- apply(data[, 3:5], 1, mean)
-variance_counts <- apply(data[, 3:5], 1, var)
+mean_counts <- apply(data[, 4:6], 1, mean)
+variance_counts <- apply(data[, 4:6], 1, var)
 df <- data.frame(mean_counts, variance_counts)
 
 ggplot(df) +
-        geom_point(aes(x=mean_counts, y=variance_counts)) + 
-        geom_line(aes(x=mean_counts, y=mean_counts, color="red")) +
+        geom_point(aes(x=mean_counts, y=variance_counts)) +
+        geom_abline(slope=1, intercept=0, color='red') +
         scale_y_log10() +
         scale_x_log10()
 ```
 
-![](images/mean_versus_variance.png)
+> **DISCUSSION:** why `4:6` in the above code?
+
+![mean vs variance](images/mean_versus_variance.png)
 
 Note that in the above figure, the variance across replicates tends to be greater than the mean (red line), especially for genes with large mean expression levels. *This is a good indication that our data do not fit the Poisson distribution and we need to account for this increase in variance using the Negative Binomial model (i.e. Poisson will underestimate variability leading to an increase in false positive DE genes).*
 
 ### Improving mean estimates (i.e. reducing variance) with biological replicates
 
-The variance or scatter tends to reduce as we increase the number of biological replicates (*the distribution will approach the Poisson distribution with increasing numbers of replicates*), since standard deviations of averages are smaller than standard deviations of individual observations. **The value of additional replicates is that as you add more data (replicates), you get increasingly precise estimates of group means, and ultimately greater confidence in the ability to distinguish differences between sample classes (i.e. more DE genes).**
+The variance tends to reduce as we increase the number of biological replicates (*the distribution will approach the Poisson distribution with increasing numbers of replicates*), since standard deviations of averages are smaller than standard deviations of individual observations. **The value of additional replicates is that as you add more data (replicates), you get increasingly precise estimates of group means, and ultimately greater confidence in the ability to distinguish differences between sample classes (i.e. more DE genes).**
 
 The figure below illustrates the relationship between sequencing depth and number of replicates on the number of differentially expressed genes identified [[1](https://academic.oup.com/bioinformatics/article/30/3/301/228651/RNA-seq-differential-expression-studies-more)]. Note that an **increase in the number of replicates tends to return more DE genes than increasing the sequencing depth**. Therefore, generally more replicates are better than higher sequencing depth, with the caveat that higher depth is required for detection of lowly expressed DE genes and for performing isoform-level differential expression. Generally, the minimum sequencing depth recommended is 20-30 million reads per sample, but we have seen good RNA-seq experiments with 10 million reads if there are a good number of replicates.
 
@@ -240,15 +257,19 @@ To model counts appropriately when performing a differential expression analysis
 
 Many studies describing comparisons between these methods show that while there is some agreement, there is also much variability between tools. **Additionally, there is no one method that performs optimally under all conditions ([Soneson and Dleorenzi, 2013](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-91)).**
 
-![](../img/deg_methods1.png)
+This multi-way Venn diagram shows that the four methods assessed do have substantially overlapping differential expression calls, but some methods disagree. This is also using the original DESeq algorithm (as opposed to the DESeq2 version we'll be using), but it gives a good flavor of the variability across methods.
 
-**We will be using [DESeq2](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) for the DE analysis, and the analysis steps with DESeq2 are shown in the flowchart below in green**. DESeq2 first normalizes the count data to account for differences in library sizes and RNA composition between samples. Then, we will use the normalized counts to make some plots for QC at the gene and sample level. The final step is to use the appropriate functions from the DESeq2 package to perform the differential expression analysis.
+> **DISCUSSION:** Which one is correct? How can we tell?
+
+![DEG methods venn](../img/deg_methods1.png)
+
+**We will be using [DESeq2](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) for the DE analysis, and the analysis steps with DESeq2 are shown in the flowchart below in blue**. DESeq2 first normalizes the count data to account for differences in library sizes and RNA composition between samples. Then, we will use the normalized counts to make some plots for QC at the gene and sample level. The final step is to use the appropriate functions from the DESeq2 package to perform the differential expression analysis.
 
 <img src="../img/deseq_workflow_full_2018.png" width="500"/>
 
 We will go in-depth into each of these steps in the following lessons, but additional details and helpful suggestions regarding DESeq2 can be found in the [DESeq2 vignette](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html). As you go through this workflow and questions arise, you can reference the vignette from within RStudio:
 
-```         
+```
 vignette("DESeq2")
 ```
 

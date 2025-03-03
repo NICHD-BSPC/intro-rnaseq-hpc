@@ -28,23 +28,23 @@ The first step in the DE analysis workflow is count normalization, which is nece
 
 <img src="../img/deseq_workflow_normalization_2018.png" width="400"/>
 
-The counts of mapped reads for each gene is proportional to the expression of RNA ("interesting") in addition to many other factors ("uninteresting"). Normalization is the process of scaling raw count values to account for the "uninteresting" factors. In this way the expression levels are more comparable between and/or within samples.
+The counts of mapped reads for each gene is proportional to the expression of RNA, which is of primary interest to us, but also includes many other factors which are not interesting and not biologically meaningful. Normalization is the process of scaling raw count values to account for the "uninteresting" factors. In this way the expression levels are more comparable between and/or within samples.
 
 The main factors often considered during normalization are:
 
--   **Sequencing depth:** Accounting for sequencing depth is necessary for comparison of gene expression between samples. In the example below, each gene appears to have doubled in expression in *Sample A* relative to *Sample B*, however this is a consequence of *Sample A* having double the sequencing depth.
+-   **Sequencing depth:** The amount of reads we get in a FASTQ file is related to the amount of cDNA in the library. Due to the small concentrations involved and slight errors in pipetting accuracy, it is difficult to get *exactly* the same amount of cDNA in each library for sequencing. We need to control for this when comparing between samples. In the example below, each gene appears to have doubled in expression in *Sample A* relative to *Sample B*, however this is a consequence of *Sample A* having double the sequencing depth.
 
     <img src="../img/normalization_methods_depth.png" width="400"/>
 
     > ***NOTE:** In the figure above, each pink and green rectangle represents a read aligned to a gene. Reads connected by dashed lines connect a read spanning an intron.*
 
--   **Gene length:** Accounting for gene length is necessary for comparing expression between different genes within the same sample. In the example, *Gene X* and *Gene Y* have similar levels of expression, but the number of reads mapped to *Gene X* would be many more than the number mapped to *Gene Y* because *Gene X* is longer.
+-   **Gene length:** Accounting for gene length is necessary for comparing expression between different genes within the same sample. In the example, *Gene X* and *Gene Y* have similar levels of expression (i.e., the same number of transcript are expressed), but the number of reads mapped to *Gene X* would be many more than the number mapped to *Gene Y* simply because *Gene X* is longer.
 
     <img src="../img/normalization_methods_length.png" width="200"/>
 
 -   **RNA composition:** A few highly differentially expressed genes between samples, differences in the number of genes expressed between samples, or presence of contamination can skew some types of normalization methods. Accounting for RNA composition is recommended for accurate comparison of expression between samples, and is particularly important when performing differential expression analyses [[1](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106)].
 
-    In the example, if we were to divide each sample by the total number of counts to normalize, the counts would be greatly skewed by the DE gene, which takes up most of the counts for *Sample A*, but not *Sample B*. Most other genes for *Sample A* would be divided by the larger number of total counts and appear to be less expressed than those same genes in *Sample B*.
+    In the example, if we were to divide each sample by the total number of counts to normalize, the counts would be greatly skewed by the *Gene DE*, which takes up most of the counts for *Sample A* -- but not *Sample B*. Most other genes for *Sample A* would be divided by the larger number of total counts and appear to be less expressed than those same genes in *Sample B*.
 
     <img src="../img/normalization_methods_composition.png" width="400"/>
 
@@ -122,13 +122,13 @@ The figure below illustrates the median value for the distribution of all gene r
 
 <img src="../img/deseq_median_of_ratios.png" width="400"/>
 
-The median of ratios method makes the assumption that not ALL genes are differentially expressed; therefore, the normalization factors should account for sequencing depth and RNA composition of the sample (large outlier genes will not represent the median ratio values). **This method is robust to imbalance in up-/down-regulation and large numbers of differentially expressed genes.**
+The median of ratios method makes the assumption that not ALL genes are differentially expressed; therefore, the size factors should account for sequencing depth and RNA composition of the sample (large outlier genes will not represent the median ratio values). **This method is robust to imbalance in up-/down-regulation and large numbers of differentially expressed genes.**
 
 > Usually these size factors are around 1, if you see large variations between samples it is important to take note since it might indicate the presence of extreme outliers.
 
-**Step 4: calculate the normalized count values using the normalization factor**
+**Step 4: calculate the normalized count values using the size factor**
 
-This is performed by dividing each raw count value in a given sample by that sample's normalization factor to generate normalized count values. This is performed for all count values (every gene in every sample). For example, if the median ratio for SampleA was 1.3 and the median ratio for SampleB was 0.77, you could calculate normalized counts as follows:
+This is performed by dividing each raw count value in a given sample by that sample's size factor to generate normalized count values. This is performed for all count values (every gene in every sample). For example, if the median ratio for SampleA was 1.3 and the median ratio for SampleB was 0.77, you could calculate normalized counts as follows:
 
 SampleA median ratio = 1.3
 
@@ -187,23 +187,22 @@ Now that we know the theory of count normalization, we will normalize the counts
 We should always make sure that we have sample names that match between the two files, and that the samples are in the right order. DESeq2 will output an error if this is not the case.
 
 ``` r
-### Check that sample names match in both files
-all(colnames(data) %in% rownames(meta))
+# Check that sample names match in both files
 all(colnames(data) == rownames(meta))
 ```
 
-If your data did not match, you could use the `match()` function to rearrange them to be matching.
+If your data did not match you could use the `match()` function to rearrange them to be matching.
 
 ------------------------------------------------------------------------
 
 ### 2. Create DESEq2 object
 
-Bioconductor software packages often define and use a custom class within R for storing data (input data, intermediate data and also results). These custom data structures are similar to `lists` in that they can contain multiple different data types/structures within them. But, unlike lists they have pre-specified `data slots`, which hold specific types/classes of data. The data stored in these pre-specified slots can be accessed by using specific package-defined functions.
+Bioconductor software packages often define and use a custom class within R for storing data (input data, intermediate data and also results). These custom data structures are similar to *lists* in that they can contain multiple different data types/structures within them. But, unlike lists they have pre-specified *slots*, which hold specific types/classes of data. The data stored in these pre-specified slots can be accessed by using specific package-defined functions.
 
 Let's start by creating the `DESeqDataSet` object and then we can talk a bit more about what is stored inside it. To create the object we will need the **count matrix** and the **metadata** table as input. We will also need to specify a **design formula**. The design formula specifies the column(s) in the metadata table and how they should be used in the analysis. For our dataset we only have one column we are interested in, that is `~sampletype`. This column has three factor levels, which tells DESeq2 that for each gene we want to evaluate gene expression change with respect to these different levels.
 
 ``` r
-## Create DESeq2Dataset object
+# Create DESeq2Dataset object
 dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 ```
 
@@ -215,7 +214,7 @@ You can use DESeq-specific functions to access the different slots and retrieve 
 View(counts(dds))
 ```
 
-As we go through the workflow we will use the relevant functions to check what information gets stored inside our object.
+As we go through the workflow we will use the relevant functions to check what information gets stored inside our object. It's good practice to do this any time you are learning a new software package.
 
 ### 3. Generate the Mov10 normalized counts
 
