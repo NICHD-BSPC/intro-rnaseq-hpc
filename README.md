@@ -2,7 +2,7 @@
 
 ### Description
 
-This repository has teaching materials for the first four weeks of a 9-week Introduction to RNA-sequencing data analysis workshop held at NICHD in 2025. This workshop focuses on teaching basic computational skills to enable the effective use of an high-performance computing environment to implement an RNA-seq data analysis workflow. It includes an introduction to shell (bash) and shell scripting, running the RNA-seq workflow from FASTQ files to count data and covers best practice guidelines for RNA-seq experimental design and data organization/management.
+This repository has teaching materials for a 9-week Introduction to RNA-sequencing data analysis workshop held at NICHD in 2025. This workshop focuses on teaching basic computational skills to enable the effective use of an high-performance computing environment to implement an RNA-seq data analysis workflow. The first four and a half weeks includes an introduction to shell (bash) and shell scripting, running the RNA-seq workflow from FASTQ files to count data and covers best practice guidelines for RNA-seq experimental design and data organization/management. The latter half covers differential expression analyses using DEseq2 and downstream analyses of those results. 
 
 ### Learning Objectives
 
@@ -31,6 +31,7 @@ Note: Links to weekly lessons will be provided several days in advance in the ta
 | [Week 3](schedule/links-to-lessons.md#week-3) | Reference genomes, theory and practice of mapping RNAseq reads to a reference, Mapping QC|
 | [Week 4](schedule/links-to-lessons.md#week-4) | Theory and practice of counting RNAseq reads|
 | [Week 5](schedule/links-to-lessons.md#week-5) | Automation of the RNAseq workflow, transition to RStudio for differential expression analyses | 
+| [Week 6](schedule/links-to-lessons.md#week-6) | Overview and prep for DEseq2 analysis pipeline, assessing sample quality, design formulas |
 
 ### Course communication: 
 * For any content questions: We will be using the `rnaseq_jan2025` Slack channel under the Bioinformatics @NICHD workspace. Posting your questions in this channel is great, as multiple staff and fellow students will be able to respond. Also, you probably aren't the only one with that question!
