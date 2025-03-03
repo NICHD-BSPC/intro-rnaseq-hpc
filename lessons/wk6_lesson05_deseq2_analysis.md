@@ -1,9 +1,7 @@
 ---
 title: "Gene-level differential expression analysis with DESeq2"
-author: "Meeta Mistry, Radhika Khetani, Mary Piper"
-Edited: "Sally Chang at NICHD"
-date: "Wednesday, May 27th, 2020"
-edited date: "November 14th, 2024"
+author: "Harvard HPC Staff, Adapted by Sally Chang at NICHD"
+date: "Last Modified March 2025"
 ---
 
 Approximate time: 60 minutes
@@ -23,7 +21,7 @@ Previously, we created the DESeq2 object using the appropriate design formula an
 # DO NOT RUN
 
 ## Create DESeq2Dataset object
-dds <- DESeqDataSetFromTximport(txi, colData = meta, design = ~ sampletype)
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 
 ## Run analysis
 dds <- DESeq(dds)
@@ -61,10 +59,10 @@ Let's take a quick look at size factor values we have for each sample:
 ## Check the size factors
 sizeFactors(dds)
 
-Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 Mov10_oe_1 Mov10_oe_2 
- 1.1149694  0.9606733  0.7492240  1.5633640  0.9359695  1.2262649  1.1405026 
-Mov10_oe_3 
- 0.6542030 
+Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 
+ 1.1053069  0.9553874  0.7478763  1.5464161  0.9278142 
+Mov10_oe_1 Mov10_oe_2 Mov10_oe_3 
+ 1.2313004  1.1522491  0.6637763 
 ```
 
 These numbers should be identical to those we generated initially when we had run the function `estimateSizeFactors(dds)`. Take a look at the total number of reads for each sample:
@@ -72,6 +70,11 @@ These numbers should be identical to those we generated initially when we had ru
 ``` r
 ## Total number of raw counts per sample
 colSums(counts(dds))
+
+Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 
+  28681404   24434907   18879568   41589274   24555685 
+Mov10_oe_1 Mov10_oe_2 Mov10_oe_3 
+  30035408   28043922   16209696 
 ```
 
 *How do the numbers correlate with the size factor?*
