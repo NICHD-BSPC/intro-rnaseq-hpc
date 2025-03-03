@@ -59,7 +59,8 @@
 - [Automating the RNAseq workflow](../lessons/wk4_lesson02_automating_workflow.md) 60 minutes in class, ~30-45 minutes of assignment
 - [Intro to R and RStudio](../lessons/wk5_lesson01_introR_Rstudio.md) Friday: 90 min in class, ~20 minute assignment
 - [Experimental Design](../lessons/wk2_lesson05_experimental_design.md) ~30 minutes of reading, ~30 minutes of assignment. **Note: This assignment is now due end of Week 5**
-- 
+
+------------------------------------------------------------------------
 ## Week 6: 
 - [Differential Gene Expression Overview and Setup](../lessons/wk6_lesson01_dge_setup_overview.md) Brief (~20 min) assignment
 - [Count normalization](../lessons/wk6_lesson02_count_normalization.md) 
