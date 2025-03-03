@@ -1,7 +1,7 @@
 ---
 title: "Gene-level differential expression analysis with DESeq2"
 author: "Harvard HPC Staff, Adapted by Sally Chang @ NICHD"
-Last Edited: February 2025
+Last Edited: March 2025
 ---
 
 Approximate time: 30 minutes
@@ -89,11 +89,11 @@ Now that we know how to specify the model to DESeq2, we can run the differential
 
 **To get our differential expression results from our raw count data, we only need to run 2 lines of code!**
 
-First we create a DESeqDataSet as we did in the ['Count normalization'](https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html#2-create-deseq2-object) lesson and specify the `txi` object which contains our raw counts, the metadata variable, and provide our design formula:
+First we create a DESeqDataSet as we did in the ['Count normalization'](https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html#2-create-deseq2-object) lesson and specify the table that contains our raw counts, the metadata variable, and provide our design formula:
 
 ``` r
 ## Create DESeq2Dataset object
-dds <- DESeqDataSetFromTximport(txi, colData = meta, design = ~ sampletype)
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 ```
 
 Then, to run the actual differential expression analysis, we use a single call to the function `DESeq()`.
@@ -122,7 +122,7 @@ final dispersion estimates
 fitting model and testing
 ```
 
-We will discuss what is occurring in each of these steps in the next few lessons, but the code to execute these steps is encompassed in the two lines above.
+We will discuss what is occurring in each of these steps in the next few lessons, but the code to execute these steps is encompassed in the two lines above. Future lessons will also go over the actual meaning of some of these result objects.
 
 > **NOTE:** There are individual functions available in DESeq2 that would allow us to carry out each step in the workflow in a step-wise manner, rather than a single call. We demonstrated one example when generating size factors to create a normalized matrix. By calling `DESeq()`, the individual functions for each step are run for you.
 
@@ -160,3 +160,10 @@ How would the design formula be structured to perform the following analyses?
 3.  Test for the effect of `genotype` on the `treatment` effects.
 
 ------------------------------------------------------------------------
+
+## **ASSIGNMENT**: 
+
+Given the the metadata table you have sent me for your own experiment, do the following in a text file or RScript in your `/rnaseq/DEanalysis` directory.
+
+1.  Write a design formula for your experiment, in the format of `design = ~ sex + age + treatment` . Make sure to include any interaction terms or terms that you want to "regress" out. There are additional recommendations for complex designs in the [DESeq2 vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#interactions).
+2.  Briefly explain (in 1-2 sentences) the reasoning for this design formula.
