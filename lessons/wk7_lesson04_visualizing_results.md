@@ -1,8 +1,7 @@
 ---
 title: "Advanced visualizations"
-author: "Meeta Mistry, Mary Piper, Radhika Khetani"
-edited: "Sally Chang at NICHD, November 19th, 2024"
-date: "December 4th, 2019"
+author: "Harvard HPC Staff, adapted by Sally Chang at NICHD"
+date: "Last Modified March 2025"
 ---
 
 Approximate time: 75 minutes

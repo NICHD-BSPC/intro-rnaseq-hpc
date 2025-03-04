@@ -1,8 +1,7 @@
 ---
 title: "Exploring DESeq2 results: Wald test"
-author: "Meeta Mistry, Radhika Khetani, Mary Piper"
-date: "June 1, 2020"
-edited: "Sally Chang at NICHD on November 18th"
+author: "Harvard HPC Staff, adapted by Sally Chang at NICHD"
+edited: "Last Modified March 2025"
 ---
 
 Approximate time: 60 minutes

@@ -1,8 +1,7 @@
 ---
 title: "Summarizing results from the Wald test"
-author: "Meeta Mistry, Radhika Khetani, Mary Piper"
-edited: "Sally Chang at NICHD, November 19th 2024"
-date: "June 1, 2020"
+author: "Harvard HPC Staff, adapted by Sally Chang at NICHD"
+date: "Last Modified March 2025"
 ---
 
 Approximate time: 20 minutes
