@@ -63,13 +63,13 @@ In DESeq2, the **Wald test is the default used for hypothesis testing when compa
 
 -   If the p-value is small we reject the null hypothesis and state that there is evidence against the null (i.e. the gene is differentially expressed).
 
-The **model fit and Wald test were already run previously as part of the `DESeq()` function**:
+The **model fit and Wald test were already run previously as part of the `DESeq()` function** in Week 6 Lesson 04:
 
 ``` r
 ## DO NOT RUN THIS CODE
 
 ## Create DESeq2Dataset object
-dds <- DESeqDataSetFromTximport(txi, colData = meta, design = ~ sampletype)
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 
 ## Run analysis
 dds <- DESeq(dds)
@@ -105,7 +105,7 @@ To use the LRT, we use the `DESeq()` function but this time adding two arguments
 
 ``` r
 # The full model was specified previously with the `design = ~ sampletype`:
-# dds <- DESeqDataSetFromTximport(txi, colData = meta, ~ sampletype)
+#dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 
 # Likelihood ratio test
 dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1)
