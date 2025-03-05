@@ -37,18 +37,18 @@ Contrasts can be specified in two different ways (with the first method more com
 1.  Contrasts can be supplied as a **character vector with exactly three elements**: the name of the factor (of interest) in the design formula, the name of the two factors levels to compare. The factor level given last is the base level for the comparison. The syntax is given below:
 
 ``` r
-    # DO NOT RUN!
-    contrast <- c("condition", "level_to_compare", "base_level")
-    results(dds, contrast = contrast)
+# DO NOT RUN!
+contrast <- c("condition", "level_to_compare", "base_level")
+results(dds, contrast = contrast)
 ```
 
 2.  Contrasts can be given as a **list of 2 character vectors**: the names of the fold changes for the level of interest, and the names of the fold changes for the base level. These names should match identically to the elements of `resultsNames(object)`. *This method can be useful for combining interaction terms and main effects.*
 
 ``` r
-    # DO NOT RUN!
-    resultsNames(dds) # to see what names to use
-    contrast <- list(resultsNames(dds)[1], resultsNames(dds)[2])
-    results(dds, contrast = contrast)
+# DO NOT RUN!
+resultsNames(dds) # to see what names to use
+contrast <- list(resultsNames(dds)[1], resultsNames(dds)[2])
+results(dds, contrast = contrast)
 ```
 
 Alternatively, if you **only had two factor levels you could do nothing** and not worry about specifying contrasts (i.e. `results(dds)`). In this case, DESeq2 will choose what your base factor level based on alphabetical order of the levels.
@@ -79,7 +79,7 @@ You will see we have the option to provide a wide array of arguments and tweak t
 res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.05)
 ```
 
-> **NOTE:** For our analysis, in addition to the `contrast` argument we will also provide a value of 0.05 for the `alpha` argument. We will describe this in more detail when we talk about [gene-level filtering]().
+> **NOTE:** For our analysis, in addition to the `contrast` argument we will also provide a value of 0.05 for the `alpha` argument. We will describe this in more detail when we talk about gene level filtering.
 
 The results table that is returned to us is **a `DESeqResults` object**, which is a simple subclass of DataFrame. In many ways it can be treated like a dataframe (i.e when accessing/subsetting data), however it is important to recognize that there are differences for downstream steps like visualization.
 
@@ -91,31 +91,19 @@ class(res_tableOE)
 Now let's take a look at **what information is stored** in the results:
 
 ``` r
-
 # What is stored in results?
 res_tableOE %>% 
 data.frame() %>% 
 View()
 ```
 
-```         
-log2 fold change (MAP): sampletype MOV10_overexpression vs control 
-Wald test p-value: sampletype MOV10_overexpression vs control 
-DataFrame with 57914 rows and 6 columns
-                    baseMean    log2FoldChange  lfcSE       stat        pvalue      padj
-                    <numeric>   <numeric>   <numeric>   <numeric>   <numeric>   <numeric>
-ENSG00000000003     3.53E+03    -0.427190489    0.0755347   -5.65604739 1.55E-08    4.47E-07
-ENSG00000000005     2.62E+01    0.016159765 0.23735203  0.06584098  9.48E-01    9.74E-01
-ENSG00000000419     1.48E+03    0.362663551 0.10761742  3.36995355  7.52E-04    4.91E-03
-ENSG00000000457     5.19E+02    0.219135591 0.09768842  2.24476439  2.48E-02    8.21E-02
-ENSG00000000460     1.16E+03    -0.261603812    0.07912962  -3.30661411 9.44E-04    5.92E-03
-...         ...     ...     ...     ...     ...     ...
-```
+> **Discussion:** The `%>%` acts as a pipe symbol in R. This functionality comes as part of the [`dplyr`](https://dplyr.tidyverse.org/) package, which was loaded as part of the `tidyverse` that we loaded at the beginning of our lessons. Knowing this, what exactly is the code above doing?
 
 We have six columns of information reported for each gene (row). We can use the `mcols()` function to extract information on what the values stored in each column represent:
 
 ``` r
 # Get information on each column in results
+# mcols = metadata columns
 mcols(res_tableOE, use.names=T)
 ```
 
@@ -155,14 +143,15 @@ data.frame() %>%
 View()
 ```
 
-> **The baseMean column for these genes will be zero, and the log2 fold change estimates, p-value and adjusted p-value will all be set to NA.**
+> **The baseMean column for these genes will be zero, and the log2 fold change estimates, p-value and adjusted p-value will all be set to NA. *How would you adjust the command above to count the number of rows matching this condition*?**
 
 **2. Genes with an extreme count outlier**
 
 The `DESeq()` function calculates, for every gene and for every sample, a diagnostic test for outliers called Cook’s distance. Cook’s distance is a measure of how much a single sample is influencing the fitted coefficients for a gene, and a large value of Cook’s distance is intended to indicate an outlier count. Genes which contain a Cook’s distance above a threshold are flagged, however at least 3 replicates are required for flagging, as it is difficult to judge which sample might be an outlier with only 2 replicates. We can turn off this filtering by using the `cooksCutoff` argument in the `results()` function.
 
 ``` r
-# Filter genes that have an extreme outlier by looking for those rows that have a non-zero base mean but no values for p-value and adjusted p-value
+# Filter genes that have an extreme outlier by looking for those rows that have a non-zero base mean but no values for p-value and adjusted p-value. Do we actually have any of these?
+
 res_tableOE[which(is.na(res_tableOE$pvalue) & 
                     is.na(res_tableOE$padj) &
                     res_tableOE$baseMean > 0),] %>% 
@@ -271,6 +260,8 @@ A plot that can be useful to exploring our results is the MA plot. The MA plot s
 plotMA(res_tableOE_unshrunken, ylim=c(-2,2))
 ```
 
+![](images/ma_plot_unshrunken-01.png){width="393"}
+
 **And now the shrunken results:**
 
 ``` r
@@ -278,19 +269,15 @@ plotMA(res_tableOE_unshrunken, ylim=c(-2,2))
 plotMA(res_tableOE, ylim=c(-2,2))
 ```
 
+![](images/ma_plot_shrunken.png){width="420"}
+
 On the left you have the unshrunken fold change values plotted and you can see the abundance of scatter for the the lowly expressed genes. That is, many of the lowly expressed genes exhibit very high fold changes. After shrinkage, we see the fold changes are much smaller estimates.
-
-<p float="left">
-
-<img src="../img/maplot_unshrunken.png" width="400"/> <img src="../img/MA_plot.png" width="400"/>
-
-</p>
 
 In addition to the comparison described above, this plot allows us to evaluate the magnitude of fold changes and how they are distributed relative to mean expression. Generally, we would expect to see significant genes across the full range of expression levels.
 
 ------------------------------------------------------------------------
 
-**Excercise**
+## **Assignment:** 
 
 **MOV10 Differential Expression Analysis: Control versus Knockdown**
 
@@ -299,6 +286,7 @@ Now that we have results for the overexpression results, do the same for the **C
 1.  Create a contrast vector called `contrast_kd`.
 2.  Use contrast vector in the `results()` to extract a results table and store that to a variable called `res_tableKD`.
 3.  Shrink the LFC estimates using `lfcShrink()` and assign it back to `res_tableKD`.
+4.  Store the code you used to do the above exercises in an RScript named `control_vs_kd.R` .
 
 ------------------------------------------------------------------------
 
