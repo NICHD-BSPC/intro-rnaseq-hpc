@@ -89,10 +89,6 @@ When visualizing on PC1 and PC2, we don't see the samples separate by `treatment
 
 We start with the factor `cage`, but the `cage` factor does not seem to explain the variation on PC1 or PC2.
 
-``` r
-# Write code to color the samples by `cage` rather than by `treatment`
-```
-
 <p align="center">
 
 <img src="../img/example_PCA_cage.png" width="600"/>
@@ -100,10 +96,6 @@ We start with the factor `cage`, but the `cage` factor does not seem to explain 
 </p>
 
 Then, we color by the `sex` factor, which appears to separate samples on PC2. This is good information to take note of, as we can use it downstream to account for the variation due to sex in the model and regress it out.
-
-``` r
-# Write code to color the samples by `sex` rather than by `cage`
-```
 
 <p align="center">
 
@@ -186,9 +178,7 @@ plotPCA(rld, intgroup="sampletype")
 ```
 
 <p align="center">
-
-![](images/mov10_pca.png)
-
+<img src="../img/mov10_pca.png" width="600" alt="mov 10 experiement PCA"/>
 </p>
 
 ------------------------------------------------------------------------
@@ -199,10 +189,6 @@ Exercise:
 2.  Does it fit the expectation from the experimental design?
 3.  What do you think the %variance information (in the axes titles) tell you about the data in the context of the PCA?
 4.  Try plotting a different variable than `sampletype` - did you learn anything new?
-
-``` r
-# Try another varible besides sampletype to color your PCA plot
-```
 
 ------------------------------------------------------------------------
 
@@ -265,9 +251,7 @@ pheatmap(rld_cor, annotation = meta)
 When you plot using `pheatmap()` the hierarchical clustering information is used to place similar samples together and this information is represented by the tree structure along the axes. The `annotation` argument accepts a dataframe as input, in our case it is the `meta` data frame.
 
 <p align="center">
-
-![](images/mov10_default_heatmap.png)
-
+<img src="../img/mov10_default_heatmap.png" width="600" alt="mov10 heatmap with default settings"/>
 </p>
 
 Overall, we observe pretty high correlations across the board ( \> 0.999) suggesting no outlying sample(s). Also, similar to the PCA plot you see the samples clustering together by sample group. Together, these plots suggest to us that the data are of good quality and we have the green light to proceed to differential expression analysis.
