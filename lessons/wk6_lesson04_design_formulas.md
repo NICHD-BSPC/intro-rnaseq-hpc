@@ -161,7 +161,7 @@ How would the design formula be structured to perform the following analyses?
 
 ------------------------------------------------------------------------
 
-## **ASSIGNMENT**: 
+## **ASSIGNMENT**:
 
 Given the the metadata table you have sent me for your own experiment, do the following in a text file or RScript in your `/rnaseq/DEanalysis` directory.
 
