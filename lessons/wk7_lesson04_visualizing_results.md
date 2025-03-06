@@ -22,6 +22,7 @@ We will be working with three different data objects we have already created in 
 -   Metadata for our samples (a dataframe): `meta`
 -   Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts`
 -   Tibble versions of the DESeq2 results we generated in the last lesson: `res_tableOE_tb` and `res_tableKD_tb`
+-   Get Gene mapping table using `wget`: <https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.metadata.HGNC.gz>
 
 First, let's create a metadata tibble from the data frame (don't lose the row names!)
 
