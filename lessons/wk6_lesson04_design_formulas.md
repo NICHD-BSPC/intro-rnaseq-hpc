@@ -156,7 +156,7 @@ How would the design formula be structured to perform the following analyses?
 
 1.  Test for the effect of `treatment`.
 
-2.  Test for the effect of `genotype`, while regressing out the variation due to `treatment`.
+2.  Test for the effect of `genotype`, while regressing out (taking into account) the variation due to `treatment`.
 
 3.  Test for the effect of `genotype` on the `treatment` effects.
 
@@ -164,7 +164,7 @@ How would the design formula be structured to perform the following analyses?
 
 ## **ASSIGNMENT**:
 
-Given the the metadata table you have sent me for your own experiment, do the following in a text file or RScript in your `/rnaseq/DEanalysis` directory.
+Given the the metadata table you have sent me for your own experiment, do the following in a text file or RScript in your `rnaseq/DEanalysis` directory.
 
 1.  Write a design formula for your experiment, in the format of `design = ~ sex + age + treatment` . Make sure to include any interaction terms or terms that you want to "regress" out. There are additional recommendations for complex designs in the [DESeq2 vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#interactions).
 2.  Briefly explain (in 1-2 sentences) the reasoning for this design formula.
