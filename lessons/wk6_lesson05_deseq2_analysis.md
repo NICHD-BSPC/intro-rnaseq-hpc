@@ -83,9 +83,14 @@ We see that the larger size factors correspond to the samples with higher sequen
 
 Now take a look at the total depth after normalization using:
 
-``` r
+```         
 ## Total number of normalized counts per sample
 colSums(counts(dds, normalized=T))
+
+Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 
+  25948816   25575915   25244238   26893973 
+Mov10_kd_3 Mov10_oe_1 Mov10_oe_2 Mov10_oe_3 
+  26466168   24393241   24338420   24420422 
 ```
 
 *How do the values across samples compare with the total counts taken for each sample?*
