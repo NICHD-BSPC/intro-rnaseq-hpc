@@ -26,7 +26,9 @@ The [DESeq2 paper](https://genomebiology.biomedcentral.com/articles/10.1186/s130
 Differential expression analysis with DESeq2 involves multiple steps as displayed in the flowchart below in blue. Briefly, DESeq2 will model the raw counts, using normalization factors (size factors) to account for differences in library depth. Then, it will estimate the gene-wise dispersions and shrink these estimates to generate more accurate estimates of dispersion to model the counts. Finally, DESeq2 will fit the negative binomial model and perform hypothesis testing using the Wald test or Likelihood Ratio Test.
 
 <p align="center">
-<img src="../img/deseq_workflow1.png" width="300" alt="deseq workflow"/>
+
+<img src="../img/deseq_workflow1.png" alt="deseq workflow" width="300"/>
+
 </p>
 
 > **NOTE:** DESeq2 is actively maintained by the developers and continuously being updated. As such, it is important that you note the version you are working with. Recently, there have been some rather **big changes implemented** that impact the output. To find out more detail about the specific **modifications made to methods described in the original 2014 paper**, take a look at [this section in the DESeq2 vignette](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#methods-changes-since-the-2014-deseq2-paper).
@@ -154,7 +156,7 @@ How would the design formula be structured to perform the following analyses?
 
 1.  Test for the effect of `treatment`.
 
-2.  Test for the effect of `genotype`, while regressing out the variation due to `treatment`.
+2.  Test for the effect of `genotype`, while regressing out (taking into account) the variation due to `treatment`.
 
 3.  Test for the effect of `genotype` on the `treatment` effects.
 
@@ -162,7 +164,7 @@ How would the design formula be structured to perform the following analyses?
 
 ## **ASSIGNMENT**:
 
-Given the the metadata table you have sent me for your own experiment, do the following in a text file or RScript in your `/rnaseq/DEanalysis` directory.
+Given the the metadata table you have sent me for your own experiment, do the following in a text file or RScript in your `rnaseq/DEanalysis` directory.
 
 1.  Write a design formula for your experiment, in the format of `design = ~ sex + age + treatment` . Make sure to include any interaction terms or terms that you want to "regress" out. There are additional recommendations for complex designs in the [DESeq2 vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#interactions).
 2.  Briefly explain (in 1-2 sentences) the reasoning for this design formula.
