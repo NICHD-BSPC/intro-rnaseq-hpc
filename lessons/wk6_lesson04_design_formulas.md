@@ -90,13 +90,14 @@ Now that we know how to specify the model to DESeq2, we can run the differential
 First we create a DESeqDataSet as we did in the ['Count normalization'](https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html#2-create-deseq2-object) lesson and specify the table that contains our raw counts, the metadata variable, and provide our design formula:
 
 ``` r
-# Create DESeq2Dataset object
+# Create DESeq2Dataset object if not already in our env
 dds <- DESeqDataSetFromMatrix(countData=data, colData=meta, design=~sampletype)
 ```
 
 Then, to run the actual differential expression analysis, we use a single call to the function `DESeq()`.
 
 ``` r
+## This would be a good step to add to both of our scripts
 # Run analysis. This does a lot!
 dds <- DESeq(dds)
 ```

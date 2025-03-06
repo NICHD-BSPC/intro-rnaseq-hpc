@@ -61,7 +61,7 @@ In other words, if you use regular log transformation on typical RNA-seq data, y
 
 Principal Component Analysis (PCA) is a technique used to emphasize variation and bring out strong patterns in a dataset (dimensionality reduction). This is a very important technique used in the QC and analysis of both bulk and single-cell RNAseq data.
 
-To better understand how it works you can go through **[this YouTube video from StatQuest](https://www.youtube.com/watch?v=_UVHneBUBW0) that explains PCA, or a Harvard HPC lesson on [PCA.](https://github.com/hbctraining/Intro-to-DGE/blob/master/lessons/principal_component_analysis.md)**
+To better understand how it works you can go through [**this YouTube video from StatQuest**](https://www.youtube.com/watch?v=_UVHneBUBW0) **that explains PCA, or a Harvard HPC lesson on [PCA.](https://github.com/hbctraining/Intro-to-DGE/blob/master/lessons/principal_component_analysis.md)**
 
 To quote from the [Wikipedia entry on PCA](https://en.wikipedia.org/wiki/Principal_component_analysis):
 
@@ -153,7 +153,46 @@ The hierarchical tree along the axes indicates which samples are more similar to
 
 Now that we have a good understanding of the QC steps normally employed for RNA-seq, let's implement them for the Mov10 dataset we are going to be working with.
 
-### Transform normalized counts for the MOV10 dataset
+### Setting up for our analysis
+
+1.Get your HPC On Demand session going:
+
+-   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
+
+-   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
+
+-   Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -\> DEanalysis), to navigate to and open `DEanalysis.Rproj`
+
+2.  We are assuming that you have the `dds` object in your environment and your packages are loaded, so you can save the following as `de_setup.R` and run it all:
+
+    ``` r
+    # Gene-level differential expression analysis using DESeq2
+
+    # Setup
+    # Bioconductor and CRAN libraries used - already installed on Biowulf
+    library(tidyverse)
+    library(RColorBrewer)
+    library(DESeq2)
+    library(pheatmap)
+
+
+    # installing DEGreport
+    # library(BiocManager)
+    # install("DEGreport")
+
+    # load DEGreport into environment
+    library(DEGreport)
+
+    # Load in data
+    data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+    meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+    # Create DESeq2Dataset object
+    dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+    ```
+
+## Transform normalized counts for the MOV10 dataset
 
 **To improve the distances/clustering for the PCA and heirarchical clustering visualization methods**, we need to moderate the variance across the mean by applying the rlog transformation to the normalized counts.
 
