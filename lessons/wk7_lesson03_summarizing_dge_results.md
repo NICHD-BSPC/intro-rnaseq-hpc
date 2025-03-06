@@ -23,13 +23,13 @@ summary(res_tableOE, alpha = 0.05)
 In addition to the number of genes up- and down-regulated at the default threshold, **the function also reports the number of genes that were tested (genes with non-zero total read count), and the number of genes not included in multiple test correction due to a low mean count**.
 
 ```         
-out of 38903 with nonzero total read count
+out of 43674 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)       : 2004, 5.2%
-LFC < 0 (down)     : 2770, 7.1%
-outliers [1]       : 28, 0.072%
-low counts [2]     : 20580, 53%
-(mean count < 13)
+LFC > 0 (up)       : 3204, 7.3%
+LFC < 0 (down)     : 4284, 9.8%
+outliers [1]       : 0, 0%
+low counts [2]     : 22701, 52%
+(mean count < 5)
 [1] see 'cooksCutoff' argument of ?results
 [2] see 'independentFiltering' argument of ?results
 ```
@@ -45,7 +45,11 @@ Let's first create variables that contain our threshold criteria. We will only b
 padj.cutoff <- 0.05
 ```
 
-We can easily subset the results table to only include those that are significant using the `filter()` function, but first we will convert the results table into a tibble:
+We can easily subset the results table to only include those that are significant using the `filter()` function, but first we will convert the results table into a [tibble](https://tibble.tidyverse.org/), which is also part of the Tidyverse extended universe like `dplyr` .
+
+From the [R for Data Science](https://r4ds.had.co.nz/tibbles.html) guide:
+
+> Throughout this book we work with “tibbles” instead of R’s traditional `data.frame`. Tibbles *are* data frames, but they tweak some older behaviours to make life a little easier. R is an old language, and some things that were useful 10 or 20 years ago now get in your way. It’s difficult to change base R without breaking existing code, so most innovation occurs in packages. Here we will describe the **tibble** package, which provides opinionated data frames that make working in the tidyverse a little easier.
 
 ``` r
 # Create a tibble of results
@@ -53,12 +57,14 @@ res_tableOE_tb <- res_tableOE %>%
   data.frame() %>%
   rownames_to_column(var="gene") %>% 
   as_tibble()
+
+#What do you think is happening in rownames_to_columns()?
 ```
 
 Now we can subset that table to only keep the significant genes using our pre-defined thresholds:
 
 ``` r
-# Subset the tibble to keep only significant genes - how can we tell that this extracted the right number of genes? 
+# Subset the tibble to keep only significant genes 
 sigOE <- res_tableOE_tb %>%
         dplyr::filter(padj < padj.cutoff)
 ```
@@ -68,9 +74,18 @@ sigOE <- res_tableOE_tb %>%
 sigOE
 ```
 
+**Discussion**: How can we tell that this extracted the right number of genes? And do we remember what these columns represent?
+
+-   `baseMean`: mean of normalized counts for all samples
+-   `log2FoldChange`: log2 fold change
+-   `lfcSE`: standard error
+-   `stat`: Wald statistic
+-   `pvalue`: Wald test p-value
+-   `padj`: BH adjusted p-values
+
 ------------------------------------------------------------------------
 
-**Exercise**
+## **ASSIGNMENT:** 
 
 **MOV10 Differential Expression Analysis: Control versus Knockdown**
 
