@@ -55,6 +55,8 @@ These unsupervised clustering methods are run using **log2 transformed normalize
 
 > **NOTE2:** The [DESeq2 vignette](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) suggests large datasets (100s of samples) to use the variance-stabilizing transformation (vst) instead of rlog for transformation of the counts, since the rlog function might take too long to run and the `vst()` function is faster with similar properties to rlog.
 
+In other words, if you use regular log transformation on typical RNA-seq data, you get lots of variation on the low end. Since PCA (for example) looks at variation, it will pay more attention to low-count genes -- which is usually not what we want. Regularlized log takes care of this, making variance more equal across the dynamic range (i.e., it's a "variance-stabilizing transform").
+
 ### Principal Component Analysis (PCA)
 
 Principal Component Analysis (PCA) is a technique used to emphasize variation and bring out strong patterns in a dataset (dimensionality reduction). This is a very important technique used in the QC and analysis of both bulk and single-cell RNAseq data.
@@ -113,9 +115,11 @@ Next we explore the `strain` factor and find that it explains the variation on P
 
 It's great that we have been able to identify the sources of variation for both PC1 and PC2. By accounting for it in our model, we should be able to detect more genes differentially expressed due to `treatment`.
 
-Worrisome about this plot is that we see two samples that do not cluster with the correct strain. This would indicate a likely **sample swap** and should be investigated to determine whether these samples are indeed the labeled strains. If we found there was a switch, we could swap the samples in the metadata. However, if we think they are labeled correctly or are unsure, we could just remove the samples from the dataset.
+Worrisome about this plot is that we see two samples that do not cluster with the correct strain. This would indicate a likely **sample swap** and should be investigated to determine whether these samples are indeed the labeled strains. If we found there was a switch (say, by cross-referencing a lab notebook, or verifying some other way), we could swap the samples in the metadata.
 
-Still we haven't found if `treatment` is a major source of variation after `strain` and `sex`. So, we explore PC3 and PC4 to see if `treatment` is driving the variation represented by either of these PCs.
+While it is straightforward to exclude samples (e.g., ignore these two samples), we need to be very careful about removing samples just because we don't like how they look in the PCA plot (i.e., cherry-picking). What we see here might be true biological variability, and we would want to make sure our results are reproducible by others repeating the same experiment. Removing possible outliers is a judgement call; any removals you make you would want to be able to justify in the methods section.
+
+Still we haven't found if `treatment` is a major source of variation after `strain` and `sex`. Recall that PCs are ordered by most variance explained in the dataset. PC1 explains the most, and that seems to be explained by `sex`. PC2 explains the second most variation, and that seems to be `strain`. Let's explore PC3 and PC4 to see if `treatment` is driving the variation represented by either of these PCs.
 
 <p align="center">
 
@@ -126,6 +130,8 @@ Still we haven't found if `treatment` is a major source of variation after `stra
 We find that the samples separate by `treatment` on PC3, and are optimistic about our DE analysis since our condition of interest, `treatment`, is separating on PC3 and we can regress out the variation driving PC1 and PC2.
 
 Depending on how much variation is explained by the first few principal components, you **may want to explore more (i.e consider more components and plot pairwise combinations)**. Even if your samples do not separate clearly by the experimental variable, you may still get biologically relevant results from the DE analysis. If you are expecting very small effect sizes, then it's possible the signal is drowned out by extraneous sources of variation. In situations **where you can identify those sources, it is important to account for these in your model**, as it provides more power to the tool for detecting DE genes.
+
+In this example, strain and sex are clearly introducing variation -- in fact, more variation than the treatment. If we don't control for those differences, we will have low power to detect significantly changing genes due to treatment.
 
 ### Hierarchical Clustering Heatmap
 
@@ -255,6 +261,8 @@ When you plot using `pheatmap()` the hierarchical clustering information is used
 </p>
 
 Overall, we observe pretty high correlations across the board ( \> 0.999) suggesting no outlying sample(s). Also, similar to the PCA plot you see the samples clustering together by sample group. Together, these plots suggest to us that the data are of good quality and we have the green light to proceed to differential expression analysis.
+
+If the data were *not* this clean, then we would try to understand why. If others prepared the libraries, we might consult with them to see if there were known issues. We could collect more metadata to see if we could explain unexpected varation that we see. Even if none of that helps, we could still proceed with differential expression, but we might not expect to get many differentially expressed genes.
 
 > NOTE: The `pheatmap` function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. If you are curious and want to explore more, try running the code below. *How does your plot change?* Take a look through the help pages (`?pheatmap`) and identify what each of the added arguments is contributing to the plot.
 >
