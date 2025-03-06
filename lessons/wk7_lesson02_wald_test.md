@@ -260,7 +260,7 @@ A plot that can be useful to exploring our results is the MA plot. The MA plot s
 plotMA(res_tableOE_unshrunken, ylim=c(-2,2))
 ```
 
-![](images/ma_plot_unshrunken-01.png){width="393"}
+<img src="../img/ma_plot_unshrunken.png" width="393" alt="MA plot with unshrunken dataset"/>
 
 **And now the shrunken results:**
 
@@ -269,7 +269,8 @@ plotMA(res_tableOE_unshrunken, ylim=c(-2,2))
 plotMA(res_tableOE, ylim=c(-2,2))
 ```
 
-![](images/ma_plot_shrunken.png){width="420"}
+<img src="../img/ma_plot_shrunken.png" width="420" alt="MA plot with shrunken values"/>
+
 
 On the left you have the unshrunken fold change values plotted and you can see the abundance of scatter for the the lowly expressed genes. That is, many of the lowly expressed genes exhibit very high fold changes. After shrinkage, we see the fold changes are much smaller estimates.
 

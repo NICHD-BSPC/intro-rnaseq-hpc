@@ -26,9 +26,7 @@ The [DESeq2 paper](https://genomebiology.biomedcentral.com/articles/10.1186/s130
 Differential expression analysis with DESeq2 involves multiple steps as displayed in the flowchart below in blue. Briefly, DESeq2 will model the raw counts, using normalization factors (size factors) to account for differences in library depth. Then, it will estimate the gene-wise dispersions and shrink these estimates to generate more accurate estimates of dispersion to model the counts. Finally, DESeq2 will fit the negative binomial model and perform hypothesis testing using the Wald test or Likelihood Ratio Test.
 
 <p align="center">
-
-![](images/deseq_workflow1.png)
-
+<img src="../img/deseq_workflow1.png" width="300" alt="deseq workflow"/>
 </p>
 
 > **NOTE:** DESeq2 is actively maintained by the developers and continuously being updated. As such, it is important that you note the version you are working with. Recently, there have been some rather **big changes implemented** that impact the output. To find out more detail about the specific **modifications made to methods described in the original 2014 paper**, take a look at [this section in the DESeq2 vignette](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#methods-changes-since-the-2014-deseq2-paper).
@@ -61,7 +59,7 @@ The tilde (`~`) should always precede your factors and tells DESeq2 to model the
 
 > #### Does the order of variables matter?
 >
-> In short, the order of variables in your design formula will not change the final results (i.e. the coefficients returned are the always the same). Typically, it has been best practice to list the variable that is your main effect in the last position of your design formula. In this way, the default result that is returned to you when using the `results()` function will be for your main effect.
+> In short, the order of variables in your design formula will not change the final results (i.e. the coefficients returned are the always the same). Typically, it has been best practice to list the variable that is your main effect in the last position of your design formula. In this way, the default result that is returned to you when using the `results()` function, with no other arguments, will be for your main effect. In practice, we usually explicitly provide arguments to `results()` so there is no ambiguity, in which case the order does not matter.
 
 ------------------------------------------------------------------------
 
@@ -92,15 +90,15 @@ Now that we know how to specify the model to DESeq2, we can run the differential
 First we create a DESeqDataSet as we did in the ['Count normalization'](https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html#2-create-deseq2-object) lesson and specify the table that contains our raw counts, the metadata variable, and provide our design formula:
 
 ``` r
-## Create DESeq2Dataset object if we don't already have it in our env 
-dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
+# Create DESeq2Dataset object if not already in our env
+dds <- DESeqDataSetFromMatrix(countData=data, colData=meta, design=~sampletype)
 ```
 
 Then, to run the actual differential expression analysis, we use a single call to the function `DESeq()`.
 
 ``` r
-## Run analysis
 ## This would be a good step to add to both of our scripts
+# Run analysis. This does a lot!
 dds <- DESeq(dds)
 ```
 
