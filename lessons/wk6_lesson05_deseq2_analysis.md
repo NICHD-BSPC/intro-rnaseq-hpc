@@ -20,10 +20,10 @@ Previously, we created the DESeq2 object using the appropriate design formula an
 ``` r
 # DO NOT RUN
 
-## Create DESeq2Dataset object
+# Create DESeq2Dataset object
 dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 
-## Run analysis
+# Run analysis
 dds <- DESeq(dds)
 ```
 
@@ -31,7 +31,7 @@ We completed the entire workflow for the differential gene expression analysis w
 
 <p align="center">
 
-![](images/deseq2_workflow_separate_2018.png){width="564"}
+<img src="images/deseq2_workflow_separate_2018.png" width="300"/>
 
 </p>
 
@@ -56,7 +56,7 @@ To normalize the count data, DESeq2 calculates size factors for each sample usin
 Let's take a quick look at size factor values we have for each sample:
 
 ``` r
-## Check the size factors
+# Check the size factors
 sizeFactors(dds)
 
 Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 
@@ -68,7 +68,7 @@ Mov10_oe_1 Mov10_oe_2 Mov10_oe_3
 These numbers should be identical to those we generated initially when we had run the function `estimateSizeFactors(dds)`. Take a look at the total number of reads for each sample:
 
 ``` r
-## Total number of raw counts per sample
+# Total number of raw counts per sample
 colSums(counts(dds))
 
 Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 

@@ -59,7 +59,7 @@ The tilde (`~`) should always precede your factors and tells DESeq2 to model the
 
 > #### Does the order of variables matter?
 >
-> In short, the order of variables in your design formula will not change the final results (i.e. the coefficients returned are the always the same). Typically, it has been best practice to list the variable that is your main effect in the last position of your design formula. In this way, the default result that is returned to you when using the `results()` function will be for your main effect.
+> In short, the order of variables in your design formula will not change the final results (i.e. the coefficients returned are the always the same). Typically, it has been best practice to list the variable that is your main effect in the last position of your design formula. In this way, the default result that is returned to you when using the `results()` function, with no other arguments, will be for your main effect. In practice, we usually explicitly provide arguments to `results()` so there is no ambiguity, in which case the order does not matter.
 
 ------------------------------------------------------------------------
 
@@ -90,14 +90,14 @@ Now that we know how to specify the model to DESeq2, we can run the differential
 First we create a DESeqDataSet as we did in the ['Count normalization'](https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html#2-create-deseq2-object) lesson and specify the table that contains our raw counts, the metadata variable, and provide our design formula:
 
 ``` r
-## Create DESeq2Dataset object
-dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData=data, colData=meta, design=~sampletype)
 ```
 
 Then, to run the actual differential expression analysis, we use a single call to the function `DESeq()`.
 
 ``` r
-## Run analysis
+# Run analysis. This does a lot!
 dds <- DESeq(dds)
 ```
 
