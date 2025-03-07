@@ -22,7 +22,7 @@ We will be working with three different data objects we have already created in 
 -   Metadata for our samples (a dataframe): `meta`
 -   Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts`
 -   Tibble versions of the DESeq2 results we generated in the last lesson: `res_tableOE_tb` and `res_tableKD_tb`
--   Get Gene mapping table using `wget`: <https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.metadata.HGNC.gz>
+-   Access to the original GTF file at `/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf`
 
 First, let's create a metadata tibble from the data frame (don't lose the row names!)
 
@@ -76,7 +76,7 @@ To pick out a specific gene of interest to plot, for example MOV10, we can use t
 
 ``` r
 # Find the Ensembl ID of MOV10
-grch38annot[grch38annot$symbol == "MOV10", "ensgene"]
+normalized_[grch38annot$symbol == "MOV10", "ensgene"]
 
 # Plot expression for single gene
 plotCounts(dds, gene="ENSG00000155363", intgroup="sampletype") 
@@ -109,6 +109,8 @@ ggplot(d, aes(x = sampletype, y = count, color = sampletype)) +
 > Note that in the plot below (code above), we are using `geom_text_repel()` from the `ggrepel` package to label our individual points on the plot.
 
 <img src="../img/plotCounts_ggrepel_salmon.png" width="700"/>
+
+ASSIGNMENT: DO THIS FOR YOUR GENE OF INTEREST
 
 > If you are interested in plotting the expression of multiple genes all together, please refer to [the short lesson linked here](top20_genes-expression_plotting.md) where we demo this for the top 20 most significantly expressed genes.
 
@@ -222,8 +224,7 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
 > If you are interested, the example code below shows how you can use DEGreport to create similar plots. **Note that this is example code, do not run.**
 >
 > ``` r
-> # Install DEGreport - I think this took too much memory to install right away. 
-> BiocManager::install("DEGreport")
+> # Install DEGreport 
 > ```
 
 > ``` r
