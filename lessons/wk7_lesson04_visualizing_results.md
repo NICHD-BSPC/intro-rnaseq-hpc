@@ -80,6 +80,12 @@ normalized_counts <- normalized_counts %>%
 >                      left_join(gtf_names, by=c("gene" = "ensgene"))
 > ```
 
+So we don't need to do this again next time, let's write the normalized counts data frame we just created to a file:
+
+``` r
+write.table(normalized_counts, file="normalized_counts.txt",  col.names = TRUE, row.names = FALSE, quote = FALSE)
+```
+
 ### Plotting significant DE genes
 
 One way to visualize results would be to simply plot the expression data for a handful of genes. We could do that by picking out specific genes of interest or selecting a range of genes.
@@ -135,7 +141,7 @@ Take the above steps (starting with finding the Ensembl Gene ID) for a gene symb
 
 ### Heatmap
 
-In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`.
+In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`. Remember that `sig0E` is a data object from the previous lessons.
 
 ``` r
 ### Extract normalized expression for significant genes from the OE and control samples (2:4 and 7:9)
@@ -203,8 +209,8 @@ This is a great way to get an overall picture of what is going on, but what if w
 First, we need to order the res_tableOE tibble by `padj`, and add an additional column to it, to include on those gene names we want to use to label the plot.
 
 ``` r
-## Add all the gene symbols as a column from the grch38 table using bind_cols()
-res_tableOE_tb <- bind_cols(res_tableOE_tb, symbol=grch38annot$symbol[match(res_tableOE_tb$gene, grch38annot$ensgene)])
+## Add all the gene symbols as a column from the gtf_names table using bind_cols()
+res_tableOE_tb <- bind_cols(res_tableOE_tb, symbol=gtf_names$symbol[match(res_tableOE_tb$gene, gtf_names$ensgene)])
 
 ## Create an empty column to indicate which genes to label
 res_tableOE_tb <- res_tableOE_tb %>% dplyr::mutate(genelabels = "")
@@ -243,7 +249,8 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
 > If you are interested, the example code below shows how you can use DEGreport to create similar plots. **Note that this is example code, do not run.**
 >
 > ``` r
-> # Install DEGreport 
+> ## load degreport
+> library(degreport)
 > ```
 
 > ``` r
@@ -252,8 +259,7 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
 > DEGreport::degVolcano(
 >     data.frame(res[,c("log2FoldChange","padj")]), # table - 2 columns
 >     plot_text = data.frame(res[1:10,c("log2FoldChange","padj","id")])) # table to add names
->     
-> # Available in the newer version for R 3.4
+>
 > DEGreport::degPlotWide(dds = dds, genes = row.names(res)[1:5], group = "condition")
 > ```
 
