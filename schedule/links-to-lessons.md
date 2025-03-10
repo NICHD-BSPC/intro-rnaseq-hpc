@@ -68,4 +68,12 @@
 - [DE Design Formulas](../lessons/wk6_lesson04_design_formulas.md) Brief (~20 min) assignment
 - [DEseq2 Analysis Pipeline](../lessons/wk6_lesson05_deseq2_analysis.md)
 
+------------------------------------------------------------------------
 
+## Week 7: 
+- [Hypothesis Testing](../lessons/wk7_lesson01_hypothesis_testing.md)
+- [Exploring Wald Test Results](../lessons/wk7_lesson02_wald_test.md) Brief assignment
+- [Summarizing DE Results](../lessons/wk7_lesson03_summarizing_dge_results.md) Brief assignment
+- [Visualizing DE Results](../lessons/wk7_lesson04_visualizing_results.md) Brief assignment
+
+**Additional assignment**: Be prepared by Tuesday of Week 8 (March 18th) to talk about your metadata table assignment and your design formula assignment in front of the class. 
