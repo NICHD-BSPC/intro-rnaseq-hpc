@@ -22,8 +22,28 @@ We will be working with three different data objects we have already created in 
 -   Metadata for our samples (a dataframe): `meta`
 -   Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts`
 -   Tibble versions of the DESeq2 results we generated in the last lesson: `res_tableOE_tb` and `res_tableKD_tb`
+-   Access to the original GTF file to link those Ensembl gene IDs with the more readable Gene Symbols for visualization
 
-First, let's create a metadata tibble from the data frame (don't lose the row names!)
+First, let's read in the GTF and extract just the Ensembl Gene IDs and the Gene Symbols so that we can associate those Gene Symbols to your data for better visualizations. **You DO NOT need to run this, I have made this data frame for you**:
+
+``` r
+## Convert our GTF to a large data frame. YOU DO NOT NEED TO RUN ANY CODE IN THIS CELL 
+library(rtracklayer)
+gtf <- readGFF("/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf")
+
+# Extract only the columns with ensembl gene names and gene symbols
+gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
+  dplyr::distinct() %>% 
+  dplyr::rename(ensgene = gene_id, symbol = gene_name)
+```
+
+\*\*Instead, let's read in `gtf_names` from a file in our shared folder\*\*:
+
+``` r
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gene_names.txt", header=TRUE)
+```
+
+Second, let's create a metadata tibble from the data frame (don't lose the row names!)
 
 ``` r
 mov10_meta <- meta %>% 
@@ -40,30 +60,31 @@ normalized_counts <- counts(dds, normalized=T) %>%
                      data.frame() %>%
                      rownames_to_column(var="gene") 
   
-# Next, merge together (ensembl IDs) the normalized counts data frame with a subset of the annotations in the tx2gene data frame (only the columns for ensembl gene IDs and gene symbols)
-grch38annot <- tx2gene %>% 
-               dplyr::select(ensgene, symbol) %>% 
-               dplyr::distinct()
 
-## This will bring in a column of gene symbols
-normalized_counts <- merge(normalized_counts, grch38annot, by.x="gene", by.y="ensgene")
+## This will bring in a column of gene symbols and merge by Ensembl gene names
+normalized_counts <- merge(normalized_counts, gtf_names, by.x="gene", by.y="ensgene")
+
 
 # Now create a tibble for the normalized counts
 normalized_counts <- normalized_counts %>%
                      as_tibble()
-  
-normalized_counts 
 ```
 
-> **NOTE:** A possible alternative to the above (have students come up with this more elegant solution):
->
+**NOTE:** A possible alternative to the above that does all of that in one command, you don't have to run both!
+
 > ``` r
 > normalized_counts <- counts(dds, normalized=T) %>% 
 >                      data.frame() %>%
 >                      rownames_to_column(var="gene") %>%
 >                      as_tibble() %>%
->                      left_join(grch38annot, by=c("gene" = "ensgene"))
+>                      left_join(gtf_names, by=c("gene" = "ensgene"))
 > ```
+
+So we don't need to do this again next time, let's write the normalized counts data frame we just created to a file:
+
+``` r
+write.table(normalized_counts, file="normalized_counts.txt",  col.names = TRUE, row.names = FALSE, quote = FALSE)
+```
 
 ### Plotting significant DE genes
 
@@ -74,11 +95,11 @@ One way to visualize results would be to simply plot the expression data for a h
 To pick out a specific gene of interest to plot, for example MOV10, we can use the `plotCounts()` from DESeq2. `plotCounts()` requires that the gene specified matches the original input to DESeq2, which in our case was Ensembl IDs.
 
 ``` r
-# Find the Ensembl ID of MOV10
-grch38annot[grch38annot$symbol == "MOV10", "ensgene"]
+# Find the Ensembl ID of MOV10. Search by Symbol and report back Gene
+normalized_counts[normalized_counts$symbol == "MOV10", "gene"]
 
 # Plot expression for single gene
-plotCounts(dds, gene="ENSG00000155363", intgroup="sampletype") 
+plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype") 
 ```
 
 <img src="../img/topgen_plot_salmon.png" width="600"/>
@@ -90,16 +111,19 @@ plotCounts(dds, gene="ENSG00000155363", intgroup="sampletype")
 If you wish to change the appearance of this plot, we can save the output of `plotCounts()` to a variable specifying the `returnData=TRUE` argument, then use `ggplot()`:
 
 ``` r
+# Load ggrepel package which helps space out labels. Be sure to add this to your setup script for the future!
+library(ggrepel)
+
 # Save plotcounts to a data frame object
-d <- plotCounts(dds, gene="ENSG00000155363", intgroup="sampletype", returnData=TRUE)
+mov10_counts <- plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype", returnData=TRUE)
 
 # What is the data output of plotCounts()?
-d %>% View()
+mov10_counts %>% View()
 
 # Plot the MOV10 normalized counts, using the samplenames (rownames(d) as labels)
-ggplot(d, aes(x = sampletype, y = count, color = sampletype)) + 
+ggplot(mov10_counts, aes(x = sampletype, y = count, color = sampletype)) + 
     geom_point(position=position_jitter(w = 0.1,h = 0)) +
-    geom_text_repel(aes(label = rownames(d))) + 
+    geom_text_repel(aes(label = rownames(mov10_counts))) + 
     theme_bw() +
     ggtitle("MOV10") +
     theme(plot.title = element_text(hjust = 0.5))
@@ -109,11 +133,15 @@ ggplot(d, aes(x = sampletype, y = count, color = sampletype)) +
 
 <img src="../img/plotCounts_ggrepel_salmon.png" width="700"/>
 
-> If you are interested in plotting the expression of multiple genes all together, please refer to [the short lesson linked here](top20_genes-expression_plotting.md) where we demo this for the top 20 most significantly expressed genes.
+## **ASSIGNMENT**:
+
+Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol of your choice and create a custom ggplot() of the expression of this gene across our sample types. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
+
+**Be sure to export your image as a .PNG file and to save the lines of customized code you used in an R Script!**
 
 ### Heatmap
 
-In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`.
+In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`. Remember that `sig0E` is a data object from the previous lessons.
 
 ``` r
 ### Extract normalized expression for significant genes from the OE and control samples (2:4 and 7:9)
@@ -181,8 +209,8 @@ This is a great way to get an overall picture of what is going on, but what if w
 First, we need to order the res_tableOE tibble by `padj`, and add an additional column to it, to include on those gene names we want to use to label the plot.
 
 ``` r
-## Add all the gene symbols as a column from the grch38 table using bind_cols()
-res_tableOE_tb <- bind_cols(res_tableOE_tb, symbol=grch38annot$symbol[match(res_tableOE_tb$gene, grch38annot$ensgene)])
+## Add all the gene symbols as a column from the gtf_names table using bind_cols()
+res_tableOE_tb <- bind_cols(res_tableOE_tb, symbol=gtf_names$symbol[match(res_tableOE_tb$gene, gtf_names$ensgene)])
 
 ## Create an empty column to indicate which genes to label
 res_tableOE_tb <- res_tableOE_tb %>% dplyr::mutate(genelabels = "")
@@ -221,8 +249,8 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
 > If you are interested, the example code below shows how you can use DEGreport to create similar plots. **Note that this is example code, do not run.**
 >
 > ``` r
-> # Install DEGreport - I think this took too much memory to install right away. 
-> BiocManager::install("DEGreport")
+> ## load degreport
+> library(degreport)
 > ```
 
 > ``` r
@@ -231,13 +259,10 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
 > DEGreport::degVolcano(
 >     data.frame(res[,c("log2FoldChange","padj")]), # table - 2 columns
 >     plot_text = data.frame(res[1:10,c("log2FoldChange","padj","id")])) # table to add names
->     
-> # Available in the newer version for R 3.4
+>
 > DEGreport::degPlotWide(dds = dds, genes = row.names(res)[1:5], group = "condition")
 > ```
 
 ------------------------------------------------------------------------
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
-
--   *Materials and hands-on activities were adapted from [RNA-seq workflow](http://www.bioconductor.org/help/workflows/rnaseqGene/#de) on the Bioconductor website*

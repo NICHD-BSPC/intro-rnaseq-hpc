@@ -85,7 +85,7 @@ sigOE
 
 ------------------------------------------------------------------------
 
-## **ASSIGNMENT:** 
+## **ASSIGNMENT:**
 
 **MOV10 Differential Expression Analysis: Control versus Knockdown**
 
