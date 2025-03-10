@@ -64,6 +64,20 @@ contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
 >
 > Yes, it does matter. **Deciding what level is the base level will determine how to interpret the fold change that is reported.** So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in factor level of interest relative to the base level. Thus, if leaving it up to DESeq2 to decide on the contrasts be sure to check that the alphabetical order coincides with the fold change direction you are anticipating.
 
+## Getting Ready to work in R
+1.Get your HPC On Demand session going:
+
+-   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
+
+-   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
+
+-   Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -\> DEanalysis), to navigate to and open `DEanalysis.Rproj`
+
+2.  We are assuming that you have the `dds` object in your environment and your packages are loaded - run your `de_setup.R` script if needed!
+
+3.  Run the actual DESeq2 analysis if needed `dds <- DESeq(dds)`. 
+
+
 ## The results table
 
 Now that we have our contrast created, we can use it as input to the `results()` function. Let's take a quick look at the help manual for the function:
