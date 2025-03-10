@@ -24,7 +24,7 @@ We will be working with three different data objects we have already created in 
 -   Tibble versions of the DESeq2 results we generated in the last lesson: `res_tableOE_tb` and `res_tableKD_tb`
 -   Access to the original GTF file to link those Ensembl gene IDs with the more readable Gene Symbols for visualization
 
-First, let's read in the GTF and extract just the. You DO NOT need to run this, I have made this data frame for you:
+First, let's read in the GTF and extract just the Ensembl Gene IDs and the Gene Symbols so that we can associate those Gene Symbols to your data for better visualizations. **You DO NOT need to run this, I have made this data frame for you**:
 
 ``` r
 ## Convert our GTF to a large data frame. YOU DO NOT NEED TO RUN ANY CODE IN THIS CELL 
@@ -37,13 +37,13 @@ gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
   dplyr::rename(ensgene = gene_id, symbol = gene_name)
 ```
 
-Instead, let's read in `gtf_names` from a file in our shared folder:
+\*\*Instead, let's read in `gtf_names` from a file in our shared folder\*\*:
 
 ``` r
 gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gene_names.txt", header=TRUE)
 ```
 
-First, let's create a metadata tibble from the data frame (don't lose the row names!)
+Second, let's create a metadata tibble from the data frame (don't lose the row names!)
 
 ``` r
 mov10_meta <- meta %>% 
@@ -60,27 +60,24 @@ normalized_counts <- counts(dds, normalized=T) %>%
                      data.frame() %>%
                      rownames_to_column(var="gene") 
   
-# Next, merge together (ensembl IDs) the normalized counts data frame with a subset of the annotations in the tx2gene data frame (only the columns for ensembl gene IDs and gene symbols)
-grch38annot <- tx2gene %>% 
-               dplyr::select(ensgene, symbol) %>% 
-               dplyr::distinct()
 
-## This will bring in a column of gene symbols
-normalized_counts <- merge(normalized_counts, grch38annot, by.x="gene", by.y="ensgene")
+## This will bring in a column of gene symbols and merge by Ensembl gene names
+normalized_counts <- merge(normalized_counts, gtf_names, by.x="gene", by.y="ensgene")
+
 
 # Now create a tibble for the normalized counts
 normalized_counts <- normalized_counts %>%
                      as_tibble()
 ```
 
-> **NOTE:** A possible alternative to the above (have students come up with this more elegant solution):
->
+**NOTE:** A possible alternative to the above that does all of that in one command, you don't have to run both!
+
 > ``` r
 > normalized_counts <- counts(dds, normalized=T) %>% 
 >                      data.frame() %>%
 >                      rownames_to_column(var="gene") %>%
 >                      as_tibble() %>%
->                      left_join(grch38annot, by=c("gene" = "ensgene"))
+>                      left_join(gtf_names, by=c("gene" = "ensgene"))
 > ```
 
 ### Plotting significant DE genes
@@ -92,11 +89,11 @@ One way to visualize results would be to simply plot the expression data for a h
 To pick out a specific gene of interest to plot, for example MOV10, we can use the `plotCounts()` from DESeq2. `plotCounts()` requires that the gene specified matches the original input to DESeq2, which in our case was Ensembl IDs.
 
 ``` r
-# Find the Ensembl ID of MOV10
-normalized_[grch38annot$symbol == "MOV10", "ensgene"]
+# Find the Ensembl ID of MOV10. Search by Symbol and report back Gene
+normalized_counts[normalized_counts$symbol == "MOV10", "gene"]
 
 # Plot expression for single gene
-plotCounts(dds, gene="ENSG00000155363", intgroup="sampletype") 
+plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype") 
 ```
 
 <img src="../img/topgen_plot_salmon.png" width="600"/>
@@ -108,16 +105,19 @@ plotCounts(dds, gene="ENSG00000155363", intgroup="sampletype")
 If you wish to change the appearance of this plot, we can save the output of `plotCounts()` to a variable specifying the `returnData=TRUE` argument, then use `ggplot()`:
 
 ``` r
+# Load ggrepel package which helps space out labels. Be sure to add this to your setup script for the future!
+library(ggrepel)
+
 # Save plotcounts to a data frame object
-d <- plotCounts(dds, gene="ENSG00000155363", intgroup="sampletype", returnData=TRUE)
+mov10_counts <- plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype", returnData=TRUE)
 
 # What is the data output of plotCounts()?
-d %>% View()
+mov10_counts %>% View()
 
 # Plot the MOV10 normalized counts, using the samplenames (rownames(d) as labels)
-ggplot(d, aes(x = sampletype, y = count, color = sampletype)) + 
+ggplot(mov10_counts, aes(x = sampletype, y = count, color = sampletype)) + 
     geom_point(position=position_jitter(w = 0.1,h = 0)) +
-    geom_text_repel(aes(label = rownames(d))) + 
+    geom_text_repel(aes(label = rownames(mov10_counts))) + 
     theme_bw() +
     ggtitle("MOV10") +
     theme(plot.title = element_text(hjust = 0.5))
@@ -127,9 +127,11 @@ ggplot(d, aes(x = sampletype, y = count, color = sampletype)) +
 
 <img src="../img/plotCounts_ggrepel_salmon.png" width="700"/>
 
-ASSIGNMENT: DO THIS FOR YOUR GENE OF INTEREST
+## **ASSIGNMENT**:
 
-> If you are interested in plotting the expression of multiple genes all together, please refer to [the short lesson linked here](top20_genes-expression_plotting.md) where we demo this for the top 20 most significantly expressed genes.
+Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol of your choice and create a custom ggplot() of the expression of this gene across our sample types. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
+
+**Be sure to export your image as a .PNG file and to save the lines of customized code you used in an R Script!**
 
 ### Heatmap
 
