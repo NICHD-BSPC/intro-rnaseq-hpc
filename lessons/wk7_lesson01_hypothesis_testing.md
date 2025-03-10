@@ -1,7 +1,7 @@
 ---
 title: "Hypothesis testing and multiple testing"
 author: "Harvard HPC Staff, Adapted by Sally Chang @ NICHD"
-date: "Last Modified February 2025""
+date: "Last Modified February 2025"
 ---
 
 Approximate time: 60 minutes
@@ -19,7 +19,7 @@ The final step in the DESeq2 workflow is taking the counts for each gene and fit
 
 <p align="center">
 
-![](images/deseq_workflow_full_2018-01.png){width="385"}
+<img src="../img/deseq_workflow_full_2018.png" width="385" alt="deseq full workflow"/>
 
 </p>
 
