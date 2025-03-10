@@ -32,6 +32,7 @@ Note: Links to weekly lessons will be provided several days in advance in the ta
 | [Week 4](schedule/links-to-lessons.md#week-4) | Theory and practice of counting RNAseq reads|
 | [Week 5](schedule/links-to-lessons.md#week-5) | Automation of the RNAseq workflow, transition to RStudio for differential expression analyses | 
 | [Week 6](schedule/links-to-lessons.md#week-6) | Overview and prep for DEseq2 analysis pipeline, assessing sample quality, design formulas |
+| [Week 7](schedule/links-to-lessons.md#week-7) | Hypothesis testing in DESeq2, summarizing and visualizing results |
 
 ### Course communication: 
 * For any content questions: We will be using the `rnaseq_jan2025` Slack channel under the Bioinformatics @NICHD workspace. Posting your questions in this channel is great, as multiple staff and fellow students will be able to respond. Also, you probably aren't the only one with that question!
