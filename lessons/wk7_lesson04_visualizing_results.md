@@ -22,7 +22,26 @@ We will be working with three different data objects we have already created in 
 -   Metadata for our samples (a dataframe): `meta`
 -   Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts`
 -   Tibble versions of the DESeq2 results we generated in the last lesson: `res_tableOE_tb` and `res_tableKD_tb`
--   Access to the original GTF file at `/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf`
+-   Access to the original GTF file to link those Ensembl gene IDs with the more readable Gene Symbols for visualization
+
+First, let's read in the GTF and extract just the. You DO NOT need to run this, I have made this data frame for you:
+
+``` r
+## Convert our GTF to a large data frame. YOU DO NOT NEED TO RUN ANY CODE IN THIS CELL 
+library(rtracklayer)
+gtf <- readGFF("/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf")
+
+# Extract only the columns with ensembl gene names and gene symbols
+gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
+  dplyr::distinct() %>% 
+  dplyr::rename(ensgene = gene_id, symbol = gene_name)
+```
+
+Instead, let's read in `gtf_names` from a file in our shared folder:
+
+``` r
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gene_names.txt", header=TRUE)
+```
 
 First, let's create a metadata tibble from the data frame (don't lose the row names!)
 
@@ -52,8 +71,6 @@ normalized_counts <- merge(normalized_counts, grch38annot, by.x="gene", by.y="en
 # Now create a tibble for the normalized counts
 normalized_counts <- normalized_counts %>%
                      as_tibble()
-  
-normalized_counts 
 ```
 
 > **NOTE:** A possible alternative to the above (have students come up with this more elegant solution):
@@ -241,5 +258,3 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
 ------------------------------------------------------------------------
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
-
--   *Materials and hands-on activities were adapted from [RNA-seq workflow](http://www.bioconductor.org/help/workflows/rnaseqGene/#de) on the Bioconductor website*
