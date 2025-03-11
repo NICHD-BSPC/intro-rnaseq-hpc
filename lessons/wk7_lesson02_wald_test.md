@@ -290,6 +290,16 @@ On the left you have the unshrunken fold change values plotted and you can see t
 
 In addition to the comparison described above, this plot allows us to evaluate the magnitude of fold changes and how they are distributed relative to mean expression. Generally, we would expect to see significant genes across the full range of expression levels.
 
+## Writing out our table
+
+Let's say we wanted to save our `res_tableOE` object as a table so we could read it in again later. Let's use the following command. 
+
+``` r
+write.table(res_tableOE, file = "res_tableOE.tsv", sep = "\t", row.names=FALSE, col.names=TRUE)
+```
+
+**Discussion:** What do the different arguments mean? How can we access help documentation about `write.table()`? 
+
 ------------------------------------------------------------------------
 
 ## **Assignment:** 
