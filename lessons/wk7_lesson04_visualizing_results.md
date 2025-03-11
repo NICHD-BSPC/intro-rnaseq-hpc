@@ -112,7 +112,7 @@ normalized_counts[normalized_counts$symbol == "MOV10", "gene"]
 plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype") 
 ```
 
-<img src="../img/topgen_plot_salmon.png" width="600"/>
+<img src="../img/single_gene_expression_boring.png" width="600"/>
 
 > This DESeq2 function only allows for plotting the counts of a single gene at a time, and is not flexible regarding the appearance.
 
