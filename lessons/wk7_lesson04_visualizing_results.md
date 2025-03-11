@@ -21,7 +21,15 @@ We will be working with three different data objects we have already created in 
 
 -   Metadata for our samples (a dataframe): `meta`
 -   Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts`
--   Tibble versions of the DESeq2 results we generated in the last lesson: `res_tableOE_tb` and `res_tableKD_tb`
+-   Tibble versions of the DESeq2 results we generated in the last lesson: `res_tableOE_tb`.
+    -   If you don't already have this, you can read in the `res_table_OE.tsv` files and convert to a tibble:
+
+        ``` r
+        res_tableOE_tb <- res_tableOE %>%
+          data.frame() %>%
+          rownames_to_column(var="gene") %>% 
+          as_tibble()
+        ```
 -   Access to the original GTF file to link those Ensembl gene IDs with the more readable Gene Symbols for visualization
 
 First, let's read in the GTF and extract just the Ensembl Gene IDs and the Gene Symbols so that we can associate those Gene Symbols to your data for better visualizations. **You DO NOT need to run this, I have made this data frame for you**:
@@ -37,11 +45,13 @@ gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
   dplyr::rename(ensgene = gene_id, symbol = gene_name)
 ```
 
-\*\*Instead, let's read in `gtf_names` from a file in our shared folder\*\*:
+**Instead, let's read in `gtf_names` from a file in our shared folder**:
 
 ``` r
 gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gene_names.txt", header=TRUE)
 ```
+
+**Discussion**: What are some commands we can use to preview the contents of this table and if it has the \~78k features we expected from our original GTF?
 
 Second, let's create a metadata tibble from the data frame (don't lose the row names!)
 
@@ -83,7 +93,7 @@ normalized_counts <- normalized_counts %>%
 So we don't need to do this again next time, let's write the normalized counts data frame we just created to a file:
 
 ``` r
-write.table(normalized_counts, file="normalized_counts.txt",  col.names = TRUE, row.names = FALSE, quote = FALSE)
+write.table(normalized_counts, file="normalized_counts.txt",  col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
 ```
 
 ### Plotting significant DE genes
@@ -142,6 +152,13 @@ Take the above steps (starting with finding the Ensembl Gene ID) for a gene symb
 ### Heatmap
 
 In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`. Remember that `sig0E` is a data object from the previous lessons.
+
+``` r
+### If you need to regenerate sigOE
+# Subset the tibble to keep only significant genes 
+sigOE <- res_tableOE_tb %>%
+  dplyr::filter(padj < 0.05)
+```
 
 ``` r
 ### Extract normalized expression for significant genes from the OE and control samples (2:4 and 7:9)
