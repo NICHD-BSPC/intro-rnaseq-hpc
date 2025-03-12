@@ -1,8 +1,7 @@
 ---
 title: "DGE analysis using LRT in DESeq2"
-author: "Meeta Mistry and Mary Piper"
-edited: "Sally Chang at NICHD, November 19th 2024"
-date: "June 14, 2017"
+author: "Harvard HPC Staff, Adapted by Sally Chang at NICHD"
+date: "Last Modified March 2025"
 ---
 
 Approximate time: 60 minutes
@@ -23,7 +22,9 @@ Generally, this test will result in a larger number of genes than the individual
 
 To extract the results from our `dds_lrt` object we can use the same `results()` function we had used with the Wald test. *There is no need for contrasts since we are not making a pair-wise comparison.*
 
-> **NOTE:** In an [earlier lesson](05a_hypothesis_testing.md#likelihood-ratio-test-lrt) on hypothesis testing, we had you create the object `dds_lrt`. If you are **having trouble finding the object**, please run the code: `dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1 )`
+> **NOTE:** In an earlier lesson on hypothesis testing, we had you create the object `dds_lrt`.
+>
+> If you are **having trouble finding the object**, please run the code: `dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1 )`
 
 ``` r
 # Extract results for LRT
@@ -76,6 +77,9 @@ For analyses using the likelihood ratio test, the p-values are determined solely
 When filtering significant genes from the LRT we threshold only the `padj` column. *How many genes are significant at `padj < 0.05`?*
 
 ``` r
+# set up cutoff if this happened already
+padj.cutoff <- 0.05
+
 # Create a tibble for LRT results
 res_LRT_tb <- res_LRT %>%
   data.frame() %>%
@@ -91,14 +95,13 @@ nrow(sigLRT_genes)
 
 # Compare to numbers we had from Wald test
 nrow(sigOE)
-nrow(sigKD)
 ```
 
 The number of significant genes observed from the LRT is quite high. This list includes genes that can be changing in any direction across the three factor levels (control, KO, overexpression). To reduce the number of significant genes, we can increase the stringency of our FDR threshold (`padj.cutoff`).
 
 ------------------------------------------------------------------------
 
-**Exercise**
+**Exercise: Actually show code of how to do this**
 
 1.  Compare the resulting gene list from the LRT test to the gene lists from the Wald test comparisons.
     1.  How many of the `sigLRT_genes` overlap with the significant genes in `sigOE`?

@@ -11,6 +11,16 @@ Approximate time: 20 minutes
 -   Evaluate the number of differentially expressed genes produced for each comparison
 -   Construct R objects containing significant genes from each comparison
 
+## **Getting Back up to Speed**
+
+You need to have the `res_tableOE` object in your environment. Assuming that you at least have our `dds` object, you can run:
+
+``` r
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.05)
+res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
+```
+
 ## Summarizing results
 
 To summarize the results table, a handy function in DESeq2 is `summary()`. Confusingly it has the same name as the function used to inspect data frames. This function when called with a DESeq results table as input, will summarize the results using a default threshold of padj \< 0.1. However, since we had set the `alpha` argument to 0.05 when creating our results table threshold: FDR \< 0.05 (padj/FDR is used even though the output says `p-value < 0.05`). Let's start with the OE vs control results:
@@ -82,6 +92,16 @@ sigOE
 -   `stat`: Wald statistic
 -   `pvalue`: Wald test p-value
 -   `padj`: BH adjusted p-values
+
+## Writing out our table
+
+Let's say we wanted to save our `res_tableOE_tb` object as a table so we could read it in again later. Let's use the following command:
+
+``` r
+write.table(res_tableOE_tb, file = "res_tableOE_tb.tsv", sep = "\t", row.names=FALSE, col.names=TRUE)
+```
+
+**Discussion:** What do the different arguments mean? How can we access help documentation about `write.table()`?\
 
 ------------------------------------------------------------------------
 
