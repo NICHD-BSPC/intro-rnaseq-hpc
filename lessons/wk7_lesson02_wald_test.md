@@ -65,6 +65,7 @@ contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
 > Yes, it does matter. **Deciding what level is the base level will determine how to interpret the fold change that is reported.** So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in factor level of interest relative to the base level. Thus, if leaving it up to DESeq2 to decide on the contrasts be sure to check that the alphabetical order coincides with the fold change direction you are anticipating.
 
 ## Getting Ready to work in R
+
 1.Get your HPC On Demand session going:
 
 -   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
@@ -75,8 +76,7 @@ contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
 
 2.  We are assuming that you have the `dds` object in your environment and your packages are loaded - run your `de_setup.R` script if needed!
 
-3.  Run the actual DESeq2 analysis if needed `dds <- DESeq(dds)`. 
-
+3.  Run the actual DESeq2 analysis if needed `dds <- DESeq(dds)`.
 
 ## The results table
 
@@ -241,6 +241,15 @@ In the figure above, we have an example using two genes green gene and purple ge
 
 To generate the shrunken log2 fold change estimates, you have to run an additional step on your results object (that we will create below) with the function `lfcShrink()`.
 
+First, you may need to regenerate our `res_tableOE` object:
+
+``` r
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.05)
+```
+
+And then do the shrinking:
+
 ``` r
 ## Save the unshrunken results to compare
 res_tableOE_unshrunken <- res_tableOE
@@ -274,7 +283,7 @@ A plot that can be useful to exploring our results is the MA plot. The MA plot s
 plotMA(res_tableOE_unshrunken, ylim=c(-2,2))
 ```
 
-<img src="../img/ma_plot_unshrunken.png" width="393" alt="MA plot with unshrunken dataset"/>
+<img src="../img/ma_plot_unshrunken.png" alt="MA plot with unshrunken dataset" width="393"/>
 
 **And now the shrunken results:**
 
@@ -283,26 +292,15 @@ plotMA(res_tableOE_unshrunken, ylim=c(-2,2))
 plotMA(res_tableOE, ylim=c(-2,2))
 ```
 
-<img src="../img/ma_plot_shrunken.png" width="420" alt="MA plot with shrunken values"/>
-
+<img src="../img/ma_plot_shrunken.png" alt="MA plot with shrunken values" width="420"/>
 
 On the left you have the unshrunken fold change values plotted and you can see the abundance of scatter for the the lowly expressed genes. That is, many of the lowly expressed genes exhibit very high fold changes. After shrinkage, we see the fold changes are much smaller estimates.
 
 In addition to the comparison described above, this plot allows us to evaluate the magnitude of fold changes and how they are distributed relative to mean expression. Generally, we would expect to see significant genes across the full range of expression levels.
 
-## Writing out our table
-
-Let's say we wanted to save our `res_tableOE` object as a table so we could read it in again later. Let's use the following command. 
-
-``` r
-write.table(res_tableOE, file = "res_tableOE.tsv", sep = "\t", row.names=FALSE, col.names=TRUE)
-```
-
-**Discussion:** What do the different arguments mean? How can we access help documentation about `write.table()`? 
-
 ------------------------------------------------------------------------
 
-## **Assignment:** 
+## **Assignment:**
 
 **MOV10 Differential Expression Analysis: Control versus Knockdown**
 
