@@ -25,6 +25,8 @@ We will be working with three different data objects we have already created in 
     -   If you don't already have this, you can read in the `res_table_OE.tsv` files and convert to a tibble:
 
         ``` r
+        res_tableOE <- read.table("res_tableOE.tsv", header=TRUE)
+
         res_tableOE_tb <- res_tableOE %>%
           data.frame() %>%
           rownames_to_column(var="gene") %>% 
@@ -48,7 +50,7 @@ gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
 **Instead, let's read in `gtf_names` from a file in our shared folder**:
 
 ``` r
-gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gene_names.txt", header=TRUE)
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
 ```
 
 **Discussion**: What are some commands we can use to preview the contents of this table and if it has the \~78k features we expected from our original GTF?
