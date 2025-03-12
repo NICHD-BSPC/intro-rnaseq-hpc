@@ -114,7 +114,7 @@ normalized_counts[normalized_counts$symbol == "MOV10", "gene"]
 plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype") 
 ```
 
-<img src="../img/single_gene_expression_boring.png" width="600"/>
+<img src="../img/single_gene_exression_boring.png" width="600"/>
 
 > This DESeq2 function only allows for plotting the counts of a single gene at a time, and is not flexible regarding the appearance.
 
@@ -187,7 +187,7 @@ pheatmap(norm_OEsig[2:7],
     height = 20)
 ```
 
-<img src="../img/pheatmap_aug2020.png" width="600"/>
+<img src="../img/mov10_oe_heatmap.png" width="600"/>
 
 > *NOTE:* There are several additional arguments we have included in the function for aesthetics. One important one is `scale="row"`, in which Z-scores are plotted, rather than the actual normalized count value.
 >
@@ -221,7 +221,7 @@ ggplot(res_tableOE_tb) +
           axis.title = element_text(size = rel(1.25)))  
 ```
 
-<img src="../img/volcano_plot_1_salmon.png" width="500"/>
+<img src="../img/mov10_oe_unlabeled_volcano.png" width="500"/>
 
 This is a great way to get an overall picture of what is going on, but what if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the Volcano plot using `geom_text_repel()`.
 
@@ -257,7 +257,7 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
           axis.title = element_text(size = rel(1.25))) 
 ```
 
-<img src="../img/volcano_plot_2_salmon.png" width="500"/>
+<img src="../img/mov10_oe_labeled_volcano.png" width="500"/>
 
 ------------------------------------------------------------------------
 
