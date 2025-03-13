@@ -372,6 +372,9 @@ res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control",
 ```
 </details>
 
+Now, on to [Week 7, lesson 03!](../lessons/wk7_lesson03_summarizing_dge_results.md)
+
+------------------------------------------------------------------------
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
 
 *Some materials and hands-on activities were adapted from [RNA-seq workflow](http://www.bioconductor.org/help/workflows/rnaseqGene/#de) on the Bioconductor website*
