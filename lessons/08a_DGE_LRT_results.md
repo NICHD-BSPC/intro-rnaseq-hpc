@@ -41,15 +41,33 @@ res_LRT
 ```         
 log2 fold change (MLE): sampletype MOV10 overexpression vs control 
 LRT p-value: '~ sampletype' vs '~ 1' 
-DataFrame with 57761 rows and 6 columns
-                        baseMean     log2FoldChange              lfcSE             stat               pvalue                 padj
-                       <numeric>          <numeric>          <numeric>        <numeric>            <numeric>            <numeric>
-ENSG00000000003 3525.88347786355 -0.438245423329571 0.0774607246185232 40.4611749305021 1.63669402960044e-09 3.14070461117016e-08
-ENSG00000000005 26.2489043110535 0.0292079869376247  0.441128912409409 1.61898836146221    0.445083140923522     0.58866891597654
-ENSG00000000419 1478.25124052691  0.383635036119846  0.113760957175207 11.3410110249776  0.00344612277761083   0.0122924772964227
-ENSG00000000457  518.42202383345  0.228970583496456  0.102331174090148 14.6313920603898 0.000665018279181725  0.00304543241149833
-ENSG00000000460 1159.77613645835 -0.269138203013482 0.0814992499897986 25.0394477225533 3.65386933066256e-06 3.23415706764646e-05
-...                          ...                ...                ...              ...                  ...                  
+DataFrame with 78932 rows and 6 columns
+                   baseMean log2FoldChange     lfcSE      stat
+                  <numeric>      <numeric> <numeric> <numeric>
+ENSG00000290825.2  0.323042       0.877124  3.337510  0.358728
+ENSG00000223972.6  0.000000             NA        NA        NA
+ENSG00000310526.1 88.634809       0.108432  0.197132  0.857979
+ENSG00000227232.6  0.000000             NA        NA        NA
+ENSG00000278267.1  0.000000             NA        NA        NA
+...                     ...            ...       ...       ...
+ENSG00000303867.1   0.00000             NA        NA        NA
+ENSG00000303902.1   0.00000             NA        NA        NA
+ENSG00000306528.1   0.00000             NA        NA        NA
+ENSG00000297844.1   0.00000             NA        NA        NA
+ENSG00000309258.1   7.00007       -2.20108  0.846886   10.3397
+                      pvalue      padj
+                   <numeric> <numeric>
+ENSG00000290825.2   0.835801        NA
+ENSG00000223972.6         NA        NA
+ENSG00000310526.1   0.651167  0.772761
+ENSG00000227232.6         NA        NA
+ENSG00000278267.1         NA        NA
+...                      ...       ...
+ENSG00000303867.1         NA        NA
+ENSG00000303902.1         NA        NA
+ENSG00000306528.1         NA        NA
+ENSG00000297844.1         NA        NA
+ENSG00000309258.1 0.00568548 0.0153827
 ```
 
 The results table output looks similar to the Wald test results, with identical columns to what we observed previously.
@@ -74,19 +92,29 @@ For analyses using the likelihood ratio test, the p-values are determined solely
 
 ## Identifying significant genes
 
-When filtering significant genes from the LRT we threshold only the `padj` column. *How many genes are significant at `padj < 0.05`?*
+When filtering significant genes from the LRT we put a threshold only the `padj` column. *How many genes are significant at default p-adj of 0.1?*
 
 ``` r
-# set up cutoff if this happened already
-padj.cutoff <- 0.05
+# set up cutoff to match DEseq2 and BSPC default
+padj.cutoff <- 0.1
 
-# Create a tibble for LRT results
-res_LRT_tb <- res_LRT %>%
+# Create a data frame of these results
+res_LRT_df <- res_LRT %>%
   data.frame() %>%
-  rownames_to_column(var="gene") %>% 
-  as_tibble()
+  rownames_to_column(var="gene")
 
-# Subset to return genes with padj < 0.05
+# You probably want to also have those gene symbols attached
+res_LRT_df <- merge(gtf_names,res_LRT_df, by.x="ensgene", by.y="gene") 
+
+# Check out what this looks like with `head()`
+head(res_LRT_df)
+
+# And now you can write this out for further analysis!
+write.table(res_LRT_df,"res_LRT_df.tsv", sep="\t", row.names=FALSE, col.names=TRUE,quote=FALSE)
+```
+
+``` r
+# Subset to return genes with padj < 0.1 
 sigLRT_genes <- res_LRT_tb %>% 
   dplyr::filter(padj < padj.cutoff)
 
@@ -101,7 +129,7 @@ The number of significant genes observed from the LRT is quite high. This list i
 
 ------------------------------------------------------------------------
 
-**Exercise: Actually show code of how to do this**
+**In-Class Demo:**
 
 1.  Compare the resulting gene list from the LRT test to the gene lists from the Wald test comparisons.
     1.  How many of the `sigLRT_genes` overlap with the significant genes in `sigOE`?
@@ -115,7 +143,7 @@ We now have this list of \~7K significant genes that we know are changing in som
 
 A good next step is to identify groups of genes that share a pattern of expression change across the sample groups (levels). To do this we will be using a clustering tool called `degPatterns` from the 'DEGreport' package. The `degPatterns` tool uses a **hierarchical clustering approach based on pair-wise correlations** between genes, then cuts the hierarchical tree to generate groups of genes with similar expression profiles. The tool cuts the tree in a way to optimize the diversity of the clusters, such that the variability inter-cluster \> the variability intra-cluster.
 
-Before we begin clustering, we will **first subset our rlog transformed normalized counts** to retain only the differentially expressed genes (padj \< 0.05). In our case, it may take some time to run the clustering on 7K genes, and so for class demonstration purposes we will subset to keep only the top 1000 genes sorted by p-adjusted value.
+Before we begin clustering, we will **first subset our rlog transformed normalized counts** to retain only the differentially expressed genes (padj \< 0.1). In our case, it may take some time to run the clustering on 7K genes, and so for class demonstration purposes we will subset to keep only the top 1000 genes sorted by p-adjusted value.
 
 > #### Where do I get rlog transformed counts?
 >
