@@ -21,39 +21,17 @@ We will be working with three different data objects we have already created in 
 
 -   Metadata for our samples (a dataframe): `meta`
 -   Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts`
--   Tibble versions of the DESeq2 results we generated in the last lesson: `res_tableOE_tb`.
-    -   If you don't already have this, you can read in the `res_table_OE.tsv` files and convert to a tibble:
+-   Dataframe versions of the DESeq2 results we generated in the last lesson: `res_tableOE_df`.
+    -   If you don't already have this, you can read in the file we created in the last lesson:
 
         ``` r
-        res_tableOE <- read.table("res_tableOE.tsv", header=TRUE)
-
-        res_tableOE_tb <- res_tableOE %>%
-          data.frame() %>%
-          rownames_to_column(var="gene") %>% 
-          as_tibble()
+        res_tableOE <- read.table("res_tableOE_df.tsv", header=TRUE)
         ```
--   Access to the original GTF file to link those Ensembl gene IDs with the more readable Gene Symbols for visualization
-
-First, let's read in the GTF and extract just the Ensembl Gene IDs and the Gene Symbols so that we can associate those Gene Symbols to your data for better visualizations. **You DO NOT need to run this, I have made this data frame for you**:
-
-``` r
-## Convert our GTF to a large data frame. YOU DO NOT NEED TO RUN ANY CODE IN THIS CELL 
-library(rtracklayer)
-gtf <- readGFF("/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf")
-
-# Extract only the columns with ensembl gene names and gene symbols
-gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
-  dplyr::distinct() %>% 
-  dplyr::rename(ensgene = gene_id, symbol = gene_name)
-```
-
-**Instead, let's read in `gtf_names` from a file in our shared folder**:
+-   `gtf_names` from our previous lesson:
 
 ``` r
 gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
 ```
-
-**Discussion**: What are some commands we can use to preview the contents of this table and if it has the \~78k features we expected from our original GTF?
 
 Second, let's create a metadata tibble from the data frame (don't lose the row names!)
 
@@ -75,11 +53,6 @@ normalized_counts <- counts(dds, normalized=T) %>%
 
 ## This will bring in a column of gene symbols and merge by Ensembl gene names
 normalized_counts <- merge(normalized_counts, gtf_names, by.x="gene", by.y="ensgene")
-
-
-# Now create a tibble for the normalized counts
-normalized_counts <- normalized_counts %>%
-                     as_tibble()
 ```
 
 **NOTE:** A possible alternative to the above that does all of that in one command, you don't have to run both!

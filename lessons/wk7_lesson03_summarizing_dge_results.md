@@ -17,7 +17,7 @@ You need to have the `res_tableOE` object in your environment. Assuming that you
 
 ``` r
 contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
-res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.1)
+res_tableOE <- results(dds, contrast=contrast_oe, alpha)
 res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
 ```
 
@@ -46,7 +46,7 @@ low counts [2]     : 22701, 52%
 
 **Based on the contrast we set up - how would you interpret "upregulated"? In which group are those genes upregulated in?**
 
-## Extracting significant differentially expressed genes
+## Extracting significant DE genes and adding gene symbols
 
 Let's first create variables that contain our threshold criteria. We will only be using the adjusted p-values in our criteria:
 
@@ -55,18 +55,42 @@ Let's first create variables that contain our threshold criteria. We will only b
 padj.cutoff <- 0.1
 ```
 
-We can easily subset the results table to only include those that are significant using the `filter()` function.
+We can easily subset the results table to only include those that are significant using the `filter()` function, and merge a data frame from the
 
 ``` r
-# Create a dataframe
+# Create a dataframe to simplify the res_tableOE object. What do you think is happening in rownames_to_columns()?
 res_tableOE_df <- res_tableOE %>%
   data.frame() %>%
   rownames_to_column(var="gene")
+```
 
+*Wouldn't it be nice if we could have gene symbols associated with each of our genes instead of just the Ensembl gene IDs?*
+
+First, let's read in the GTF and extract just the Ensembl Gene IDs and the Gene Symbols so that we can associate those Gene Symbols to your data for better visualizations. **Run readGFF() this time, but in the future and your setup script, just read in the CSV option:**
+
+``` r
+## Convert our GTF to a large data frame.
+library(rtracklayer)
+gtf <- readGFF("/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf")
+
+# Extract only the columns with ensembl gene names and gene symbols
+gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
+  dplyr::distinct() %>% 
+  dplyr::rename(ensgene = gene_id, symbol = gene_name)
+```
+
+``` r
+## Next time, just read in this TSV
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
+```
+
+> **Discussion**: What are some commands we can use to preview the contents of this table and if it has the \~78k features we expected from our original GTF?
+
+Now we merge these two data frames by their columns that each contain Ensembl Gene IDs:
+
+```{r}
 #merge gene symbols
 res_tableOE_df <- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene")
-
-#What do you think is happening in rownames_to_columns()?
 ```
 
 Now we can subset that table to only keep the significant genes using our pre-defined thresholds:
@@ -82,7 +106,7 @@ sigOE <- res_tableOE_df %>%
 head(sigOE)
 ```
 
-**Discussion**: How can we tell that this extracted the right number of genes? And do we remember what these columns represent?
+**Discussion**: Do we remember what these columns represent?
 
 -   `baseMean`: mean of normalized counts for all samples
 -   `log2FoldChange`: log2 fold change
@@ -99,7 +123,7 @@ Let's say we wanted to save our `res_tableOE_df` object as a table so we could r
 write.table(res_tableOE_df, file = "res_tableOE_df.tsv", sep = "\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
 ```
 
-**Discussion:** What do the different arguments mean? How can we access help documentation about `write.table()`?\
+**Discussion:** What do the different arguments mean? How can we access help documentation about `write.table()`?
 
 ------------------------------------------------------------------------
 
@@ -107,12 +131,33 @@ write.table(res_tableOE_df, file = "res_tableOE_df.tsv", sep = "\t", row.names=F
 
 **MOV10 Differential Expression Analysis: Control versus Knockdown**
 
-1.  Using the same p-adjusted threshold as above (`padj.cutoff < 0.05`), subset `res_tableKD` to report the number of genes that are up- and down-regulated in Mov10_knockdown compared to control.
+1.  Using the same p-adjusted threshold as above (`padj.cutoff < 0.1`), subset `res_tableKD` to report the number of genes that are up- and down-regulated in Mov10_knockdown compared to control. Save it as an object called `sigKD`.
 2.  How many genes are differentially expressed in the Knockdown compared to Control? How does this compare to the overexpression significant gene list (in terms of numbers)?
 
 ------------------------------------------------------------------------
 
+## Wrap-Up
+
 Now that we have extracted the significant results, we are ready for visualization!
+
+In summary, to help prepare for the next lesson, you can add the following to your script along with the code required to create the `sigKD` object:
+
+``` r
+padj.cutoff <- 0.1
+
+res_tableOE_df <- res_tableOE %>%
+data.frame() %>%
+rownames_to_column(var="gene")
+
+## Next time, just read in this TSV
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
+
+# merge gene names
+res_tableOE_df <- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene")
+
+sigOE <- res_tableOE_df %>%
+  dplyr::filter(padj < padj.cutoff)
+```
 
 ------------------------------------------------------------------------
 
