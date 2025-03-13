@@ -17,17 +17,17 @@ You need to have the `res_tableOE` object in your environment. Assuming that you
 
 ``` r
 contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
-res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.05)
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.1)
 res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
 ```
 
 ## Summarizing results
 
-To summarize the results table, a handy function in DESeq2 is `summary()`. Confusingly it has the same name as the function used to inspect data frames. This function when called with a DESeq results table as input, will summarize the results using a default threshold of padj \< 0.1. However, since we had set the `alpha` argument to 0.05 when creating our results table threshold: FDR \< 0.05 (padj/FDR is used even though the output says `p-value < 0.05`). Let's start with the OE vs control results:
+To summarize the results table, a handy function in DESeq2 is `summary()`. Confusingly it has the same name as the function used to inspect data frames. This function when called with a DESeq results table as input, will summarize the results using a default threshold of padj \< 0.1, which is comparable to the results you would get from BSPC.
 
 ``` r
 ## Summarize results
-summary(res_tableOE, alpha = 0.05)
+summary(res_tableOE, alpha = 0.1)
 ```
 
 In addition to the number of genes up- and down-regulated at the default threshold, **the function also reports the number of genes that were tested (genes with non-zero total read count), and the number of genes not included in multiple test correction due to a low mean count**.
@@ -52,7 +52,7 @@ Let's first create variables that contain our threshold criteria. We will only b
 
 ``` r
 ### Set thresholds
-padj.cutoff <- 0.05
+padj.cutoff <- 0.1
 ```
 
 We can easily subset the results table to only include those that are significant using the `filter()` function, but first we will convert the results table into a [tibble](https://tibble.tidyverse.org/), which is also part of the Tidyverse extended universe like `dplyr` .
@@ -62,11 +62,13 @@ From the [R for Data Science](https://r4ds.had.co.nz/tibbles.html) guide:
 > Throughout this book we work with “tibbles” instead of R’s traditional `data.frame`. Tibbles *are* data frames, but they tweak some older behaviours to make life a little easier. R is an old language, and some things that were useful 10 or 20 years ago now get in your way. It’s difficult to change base R without breaking existing code, so most innovation occurs in packages. Here we will describe the **tibble** package, which provides opinionated data frames that make working in the tidyverse a little easier.
 
 ``` r
-# Create a tibble of results
-res_tableOE_tb <- res_tableOE %>%
+# Create a dataframe
+res_tableOE_df <- res_tableOE %>%
   data.frame() %>%
-  rownames_to_column(var="gene") %>% 
-  as_tibble()
+  rownames_to_column(var="gene")
+
+#merge gene symbols
+res_tableOE_df <- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene")
 
 #What do you think is happening in rownames_to_columns()?
 ```
@@ -74,14 +76,14 @@ res_tableOE_tb <- res_tableOE %>%
 Now we can subset that table to only keep the significant genes using our pre-defined thresholds:
 
 ``` r
-# Subset the tibble to keep only significant genes 
-sigOE <- res_tableOE_tb %>%
+# Subset the dataframe to keep only significant genes 
+sigOE <- res_tableOE_df %>%
         dplyr::filter(padj < padj.cutoff)
 ```
 
 ``` r
-# Take a quick look at this tibble
-sigOE
+# Take a quick look at this dataframe
+head(sigOE)
 ```
 
 **Discussion**: How can we tell that this extracted the right number of genes? And do we remember what these columns represent?
@@ -95,10 +97,10 @@ sigOE
 
 ## Writing out our table
 
-Let's say we wanted to save our `res_tableOE_tb` object as a table so we could read it in again later. Let's use the following command:
+Let's say we wanted to save our `res_tableOE_df` object as a table so we could read it in again later. Let's use the following command:
 
 ``` r
-write.table(res_tableOE_tb, file = "res_tableOE_tb.tsv", sep = "\t", row.names=FALSE, col.names=TRUE)
+write.table(res_tableOE_df, file = "res_tableOE_df.tsv", sep = "\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
 ```
 
 **Discussion:** What do the different arguments mean? How can we access help documentation about `write.table()`?\
