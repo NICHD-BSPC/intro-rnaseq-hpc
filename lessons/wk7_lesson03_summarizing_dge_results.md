@@ -55,11 +55,7 @@ Let's first create variables that contain our threshold criteria. We will only b
 padj.cutoff <- 0.1
 ```
 
-We can easily subset the results table to only include those that are significant using the `filter()` function, but first we will convert the results table into a [tibble](https://tibble.tidyverse.org/), which is also part of the Tidyverse extended universe like `dplyr` .
-
-From the [R for Data Science](https://r4ds.had.co.nz/tibbles.html) guide:
-
-> Throughout this book we work with “tibbles” instead of R’s traditional `data.frame`. Tibbles *are* data frames, but they tweak some older behaviours to make life a little easier. R is an old language, and some things that were useful 10 or 20 years ago now get in your way. It’s difficult to change base R without breaking existing code, so most innovation occurs in packages. Here we will describe the **tibble** package, which provides opinionated data frames that make working in the tidyverse a little easier.
+We can easily subset the results table to only include those that are significant using the `filter()` function.
 
 ``` r
 # Create a dataframe
