@@ -1,8 +1,7 @@
 ---
 title: "Functional Analysis for RNA-seq"
-author: "Mary Piper, Radhika Khetani, Meeta Mistry, Jihe Liu, Will Gammerdinger"
-date: "Monday, September 12th, 2022"
-edited: "Sally Chang at NICHD, November 20th, 2024"
+author: "Harvard HPC Staff, adapted by Sally Chang @ NICHD"
+edited: "Last Edited March 2025"
 ---
 
 Approximate time: 120 minutes
