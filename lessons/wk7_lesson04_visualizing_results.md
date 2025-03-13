@@ -17,31 +17,28 @@ Approximate time: 75 minutes
 
 When we are working with large amounts of data it can be useful to display that information graphically to gain more insight. During this lesson, we will get you started with some basic and more advanced plots commonly used when exploring differential gene expression data, however, many of these plots can be helpful in visualizing other types of data as well.
 
-We will be working with three different data objects we have already created in earlier lessons:
+## Assembling our Data
 
--   Metadata for our samples (a dataframe): `meta`
--   Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts`
--   Dataframe versions of the DESeq2 results we generated in the last lesson: `res_tableOE_df`.
-    -   If you don't already have this, you can read in the file we created in the last lesson:
+We will be working with three different data objects we have already created in earlier lessons or will re-create now:
 
-        ``` r
-        res_tableOE <- read.table("res_tableOE_df.tsv", header=TRUE)
-        ```
--   `gtf_names` from our previous lesson:
+**Metadata for our samples (a dataframe): `meta`**
+
+Create a version of our metadata that moves the rownames to a column called `samplename` because some of the visualization software expects that:
+
+``` r
+mov10_meta <- meta %>% 
+              rownames_to_column(var="samplename")
+```
+
+**GTF info columns:**
+
+If you don't already have this, you can read in the file we created in the last lesson:
 
 ``` r
 gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
 ```
 
-Second, let's create a metadata tibble from the data frame (don't lose the row names!)
-
-``` r
-mov10_meta <- meta %>% 
-              rownames_to_column(var="samplename") %>% 
-              as_tibble()
-```
-
-Next, let's bring in a column with gene symbols to the `normalized_counts` object, so we can use them to label our plots. Ensembl IDs are great for many things, but the gene symbols are much more recognizable to us, as biologists.
+**Normalized count data (matrix):** Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts` . Next, let's bring in a column with gene symbols to the `normalized_counts` object, so we can use them to label our plots. Ensembl IDs are great for many things, but the gene symbols are much more recognizable to us, as biologists
 
 ``` r
 # DESeq2 creates a matrix when you use the counts() function
@@ -49,29 +46,24 @@ Next, let's bring in a column with gene symbols to the `normalized_counts` objec
 normalized_counts <- counts(dds, normalized=T) %>% 
                      data.frame() %>%
                      rownames_to_column(var="gene") 
-  
 
 ## This will bring in a column of gene symbols and merge by Ensembl gene names
 normalized_counts <- merge(normalized_counts, gtf_names, by.x="gene", by.y="ensgene")
-```
 
-**NOTE:** A possible alternative to the above that does all of that in one command, you don't have to run both!
+#So we don't need to do this again next time, let's write the normalized counts data frame we just created to a file:
 
-> ``` r
-> normalized_counts <- counts(dds, normalized=T) %>% 
->                      data.frame() %>%
->                      rownames_to_column(var="gene") %>%
->                      as_tibble() %>%
->                      left_join(gtf_names, by=c("gene" = "ensgene"))
-> ```
-
-So we don't need to do this again next time, let's write the normalized counts data frame we just created to a file:
-
-``` r
 write.table(normalized_counts, file="normalized_counts.txt",  col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
 ```
 
-### Plotting significant DE genes
+**DESeq2 results dataframe:**
+
+If you don't already have this, you can read in the file we created in the last lesson:
+
+``` r
+res_tableOE <- read.table("res_tableOE_df.tsv", header=TRUE)
+```
+
+## Plotting significant DE genes
 
 One way to visualize results would be to simply plot the expression data for a handful of genes. We could do that by picking out specific genes of interest or selecting a range of genes.
 
@@ -80,8 +72,8 @@ One way to visualize results would be to simply plot the expression data for a h
 To pick out a specific gene of interest to plot, for example MOV10, we can use the `plotCounts()` from DESeq2. `plotCounts()` requires that the gene specified matches the original input to DESeq2, which in our case was Ensembl IDs.
 
 ``` r
-# Find the Ensembl ID of MOV10. Search by Symbol and report back Gene
-normalized_counts[normalized_counts$symbol == "MOV10", "gene"]
+# Find the Ensembl ID of MOV10. Search by Symbol and report back ensembl gene
+normalized_counts[normalized_counts$symbol == "MOV10", "ensgene"]
 
 # Plot expression for single gene
 plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype") 
