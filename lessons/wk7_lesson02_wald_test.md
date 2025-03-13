@@ -90,10 +90,10 @@ You will see we have the option to provide a wide array of arguments and tweak t
 
 ``` r
 ## Extract results for MOV10 overexpression vs control
-res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.05)
+res_tableOE <- results(dds, contrast=contrast_oe)
 ```
 
-> **NOTE:** For our analysis, in addition to the `contrast` argument we will also provide a value of 0.05 for the `alpha` argument. We will describe this in more detail when we talk about gene level filtering.
+> **NOTE:** For our analysis, in addition to the `contrast` argument we will NOT provide a value of 0.05 for an optional `alpha` argument. Instead we will be using the default of 0.1, which is what BSPC does for exploratory analyses.
 
 The results table that is returned to us is **a `DESeqResults` object**, which is a simple subclass of DataFrame. In many ways it can be treated like a dataframe (i.e when accessing/subsetting data), however it is important to recognize that there are differences for downstream steps like visualization.
 
@@ -187,7 +187,7 @@ DESeq2 defines a low mean threshold, that is empirically determined from your da
 
 *Image courtesy of [slideshare presentation](https://www.slideshare.net/joachimjacob/5rna-seqpart5detecting-differentialexpression) from Joachim Jacob, 2014.*
 
-At a user-specified value (`alpha = 0.05`), DESeq2 evaluates the change in the number of significant genes as it filters out increasingly bigger portions of genes based on their mean counts, as shown in the figure above. The point at which the number of significant genes reaches a peak is the low mean threshold that is used to filter genes that undergo multiple testing. There is also an argument to turn off the filtering off by setting `independentFiltering = F`.
+At a user-specified value (`alpha = 0.1`), DESeq2 evaluates the change in the number of significant genes as it filters out increasingly bigger portions of genes based on their mean counts, as shown in the figure above. The point at which the number of significant genes reaches a peak is the low mean threshold that is used to filter genes that undergo multiple testing. There is also an argument to turn off the filtering off by setting `independentFiltering = F`.
 
 ``` r
 # Filter genes below the low mean threshold
@@ -218,7 +218,23 @@ log2 (normalized_counts_group1 / normalized_counts_group2)
 
 The problem is, these fold change estimates are not entirely accurate as they do not account for the large dispersion we observe with low read counts. To address this, the **log2 fold changes need to be adjusted**.
 
-### More accurate LFC estimates
+**This is where we stopped on Tuesday of Week 7!**
+
+------------------------------------------------------------------------
+
+### More accurate LFC estimates: Picking up again from Tuesday
+
+1.Get your HPC On Demand session going:
+
+-   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory and **INCREASE MEMORY TO 8G**: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
+
+-   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
+
+-   Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -\> DEanalysis), to navigate to and open `DEanalysis.Rproj`
+
+2.  We are assuming that you have the `dds` object in your environment and your packages are loaded - run your `de_setup.R` script if needed!
+
+3.  Run the actual DESeq2 analysis if needed `dds <- DESeq(dds)`.
 
 To generate more accurate log2 foldchange (LFC) estimates, DESeq2 allows for the **shrinkage of the LFC estimates toward zero** when the information for a gene is low, which could include:
 
@@ -245,8 +261,10 @@ First, you may need to regenerate our `res_tableOE` object:
 
 ``` r
 contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
-res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.05)
+res_tableOE <- results(dds, contrast=contrast_oe)
 ```
+
+> **NOTE:** For our analysis, in addition to the `contrast` argument we will NOT provide a value of 0.05 for an optional `alpha` argument. Instead we will be using the default of 0.1, which is what BSPC does for exploratory analyses.
 
 And then do the shrinking:
 
@@ -294,7 +312,7 @@ plotMA(res_tableOE, ylim=c(-2,2))
 
 <img src="../img/ma_plot_shrunken.png" alt="MA plot with shrunken values" width="420"/>
 
-On the left you have the unshrunken fold change values plotted and you can see the abundance of scatter for the the lowly expressed genes. That is, many of the lowly expressed genes exhibit very high fold changes. After shrinkage, we see the fold changes are much smaller estimates.
+On the top you have the unshrunken fold change values plotted and you can see the abundance of scatter for the the lowly expressed genes. That is, many of the lowly expressed genes exhibit very high fold changes. After shrinkage, we see the fold changes are much smaller estimates.
 
 In addition to the comparison described above, this plot allows us to evaluate the magnitude of fold changes and how they are distributed relative to mean expression. Generally, we would expect to see significant genes across the full range of expression levels.
 
@@ -311,7 +329,48 @@ Now that we have results for the overexpression results, do the same for the **C
 3.  Shrink the LFC estimates using `lfcShrink()` and assign it back to `res_tableKD`.
 4.  Store the code you used to do the above exercises in an RScript named `control_vs_kd.R` .
 
-------------------------------------------------------------------------
+## R Script updates: 
+
+Here is what your `de_setup.R` script should look like now to regenerate all the R objects we will need to the next lesson:
+
+<details>
+
+<summary>R Script Progress</summary>
+
+```r
+# Gene-level differential expression analysis using DESeq2
+
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(ggrepel)
+library(DEGreport)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
+
+# Run analysis. This does a lot!
+dds <- DESeq(dds)
+
+#Set up control vs. OE contrast
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.1)
+
+#LFC shrinking
+res_tableOE_unshrunken <- res_tableOE
+res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
+
+#Add your knockdown vs. control contrast code below: 
+```
+</details>
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
 
