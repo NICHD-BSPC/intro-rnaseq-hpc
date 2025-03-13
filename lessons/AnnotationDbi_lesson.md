@@ -1,3 +1,9 @@
+---
+title: "AnnotationDbi"
+author: "Harvard HPC Staff, Adapted by Sally Chang at NICHD"
+date: "Last Modified March 2025"
+---
+
 ## AnnotationDbi
 
 AnnotationDbi is an R package that provides an interface for connecting and querying various annotation databases using SQLite data storage. The AnnotationDbi packages can query the *OrgDb*, *TxDb*, *EnsDb*, *Go.db*, and *BioMart* annotations. There is helpful [documentation](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf) available to reference when extracting data from any of these databases.
@@ -17,7 +23,7 @@ org.Hs.eg.db
 
 We can see the metadata for the database by just typing the name of the database, including the species, last updates for the different source information, and the source urls. Note the KEGG data from this database was last updated in 2011, so may not be the best site for KEGG pathway information.
 
-``` r
+```         
 OrgDb object:
 | DBSCHEMAVERSION: 2.1
 | Db type: OrgDb
@@ -25,34 +31,39 @@ OrgDb object:
 | DBSCHEMA: HUMAN_DB
 | ORGANISM: Homo sapiens
 | SPECIES: Human
-| EGSOURCEDATE: 2018-Oct11
+| EGSOURCEDATE: 2024-Sep20
 | EGSOURCENAME: Entrez Gene
 | EGSOURCEURL: ftp://ftp.ncbi.nlm.nih.gov/gene/DATA
 | CENTRALID: EG
 | TAXID: 9606
-| GOSOURCENAME: Gene Ontology
-| GOSOURCEURL: ftp://ftp.geneontology.org/pub/go/godatabase/archive/latest-lite/
-| GOSOURCEDATE: 2018-Oct10
-| GOEGSOURCEDATE: 2018-Oct11
+| GOSOURCENAME: 
+| GOSOURCEURL: 
+| GOSOURCEDATE: 
+| GOEGSOURCEDATE: 2024-Sep20
 | GOEGSOURCENAME: Entrez Gene
 | GOEGSOURCEURL: ftp://ftp.ncbi.nlm.nih.gov/gene/DATA
 | KEGGSOURCENAME: KEGG GENOME
 | KEGGSOURCEURL: ftp://ftp.genome.jp/pub/kegg/genomes
 | KEGGSOURCEDATE: 2011-Mar15
 | GPSOURCENAME: UCSC Genome Bioinformatics (Homo sapiens)
-| GPSOURCEURL: 
-| GPSOURCEDATE: 2018-Oct2
-| ENSOURCEDATE: 2018-Oct05
+| GPSOURCEURL: ftp://hgdownload.cse.ucsc.edu/goldenPath/hg38/database
+| GPSOURCEDATE: 2024-Sep22
+| ENSOURCEDATE: 2024-May14
 | ENSOURCENAME: Ensembl
 | ENSOURCEURL: ftp://ftp.ensembl.org/pub/current_fasta
 | UPSOURCENAME: Uniprot
 | UPSOURCEURL: http://www.UniProt.org/
-| UPSOURCEDATE: Thu Oct 18 05:22:10 2018
+| UPSOURCEDATE: Mon Sep 23 15:46:45 2024
 ```
 
 We can easily extract information from this database using *AnnotationDbi* with the methods: `columns`, `keys`, `keytypes`, and `select`. For example, we will use our `org.Hs.eg.db` database to acquire information, but know that the same methods work for the *TxDb*, *Go.db*, *EnsDb*, and *BioMart* annotations.
 
 Because as we saw, we do not have a gene symbol for every gene in our dataset, we are going to need to clean up our Ensembl Gene IDs by removing the trailing versions i.e. turn `ENSG00000000003.16` into just `ENSG00000000003`. These are now something we can search into
+
+``` r
+# use gsub to replace column with stripped gene symbols
+res_tableOE_df$ensgene <- gsub("\\..*","",res_tableOE_df$ensgene)
+```
 
 ``` r
 # Return the Ensembl IDs for a set of genes
@@ -62,7 +73,7 @@ annotations_orgDb <- AnnotationDbi::select(org.Hs.eg.db, # database
                                      keytype = "ENSEMBL") # type of data given in 'keys' argument
 ```
 
-We started from at about 57K genes in our results table, and the dimensions of our resulting annotation data frame also look quite similar. Let's take a peek to see if we actually returned annotations for each individual Ensembl gene ID that went in to the query:
+We started from at about 79k in our results table, and the dimensions of our resulting annotation data frame also look quite similar. Let's take a peek to see if we actually returned annotations for each individual Ensembl gene ID that went in to the query:
 
 ``` r
 length(which(is.na(annotations_orgDb$SYMBOL)))
@@ -103,6 +114,9 @@ EnsDb.Hsapiens.v86
 
 # Explore the fields that can be used as keys
 keytypes(EnsDb.Hsapiens.v86)
+
+# Explore columns of data that can be used for other analyses
+columns(EnsDb.Hapiens.v86)
 ```
 
 Now we can return all gene IDs for our gene list:
