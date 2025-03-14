@@ -48,7 +48,7 @@ normalized_counts <- counts(dds, normalized=T) %>%
                      rownames_to_column(var="gene") 
 
 ## This will bring in a column of gene symbols and merge by Ensembl gene names
-normalized_counts <- merge(normalized_counts, gtf_names, by.x="gene", by.y="ensgene")
+normalized_counts <- merge(gtf_names, normalized_counts, by.x="ensgene", by.y="gene")
 
 #So we don't need to do this again next time, let's write the normalized counts data frame we just created to a file:
 
@@ -60,7 +60,7 @@ write.table(normalized_counts, file="normalized_counts.txt",  col.names = TRUE, 
 If you don't already have this, you can read in the file we created in the last lesson:
 
 ``` r
-res_tableOE <- read.table("res_tableOE_df.tsv", header=TRUE)
+res_tableOE_df <- read.table("res_tableOE_df.tsv", header=TRUE)
 ```
 
 ## Plotting significant DE genes
@@ -110,7 +110,7 @@ ggplot(mov10_counts, aes(x = sampletype, y = count, color = sampletype)) +
 
 > Note that in the plot below (code above), we are using `geom_text_repel()` from the `ggrepel` package to label our individual points on the plot.
 
-<img src="../img/plotCounts_ggrepel_salmon.png" width="700"/>
+<img src="../img/colored_mov10_expression.png" width="700"/>
 
 ## **ASSIGNMENT OPTION 1**:
 
