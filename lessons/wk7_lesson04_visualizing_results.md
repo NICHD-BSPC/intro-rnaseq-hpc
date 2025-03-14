@@ -110,7 +110,7 @@ ggplot(mov10_counts, aes(x = sampletype, y = count, color = sampletype)) +
 
 <img src="../img/plotCounts_ggrepel_salmon.png" width="700"/>
 
-## **ASSIGNMENT**:
+## **ASSIGNMENT OPTION 1**:
 
 Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol of your choice and create a custom ggplot() of the expression of this gene across our sample types. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
 
@@ -124,13 +124,13 @@ In addition to plotting subsets, we could also extract the normalized values of 
 ### If you need to regenerate sigOE
 # Subset the tibble to keep only significant genes 
 sigOE <- res_tableOE_tb %>%
-  dplyr::filter(padj < 0.05)
+  dplyr::filter(padj < 0.1)
 ```
 
 ``` r
-### Extract normalized expression for significant genes from the OE and control samples (2:4 and 7:9)
-norm_OEsig <- normalized_counts[,c(1:4,7:9)] %>% 
-              dplyr::filter(gene %in% sigOE$gene)  
+### Extract normalized expression for significant genes from the OE and control samples (3:5 and 8:10)
+norm_OEsig <- normalized_counts[,c(1:5,8:10)] %>% 
+  dplyr::filter(ensgene %in% sigOE$ensgene) 
 ```
 
 Now let's draw the heatmap using `pheatmap`:
@@ -140,7 +140,7 @@ Now let's draw the heatmap using `pheatmap`:
 heat_colors <- brewer.pal(6, "YlOrRd")
 
 ### Run pheatmap using the metadata data frame for the annotation
-pheatmap(norm_OEsig[2:7], 
+pheatmap(norm_OEsig[3:8], 
     color = heat_colors, 
     cluster_rows = T, 
     show_rownames = F,
@@ -167,15 +167,15 @@ To generate a volcano plot, we first need to have a column in our results data i
 ``` r
 ## Obtain logical vector where TRUE values denote padj values < 0.05 and fold change > 1.5 in either direction
 
-res_tableOE_tb <- res_tableOE_tb %>% 
-                  dplyr::mutate(threshold_OE = padj < 0.05 & abs(log2FoldChange) >= 0.58)
+res_tableOE_plotting <- res_tableOE_df %>% 
+                  dplyr::mutate(threshold_OE = padj < 0.1 & abs(log2FoldChange) >= 0.58)
 ```
 
 Now we can start plotting. The `geom_point` object is most applicable, as this is essentially a scatter plot:
 
 ``` r
 ## Volcano plot
-ggplot(res_tableOE_tb) +
+ggplot(res_tableOE_plotting) +
     geom_point(aes(x = log2FoldChange, y = -log10(padj), colour = threshold_OE)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
@@ -190,14 +190,11 @@ ggplot(res_tableOE_tb) +
 
 This is a great way to get an overall picture of what is going on, but what if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the Volcano plot using `geom_text_repel()`.
 
-First, we need to order the res_tableOE tibble by `padj`, and add an additional column to it, to include on those gene names we want to use to label the plot.
+First, we need to order the res_tableOE by `padj`, and add an additional column to it, to include on those gene names we want to use to label the plot.
 
 ``` r
-## Add all the gene symbols as a column from the gtf_names table using bind_cols()
-res_tableOE_tb <- bind_cols(res_tableOE_tb, symbol=gtf_names$symbol[match(res_tableOE_tb$gene, gtf_names$ensgene)])
-
 ## Create an empty column to indicate which genes to label
-res_tableOE_tb <- res_tableOE_tb %>% dplyr::mutate(genelabels = "")
+res_tableOE_plotting <- res_tableOE_plotting %>% dplyr::mutate(genelabels = "")
 
 ## Sort by padj values 
 res_tableOE_tb <- res_tableOE_tb %>% dplyr::arrange(padj)
@@ -211,7 +208,7 @@ View(res_tableOE_tb)
 Next, we plot it as before with an additional layer for `geom_text_repel()` wherein we can specify the column of gene labels we just created.
 
 ``` r
-ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
+ggplot(res_tableOE_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
     geom_point(aes(colour = threshold_OE)) +
     geom_text_repel(aes(label = genelabels)) +
     ggtitle("Mov10 overexpression") +
@@ -223,6 +220,58 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange, y = -log10(padj))) +
 ```
 
 <img src="../img/mov10_oe_labeled_volcano.png" width="500"/>
+
+### Selecting Your Own Gene
+
+What if you want to select your own gene of interest? One way is creating a new data frame where you have added a value in the `genelabels` column just for that one symbol.
+
+``` r
+res_tableOE_df[res_tableOE_tb$symbol == "Mygene", "genelabels"]
+
+res_tableOE_mygene <- res_tableOE_df %>% 
+  dplyr::mutate(threshold_OE = padj < 0.1 & abs(log2FoldChange) >= 0.58)
+
+res_tableOE_mygene <- res_tableOE_mygene %>% dplyr::mutate(genelabels = "")
+
+# Assign value just to that one empty genelabel slot! You can use a strategy like this in other data frames and with other genes - or whole custom lists of genes. 
+res_tableOE_mygene[res_tableOE_mygene$symbol == "HOXA3", "genelabels"] = "HOXA3"
+```
+
+**Now let's check this out in a volcano plot:**
+
+``` r
+ggplot(res_tableOE_mygene, aes(x = log2FoldChange, y = -log10(padj))) +
+    geom_point(aes(colour = threshold_OE)) +
+    geom_text_repel(aes(label = genelabels)) +
+    ggtitle("Mov10 overexpression") +
+    xlab("log2 fold change") + 
+    ylab("-log10 adjusted p-value") +
+    theme(legend.position = "none",
+          plot.title = element_text(size = rel(1.5), hjust = 0.5),
+          axis.title = element_text(size = rel(1.25))) 
+```
+
+But where is our gene?? Let's actually increase that overlaps parameter...
+
+``` r
+options(ggrepel.max.overlaps = Inf)
+
+ggplot(res_tableOE_mygene, aes(x = log2FoldChange, y = -log10(padj))) +
+    geom_point(aes(colour = threshold_OE)) +
+    geom_text_repel(aes(label = genelabels)) +
+    ggtitle("Mov10 overexpression") +
+    xlab("log2 fold change") + 
+    ylab("-log10 adjusted p-value") +
+    theme(legend.position = "none",
+          plot.title = element_text(size = rel(1.5), hjust = 0.5),
+          axis.title = element_text(size = rel(1.25))) 
+```
+
+INSERT IMAGE HERE
+
+So, not the most informative, but there it is!
+
+## MA Plots, revisited
 
 ------------------------------------------------------------------------
 
