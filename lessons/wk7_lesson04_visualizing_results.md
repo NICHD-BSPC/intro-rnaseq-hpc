@@ -267,7 +267,7 @@ ggplot(res_tableOE_mygene, aes(x = log2FoldChange, y = -log10(padj))) +
           axis.title = element_text(size = rel(1.25))) 
 ```
 
-INSERT IMAGE HERE
+<img src="../img/hox3a_labeled_volcano.png" width="500"/>
 
 So, not the most informative, but there it is!
 
