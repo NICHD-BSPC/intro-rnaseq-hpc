@@ -55,6 +55,6 @@ DEGreport
 (3) Set up your own local DEAnalysis RProject, probably in its own new directory. The instructions from [Week 5 Lesson 01](https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk5_lesson01_introR_Rstudio.html) are still mostly relevant, but you will need to make sure the paths and and directories are adjusted for your local operating system.
 
 4.  Get the data minimally necessary for re-creating your downstream differential expression analyses:
-    -   Metadata:
-    -   Read Counts:
-    -   Gene symbols (so you don't need to mess with a whole GTF):
+    -   [Metadata](../data/mov10_AllSamples_metadata.txt)
+    -   [Read Counts](../data/mov10_AllSamples_featurecounts.Rmatrix.txt)
+    -   [Gene Symbols](../data/gtf_names.txt) data frame, so you don't need to mess with a whole GTF
