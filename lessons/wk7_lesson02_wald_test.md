@@ -370,6 +370,7 @@ res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control",
 
 #Add your knockdown vs. control contrast code below: 
 ```
+
 </details>
 
 Now, on to [Week 7, lesson 03!](../lessons/wk7_lesson03_summarizing_dge_results.md)
