@@ -269,7 +269,11 @@ ggplot(res_tableOE_mygene, aes(x = log2FoldChange, y = -log10(padj))) +
 
 <img src="../img/hox3a_labeled_volcano.png" width="500"/>
 
-So, not the most informative, but there it is!
+## **ASSIGNMENT OPTION 2**:
+
+Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol(s) of your choice and create a custom volcano plot. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
+
+**Be sure to export your image as a .PNG file and to save the lines of customized code you used in an R Script!**
 
 ------------------------------------------------------------------------
 
