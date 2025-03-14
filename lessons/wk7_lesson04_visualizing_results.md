@@ -83,6 +83,8 @@ plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype")
 
 > This DESeq2 function only allows for plotting the counts of a single gene at a time, and is not flexible regarding the appearance.
 
+If you are interested in plotting the expression of multiple genes all together, please refer to the short [lesson linked here](https://github.com/hbctraining/Intro-to-DGE/blob/master/lessons/top20_genes-expression_plotting.md) where we demo this for the top 20 most significantly expressed genes.
+
 #### **Using ggplot2 to plot expression of a single gene**
 
 If you wish to change the appearance of this plot, we can save the output of `plotCounts()` to a variable specifying the `returnData=TRUE` argument, then use `ggplot()`:
