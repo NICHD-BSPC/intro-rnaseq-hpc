@@ -197,12 +197,12 @@ First, we need to order the res_tableOE by `padj`, and add an additional column 
 res_tableOE_plotting <- res_tableOE_plotting %>% dplyr::mutate(genelabels = "")
 
 ## Sort by padj values 
-res_tableOE_tb <- res_tableOE_tb %>% dplyr::arrange(padj)
+res_tableOE_plotting <- res_tableOE_plotting %>% dplyr::arrange(padj)
 
 ## Populate the genelabels column with contents of the gene symbols column for the first 10 rows, i.e. the top 10 most significantly expressed genes
-res_tableOE_tb$genelabels[1:10] <- as.character(res_tableOE_tb$symbol[1:10])
+res_tableOE_plotting$genelabels[1:10] <- as.character(res_tableOE_plotting$symbol[1:10])
 
-View(res_tableOE_tb)
+View(res_tableOE_plotting)
 ```
 
 Next, we plot it as before with an additional layer for `geom_text_repel()` wherein we can specify the column of gene labels we just created.
