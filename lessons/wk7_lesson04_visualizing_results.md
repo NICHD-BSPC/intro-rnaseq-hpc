@@ -271,8 +271,6 @@ INSERT IMAGE HERE
 
 So, not the most informative, but there it is!
 
-## MA Plots, revisited
-
 ------------------------------------------------------------------------
 
 > ### An R package for visualization of DGE results
