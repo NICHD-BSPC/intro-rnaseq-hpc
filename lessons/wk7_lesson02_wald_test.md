@@ -333,10 +333,6 @@ Now that we have results for the overexpression results, do the same for the **C
 
 Here is what your `de_setup.R` script should look like now to regenerate all the R objects we will need to the next lesson:
 
-<details>
-
-<summary>R Script Progress</summary>
-
 ```r
 # Gene-level differential expression analysis using DESeq2
 
@@ -370,8 +366,6 @@ res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control",
 
 #Add your knockdown vs. control contrast code below: 
 ```
-
-</details>
 
 Now, on to [Week 7, lesson 03!](../lessons/wk7_lesson03_summarizing_dge_results.md)
 
