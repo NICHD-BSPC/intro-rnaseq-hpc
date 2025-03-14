@@ -140,7 +140,7 @@ write.table(res_tableOE_df, file = "res_tableOE_df.tsv", sep = "\t", row.names=F
 
 Now that we have extracted the significant results, we are ready for visualization!
 
-In summary, to help prepare for the next lesson, you can add the following to your script along with the code required to create the `sigKD` object:
+In summary, to help prepare for the [next lesson](../lessons/wk7_lesson04_visualizing_results.md), you can add the following to your script along with the code required to create the `sigKD` object:
 
 ``` r
 padj.cutoff <- 0.1
