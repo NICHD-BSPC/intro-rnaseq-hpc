@@ -124,7 +124,7 @@ For the different steps in the functional analysis, we require Ensembl and Entre
 
 ``` r
 ## Untested genes have padj = NA, so let's keep genes with padj != NA
-res_tableOE_tb_noNAs <- filter(res_tableOE_tb, padj != "NA" )
+res_tableOE_df_noNAs <- filter(res_tableOE_df, padj != "NA" )
 ```
 
 > ***NOTE:** If you were unable to generate the `annotations_ahb` object, you can download the annotations to your `data` folder by right-clicking [here](https://github.com/hbctraining/DGE_workshop_salmon_online/raw/master/data/annotations_ahb.csv) and selecting "Save link as..."*
@@ -142,6 +142,18 @@ annotations_ahb <- read.csv("annotations_ahb.csv")
 ## Merge the AnnotationHub dataframe with the results 
 res_ids <- left_join(res_tableOE_tb_noNAs, annotations_ahb, by=c("gene"="gene_id")) 
 ```
+
+## AnnotationDbi
+
+The annotation dataframe was created using an R package called `AnnotationDbi`. `AnnotationDbi` provides an interface for connecting and querying various annotation databases using SQLite data storage. The AnnotationDbi packages can query the *OrgDb*, *TxDb*, *EnsDb*, *Go.db*, and *BioMart* annotations. There is helpful [documentation](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf) available to reference when extracting data from any of these databases.
+
+### EnsDb.Hsapiens.v86
+
+To generate the Ensembl annotations you see here, the *EnsDb* database was queried using `AnnotationDbi`. You will need to decide the release of Ensembl you would like to query. We know that our data is for GRCh38, and the most current *EnsDb* release for GRCh38 in Bioconductor is release 86, so we can install this database. All Ensembl releases are listed [here](http://useast.ensembl.org/info/website/archives/index.html). **NOTE: this is not the most current release of GRCh38 in the Ensembl database, but it's as current as we can obtain through AnnotationDbi.**
+
+You learn the specifics of accessing annotations using `AnnotationDbi` for your own model organism in this [supplemental lesson](../lessons/wk8_lesson02_annotation_dbi.md).
+
+## Perform the overrepresentation analysis
 
 To perform the over-representation analysis, we need a list of background genes and a list of significant genes. For our background dataset we will use all genes tested for differential expression (all genes in our results table). For our significant gene list we will use genes with p-adjusted values less than 0.05 (we could include a fold change threshold too if we have many DE genes).
 
