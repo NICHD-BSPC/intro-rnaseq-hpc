@@ -58,7 +58,7 @@ OrgDb object:
 
 We can easily extract information from this database using *AnnotationDbi* with the methods: `columns`, `keys`, `keytypes`, and `select`. For example, we will use our `org.Hs.eg.db` database to acquire information, but know that the same methods work for the *TxDb*, *Go.db*, *EnsDb*, and *BioMart* annotations.
 
-Because as we saw, we do not have a gene symbol for every gene in our dataset, we are going to need to clean up our Ensembl Gene IDs by removing the trailing versions i.e. turn `ENSG00000000003.16` into just `ENSG00000000003`. These are now something we can search into
+Because as we saw, we do not have a gene symbol for every gene in our dataset, we are going to need to clean up our Ensembl Gene IDs by removing the trailing versions i.e. turn `ENSG00000000003.16` into just `ENSG00000000003`. These are now something we can search in these annotation databases:
 
 ``` r
 # use gsub to replace column with stripped gene symbols

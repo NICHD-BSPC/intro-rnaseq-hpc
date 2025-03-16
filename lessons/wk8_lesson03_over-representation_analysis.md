@@ -4,7 +4,7 @@ author: "Harvard HPC Staff, adapted by Sally Chang @ NICHD"
 edited: "Last Edited March 2025"
 ---
 
-Approximate time: 120 minutes
+Approximate time: 90 minutes
 
 ## Learning Objectives:
 
@@ -101,11 +101,9 @@ Some genes with less information may only be associated with general 'parent' te
 
 [Tips for working with GO terms](http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003343)
 
-## clusterProfiler
+## Preparing for clusterProfiler
 
 We will be using [clusterProfiler](http://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) to perform over-representation analysis on GO terms associated with our list of significant genes. The tool takes as input a significant gene list and a background gene list and performs statistical enrichment analysis using hypergeometric testing. The basic arguments allow the user to select the appropriate organism and GO ontology (BP, CC, MF) to test.
-
-### Running clusterProfiler
 
 To run clusterProfiler GO over-representation analysis, we will change our gene names into Ensembl IDs, since the tool works a bit easier with the Ensembl IDs.
 
@@ -120,39 +118,53 @@ library(org.Hs.eg.db)
 library(ggnewscale)
 ```
 
-For the different steps in the functional analysis, we require Ensembl and Entrez IDs. We will use the gene annotations that we generated previously to merge with our differential expression results. Before we do that, let's subset our results tibble to only have the genes that were tested, i.e. genes whose p-adjusted values are not equal to "NA".
+For the different steps in the functional analysis, we require Ensembl and Entrez IDs. We will use the gene annotations that we generated previously to merge with our differential expression results.
+
+Before we do that, let's subset our results to only have the genes that were tested, i.e. genes whose p-adjusted values are not equal to "NA".
 
 ``` r
 ## Untested genes have padj = NA, so let's keep genes with padj != NA
-res_tableOE_tb_noNAs <- filter(res_tableOE_tb, padj != "NA" )
+res_tableOE_df_noNAs <- filter(res_tableOE_df, padj != "NA" )
 ```
 
-> ***NOTE:** If you were unable to generate the `annotations_ahb` object, you can download the annotations to your `data` folder by right-clicking [here](https://github.com/hbctraining/DGE_workshop_salmon_online/raw/master/data/annotations_ahb.csv) and selecting "Save link as..."*
+We are also going to need to clean up our Ensembl Gene IDs by removing the trailing versions i.e. turn `ENSG00000000003.16` into just `ENSG00000000003`. These are now something we can use as a key for our annotation database:
 
-``` bash
-### Or do it on the command line
-wget https://github.com/hbctraining/DGE_workshop_salmon_online/raw/master/data/annotations_ahb.csv
+``` r
+# use gsub to replace column with stripped gene symbols
+res_tableOE_df$ensgene <- gsub("\\..*","",res_tableOE_df$ensgene)
 ```
+
+## AnnotationDbi
 
 ``` r
 ### To read in the object, you can run the following code: 
-annotations_ahb <- read.csv("annotations_ahb.csv")
+annotations_edb <- read.csv("annotations_edb.tsv")
 
 
-## Merge the AnnotationHub dataframe with the results 
-res_ids <- left_join(res_tableOE_tb_noNAs, annotations_ahb, by=c("gene"="gene_id")) 
+## Merge the AnnotationHub dataframe with the results using left_join(), another way of merging tables by a column.
+res_ids <- left_join(res_tableOE_df_noNAs, annotations_edb, by=c("ensgene"="GENEID")) 
 ```
+
+The annotation dataframe was created using an R package called `AnnotationDbi`. `AnnotationDbi` provides an interface for connecting and querying various annotation databases using SQLite data storage. The AnnotationDbi packages can query the *OrgDb*, *TxDb*, *EnsDb*, *Go.db*, and *BioMart* annotations. There is helpful [documentation](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf) available to reference when extracting data from any of these databases.
+
+### EnsDb.Hsapiens.v86
+
+To generate the Ensembl annotations you see here, the *EnsDb* database was queried using `AnnotationDbi`. You will need to decide the release of Ensembl you would like to query. We know that our data is for GRCh38, and the most current *EnsDb* release for GRCh38 in Bioconductor is release 86, so we can install this database. All Ensembl releases are listed [here](http://useast.ensembl.org/info/website/archives/index.html). **NOTE: this is not the most current release of GRCh38 in the Ensembl database, but it's as current as we can obtain through AnnotationDbi.**
+
+You learn the specifics of accessing annotations using `AnnotationDbi` for your own model organism in this [supplemental lesson](../lessons/wk8_lesson02_annotation_dbi.md).
+
+## Perform the overrepresentation analysis
 
 To perform the over-representation analysis, we need a list of background genes and a list of significant genes. For our background dataset we will use all genes tested for differential expression (all genes in our results table). For our significant gene list we will use genes with p-adjusted values less than 0.05 (we could include a fold change threshold too if we have many DE genes).
 
 ``` r
 ## Create background dataset for hypergeometric testing using all tested genes for significance in the results                 
-allOE_genes <- as.character(res_ids$gene)
+allOE_genes <- as.character(res_ids$ensgene)
 
 ## Extract significant results
 sigOE <- dplyr::filter(res_ids, padj < 0.05)
 
-sigOE_genes <- as.character(sigOE$gene)
+sigOE_genes <- as.character(sigOE$ensgene)
 ```
 
 Now we can perform GO enrichment for the Biological Process ontology and save the results:
