@@ -271,6 +271,28 @@ ggplot(res_tableOE_mygene, aes(x = log2FoldChange, y = -log10(padj))) +
 
 <img src="../img/hox3a_labeled_volcano.png" width="500"/>
 
+## Back to MA Plots
+
+Volcano plots are often in published studies, but BSPC actually prefers to ship and publish MA plots. MA plots contain more information than a volcano plot: By just expressing significance as a color, rather than using P-value as a whole axis, MA plots allow you to also plot mean counts as a separate variable.
+
+Switching from a volcano plot to an MA plot is pretty easy! Let's fill in this script together with the correct X and Y variables, and create axes labels to match:
+
+``` r
+ggplot(res_tableOE_plotting, aes(x = , y = )) +
+  geom_point(aes(colour = threshold_OE)) +
+  geom_text_repel(aes(label = genelabels)) +
+  ggtitle("Mov10 overexpression") +
+  xlab("") + 
+  ylab("") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        axis.title = element_text(size = rel(1.25)))
+```
+
+If we do this correctly, we should have a something like the following - depending on what you have saved as your `genelabels` variable and how big your plot window is:
+
+![](images/mov10_ggplot_maplot.png){width="479"}
+
 ## **ASSIGNMENT OPTION 2**:
 
 Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol(s) of your choice and create a custom volcano plot. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
