@@ -74,7 +74,7 @@ The results table output looks similar to the Wald test results, with identical 
 
 ### Why are fold changes reported for an LRT test?
 
-For analyses using the likelihood ratio test, the p-values are determined solely by the difference in deviance between the full and reduced model formula. **A single log2 fold change is printed in the results table for consistency with other results table outputs, but is not associated with the actual test.**
+For analyses using the likelihood ratio test, the p-values are determined solely by the difference in deviance between the full and reduced model formula. **A single log2 fold change is printed in the results table for consistency with other results table outputs, but is not associated with the actual test. You should ignore this column in results from LRT.**
 
 **Columns relevant to the LRT test:**
 
@@ -198,7 +198,9 @@ Once the clustering is finished running, you will get your command prompt back i
 
 </p>
 
-Suppose we are interested in the genes which show a decreased expression in the knockdown samples and increase in the overexpression. According to the plot there are 247 genes which share this expression profile. To find out what these genes are let's explore the output. What type of data structure is the `clusters` output?
+Suppose we are interested in the genes which show a decreased expression in the knockdown samples and increase in the overexpression. The closest pattern to this might group 1, with 275 genes. However it's important to note that **the clusters do not have statistical significance.**. That is, just because the pattern seems to have a shape where MOV10 knockdown looks to be less, this does NOT mean that these genes have signficantly decreased expression in MOV10 relative to control. To know that, we'd need to inspect the contrast that specifically compares those two conditions.
+
+But that cluster still seems interesting, so let's explore the output to see what genes those are. What type of data structure is the `clusters` output?
 
 ``` r
 # What type of data structure is the `clusters` output?
@@ -275,67 +277,6 @@ The type of **gene expression patterns we do expect** the LRT to return are thos
 Continuing with our example dataset, after running the LRT we can determine the set of significant genes using a threshold of `padj` \< 0.05. The next step would be to sort those genes into groups based on shared expression patterns, and we could do this using `degPatterns()`. Here, you will notice that we make use of the `col` argument since we have two groups that we are comparing to one another.
 
 ``` r
-clusters <- degPatterns(cluster_rlog, metadata = meta, time="time", col="treatment")
-```
-
-Depending on what type of shared expression profiles exist in your data, you can then extract the groups of genes associated with the patterns of interest and move on to functional analysis for each of the gene groups of interest.
-
-------------------------------------------------------------------------
-
-## Time course analyses with LRT
-
-Despite the popularity of static measurement of gene expression, time-course capturing of biological processes is essential to reflect their dynamic nature, particularly when patterns are complex and are not simply ascending or descending. When working with this type of data, the Likelihood Ratio Test (LRT) is especially helpful. We can use the LRT to explore whether there are any significant differences across a series of timepoints and further evaluate differences observed between sample classes.
-
-For example, suppose we have an experiment looking at the effect of treatment over time on mice of two different genotypes. We could use a design formula for our 'full model' that would include the major sources of variation in our data: `genotype`, `treatment`, `time`, and our main condition of interest, which is the difference in the effect of treatment over time (`treatment:time`).
-
-> **NOTE:** This is just example code for our hypothetical experiment. You **should not run this code**.
-
-``` r
-## DO NOT RUN
-
-full_model <- ~ genotype + treatment + time + treatment:time
-```
-
-To perform the LRT test, we also need to provide a reduced model, that is the full model without the `treatment:time` term:
-
-``` r
-## DO NOT RUN
-
-reduced_model <- ~ genotype + treatment + time
-```
-
-Then, we could run the LRT by using the following code:
-
-``` r
-## DO NOT RUN
-
-dds <- DESeqDataSetFromMatrix(countData = raw_counts, colData = metadata, design = ~ genotype + treatment + time + treatment:time)
-
-dds_lrt_time <- DESeq(dds, test="LRT", reduced = ~ genotype + treatment + time)
-```
-
-To understand what kind of gene expression patterns will be identified as differentially expressed, we have a few examples below. In the plots below we have Time on the x-axis and gene expression on the y-axis. In this dataset there are two samples for each time point, one having undergone some treatment (red) and the other without (blue).
-
-For this figure, we are depicting the type of **genes that will not be identified as differentially expressed.** Here, we observe that GeneX is differentially expressed between the time points, however there is no difference in that expression pattern between the treatment groups.
-
-<p align="center">
-
-<img src="../img/lrt_time_nodiff.png" width="300"/>
-
-</p>
-
-The type of **gene expression patterns we do expect** the LRT to return are those that exhibit differences in the effect of treatment over time. In the example below, GeneX displays a different expression pattern over time for the two treatment groups.
-
-<p align="center">
-
-<img src="../img/lrt_time_yesdiff.png" width="300"/>
-
-</p>
-
-Continuing with our example dataset, after running the LRT we can determine the set of significant genes using a threshold of `padj` \< 0.05. The next step would be to sort those genes into groups based on shared expression patterns, and we could do this using `degPatterns()`. Here, you will notice that we make use of the `col` argument since we have two groups that we are comparing to one another.
-
-``` r
-# Don't run, this is still theoretical
 clusters <- degPatterns(cluster_rlog, metadata = meta, time="time", col="treatment")
 ```
 
