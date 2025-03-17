@@ -252,21 +252,21 @@ dotplot(ego, showCategory=30)
 
 </p>
 
-The next plot is the **enrichment GO plot**, which shows the relationship between the top 50 most significantly enriched GO terms (padj.), by grouping similar terms together. Before creating the plot, we will need to obtain the similarity between terms using the `pairwise_termsim()` function ([instructions for emapplot](https://rdrr.io/github/GuangchuangYu/enrichplot/man/emapplot.html)). In the enrichment plot, the color represents the p-values relative to the other displayed terms (brighter red is more significant), and the size of the terms represents the number of genes that are significant from our list.
+The next plot is the **enrichment GO plot**, which shows the relationship between the top X most significantly enriched GO terms (padj.), by grouping similar terms together. Before creating the plot, we will need to obtain the similarity between terms using the `pairwise_termsim()` function ([instructions for emapplot](https://rdrr.io/github/GuangchuangYu/enrichplot/man/emapplot.html)). In the enrichment plot, the color represents the p-values relative to the other displayed terms (brighter red is more significant), and the size of the terms represents the number of genes that are significant from our list.
 
 ``` r
 ## Add similarity matrix to the termsim slot of enrichment result
 ego <- enrichplot::pairwise_termsim(ego)
 
-## Enrichmap clusters the 50 most significant (by padj) GO terms to visualize relationships between terms
-emapplot(ego, showCategory = 50)
+## Enrichmap clusters the 30 most significant (by padj) GO terms to visualize relationships between terms
+emapplot(ego, showCategory = 30)
 ```
 
-**To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PDF...`. In the pop-up window, change the `PDF size` to `12 x 14` to give a figure of appropriate size for the text labels.
+**To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PNG...`, and then adjust as necessary.
 
 <p align="center">
 
-<img src="../img/emapplot_salmon.png" width="800"/>
+![](images/emaplot_30categories.png){width="475"}
 
 </p>
 
