@@ -33,7 +33,8 @@ Note: Links to weekly lessons will be provided several days in advance in the ta
 | [Week 5](schedule/links-to-lessons.md#week-5) | Automation of the RNAseq workflow, transition to RStudio for differential expression analyses | 
 | [Week 6](schedule/links-to-lessons.md#week-6) | Overview and prep for DEseq2 analysis pipeline, assessing sample quality, design formulas |
 | [Week 7](schedule/links-to-lessons.md#week-7) | Hypothesis testing in DESeq2, summarizing and visualizing results |
-
+| [Week 8](schedule/links-to-lessons.md#week-8)| Likelihood ratio test results, overenrichment analyses, functional class scoring | 
+| Week 9 | Any material left from Week 8, course wrap-up, review of requested topics | 
 ### Course communication: 
 * For any content questions: We will be using the `rnaseq_jan2025` Slack channel under the Bioinformatics @NICHD workspace. Posting your questions in this channel is great, as multiple staff and fellow students will be able to respond. Also, you probably aren't the only one with that question!
 * For scheduling/personal concerns: Contact Dr. Chang by e-mail. 
