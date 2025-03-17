@@ -237,18 +237,18 @@ cluster_summary <- data.frame(ego)
 
 clusterProfiler has a variety of options for viewing the over-represented GO terms. We will explore the dotplot, enrichment plot, and the category netplot.
 
-The **dotplot** shows the number of genes associated with the first 50 terms (size) and the p-adjusted values for these terms (color). This plot displays the top 50 GO terms by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
+The **dotplot** shows the number of genes associated with the first X terms (size) and the p-adjusted values for these terms (color). This plot displays the top X GO terms by gene ratio (\# genes related to GO term / total number of sig genes), not p-adjusted value.
 
 ``` r
 ## Dotplot 
-dotplot(ego, showCategory=50)
+dotplot(ego, showCategory=30)
 ```
 
-**To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PDF...`. In the pop-up window, change: - `Orientation:` to `Landscape` - `PDF size` to `8 x 14` to give a figure of appropriate size for the text labels
+**To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PNG...`. In the pop-up window, change orientation and size as needed to give a figure of appropriate size for the text labels
 
 <p align="center">
 
-<img src="../img/mov10oe_dotplot.png" width="800"/>
+![](images/dotplot_30categories.png){width="460"}
 
 </p>
 
