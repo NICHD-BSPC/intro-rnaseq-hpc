@@ -4,7 +4,7 @@ author: "Harvard HPC Staff, adapted by Sally Chang @ NICHD"
 edited: "Last Edited March 2025"
 ---
 
-Approximate time: 90 minutes
+Approximate time: 60 minutes
 
 ## Learning Objectives:
 
@@ -214,22 +214,25 @@ cluster_summary <- data.frame(ego)
 
 **Let's explore the columns of these results:**
 
-------------------------------------------------------------------------
+#### **What do we need to know about the output from `enrichGO()`?**
 
-## ASSIGNMENT
+These descriptions are taken from an [NCI Coding Club exercise](https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/FunctionalEnrich_clusterProfiler/)!
 
-> **Perform GO enrichment analysis with only the up or down regulated genes.** This can be useful to identify GO terms impacted in one direction and not the other. **Warning: If very few genes are in any of these lists (\< 50, roughly) it may not be possible to get any significant GO terms.**
->
-> ```         
-> ## Extract upregulated genes
-> sigOE_up <- dplyr::filter(res_ids, padj < 0.1 & log2FoldChange > 0)
->
-> sigOE_up_genes <- as.character(sigOE_up$gene)
->
-> ## Extract downregulated genes - DO THIS FOR ASSIGNMENT
-> ```
->
-> You can then create `ego_up` & `ego_down` objects by running the `enrichGO()` function for `gene = sigOE_up_genes` or `gene = sigOE_down_genes`. Report how many clusters you get for each, and compare and contrast the top 5 cluster descriptions for each analysis.
+**Some of the columns are self-explanatory, while others are not**:
+
+[**GeneRatio (k/n)**](https://yulab-smu.top/biomedical-knowledge-mining-book/enrichment-overview.html#ora-algorithm): "ratio of input genes that are annotated in a term." (\# of genes in the input list that are annotated to the corresponding term (function) / \# of genes in input list).
+
+[**BgRatio (M/N)**](https://yulab-smu.top/biomedical-knowledge-mining-book/enrichment-overview.html#ora-algorithm): "ratio of all genes that are annotated in this term" (The number of genes that are annotated to the term / The total number of genes in the background gene list ("universe")).
+
+**pvalue**: over-representation assessed using hypogeometric distribution, which is equivalent to a one sided Fisher's exact test.
+
+**p.adjust**: Hypergeometric p-value after correction for multiple testing ("BH adjusted p-values"); see `?p.adjust`.
+
+**qvalue**: another take on FDR adjusted p-values; See `?qvalue::qvalue`.
+
+**geneID**: The gene IDs that overlap with the functional term.
+
+**Count**: Total number of genes from the input gene list that match the functional term.
 
 ------------------------------------------------------------------------
 
@@ -278,29 +281,30 @@ Finally, the **category netplot** shows the relationships between the genes asso
 ## To color genes by log2 fold changes, we need to extract the log2 fold changes from our results table creating a named vector
 OE_foldchanges <- sigOE$log2FoldChange
 
-names(OE_foldchanges) <- sigOE$gene
+names(OE_foldchanges) <- sigOE$symbol
 
 ## Cnetplot details the genes associated with one or more terms - by default gives the top 5 significant terms (by padj)
 cnetplot(ego, 
          showCategory = 5, 
-         color.params=list(foldChange=OE_foldchanges),
+         foldChange=OE_foldchanges,
          vertex.label.font=6)
          
 ## If some of the high fold changes are getting drowned out due to a large range, you could set a maximum fold change value
 OE_foldchanges <- ifelse(OE_foldchanges > 2, 2, OE_foldchanges)
 OE_foldchanges <- ifelse(OE_foldchanges < -2, -2, OE_foldchanges)
 
+## Or reduce the number of categories that you are looking at, at once
 cnetplot(ego, 
-         showCategory = 5, 
+         showCategory = 3, 
          color.params=list(foldChange=OE_foldchanges),
          vertex.label.font=6)
 ```
 
-**Again, to save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PDF...`. Change the `PDF size` to `12 x 14` to give a figure of appropriate size for the text labels.
+**To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PNG...`, and then adjust as necessary.
 
 <p align="center">
 
-<img src="../img/cnetplot1_salmon.png" width="800"/>
+![](images/enrichment_clusters.png){width="388"}
 
 </p>
 
@@ -311,7 +315,7 @@ If you are interested in significant processes that are **not** among the top fi
 ego2 <- ego
 
 # arbitrary list of specific processes
-ego2@result <- ego@result[c(1,3,4,8,9),] 
+ego2@result <- ego@result[c(8,9),] 
 
 ## Plotting terms of interest
 cnetplot(ego2, 
@@ -321,11 +325,36 @@ cnetplot(ego2,
          vertex.label.font=6)
 ```
 
-<p align="center">
+### Optional: Simplify GO Enrichment Results
 
-<img src="../img/cnetplot-2_salmon.png" width="800"/>
+Because of the nature of GO, organized as a directed acyclic graph, parent terms can show enrichment due to over represented child terms. To reduce redundancy among enriched terms, `clusterProfiler` uses a `simplify()` function that uses the ["`GOSemSim` package to calculate semantic similarities among enriched GO terms using multiple methods based on information content or graph structure."](https://www.cell.com/the-innovation/pdf/S2666-6758(21)00066-7.pdf) GO terms with \>0.7 similarity are removed and represented by the most significant term ([Wu et al. 2021](https://www.cell.com/the-innovation/pdf/S2666-6758(21)00066-7.pdf)). See this [NCI Coding Club exercise](https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/FunctionalEnrich_clusterProfiler/) for more details.
 
-</p>
+Let's reduce our GO terms using `simplify()`.
+
+``` r
+# This is a long and memory intensive step 
+s_ego<-clusterProfiler::simplify(ego)
+s_ego
+```
+
+## ASSIGNMENT
+
+> **Perform GO enrichment analysis with only the up or down regulated genes.** This can be useful to identify GO terms impacted in one direction and not the other. **Warning: If very few genes are in any of these lists (\< 50, roughly) it may not be possible to get any significant GO terms.**
+
+``` r
+## Extract upregulated genes
+sigOE_up <- dplyr::filter(res_ids, padj < 0.1 & log2FoldChange > 0)
+
+sigOE_up_genes <- as.character(sigOE_up$gene)
+
+## Extract downregulated genes - DO THIS FOR ASSIGNMENT
+```
+
+> You can then create `ego_up` & `ego_down` objects by running the `enrichGO()` function for `gene = sigOE_up_genes` or `gene = sigOE_down_genes`.
+>
+> -   Report how many clusters you get for each, and compare and contrast the top 5 cluster descriptions for each analysis.
+>
+> -   Create a dotplot for at least one of these conditions.
 
 ------------------------------------------------------------------------
 
