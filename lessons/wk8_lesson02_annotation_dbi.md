@@ -65,22 +65,92 @@ OrgDb object:
 
 We can extract information from this database using *AnnotationDbi* with the methods: `columns`, `keys`, `keytypes`, and `select`. Here were are using our `org.Hs.eg.db` database to acquire information, but the same methods work for the *TxDb*, *Go.db*, *EnsDb*, and *BioMart* annotations.
 
-Because as we saw, we do not have a gene symbol for every gene in our dataset, we are going to need to clean up our Ensembl Gene IDs by removing the trailing versions i.e. turn `ENSG00000000003.16` into just `ENSG00000000003`. These are now something we can search in these annotation databases:
+Let's inspect what we have available in the orgdb:
+
+```r
+columns(org.Hs.eg.db)
+```
+
+```
+[1] "ACCNUM"       "ALIAS"        "ENSEMBL"      "ENSEMBLPROT"  "ENSEMBLTRANS"
+[6] "ENTREZID"     "ENZYME"       "EVIDENCE"     "EVIDENCEALL"  "GENENAME"
+[11] "GENETYPE"     "GO"           "GOALL"        "IPI"          "MAP"
+[16] "OMIM"         "ONTOLOGY"     "ONTOLOGYALL"  "PATH"         "PFAM"
+[21] "PMID"         "PROSITE"      "REFSEQ"       "SYMBOL"       "UCSCKG"
+```
+
+
+Ideally, all databases would use the same gene identifier, but this is unfortunately not the case. Recall that our featureCounts file that we imported into R has Ensembl identifiers. Let's check the orgdb's Ensemble identifiers:
+
+```r
+keys(org.Hs.eg.db, "ENSEMBL") %>% head()
+```
+
+```
+[1] "ENSG00000121410" "ENSG00000175899" "ENSG00000291190" "ENSG00000171428"
+[5] "ENSG00000156006" "ENSG00000196136"
+```
+
+Recall that our Ensembl IDs had a dotted version number, which will not match anything in this orgdb. So we need to clean those up, e.g., by turning `ENSG00000000003.16` into just `ENSG00000000003`. This uses a [regular expression](https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions) for the pattern matching:
 
 ``` r
 # use gsub to replace column with stripped gene symbols
 res_tableOE_df$ensgene <- gsub("\\..*","",res_tableOE_df$ensgene)
 ```
 
+
+Now we can use that cleaned set of identifiers to select items from the orgdb.
+
+
 ``` r
 # Return the Ensembl IDs for a set of genes
 annotations_orgDb <- AnnotationDbi::select(org.Hs.eg.db, # database
-                                     keys = res_tableOE_tb$gene,  # data to use for retrieval
+                                     keys = res_tableOE_df$ensgene,  # data to use for retrieval
                                      columns = c("SYMBOL", "ENTREZID","GENENAME"), # information to retreive for given data
                                      keytype = "ENSEMBL") # type of data given in 'keys' argument
 ```
 
-We started from at about 79k in our results table, and the dimensions of our resulting annotation data frame also look quite similar. Let's take a peek to see if we actually returned annotations for each individual Ensembl gene ID that went in to the query:
+We started from at about 79k in our results table, but the results from this are quite a bit longer (83k). This is because there are Ensembl IDs that have multiple entries in other columns. Let's inspect that:
+
+```r
+multi <- table(annotations_orgDb$ENSEMBL) %>%
+  sort() %>%
+  tail(25)
+multi
+```
+
+```
+ENSG00000258992 ENSG00000199270 ENSG00000199334 ENSG00000199352 ENSG00000199396 
+             36              91              91              91              91 
+ENSG00000199910 ENSG00000200343 ENSG00000200370 ENSG00000200381 ENSG00000200624 
+             91              91              91              91              91 
+ENSG00000201355 ENSG00000201588 ENSG00000201925 ENSG00000202257 ENSG00000202521 
+             91              91              91              91              91 
+ENSG00000202526 ENSG00000199337 ENSG00000273730 ENSG00000275757 ENSG00000274917 
+             91              92             207             207             208 
+ENSG00000275215 ENSG00000276700 ENSG00000277739 ENSG00000278189 ENSG00000278233 
+            208             208             208             208             208 
+```
+
+What genes are those!?
+
+```r
+annotations_orgDb %>%  filter(ENSEMBL %in% names(multi)) %>% head
+```
+
+```
+          ENSEMBL       SYMBOL  ENTREZID             GENENAME
+1 ENSG00000199270      RNA5S12 100169763 RNA, 5S ribosomal 12
+2 ENSG00000199270 LOC124905422 124905422     5S ribosomal RNA
+3 ENSG00000199270 LOC124905424 124905424     5S ribosomal RNA
+4 ENSG00000199270 LOC124905425 124905425     5S ribosomal RNA
+5 ENSG00000199270 LOC124905426 124905426     5S ribosomal RNA
+6 ENSG00000199270 LOC124905427 124905427     5S ribosomal RNA
+```
+
+So it looks like a single Ensembl ID could refer to multiple different symbols, here for 5S ribosomal RNA.
+
+Let's take a peek to see if we actually returned annotations for each individual Ensembl gene ID that went in to the query:
 
 ``` r
 length(which(is.na(annotations_orgDb$SYMBOL)))
