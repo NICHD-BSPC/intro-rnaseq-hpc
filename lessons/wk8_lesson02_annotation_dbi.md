@@ -6,11 +6,18 @@ date: "Last Modified March 2025"
 
 ## AnnotationDbi
 
-AnnotationDbi is an R package that provides an interface for connecting and querying various annotation databases using SQLite data storage. The AnnotationDbi packages can query the *OrgDb*, *TxDb*, *EnsDb*, *Go.db*, and *BioMart* annotations. There is helpful [documentation](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf) available to reference when extracting data from any of these databases.
+AnnotationDbi is an R package that provides an interface for connecting and querying various annotation databases using SQLite data storage (a convenient and performant flat-file database format). There are AnnotationDbi packages that contain information on gene IDs, Gene Ontology terms, and more. There is helpful [documentation](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf) available to reference when extracting data from any of these databases.
+
+AnnotationDbi is just the interface; you need to get an appropriate annotation package that you can use with AnnotationDbi.
+
+There are a plethora of organism-specific *orgDb* packages, such as `org.Hs.eg.db` for human and `org.Mm.eg.db` for mouse. A list of organism databases can be found [here](https://www.bioconductor.org/packages/release/BiocViews.html#___OrgDb). These databases are best for converting gene IDs or obtaining GO information for current genome builds, but not for older genome builds. These packages provide the current builds corresponding to the release date of the package, and update every 6 months. If a package is not available for your organism of interest, advanced users can create their own witn [AnnotationForge](https://bioconductor.org/packages/release/bioc/html/AnnotationForge.html). 
+
+Humans and common model organisms have packages that can be installed, like `org.Hs.eg.db` for human. However, only a subset of available annotations are available as packages. For anything else, use the [AnnotationHub](https://bioconductor.org/packages/release/bioc/html/AnnotationHub.html) package. Model organism annotations are also available through AnnotationHub, so this is the most generic approach.
+
 
 ### org.Hs.eg.db
 
-There are a plethora of organism-specific *orgDb* packages, such as `org.Hs.eg.db` for human and `org.Mm.eg.db` for mouse, and a list of organism databases can be found [here](https://www.bioconductor.org/packages/release/BiocViews.html#___OrgDb). These databases are best for converting gene IDs or obtaining GO information for current genome builds, but not for older genome builds. These packages provide the current builds corresponding to the release date of the package, and update every 6 months. If a package is not available for your organism of interest, you can create your own using *AnnotationHub*.
+For convenience, here we will use the already-installed `org.Hs.eg.db` OrgDb:
 
 ``` r
 # Load libraries
@@ -21,7 +28,7 @@ library(AnnotationDbi)
 org.Hs.eg.db
 ```
 
-We can see the metadata for the database by just typing the name of the database, including the species, last updates for the different source information, and the source urls. Note the KEGG data from this database was last updated in 2011, so may not be the best site for KEGG pathway information.
+We can see the metadata for the database by just typing the name of the database, including the species, last updates for the different source information, and the source urls. Note the KEGG data from this database was last updated in 2011. KEGG is under a subscription model so BioConductor can not redistribute the content since this earlier freeze date.
 
 ```         
 OrgDb object:
@@ -56,7 +63,7 @@ OrgDb object:
 | UPSOURCEDATE: Mon Sep 23 15:46:45 2024
 ```
 
-We can easily extract information from this database using *AnnotationDbi* with the methods: `columns`, `keys`, `keytypes`, and `select`. For example, we will use our `org.Hs.eg.db` database to acquire information, but know that the same methods work for the *TxDb*, *Go.db*, *EnsDb*, and *BioMart* annotations.
+We can extract information from this database using *AnnotationDbi* with the methods: `columns`, `keys`, `keytypes`, and `select`. Here were are using our `org.Hs.eg.db` database to acquire information, but the same methods work for the *TxDb*, *Go.db*, *EnsDb*, and *BioMart* annotations.
 
 Because as we saw, we do not have a gene symbol for every gene in our dataset, we are going to need to clean up our Ensembl Gene IDs by removing the trailing versions i.e. turn `ENSG00000000003.16` into just `ENSG00000000003`. These are now something we can search in these annotation databases:
 
@@ -79,7 +86,7 @@ We started from at about 79k in our results table, and the dimensions of our res
 length(which(is.na(annotations_orgDb$SYMBOL)))
 ```
 
-Looks like more than half of the input genes did not return any annotations. This is because the OrgDb family of database are primarily based on mapping using Entrez Gene identifiers. If you look at some of the Ensembl IDs from our query that returned NA, these map to pseudogenes (i.e [ENSG00000265439](https://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=ENSG00000265439;r=6:44209766-44210063;t=ENST00000580735)) or non-coding RNAs (i.e. [ENSG00000265425](http://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=ENSG00000265425;r=18:68427030-68436918;t=ENST00000577835)). The difference is due to the fact that each database implements different computational approaches for generating the gene builds. Let's get rid of those NA entries:
+Looks like more than half of the input genes did not return any annotations. This is because the OrgDb family of database are primarily based on mapping using Entrez Gene identifiers. If you look at some of the Ensembl IDs from our query that returned NA, these map to pseudogenes (i.e [ENSG00000265439](https://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=ENSG00000265439;r=6:44209766-44210063;t=ENST00000580735)) or non-coding RNAs (i.e. [ENSG00000265425](http://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=ENSG00000265425;r=18:68427030-68436918;t=ENST00000577835)). The difference is due to the fact that each database implements different computational approaches for generating the gene builds. And some databases (notably, Gene Ontology) only have functional information on proteins, which in turn only come from coding genes. Our intention is to use Gene Ontology, so while it's interesting to know about non-coding genes that are differentially expressed, let's get rid of those genes from our data that do not have corresponding entries in the orgdb:
 
 ``` r
 # Determine the indices for the non-NA genes
@@ -89,7 +96,7 @@ non_na_idx <- which(is.na(annotations_orgDb$SYMBOL) == FALSE)
 annotations_orgDb <- annotations_orgDb[non_na_idx, ]
 ```
 
-You may have also noted the *warning* returned: *'select()' returned 1:many mapping between keys and columns*. This is always going to happen with converting between different gene IDs (i.e. one geneID can map to more than one identifier in another databse) . Unless we would like to keep multiple mappings for a single gene, then we probably want to de-duplicate our data before using it.
+You may have also noted the *warning* returned: *'select()' returned 1:many mapping between keys and columns*. This is always going to happen with converting between different gene IDs (i.e. one geneID can map to more than one identifier in another databse). This is an unfortunate practical issue with gene nomenclature. Unless we would like to keep multiple mappings for a single gene, then we probably want to de-duplicate our data before using it.
 
 ``` r
 # Determine the indices for the non-duplicated genes
