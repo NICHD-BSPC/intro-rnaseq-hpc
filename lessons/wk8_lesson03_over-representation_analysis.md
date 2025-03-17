@@ -120,18 +120,18 @@ library(ggnewscale)
 
 For the different steps in the functional analysis, we require Ensembl and Entrez IDs. We will use the gene annotations that we generated previously to merge with our differential expression results.
 
-Before we do that, let's subset our results to only have the genes that were tested, i.e. genes whose p-adjusted values are not equal to "NA".
-
-``` r
-## Untested genes have padj = NA, so let's keep genes with padj != NA
-res_tableOE_df_noNAs <- filter(res_tableOE_df, padj != "NA" )
-```
-
 We are also going to need to clean up our Ensembl Gene IDs by removing the trailing versions i.e. turn `ENSG00000000003.16` into just `ENSG00000000003`. These are now something we can use as a key for our annotation database:
 
 ``` r
 # use gsub to replace column with stripped gene symbols
 res_tableOE_df$ensgene <- gsub("\\..*","",res_tableOE_df$ensgene)
+```
+
+Let's subset our results to only have the genes that were tested, i.e. genes whose p-adjusted values are not equal to "NA".
+
+``` r
+## Untested genes have padj = NA, so let's keep genes with padj != NA
+res_tableOE_df_noNAs <- filter(res_tableOE_df, padj != "NA" )
 ```
 
 ## AnnotationDbi
@@ -155,29 +155,38 @@ You learn the specifics of accessing annotations using `AnnotationDbi` for your 
 
 ## Perform the overrepresentation analysis
 
-To perform the over-representation analysis, we need a list of background genes and a list of significant genes. For our background dataset we will use all genes tested for differential expression (all genes in our results table). For our significant gene list we will use genes with p-adjusted values less than 0.05 (we could include a fold change threshold too if we have many DE genes).
+To perform the over-representation analysis, we need a list of background genes and a list of significant genes. For our background dataset we will use all genes tested for differential expression (all genes in our results table). For our significant gene list we will use genes with p-adjusted values less than 0.1 (we could include a fold change threshold too if we have many DE genes).
 
 ``` r
 ## Create background dataset for hypergeometric testing using all tested genes for significance in the results                 
 allOE_genes <- as.character(res_ids$ensgene)
 
 ## Extract significant results
-sigOE <- dplyr::filter(res_ids, padj < 0.05)
+sigOE <- dplyr::filter(res_ids, padj < 0.1)
 
 sigOE_genes <- as.character(sigOE$ensgene)
 ```
 
-Now we can perform GO enrichment for the Biological Process ontology and save the results:
+Now we can perform GO enrichment for the Biological Process ontology and save the results. Before we do so, it might be good to use `?enrichGO()` to see all of the various parameters we can adjust.
+
+There are two important parameters:
+
+-   `pvalueCutoff`: adjusted pvalue cutoff on enrichment tests to report. Default is 0.5.
+
+-   `qvalueCutoff`: qvalue cutoff on enrichment tests to report as significant. Tests must pass i) `pvalueCutoff` on unadjusted pvalues, ii) `pvalueCutoff` on adjusted pvalues and iii) `qvalueCutoff` on qvalues to be reported. Default was 0.2.
+
+**Discussion**: Given the above info about the parameters, why have we adjusted both to 1.0 below?
 
 ``` r
 ## Run GO enrichment analysis 
 ego <- enrichGO(gene = sigOE_genes, 
                 universe = allOE_genes,
+                pvalueCutoff = 1.0, 
                 keyType = "ENSEMBL",
                 OrgDb = org.Hs.eg.db, 
                 ont = "BP", 
                 pAdjustMethod = "BH", 
-                qvalueCutoff = 0.05, 
+                qvalueCutoff = 1.0, 
                 readable = TRUE)
 ```
 
@@ -190,8 +199,7 @@ ego <- enrichGO(gene = sigOE_genes,
 ``` r
 ## Output results from GO analysis to a table
 cluster_summary <- data.frame(ego)
-
-write.csv(cluster_summary, "results/clusterProfiler_Mov10oe.csv")
+## You may want to write this out to a table. 
 ```
 
 <p align="center">
@@ -204,23 +212,24 @@ write.csv(cluster_summary, "results/clusterProfiler_Mov10oe.csv")
 >
 > *This is a useful set of functions to know, since it enables one to preserve analyses at specific stages and reload them when needed.* More information about these functions can be found [here](https://www.r-bloggers.com/load-save-and-rda-files/) & [here](http://rpubs.com/euclid/387778).
 
+**Let's explore the columns of these results:**
+
 ------------------------------------------------------------------------
 
-> **NOTE:** **You can also perform GO enrichment analysis with only the up or down regulated genes** in addition to performing it for the full list of significant genes. This can be useful to identify GO terms impacted in one direction and not the other. If very few genes are in any of these lists (\< 50, roughly) it may not be possible to get any significant GO terms.
+## ASSIGNMENT
+
+> **Perform GO enrichment analysis with only the up or down regulated genes.** This can be useful to identify GO terms impacted in one direction and not the other. **Warning: If very few genes are in any of these lists (\< 50, roughly) it may not be possible to get any significant GO terms.**
 >
 > ```         
 > ## Extract upregulated genes
-> sigOE_up <- dplyr::filter(res_ids, padj < 0.05 & log2FoldChange > 0)
+> sigOE_up <- dplyr::filter(res_ids, padj < 0.1 & log2FoldChange > 0)
 >
 > sigOE_up_genes <- as.character(sigOE_up$gene)
 >
-> ## Extract downregulated genes
-> sigOE_down <- dplyr::filter(res_ids, padj < 0.05 & log2FoldChange < 0)
->  
-> sigOE_down_genes <- as.character(sigOE_down$gene)
+> ## Extract downregulated genes - DO THIS FOR ASSIGNMENT
 > ```
 >
-> You can then create `ego_up` & `ego_down` objects by running the `enrichGO()` function for `gene = sigOE_up_genes` or `gene = sigOE_down_genes`.
+> You can then create `ego_up` & `ego_down` objects by running the `enrichGO()` function for `gene = sigOE_up_genes` or `gene = sigOE_down_genes`. Report how many clusters you get for each, and compare and contrast the top 5 cluster descriptions for each analysis.
 
 ------------------------------------------------------------------------
 
