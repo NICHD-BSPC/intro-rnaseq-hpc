@@ -138,7 +138,7 @@ res_tableOE_df_noNAs <- filter(res_tableOE_df, padj != "NA" )
 
 ``` r
 ### To read in the object, you can run the following code: 
-annotations_edb <- read.csv("annotations_edb.tsv")
+annotations_edb <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/annotations_edb.txt", header=TRUE)
 
 
 ## Merge the AnnotationHub dataframe with the results using left_join(), another way of merging tables by a column.
@@ -250,7 +250,9 @@ dotplot(ego, showCategory=30)
 **To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PNG...`. In the pop-up window, change orientation and size as needed to give a figure of appropriate size for the text labels
 
 <p align="center">
+
 <img src="../img/dotplot_30categories.png" width="460"/>
+
 </p>
 
 The next plot is the **enrichment GO plot**, which shows the relationship between the top X most significantly enriched GO terms (padj.), by grouping similar terms together. Before creating the plot, we will need to obtain the similarity between terms using the `pairwise_termsim()` function ([instructions for emapplot](https://rdrr.io/github/GuangchuangYu/enrichplot/man/emapplot.html)). In the enrichment plot, the color represents the p-values relative to the other displayed terms (brighter red is more significant), and the size of the terms represents the number of genes that are significant from our list.
@@ -266,7 +268,9 @@ emapplot(ego, showCategory = 30)
 **To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PNG...`, and then adjust as necessary.
 
 <p align="center">
+
 <img src="../img/emaplot_30categories.png" width="475"/>
+
 </p>
 
 Finally, the **category netplot** shows the relationships between the genes associated with the top five most significant GO terms and the fold changes of the significant genes associated with these terms (color). The size of the GO terms reflects the number of genes in the terms, with terms with more genes being larger. This plot is particularly useful for hypothesis generation in identifying genes that may be important to several of the most affected processes.
@@ -299,7 +303,9 @@ cnetplot(ego,
 **To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PNG...`, and then adjust as necessary.
 
 <p align="center">
+
 <img src="../img/enrichment_clusters.png" width="400"/>
+
 </p>
 
 If you are interested in significant processes that are **not** among the top five, you can subset your `ego` dataset to only display these processes:
