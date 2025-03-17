@@ -18,9 +18,9 @@ Note: Links to weekly lessons will be provided several days in advance of when t
 | [Week 3](links-to-lessons.md#week-3) | Reference genomes, theory and practice of mapping RNAseq reads to a reference, Mapping QC|
 | [Week 4](links-to-lessons.md#week-4) | Theory and practice of counting RNAseq reads|
 | [Week 5](links-to-lessons.md#week-5) | Automation of the RNAseq workflow, transition to RStudio for differential expression analyses | 
-| [Week 6](schedule/links-to-lessons.md#week-6) | Overview and prep for DEseq2 analysis pipeline, assessing sample quality, design formulas |
-| [Week 7](schedule/links-to-lessons.md#week-7) | Hypothesis testing in DESeq2, summarizing and visualizing results |
-| [Week 8](schedule/links-to-lessons.md#week-8)| Likelihood ratio test results, overenrichment analyses, functional class scoring | 
+| [Week 6](links-to-lessons.md#week-6) | Overview and prep for DEseq2 analysis pipeline, assessing sample quality, design formulas |
+| [Week 7](links-to-lessons.md#week-7) | Hypothesis testing in DESeq2, summarizing and visualizing results |
+| [Week 8](links-to-lessons.md#week-8)| Likelihood ratio test results, overenrichment analyses, functional class scoring | 
 | Week 9 | Any material left from Week 8, course wrap-up, review of requested topics | 
 
 ### Submission of assignments
