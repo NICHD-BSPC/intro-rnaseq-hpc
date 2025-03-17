@@ -77,3 +77,10 @@
 - [Visualizing DE Results](../lessons/wk7_lesson04_visualizing_results.md) Brief assignment
 
 **Additional assignment**: Be prepared by Tuesday of Week 8 (March 18th) to talk about your metadata table assignment and your design formula assignment in front of the class. 
+
+# Week 8: 
+- Finish up [Visualizing DE Results](../lessons/wk7_lesson04_visualizing_results.md) Brief assignment
+- [Likelihood Ratio Testing Results](../lessons/wk8_lesson01_LRT_results.md)
+- [Annotation databases](../lessons/wk8_lesson02_annotation_dbi.md)
+- [Overrepresentation analysis](../lessons/wk8_lesson03_over-representation_analysis.md)
+- [Functional class scoring](../lessons/wk8_lesson04_functional_class_scoring.md)
