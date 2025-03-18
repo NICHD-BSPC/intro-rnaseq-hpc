@@ -261,14 +261,14 @@ We can check for NA entries, and find that we have fewer of these instances:
 length(which(is.na(annotations_edb$SYMBOL)))
 ```
 
-And we can get rid of them like we did previously:
+And we can get rid of them like we did previously, **but we don't need to right now**.
 
 ``` r
 # Determine the indices for the non-NA genes
 non_na_idx <- which(is.na(annotations_edb$SYMBOL) == FALSE)
 
 # Return only the genes with annotations using indices
-annotations_edb <- annotations_edb[non_na_idx, ]
+annotations_edb_rm <- annotations_edb[non_na_idx, ]
 ```
 
 > **NOTE:** In this case we used the same build but a slightly older release, and we found little discrepancy. If your analysis was conducted using an older genome build (i.e hg19), but used a newer build for annotation some genes may be found to be not annotated (NA). Some of the genes have changed names in between versions (due to updates and patches), so may not be present in the newer version of the database.
