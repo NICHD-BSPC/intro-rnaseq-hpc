@@ -146,7 +146,7 @@ Now we can perform GO enrichment for the Biological Process ontology and save th
 
 There are two important parameters:
 
--   `pvalueCutoff`: adjusted pvalue cutoff on enrichment tests to report. Default is 0.5.
+-   `pvalueCutoff`: adjusted pvalue cutoff on enrichment tests to report. Default is 0.05.
 
 -   `qvalueCutoff`: qvalue cutoff on enrichment tests to report as significant. Tests must pass i) `pvalueCutoff` on unadjusted pvalues, ii) `pvalueCutoff` on adjusted pvalues and iii) `qvalueCutoff` on qvalues to be reported. Default was 0.2.
 
@@ -238,17 +238,19 @@ The next plot is the **enrichment GO plot**, which shows the relationship betwee
 ## Add similarity matrix to the termsim slot of enrichment result
 ego <- enrichplot::pairwise_termsim(ego)
 
-## Enrichmap clusters the 30 most significant (by padj) GO terms to visualize relationships between terms
-emapplot(ego, showCategory = 30)
+## Enrichmap clusters the 50 most significant (by padj) GO terms to visualize relationships between terms
+emapplot(ego, showCategory = 50)
 ```
 
 **To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PNG...`, and then adjust as necessary.
 
 <p align="center">
 
-<img src="../img/emaplot_30categories.png" width="475"/>
+![](emapplot_50categories.png){width="506"}
 
 </p>
+
+## Category Netplot
 
 Finally, the **category netplot** shows the relationships between the genes associated with the top five most significant GO terms and the fold changes of the significant genes associated with these terms (color). The size of the GO terms reflects the number of genes in the terms, with terms with more genes being larger. This plot is particularly useful for hypothesis generation in identifying genes that may be important to several of the most affected processes.
 
@@ -260,17 +262,10 @@ OE_foldchanges <- sigOE$log2FoldChange
 
 names(OE_foldchanges) <- sigOE$symbol
 
-## Cnetplot details the genes associated with one or more terms - by default gives the top 5 significant terms (by padj)
-cnetplot(ego, 
-         showCategory = 5, 
-         foldChange=OE_foldchanges,
-         vertex.label.font=6)
-         
-## If some of the high fold changes are getting drowned out due to a large range, you could set a maximum fold change value
-OE_foldchanges <- ifelse(OE_foldchanges > 2, 2, OE_foldchanges)
-OE_foldchanges <- ifelse(OE_foldchanges < -2, -2, OE_foldchanges)
+## Cnetplot details the genes associated with one or more terms - by default gives the top 5 significant terms (by padj). 
+cnetplot(ego, foldChange=OE_foldchanges,vertex.label.font=6)
 
-## Or reduce the number of categories that you are looking at, at once
+## You can reduce the of categories that you are viewing on the same plot
 cnetplot(ego, 
          showCategory = 3, 
          color.params=list(foldChange=OE_foldchanges),
@@ -281,7 +276,7 @@ cnetplot(ego,
 
 <p align="center">
 
-<img src="../img/enrichment_clusters.png" width="400"/>
+<img src="../img/enrichment_clusters.png" width="426"/>
 
 </p>
 
