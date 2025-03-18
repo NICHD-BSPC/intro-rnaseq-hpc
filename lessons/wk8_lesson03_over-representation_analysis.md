@@ -118,40 +118,14 @@ library(org.Hs.eg.db)
 library(ggnewscale)
 ```
 
-For the different steps in the functional analysis, we require Ensembl and Entrez IDs. We will use the gene annotations that we generated previously to merge with our differential expression results.
-
-We are also going to need to clean up our Ensembl Gene IDs by removing the trailing versions i.e. turn `ENSG00000000003.16` into just `ENSG00000000003`. These are now something we can use as a key for our annotation database:
-
-``` r
-# use gsub to replace column with stripped gene symbols
-res_tableOE_df$ensgene <- gsub("\\..*","",res_tableOE_df$ensgene)
-```
+For the different steps in the functional analysis, we require Ensembl and Entrez IDs. We will use the `annotations_edb` dataframe that we generated previously. The annotation dataframe was created using an R package called `AnnotationDbi`. `AnnotationDbi` provides an interface for connecting and querying various annotation databases using SQLite data storage. The AnnotationDbi packages can query the *OrgDb*, *TxDb*, *EnsDb*, *Go.db*, and *BioMart* annotations.
 
 Let's subset our results to only have the genes that were tested, i.e. genes whose p-adjusted values are not equal to "NA".
 
 ``` r
 ## Untested genes have padj = NA, so let's keep genes with padj != NA
-res_tableOE_df_noNAs <- filter(res_tableOE_df, padj != "NA" )
+annotations_edb_tested <- dplyr::filter(annotations_edb, padj != "NA" )
 ```
-
-## AnnotationDbi
-
-``` r
-### To read in the object, you can run the following code: 
-annotations_edb <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/annotations_edb.txt", header=TRUE)
-
-
-## Merge the AnnotationHub dataframe with the results using left_join(), another way of merging tables by a column.
-res_ids <- left_join(res_tableOE_df_noNAs, annotations_edb, by=c("ensgene"="GENEID")) 
-```
-
-The annotation dataframe was created using an R package called `AnnotationDbi`. `AnnotationDbi` provides an interface for connecting and querying various annotation databases using SQLite data storage. The AnnotationDbi packages can query the *OrgDb*, *TxDb*, *EnsDb*, *Go.db*, and *BioMart* annotations. There is helpful [documentation](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf) available to reference when extracting data from any of these databases.
-
-### EnsDb.Hsapiens.v86
-
-To generate the Ensembl annotations you see here, the *EnsDb* database was queried using `AnnotationDbi`. You will need to decide the release of Ensembl you would like to query. We know that our data is for GRCh38, and the most current *EnsDb* release for GRCh38 in Bioconductor is release 86, so we can install this database. All Ensembl releases are listed [here](http://useast.ensembl.org/info/website/archives/index.html). **NOTE: this is not the most current release of GRCh38 in the Ensembl database, but it's as current as we can obtain through AnnotationDbi.**
-
-You learn the specifics of accessing annotations using `AnnotationDbi` for your own model organism in this [supplemental lesson](../lessons/wk8_lesson02_annotation_dbi.md).
 
 ## Perform the overrepresentation analysis
 
@@ -159,11 +133,12 @@ To perform the over-representation analysis, we need a list of background genes 
 
 ``` r
 ## Create background dataset for hypergeometric testing using all tested genes for significance in the results                 
-allOE_genes <- as.character(res_ids$ensgene)
+allOE_genes <- as.character(annotations_edb_tested$ensgene)
 
 ## Extract significant results
-sigOE <- dplyr::filter(res_ids, padj < 0.1)
+sigOE <- dplyr::filter(annotations_edb_tested, padj < 0.1)
 
+## Extract the names of the significant genes
 sigOE_genes <- as.character(sigOE$ensgene)
 ```
 
@@ -236,7 +211,7 @@ These descriptions are taken from an [NCI Coding Club exercise](https://bioinfor
 
 ------------------------------------------------------------------------
 
-### Visualizing clusterProfiler results
+## Visualizing clusterProfiler results: Dotplots
 
 clusterProfiler has a variety of options for viewing the over-represented GO terms. We will explore the dotplot, enrichment plot, and the category netplot.
 
@@ -254,6 +229,8 @@ dotplot(ego, showCategory=30)
 <img src="../img/dotplot_30categories.png" width="460"/>
 
 </p>
+
+## Enrichment GO plot (emaplot)
 
 The next plot is the **enrichment GO plot**, which shows the relationship between the top X most significantly enriched GO terms (padj.), by grouping similar terms together. Before creating the plot, we will need to obtain the similarity between terms using the `pairwise_termsim()` function ([instructions for emapplot](https://rdrr.io/github/GuangchuangYu/enrichplot/man/emapplot.html)). In the enrichment plot, the color represents the p-values relative to the other displayed terms (brighter red is more significant), and the size of the terms represents the number of genes that are significant from our list.
 
