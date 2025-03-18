@@ -160,7 +160,11 @@ pheatmap(norm_OEsig[3:8],
 >
 > Z-scores are computed on a gene-by-gene basis by subtracting the mean and then dividing by the standard deviation. The Z-scores are computed **after the clustering**, so that it only affects the graphical aesthetics and the color visualization is improved.
 
-### Volcano plot
+## Volcano plot
+
+Getting ready:
+* Start HPC on Demand with 8GB of memory
+* If you need to get caught up with your environment, you can use [this script](https://github.com/NICHD-BSPC/intro-rnaseq-hpc/blob/main/scripts/de_setup_Week7_lesson04.R) 
 
 The above plot would be great to look at the expression levels of a good number of genes, but for more of a global view there are other plots we can draw. A commonly used one is a volcano plot; in which you have the log transformed adjusted p-values plotted on the y-axis and log2 fold change values on the x-axis.
 
@@ -291,11 +295,11 @@ ggplot(res_tableOE_plotting, aes(x = , y = )) +
 
 If we do this correctly, we should have a something like the following - depending on what you have saved as your `genelabels` variable and how big your plot window is:
 
-![](images/mov10_ggplot_maplot.png){width="479"}
+<img src="../img/mov10_ggplot_maplot.png" width="450"/>
 
 ## **ASSIGNMENT OPTION 2**:
 
-Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol(s) of your choice and create a custom volcano plot. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
+Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol(s) of your choice and create a _custom volcano plot or MA plot_. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
 
 **Be sure to export your image as a .PNG file and to save the lines of customized code you used in an R Script!**
 
