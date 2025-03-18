@@ -160,13 +160,13 @@ non_duplicates_idx <- which(duplicated(annotations_orgDb$SYMBOL) == FALSE)
 annotations_orgDb <- annotations_orgDb[non_duplicates_idx, ]
 ```
 
-However, we can also explicitly add a parameter called `multiVals` to another `annotationDbi` function called `mapIds`. This parameter can either be `'first'`, `'last'`, or `'asNA'`  - what do you think these mean?
+However, we can also explicitly add a parameter called `multiVals` to another `annotationDbi` function called `mapIds`. This parameter can either be `'first'`, `'last'`, or `'asNA'` - what do you think these mean?
 
 We wrote a custom R function to apply the `multiVals = first` strategy explicitly to get a results object similar to `annotations_orgDb`:
 
 ``` r
 # Run this to load this custom function into your environment
-annotate_results <- function(df, orgdb, key_column="ensgene", keytype="ENSEMBL", annotation_columns, multiVals="first"){
+annotate_results_general <- function(df, orgdb, keytype, key_column="ensgene", annotation_columns, multiVals="first"){
   lst <- list()
   for (col in annotation_columns){
     lst[[col]] <- mapIds(
@@ -185,7 +185,7 @@ annotate_results <- function(df, orgdb, key_column="ensgene", keytype="ENSEMBL",
 And this function can be run like the following:
 
 ``` r
-annot_orgDb_first <- annotate_results(res_tableOE_df, org.Hs.eg.db, annotation_columns=c("GENENAME", "SYMBOL", "ENTREZID"))
+annot_orgDb_first <- annotate_results_general(res_tableOE_df, org.Hs.eg.db, keytype="ENSEMBL", annotation_columns=c("GENENAME", "SYMBOL", "ENTREZID"))
 ```
 
 There are now only the expected 79k results! We can double check that we have selected only one mapping per gene:
@@ -196,7 +196,7 @@ There are now only the expected 79k results! We can double check that we have se
 
 **However, this solution still has pitfalls**: There are many cases where the different possible matches to the same key actually provide other information. For example, someone might notice that `GO` is a column in the orgdb, and run `annotate_results()` on it. But with `multiVals="first"`, only one of the many GO terms will be associated with the gene, which is unhelpful and also wrong.
 
-Here is part of an object I created called `annotations_orgDb_go`  - we would lose information just be picking the first of these entries for each gene!
+Here is part of an object I created called `annotations_orgDb_go` - we would lose information just be picking the first of these entries for each gene!
 
 ```         
  ENSEMBL         GO EVIDENCE ONTOLOGY SYMBOL ENTREZID      GENENAME
@@ -245,25 +245,30 @@ EnsDb.Hsapiens.v86
 keytypes(EnsDb.Hsapiens.v86)
 
 # Explore columns of data that can be used for other analyses
-columns(EnsDb.Hapiens.v86)
+columns(EnsDb.Hsapiens.v86)
 ```
 
 Now we can return all gene IDs for our gene list:
 
 ``` r
 # Return the Ensembl IDs for a set of genes
-annotated_res <- annotate_results(res_tableOE_df, EnsDb.Hapiens.v86, annotation_columns=c("SYMBOL", "ENTREZID", "GENEBIOTYPE")) 
-
-annotations_edb <- AnnotationDbi::select(EnsDb.Hsapiens.v86,
-                                           keys = res_tableOE_df$gene,
-                                           columns = c("SYMBOL", "ENTREZID","GENEBIOTYPE"),
-                                           keytype = "GENEID")
+annotations_edb <- annotate_results(res_tableOE_df, EnsDb.Hsapiens.v86, keytype="GENEID", annotation_columns=c("SYMBOL", "ENTREZID", "GENEBIOTYPE")) 
 ```
 
-We can check for NA entries, and find that there are none:
+We can check for NA entries, and find that we have fewer of these instances:
 
 ``` r
-length(which(is.na(annotations_edb$SYMBOL) == FALSE))
+length(which(is.na(annotations_edb$SYMBOL)))
+```
+
+And we can get rid of them like we did previously, **but we don't need to right now**.
+
+``` r
+# Determine the indices for the non-NA genes
+non_na_idx <- which(is.na(annotations_edb$SYMBOL) == FALSE)
+
+# Return only the genes with annotations using indices
+annotations_edb_rm <- annotations_edb[non_na_idx, ]
 ```
 
 > **NOTE:** In this case we used the same build but a slightly older release, and we found little discrepancy. If your analysis was conducted using an older genome build (i.e hg19), but used a newer build for annotation some genes may be found to be not annotated (NA). Some of the genes have changed names in between versions (due to updates and patches), so may not be present in the newer version of the database.
