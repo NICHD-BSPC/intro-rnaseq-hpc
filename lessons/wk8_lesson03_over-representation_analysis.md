@@ -245,9 +245,7 @@ emapplot(ego, showCategory = 50)
 **To save the figure,** click on the `Export` button in the RStudio `Plots` tab and `Save as PNG...`, and then adjust as necessary.
 
 <p align="center">
-
-![](emapplot_50categories.png){width="506"}
-
+<img src="../img/emapplot_50categories.png" width="480"/>
 </p>
 
 ## Category Netplot
