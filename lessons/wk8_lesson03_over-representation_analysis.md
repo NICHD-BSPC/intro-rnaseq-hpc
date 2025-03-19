@@ -315,7 +315,7 @@ s_ego
 
 ``` r
 ## Extract upregulated genes
-sigOE_up <- dplyr::filter(res_ids, padj < 0.1 & log2FoldChange > 0)
+sigOE_up <- dplyr::filter(annotations_edb_tested, padj < 0.1 & log2FoldChange > 0)
 
 sigOE_up_genes <- as.character(sigOE_up$gene)
 
