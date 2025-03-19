@@ -173,11 +173,15 @@ pathview(gene.data = foldchanges,
               cpd = 1))
 ```
 
-> **NOTE:** pathview may not display in your R Plots window. Instead, you may see a message such as `Info: Working in directory /vf/users/Bspc-training/user/DEanalysis` and `Info: Writing image file hsa05014.pathview.png`. This indicates that the image has instead been saved to that directory. You can open the pathview file to view it.
+> **NOTE:** pathview may not display in your R Plots window. Instead, you may see a message such as `Info: Working in directory /vf/users/Bspc-training/user/DEanalysis` and `Info: Writing image file hsa05014.pathview.png`. This indicates that the image has instead been saved to that directory.
 
 <p align="center">
 
 ![](images/kegg_hsa05014.png)
+
+You can read more about Pathview output [here](https://pathview.uncc.edu/overview), including a key to the different shapes and formatting in the figure above:
+
+![](images/pathview_legend.png){width="416"}
 
 > **NOTE:** Printing out Pathview images for all significant pathways can be easily performed as follows, but since we have many pathways to deal with, I would not recommend running it now.
 >
@@ -196,7 +200,7 @@ pathview(gene.data = foldchanges,
 
 ### Incorporating other gene sets for GSEA
 
-There are other gene sets available for GSEA analysis in clusterProfiler (Disease Ontology, Reactome pathways, etc.). In addition, it is possible to supply your own gene set GMT file, and use that as input.
+There are other gene sets available for GSEA analysis in clusterProfiler (Disease Ontology, Reactome pathways, etc.). In addition, it is possible to supply your own gene set GMT (Gene Matrix Transposed) file, and use that as input.
 
 The Molecular Signatures Database (also known as [MSigDB](http://software.broadinstitute.org/gsea/msigdb/index.jsp)) is a collection of annotated gene sets. It contains 8 major collections:
 
@@ -209,13 +213,13 @@ The Molecular Signatures Database (also known as [MSigDB](http://software.broadi
 -   C6: oncogenic signatures
 -   C7: immunologic signatures
 
-Users can download GMT files from Broad Institute and use the read.gmt() function to parse the files. Alternatively, there is an R package that already packed the MSigDB gene sets in tidy data format that can be used directly with clusterProfiler. The `msigdbr` package supports severa species and some example code is provided below:
+Users can download GMT files from Broad Institute and use the read.gmt() function to parse the files. Alternatively, there is an R package that already packed the MSigDB gene sets in tidy data format that can be used directly with clusterProfiler. The `msigdbr` package supports several species and some example code is provided below:
 
 ``` r
 # DO NOT RUN
 
 library(msigdbr)
-msigdbr_show_species()
+msigdbr_species()
 
 ##  [1] "Anolis carolinensis"             "Bos taurus"                     
 ##  [3] "Caenorhabditis elegans"          "Canis lupus familiaris"         
@@ -268,7 +272,6 @@ The way the tools perform clustering is by taking the entire expression matrix a
 -   WebGestalt - <http://www.webgestalt.org> (need to register)
 -   AmiGO - <http://amigo.geneontology.org/amigo>
 -   ReviGO (visualizing GO analysis, input is GO terms) - <http://revigo.irb.hr/>
--   WGCNA - [https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/](https://web.archive.org/web/20230323144343/horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/) (no longer maintained)
 -   GSEA - <http://software.broadinstitute.org/gsea/index.jsp>
 -   SPIA - <https://www.bioconductor.org/packages/release/bioc/html/SPIA.html>
 -   GAGE/Pathview - <http://www.bioconductor.org/packages/release/bioc/html/gage.html>
