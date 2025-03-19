@@ -56,7 +56,7 @@ GSEA will use the log2 fold changes obtained from the differential expression an
 foldchanges <- res_entrez$log2FoldChange
 
 ## Name each fold change with the corresponding Entrez ID
-names(foldchanges) <- res_entrez$entrezid
+names(foldchanges) <- res_entrez$ENTREZID
 ```
 
 Next we need to order the fold changes in decreasing order. To do this we'll use the `sort()` function, which takes a vector as input. This is in contrast to Tidyverse's `arrange()`, which requires a data frame.
@@ -88,7 +88,7 @@ An enrichment score for a particular gene set is calculated by walking down the 
 
 **Step 2:** Estimation of significance:
 
-The significance of the enrichment score is determined using permutation testing, which performs rearrangements of the data points to determine the likelihood of generating an enrichment score as large as the enrichment score calculated from the observed data. Essentially, for this step, the first permutation would reorder the log2 fold changes and randomly assign them to different genes, reorder the gene ranks based on these new log2 fold changes, and recalculate the enrichment score. The second permutation would reorder the log2 fold changes again and recalculate the enrichment score again, and this would continue for the total number of permutations run. Therefore, the number of permutations run will increase the confidence in the signficance estimates.
+The significance of the enrichment score is determined using permutation testing, which performs rearrangements of the data points to determine the likelihood of generating an enrichment score as large as the enrichment score calculated from the observed data. Essentially, for this step, the first permutation would reorder the log2 fold changes and randomly assign them to different genes, reorder the gene ranks based on these new log2 fold changes, and recalculate the enrichment score. The second permutation would reorder the log2 fold changes again and recalculate the enrichment score again, and this would continue for the total number of permutations run. Therefore, the number of permutations run will increase the confidence in the significance estimates.
 
 **Step 3:** Adjust for multiple test correction
 
@@ -112,18 +112,18 @@ To perform the GSEA using KEGG gene sets with clusterProfiler, we can use the `g
 ## GSEA using gene sets from KEGG pathways
 gseaKEGG <- gseKEGG(geneList = foldchanges, # ordered named vector of fold changes (Entrez IDs are the associated names)
               organism = "hsa", # supported organisms listed below
-              minGSSize = 20, # minimum gene set size (# genes in set) - change to test more sets or recover sets with fewer # genes
-              pvalueCutoff = 0.05, # padj cutoff value
+              minGSSize = 10, # Default minimum gene set size (# genes in set)
+              pvalueCutoff = 1.0, # padj cutoff value
               verbose = FALSE)
 
 ## Extract the GSEA results
 gseaKEGG_results <- gseaKEGG@result
 
 # Write results to file
-write.csv(gseaKEGG_results, "results/gseaOE_kegg.csv", quote=F)
+write.tsv(gseaKEGG_results, "results/gseaOE_kegg.tsv", quote=F, sep="\t", row.names=FALSE, col.names=TRUE)
 ```
 
-**How many pathways are enriched?** *NOTE: The results may look slightly different for you.*
+**Why did we pick `pvalueCutoff = 1.0` again?** *NOTE: The results may look slightly different for you.*
 
 ``` r
 ## Write GSEA results to file
@@ -150,8 +150,8 @@ View(gseaKEGG_results)
 Let's explore the GSEA plot of enrichment of one of the pathways in the ranked list:
 
 ``` r
-## Plot the GSEA plot for a single enriched pathway, `hsa03040`
-gseaplot(gseaKEGG, geneSetID = 'hsa03008')
+## Plot the GSEA plot for a single enriched pathway, `hsa05014`
+gseaplot(gseaKEGG, geneSetID = 'hsa05014')
 ```
 
 <p align="center">
@@ -160,32 +160,26 @@ gseaplot(gseaKEGG, geneSetID = 'hsa03008')
 
 </p>
 
-In this plot, the lines in plot represent the genes in the gene set 'hsa03008', and where they occur among the log2 fold changes. The largest positive log2 fold changes are on the left-hand side of the plot, while the largest negative log2 fold changes are on the right. The top plot shows the magnitude of the log2 fold changes for each gene, while the bottom plot shows the running sum, with the enrichment score peaking at the red dotted line (which is among the negative log2 fold changes). This suggests the down-regulation of this pathway.
+In this plot, the lines in plot represent the genes in the gene set `hsa05014`, and where they occur among the log2 fold changes. The largest positive log2 fold changes are on the left-hand side of the plot, while the largest negative log2 fold changes are on the right. The top plot shows the magnitude of the log2 fold changes for each gene, while the bottom plot shows the running sum, with the enrichment score peaking at the red dotted line (which is among the negative log2 fold changes). This suggests the down-regulation of this pathway.
 
 Use the [Pathview R package](http://bioconductor.org/packages/release/bioc/html/pathview.html) to integrate the KEGG pathway data from clusterProfiler into pathway images:
 
 ``` r
-detach("package:dplyr", unload=TRUE) # first unload dplyr to avoid conflicts
-
 ## Output images for a single significant KEGG pathway
 pathview(gene.data = foldchanges,
-              pathway.id = "hsa03008",
+              pathway.id = "hsa05014",
               species = "hsa",
               limit = list(gene = 2, # value gives the max/min limit for foldchanges
               cpd = 1))
 ```
 
-> **NOTE:** If the below error message occurs: `Error in detach("package:dplyr", unload = T) : invalid 'name' argument`, that means the dplyr package is not currently loaded. Ignore the message and continue to run pathview command.
-
-> **NOTE:** pathview may not display in your R Plots window. Instead, you may see a message such as `Info: Working in directory /Users/yourname/Desktop/DEanalysis` and `Info: Writing image file hsa03008.pathview.png`. This indicates that the image has instead been saved to that directory. You can open the pathview file to view it.
+> **NOTE:** pathview may not display in your R Plots window. Instead, you may see a message such as `Info: Working in directory /vf/users/Bspc-training/user/DEanalysis` and `Info: Writing image file hsa05014.pathview.png`. This indicates that the image has instead been saved to that directory. You can open the pathview file to view it.
 
 <p align="center">
 
-<img src="../img/hsa03008.pathview.png" width="800"/>
+![](images/kegg_hsa05014.png)
 
-</p>
-
-> **NOTE:** Printing out Pathview images for all significant pathways can be easily performed as follows:
+> **NOTE:** Printing out Pathview images for all significant pathways can be easily performed as follows, but since we have many pathways to deal with, I would not recommend running it now.
 >
 > ``` r
 > ## Output images for all significant KEGG pathways
