@@ -10,7 +10,7 @@ Approximate time: 60 minutes
 
 -   Discuss functional class scoring, and pathway topology methods
 -   Construct a GSEA analysis using GO and KEGG gene sets
--   Examine results of a GSEA using pathwview package
+-   Examine results of a GSEA using pathview package
 -   List other tools and resources for identifying genes of novel pathways or networks
 
 ## Functional analysis using functional class scoring
@@ -41,11 +41,13 @@ The clusterProfiler package offers several functions to perform GSEA using diffe
 
 ``` r
 ## Remove any NA values (reduces the data by quite a bit)
-res_entrez <- dplyr::filter(res_ids, entrezid != "NA")
+res_tested_entrez <- dplyr::filter(annotations_edb_tested, ENTREZID != "NA")
 
 ## Remove any Entrez duplicates
-res_entrez <- res_entrez[which(duplicated(res_entrez$entrezid) == F), ]
+res_tested_entrez <- res_entrez[which(duplicated(res_entrez$ENTREZID) == F), ]
 ```
+
+**Discussion**: What does our `res_tested_entrez` table now represent?
 
 GSEA will use the log2 fold changes obtained from the differential expression analysis for every gene, to perform the analysis. We will obtain a vector of fold changes for input to clusterProfiler, in addition to the associated Entrez IDs:
 
@@ -54,7 +56,7 @@ GSEA will use the log2 fold changes obtained from the differential expression an
 foldchanges <- res_entrez$log2FoldChange
 
 ## Name each fold change with the corresponding Entrez ID
-names(foldchanges) <- res_entrez$entrezid
+names(foldchanges) <- res_entrez$ENTREZID
 ```
 
 Next we need to order the fold changes in decreasing order. To do this we'll use the `sort()` function, which takes a vector as input. This is in contrast to Tidyverse's `arrange()`, which requires a data frame.
@@ -86,7 +88,7 @@ An enrichment score for a particular gene set is calculated by walking down the 
 
 **Step 2:** Estimation of significance:
 
-The significance of the enrichment score is determined using permutation testing, which performs rearrangements of the data points to determine the likelihood of generating an enrichment score as large as the enrichment score calculated from the observed data. Essentially, for this step, the first permutation would reorder the log2 fold changes and randomly assign them to different genes, reorder the gene ranks based on these new log2 fold changes, and recalculate the enrichment score. The second permutation would reorder the log2 fold changes again and recalculate the enrichment score again, and this would continue for the total number of permutations run. Therefore, the number of permutations run will increase the confidence in the signficance estimates.
+The significance of the enrichment score is determined using permutation testing, which performs rearrangements of the data points to determine the likelihood of generating an enrichment score as large as the enrichment score calculated from the observed data. Essentially, for this step, the first permutation would reorder the log2 fold changes and randomly assign them to different genes, reorder the gene ranks based on these new log2 fold changes, and recalculate the enrichment score. The second permutation would reorder the log2 fold changes again and recalculate the enrichment score again, and this would continue for the total number of permutations run. Therefore, the number of permutations run will increase the confidence in the significance estimates.
 
 **Step 3:** Adjust for multiple test correction
 
@@ -110,18 +112,18 @@ To perform the GSEA using KEGG gene sets with clusterProfiler, we can use the `g
 ## GSEA using gene sets from KEGG pathways
 gseaKEGG <- gseKEGG(geneList = foldchanges, # ordered named vector of fold changes (Entrez IDs are the associated names)
               organism = "hsa", # supported organisms listed below
-              minGSSize = 20, # minimum gene set size (# genes in set) - change to test more sets or recover sets with fewer # genes
-              pvalueCutoff = 0.05, # padj cutoff value
+              minGSSize = 10, # Default minimum gene set size (# genes in set)
+              pvalueCutoff = 1.0, # padj cutoff value
               verbose = FALSE)
 
 ## Extract the GSEA results
 gseaKEGG_results <- gseaKEGG@result
 
 # Write results to file
-write.csv(gseaKEGG_results, "results/gseaOE_kegg.csv", quote=F)
+write.tsv(gseaKEGG_results, "results/gseaOE_kegg.tsv", quote=F, sep="\t", row.names=FALSE, col.names=TRUE)
 ```
 
-**How many pathways are enriched?** *NOTE: The results may look slightly different for you.*
+**Why did we pick `pvalueCutoff = 1.0` again?** *NOTE: The results may look slightly different for you.*
 
 ``` r
 ## Write GSEA results to file
@@ -148,8 +150,8 @@ View(gseaKEGG_results)
 Let's explore the GSEA plot of enrichment of one of the pathways in the ranked list:
 
 ``` r
-## Plot the GSEA plot for a single enriched pathway, `hsa03040`
-gseaplot(gseaKEGG, geneSetID = 'hsa03008')
+## Plot the GSEA plot for a single enriched pathway, `hsa05014`
+gseaplot(gseaKEGG, geneSetID = 'hsa05014')
 ```
 
 <p align="center">
@@ -158,32 +160,30 @@ gseaplot(gseaKEGG, geneSetID = 'hsa03008')
 
 </p>
 
-In this plot, the lines in plot represent the genes in the gene set 'hsa03008', and where they occur among the log2 fold changes. The largest positive log2 fold changes are on the left-hand side of the plot, while the largest negative log2 fold changes are on the right. The top plot shows the magnitude of the log2 fold changes for each gene, while the bottom plot shows the running sum, with the enrichment score peaking at the red dotted line (which is among the negative log2 fold changes). This suggests the down-regulation of this pathway.
+In this plot, the lines in plot represent the genes in the gene set `hsa05014`, and where they occur among the log2 fold changes. The largest positive log2 fold changes are on the left-hand side of the plot, while the largest negative log2 fold changes are on the right. The top plot shows the magnitude of the log2 fold changes for each gene, while the bottom plot shows the running sum, with the enrichment score peaking at the red dotted line (which is among the negative log2 fold changes). This suggests the down-regulation of this pathway.
 
 Use the [Pathview R package](http://bioconductor.org/packages/release/bioc/html/pathview.html) to integrate the KEGG pathway data from clusterProfiler into pathway images:
 
 ``` r
-detach("package:dplyr", unload=TRUE) # first unload dplyr to avoid conflicts
-
 ## Output images for a single significant KEGG pathway
 pathview(gene.data = foldchanges,
-              pathway.id = "hsa03008",
+              pathway.id = "hsa05014",
               species = "hsa",
               limit = list(gene = 2, # value gives the max/min limit for foldchanges
               cpd = 1))
 ```
 
-> **NOTE:** If the below error message occurs: `Error in detach("package:dplyr", unload = T) : invalid 'name' argument`, that means the dplyr package is not currently loaded. Ignore the message and continue to run pathview command.
-
-> **NOTE:** pathview may not display in your R Plots window. Instead, you may see a message such as `Info: Working in directory /Users/yourname/Desktop/DEanalysis` and `Info: Writing image file hsa03008.pathview.png`. This indicates that the image has instead been saved to that directory. You can open the pathview file to view it.
+> **NOTE:** pathview may not display in your R Plots window. Instead, you may see a message such as `Info: Working in directory /vf/users/Bspc-training/user/DEanalysis` and `Info: Writing image file hsa05014.pathview.png`. This indicates that the image has instead been saved to that directory.
 
 <p align="center">
 
-<img src="../img/hsa03008.pathview.png" width="800"/>
+![](images/kegg_hsa05014.png)
 
-</p>
+You can read more about Pathview output [here](https://pathview.uncc.edu/overview), including a key to the different shapes and formatting in the figure above:
 
-> **NOTE:** Printing out Pathview images for all significant pathways can be easily performed as follows:
+![](images/pathview_legend.png){width="416"}
+
+> **NOTE:** Printing out Pathview images for all significant pathways can be easily performed as follows, but since we have many pathways to deal with, I would not recommend running it now.
 >
 > ``` r
 > ## Output images for all significant KEGG pathways
@@ -200,7 +200,7 @@ pathview(gene.data = foldchanges,
 
 ### Incorporating other gene sets for GSEA
 
-There are other gene sets available for GSEA analysis in clusterProfiler (Disease Ontology, Reactome pathways, etc.). In addition, it is possible to supply your own gene set GMT file, and use that as input.
+There are other gene sets available for GSEA analysis in clusterProfiler (Disease Ontology, Reactome pathways, etc.). In addition, it is possible to supply your own gene set GMT (Gene Matrix Transposed) file, and use that as input.
 
 The Molecular Signatures Database (also known as [MSigDB](http://software.broadinstitute.org/gsea/msigdb/index.jsp)) is a collection of annotated gene sets. It contains 8 major collections:
 
@@ -213,13 +213,13 @@ The Molecular Signatures Database (also known as [MSigDB](http://software.broadi
 -   C6: oncogenic signatures
 -   C7: immunologic signatures
 
-Users can download GMT files from Broad Institute and use the read.gmt() function to parse the files. Alternatively, there is an R package that already packed the MSigDB gene sets in tidy data format that can be used directly with clusterProfiler. The `msigdbr` package supports severa species and some example code is provided below:
+Users can download GMT files from Broad Institute and use the read.gmt() function to parse the files. Alternatively, there is an R package that already packed the MSigDB gene sets in tidy data format that can be used directly with clusterProfiler. The `msigdbr` package supports several species and some example code is provided below:
 
 ``` r
 # DO NOT RUN
 
 library(msigdbr)
-msigdbr_show_species()
+msigdbr_species()
 
 ##  [1] "Anolis carolinensis"             "Bos taurus"                     
 ##  [3] "Caenorhabditis elegans"          "Canis lupus familiaris"         
@@ -272,7 +272,6 @@ The way the tools perform clustering is by taking the entire expression matrix a
 -   WebGestalt - <http://www.webgestalt.org> (need to register)
 -   AmiGO - <http://amigo.geneontology.org/amigo>
 -   ReviGO (visualizing GO analysis, input is GO terms) - <http://revigo.irb.hr/>
--   WGCNA - [https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/](https://web.archive.org/web/20230323144343/horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/) (no longer maintained)
 -   GSEA - <http://software.broadinstitute.org/gsea/index.jsp>
 -   SPIA - <https://www.bioconductor.org/packages/release/bioc/html/SPIA.html>
 -   GAGE/Pathview - <http://www.bioconductor.org/packages/release/bioc/html/gage.html>
