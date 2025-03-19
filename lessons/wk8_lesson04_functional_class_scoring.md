@@ -10,7 +10,7 @@ Approximate time: 60 minutes
 
 -   Discuss functional class scoring, and pathway topology methods
 -   Construct a GSEA analysis using GO and KEGG gene sets
--   Examine results of a GSEA using pathwview package
+-   Examine results of a GSEA using pathview package
 -   List other tools and resources for identifying genes of novel pathways or networks
 
 ## Functional analysis using functional class scoring
@@ -41,11 +41,13 @@ The clusterProfiler package offers several functions to perform GSEA using diffe
 
 ``` r
 ## Remove any NA values (reduces the data by quite a bit)
-res_entrez <- dplyr::filter(res_ids, entrezid != "NA")
+res_tested_entrez <- dplyr::filter(annotations_edb_tested, ENTREZID != "NA")
 
 ## Remove any Entrez duplicates
-res_entrez <- res_entrez[which(duplicated(res_entrez$entrezid) == F), ]
+res_tested_entrez <- res_entrez[which(duplicated(res_entrez$ENTREZID) == F), ]
 ```
+
+**Discussion**: What does our `res_tested_entrez` table now represent?
 
 GSEA will use the log2 fold changes obtained from the differential expression analysis for every gene, to perform the analysis. We will obtain a vector of fold changes for input to clusterProfiler, in addition to the associated Entrez IDs:
 
