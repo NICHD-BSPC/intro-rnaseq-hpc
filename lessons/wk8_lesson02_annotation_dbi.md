@@ -252,7 +252,7 @@ Now we can return all gene IDs for our gene list:
 
 ``` r
 # Return the Ensembl IDs for a set of genes
-annotations_edb <- annotate_results(res_tableOE_df, EnsDb.Hsapiens.v86, keytype="GENEID", annotation_columns=c("SYMBOL", "ENTREZID", "GENEBIOTYPE")) 
+annotations_edb <- annotate_results_general(res_tableOE_df, EnsDb.Hsapiens.v86, keytype="GENEID", annotation_columns=c("SYMBOL", "ENTREZID", "GENEBIOTYPE")) 
 ```
 
 We can check for NA entries, and find that we have fewer of these instances:
