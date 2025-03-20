@@ -175,9 +175,9 @@ pathview(gene.data = foldchanges,
 
 > **NOTE:** pathview may not display in your R Plots window. Instead, you may see a message such as `Info: Working in directory /vf/users/Bspc-training/user/DEanalysis` and `Info: Writing image file hsa05014.pathview.png`. This indicates that the image has instead been saved to that directory.
 
-<p align="center">
 
-![](images/kegg_hsa05014.png)
+<img src="../img/kegg_hsa05014.png" width="600"/>
+
 
 You can read more about Pathview output [here](https://pathview.uncc.edu/overview), including a key to the different shapes and formatting in the figure above:
 
