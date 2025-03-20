@@ -80,7 +80,7 @@ Now we are ready to perform GSEA. The details regarding GSEA can be found in the
 
 ***Image credit:**[Subramanian et al. Proceedings of the National Academy of Sciences Oct 2005, 102 (43) 15545-15550; DOI: 10.1073/pnas.0506580102](https://www.pnas.org/content/102/43/15545)*
 
-This image describes the theory of GSEA, with the 'gene set S' showing the metric used (in our case, ranked log2 fold changes) to determine enrichment of genes in the gene set. The left-most image is representing this metric used for the GSEA analysis. The log2 fold changes for each gene in the 'gene set S' is shown as a line in the middle image. The large positive log2 fold changes are at the top of the gene set image, while the largest negative log2 fold changes are at the bottom of the gene set image. In the right-most image, the gene set is turned horizontally, underneath which is an image depicting the calculations involved in determining enrichment, as described below.
+This image describes the theory of GSEA, with the 'gene set S' showing the metric used (in our case, ranked log2 fold changes) to determine enrichment of genes in the gene set. The left-most image is representing this metric used for the GSEA analysis. The log2 fold changes for each gene in the 'gene set S' is shown as a line in the middle image. All genes are represented, but only those genes that are in gene set "S" are indicated with a black line and the rest are white/blank lines. The large positive log2 fold changes are at the top of the gene set image, while the largest negative log2 fold changes are at the bottom of the gene set image. In the right-most image, the gene set is turned horizontally, underneath which is an image depicting the calculations involved in determining enrichment, as described below.
 
 **Step 1:** Calculation of enrichment score:
 
@@ -88,7 +88,7 @@ An enrichment score for a particular gene set is calculated by walking down the 
 
 **Step 2:** Estimation of significance:
 
-The significance of the enrichment score is determined using permutation testing, which performs rearrangements of the data points to determine the likelihood of generating an enrichment score as large as the enrichment score calculated from the observed data. Essentially, for this step, the first permutation would reorder the log2 fold changes and randomly assign them to different genes, reorder the gene ranks based on these new log2 fold changes, and recalculate the enrichment score. The second permutation would reorder the log2 fold changes again and recalculate the enrichment score again, and this would continue for the total number of permutations run. Therefore, the number of permutations run will increase the confidence in the significance estimates.
+The significance of the enrichment score is determined using permutation testing, which performs rearrangements of the data points to determine the likelihood of generating an enrichment score as large as the enrichment score calculated from the observed data. Essentially, for this step, the first permutation would reorder the log2 fold changes and randomly assign them to different genes, reorder the gene ranks based on these new log2 fold changes, and recalculate the enrichment score. The second permutation would reorder the log2 fold changes again and recalculate the enrichment score again, and this would continue for the total number of permutations run. Therefore, the number of permutations run will increase the resolution of the significance estimates.
 
 **Step 3:** Adjust for multiple test correction
 
@@ -262,9 +262,14 @@ You can visualize co-expression clustering using heatmaps, which should be viewe
 
 The way the tools perform clustering is by taking the entire expression matrix and computing pair-wise co-expression values. A network is then generated from which we explore the topology to make inferences on gene co-regulation. The [WGCNA](%5Bhttps://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/%5D(https://web.archive.org/web/20230323144343/horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/)) package (in R) is one example of a more sophisticated method for co-expression clustering (please note however that it is no longer maintained).
 
+We previously used degPatterns for identifying groups of genes based on coxpression clustering, so one option for exploration could be to consider each group of genes from degPatterns in an overrepresentation analysis.
+
 ## Resources for functional analysis
 
+There are many web resources for running functional enrichment of various kinds. They may use different algorithms with different assumptions as well as different databases (or similar databases but updated at different times), so you will likely get different answers. They are probably all correct in their own way. There is no one true single answer; remember that the goal of functional enrichment is to get new ideas rather than to have a definitive answer.
+
 -   g:Profiler - <http://biit.cs.ut.ee/gprofiler/index.cgi>
+-   Reactome - <https://reactome.org/>
 -   DAVID - <https://david.ncifcrf.gov>
 -   clusterProfiler - <http://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>
 -   GeneMANIA - <http://www.genemania.org/>
