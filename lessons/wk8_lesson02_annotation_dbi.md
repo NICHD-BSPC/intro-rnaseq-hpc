@@ -78,6 +78,11 @@ columns(org.Hs.eg.db)
 [21] "PMID"         "PROSITE"      "REFSEQ"       "SYMBOL"       "UCSCKG"
 ```
 
+And let's see what keys are available for mapping to this database: 
+
+``` r
+keytypes(org.Hs.eg.db)
+```
 Ideally, all databases would use the same gene identifier, but this is unfortunately not the case. Recall that our featureCounts file that we imported into R has Ensembl identifiers. Let's check the orgdb's Ensemble identifiers:
 
 ``` r
