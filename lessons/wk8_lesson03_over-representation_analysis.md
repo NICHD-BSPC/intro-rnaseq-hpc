@@ -252,6 +252,8 @@ emapplot(ego, showCategory = 50)
 
 Finally, the **category netplot** shows the relationships between the genes associated with the top five most significant GO terms and the fold changes of the significant genes associated with these terms (color). The size of the GO terms reflects the number of genes in the terms, with terms with more genes being larger. This plot is particularly useful for hypothesis generation in identifying genes that may be important to several of the most affected processes.
 
+For learning how to customize any of these plots, I highly recommend looking into the [tutorials of the Yu Lab](https://yulab-smu.top/biomedical-knowledge-mining-book/enrichplot.html), the folks behind clusterProfiler itself! 
+
 > **Note** - You may need to install the `ggnewscale` package using `install.packages("ggnewscale")` for the `cnetplot()` function to work.
 
 ``` r
