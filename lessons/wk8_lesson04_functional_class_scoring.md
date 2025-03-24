@@ -142,6 +142,50 @@ See more at this [NCI BTEP Coding Club exercise](https://bioinformatics.ccr.canc
 
 **NOTE:** Instead of saving just the results summary from the `ego_gsea` object, it might also be beneficial to save the object itself. The `save()` function enables you to save it as a `.rda` file, e.g. `save(ego_gsea, file="results/ego_gsea.rda")`. The complementary function to `save()` is the function `load()`, e.g. `ego_gsea <- load(file="results/ego_gsea.rda")`.
 
+## Graphically Exploring GSEA Results
+
+Let’s explore the GSEA plot of enrichment of one of the pathways in the ranked list:
+
+``` r
+## Plot the GSEA plot for a single enriched pathway, `GO:0022613`
+gseaplot(ego_gsea, geneSetID = 'GO:0022613')
+```
+
+![](images/gsea_go0022613.png){width="550"}
+
+`clusterProfiler` and the associated packages can create the same type of plots so we can compare with our ORA results:
+
+### Dotplot
+
+``` r
+dotplot(ego_gsea, showCategory=30) + ggtitle("dotplot for GSEA")
+```
+
+![](images/gsea_dotplot.png){width="562"}
+
+## Enrichment Maps 
+
+The `emapplot` function supports results obtained from hypergeometric test and gene set enrichment analysis.
+
+``` r
+# calculate termsim 
+library(enrichplot)
+ego_gsea_read <- pairwise_termsim(ego_gsea_read)
+```
+
+## Cnet Plots
+
+As for our ORA analysis, a [`cnetplot()`](https://rdrr.io/pkg/enrichplot/man/cnetplot.html) depicts the linkages of genes and biological concepts (*e.g.* GO terms or KEGG pathways) as a network. **GSEA result is also supported with only core enriched genes displayed.\
+**
+
+``` r
+## convert gene ID to Symbol on the fly
+ego_gsea_read <- setReadable(ego_gsea, 'org.Hs.eg.db', 'ENSEMBL')
+
+## plot
+cnetplot(ego_gsea_read, foldChange=geneList)
+```
+
 ## Optional: GSEA with KEGG (outdated)
 
 The clusterProfiler package offers several functions to perform GSEA using different genes sets, including but not limited to GO, KEGG, and MSigDb. We will use the KEGG gene sets in our examples below. The KEGG gene sets are defined using the Entrez identifiers, thus to perform the analysis we will need to acquire the corresponding Entrez IDs for our genes. We will also need to remove any genes that do not have an Entrez ID (NA values) and any duplicates (due to gene ID conversion) that may exist:
