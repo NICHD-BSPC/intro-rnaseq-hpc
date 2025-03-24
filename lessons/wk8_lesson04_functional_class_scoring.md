@@ -86,18 +86,61 @@ foldchanges <- sort(foldchanges, decreasing = TRUE)
 head(foldchanges)
 ```
 
-Running will be something like this, need to adjust parameters:
+To run the actual analysis, we will first set the seed so that we all obtain the same result:
+
+``` r
+set.seed(123456)
+```
+
+> ***NOTE:** The permutations are performed using random reordering, so every time we run the function we will get slightly different results. If we would like to use the same permutations every time we run a function, then we use the `set.seed(123456)` function prior to running. The input to `set.seed()` can be any number, but if you would want the same results, then you would need to use the same number as the lesson.*
 
 ``` r
 ego_gsea <- gseGO(geneList = foldchanges,
               keyType = "ENSEMBL",
               OrgDb = org.Hs.eg.db,
               ont = "BP",
-              minGSSize = 100,
-              maxGSSize = 500,
-              pvalueCutoff = 0.05,
+              pvalueCutoff = 1.0,
+              pAdjustMethod = "BH",
               verbose = FALSE)
 ```
+
+**Why did we pick `pvalueCutoff = 1.0` again?** *NOTE: The results may look slightly different for you.*
+
+![](images/ego_gsea_table-02.png)
+
+``` r
+## Extract the GSEA results
+gsea_go_results <- ego_gsea@result
+
+# Write results to file
+write.tsv(gsea_go_results, "results/gsea_go_results.tsv", quote=F, sep="\t", row.names=FALSE, col.names=TRUE)
+```
+
+-   The first few columns of the results table identify the GO term information
+
+-    Enrichment Score and normalized enrichment score - represents the degree to which a set is over-represented at the top or bottom of the ranked list.
+
+-   **Normalized enrichment score (NES)** - allows comparability across gene sets by [accounting for differences in gene set size and in correlations between gene sets and the expression dataset](https://www.gsea-msigdb.org/gsea/doc/GSEAUserGuideTEXT.htm#_Normalized_Enrichment_Score). A positive NES is associated with pathway activation, and a negative NES is associated with pathway suppression.
+
+-   Significance calculation (pvalue) using a permutation test on gene labels.
+
+-   Adjustment of multiple hypothesis testing (p.adjust) and FDR control (qvalue).
+
+-   **Leading edge analysis outputs:**
+
+    > The leading edge subset of a gene set is the subset of members that contribute most to the ES. For a positive ES, the leading edge subset is the set of members that appear in the ranked list prior to the peak score. For a negative ES, it is the set of members that appear subsequent to the peak score. --- [GSEAUserGuide](https://www.gsea-msigdb.org/gsea/doc/GSEAUserGuideTEXT.htm#leading_edge_subset)
+
+    tags - the percentage of genes before or after the peak in the running enrichment score, which is an indication of the percentage of genes contributing to the enrichment score.
+
+    list - where in the list the enrichment score is attained.
+
+    signal - enrichment signal strength.
+
+-   **Core enrichment:** These are the genes associated with the GO Term which contributed to the observed enrichment score (i.e. in the extremes of the ranking). The genes are listed by Ensembl ID.
+
+See more at this [NCI BTEP Coding Club exercise](https://bioinformatics.ccr.cancer.gov/docs/btep-coding-club/CC2023/FunctionalEnrich_clusterProfiler/).
+
+**NOTE:** Instead of saving just the results summary from the `ego_gsea` object, it might also be beneficial to save the object itself. The `save()` function enables you to save it as a `.rda` file, e.g. `save(ego_gsea, file="results/ego_gsea.rda")`. The complementary function to `save()` is the function `load()`, e.g. `ego_gsea <- load(file="results/ego_gsea.rda")`.
 
 ## Optional: GSEA with KEGG (outdated)
 
