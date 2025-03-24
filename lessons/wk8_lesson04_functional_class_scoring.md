@@ -39,7 +39,7 @@ Gene sets are pre-defined groups of genes, which are functionally related. Commo
 
 Now we are ready to perform GSEA. The details regarding GSEA can be found in the [PNAS paper](https://www.pnas.org/content/102/43/15545) by Subramanian et al. We will describe briefly the steps outlined in the paper below:
 
-<p align="center">
+<p align="center">h
 
 <img src="../img/gsea_overview.png" width="600"/>
 
@@ -165,7 +165,7 @@ dotplot(ego_gsea, showCategory=30) + ggtitle("dotplot for GSEA")
 
 ## Enrichment Maps 
 
-The `emapplot` function supports results obtained from hypergeometric test and gene set enrichment analysis.
+The `emapplot` function supports results obtained from hypergeometric test and *gene set enrichment analysis.*
 
 ``` r
 # calculate termsim 
