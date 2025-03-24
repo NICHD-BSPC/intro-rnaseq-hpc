@@ -35,7 +35,71 @@ One commonly used tool which is classified under Functional class scoring (FCS),
 
 Gene sets are pre-defined groups of genes, which are functionally related. Commonly used gene sets include those derived from KEGG pathways, Gene Ontology terms, MSigDB, Reactome, or gene groups that share some other functional annotations, etc. [[1](../../resources/pathway_tools.pdf)].
 
-### Preparation for GSEA
+## Theory of GSEA
+
+Now we are ready to perform GSEA. The details regarding GSEA can be found in the [PNAS paper](https://www.pnas.org/content/102/43/15545) by Subramanian et al. We will describe briefly the steps outlined in the paper below:
+
+<p align="center">
+
+<img src="../img/gsea_overview.png" width="600"/>
+
+</p>
+
+***Image credit:**[Subramanian et al. Proceedings of the National Academy of Sciences Oct 2005, 102 (43) 15545-15550; DOI: 10.1073/pnas.0506580102](https://www.pnas.org/content/102/43/15545)*
+
+This image describes the theory of GSEA, with the 'gene set S' showing the metric used (in our case, ranked log2 fold changes) to determine enrichment of genes in the gene set. The left-most image is representing this metric used for the GSEA analysis. The log2 fold changes for each gene in the 'gene set S' is shown as a line in the middle image. All genes are represented, but only those genes that are in gene set "S" are indicated with a black line and the rest are white/blank lines. The large positive log2 fold changes are at the top of the gene set image, while the largest negative log2 fold changes are at the bottom of the gene set image. In the right-most image, the gene set is turned horizontally, underneath which is an image depicting the calculations involved in determining enrichment, as described below.
+
+**Step 1:** Calculation of enrichment score:
+
+An enrichment score for a particular gene set is calculated by walking down the list of log2 fold changes and increasing the running-sum statistic every time a gene in the gene set is encountered and decreasing it when genes are not part of the gene set. The size of the increase/decrease is determined by magnitude of the log2 fold change. Larger (positive or negative) log2 fold changes will result in larger increases or decreases. The final enrichment score is where the running-sum statistic is the largest deviation from zero.
+
+**Step 2:** Estimation of significance:
+
+The significance of the enrichment score is determined using permutation testing, which performs rearrangements of the data points to determine the likelihood of generating an enrichment score as large as the enrichment score calculated from the observed data. Essentially, for this step, the first permutation would reorder the log2 fold changes and randomly assign them to different genes, reorder the gene ranks based on these new log2 fold changes, and recalculate the enrichment score. The second permutation would reorder the log2 fold changes again and recalculate the enrichment score again, and this would continue for the total number of permutations run. Therefore, the number of permutations run will increase the resolution of the significance estimates.
+
+**Step 3:** Adjust for multiple test correction
+
+After all gene sets are tested, the enrichment scores are normalized for the size of the gene set, then the p-values are corrected for multiple testing.
+
+The GSEA output will yield the core genes in the gene sets that most highly contribute to the enrichment score. The genes output are generally the genes at or before the running sum reaches its maximum value (eg. the most influential genes driving the differences between conditions for that gene set).
+
+## GSEA with GO Terms
+
+The clusterProfiler package offers several functions to perform GSEA using different genes sets, including but not limited to GO, KEGG, and MSigDb. We will use the GO gene sets in our examples below to compare with what we got for the ORA analysis. We already have everything we need in our `annotations_edb_tested` dataframe, since this analysis will also map using ENSEMBL IDs, so we can proceed.
+
+GSEA will use the log2 fold changes obtained from the differential expression analysis for every gene, to perform the analysis. We will obtain a vector of fold changes for input to clusterProfiler, in addition to the associated Ensembl IDs:
+
+``` r
+## Extract the foldchanges
+foldchanges <- annotations_edb_tested$log2FoldChange
+
+## Name each fold change with the corresponding Ensembl ID
+names(foldchanges) <- annotations_edb_tested$ensgene
+```
+
+Next we need to order the fold changes in decreasing order. To do this we’ll use the `sort()` function, which takes a vector as input:
+
+``` r
+## Sort fold changes in decreasing order
+foldchanges <- sort(foldchanges, decreasing = TRUE)
+
+head(foldchanges)
+```
+
+Running will be something like this, need to adjust parameters:
+
+``` r
+ego_gsea <- gseGO(geneList = foldchanges,
+              keyType = "ENSEMBL",
+              OrgDb = org.Hs.eg.db,
+              ont = "BP",
+              minGSSize = 100,
+              maxGSSize = 500,
+              pvalueCutoff = 0.05,
+              verbose = FALSE)
+```
+
+## Optional: GSEA with KEGG (outdated)
 
 The clusterProfiler package offers several functions to perform GSEA using different genes sets, including but not limited to GO, KEGG, and MSigDb. We will use the KEGG gene sets in our examples below. The KEGG gene sets are defined using the Entrez identifiers, thus to perform the analysis we will need to acquire the corresponding Entrez IDs for our genes. We will also need to remove any genes that do not have an Entrez ID (NA values) and any duplicates (due to gene ID conversion) that may exist:
 
@@ -68,35 +132,7 @@ foldchanges <- sort(foldchanges, decreasing = TRUE)
 head(foldchanges)
 ```
 
-### Theory of GSEA
-
-Now we are ready to perform GSEA. The details regarding GSEA can be found in the [PNAS paper](https://www.pnas.org/content/102/43/15545) by Subramanian et al. We will describe briefly the steps outlined in the paper below:
-
-<p align="center">
-
-<img src="../img/gsea_overview.png" width="600"/>
-
-</p>
-
-***Image credit:**[Subramanian et al. Proceedings of the National Academy of Sciences Oct 2005, 102 (43) 15545-15550; DOI: 10.1073/pnas.0506580102](https://www.pnas.org/content/102/43/15545)*
-
-This image describes the theory of GSEA, with the 'gene set S' showing the metric used (in our case, ranked log2 fold changes) to determine enrichment of genes in the gene set. The left-most image is representing this metric used for the GSEA analysis. The log2 fold changes for each gene in the 'gene set S' is shown as a line in the middle image. All genes are represented, but only those genes that are in gene set "S" are indicated with a black line and the rest are white/blank lines. The large positive log2 fold changes are at the top of the gene set image, while the largest negative log2 fold changes are at the bottom of the gene set image. In the right-most image, the gene set is turned horizontally, underneath which is an image depicting the calculations involved in determining enrichment, as described below.
-
-**Step 1:** Calculation of enrichment score:
-
-An enrichment score for a particular gene set is calculated by walking down the list of log2 fold changes and increasing the running-sum statistic every time a gene in the gene set is encountered and decreasing it when genes are not part of the gene set. The size of the increase/decrease is determined by magnitude of the log2 fold change. Larger (positive or negative) log2 fold changes will result in larger increases or decreases. The final enrichment score is where the running-sum statistic is the largest deviation from zero.
-
-**Step 2:** Estimation of significance:
-
-The significance of the enrichment score is determined using permutation testing, which performs rearrangements of the data points to determine the likelihood of generating an enrichment score as large as the enrichment score calculated from the observed data. Essentially, for this step, the first permutation would reorder the log2 fold changes and randomly assign them to different genes, reorder the gene ranks based on these new log2 fold changes, and recalculate the enrichment score. The second permutation would reorder the log2 fold changes again and recalculate the enrichment score again, and this would continue for the total number of permutations run. Therefore, the number of permutations run will increase the resolution of the significance estimates.
-
-**Step 3:** Adjust for multiple test correction
-
-After all gene sets are tested, the enrichment scores are normalized for the size of the gene set, then the p-values are corrected for multiple testing.
-
-The GSEA output will yield the core genes in the gene sets that most highly contribute to the enrichment score. The genes output are generally the genes at or before the running sum reaches its maximum value (eg. the most influential genes driving the differences between conditions for that gene set).
-
-### Performing GSEA
+### 
 
 First, we will set the seed so that we all obtain the same result:
 
@@ -175,9 +211,7 @@ pathview(gene.data = foldchanges,
 
 > **NOTE:** pathview may not display in your R Plots window. Instead, you may see a message such as `Info: Working in directory /vf/users/Bspc-training/user/DEanalysis` and `Info: Writing image file hsa05014.pathview.png`. This indicates that the image has instead been saved to that directory.
 
-
 <img src="../img/kegg_hsa05014.png" width="600"/>
-
 
 You can read more about Pathview output [here](https://pathview.uncc.edu/overview), including a key to the different shapes and formatting in the figure above:
 
