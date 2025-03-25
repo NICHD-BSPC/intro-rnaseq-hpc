@@ -39,7 +39,9 @@ Gene sets are pre-defined groups of genes, which are functionally related. Commo
 
 Now we are ready to perform GSEA. The details regarding GSEA can be found in the [PNAS paper](https://www.pnas.org/content/102/43/15545) by Subramanian et al. We will describe briefly the steps outlined in the paper below:
 
-<p align="center">h
+<p align="center">
+
+h
 
 <img src="../img/gsea_overview.png" width="600"/>
 
@@ -118,7 +120,7 @@ write.tsv(gsea_go_results, "results/gsea_go_results.tsv", quote=F, sep="\t", row
 
 -   The first few columns of the results table identify the GO term information
 
--    Enrichment Score and normalized enrichment score - represents the degree to which a set is over-represented at the top or bottom of the ranked list.
+-   Enrichment Score and normalized enrichment score - represents the degree to which a set is over-represented at the top or bottom of the ranked list.
 
 -   **Normalized enrichment score (NES)** - allows comparability across gene sets by [accounting for differences in gene set size and in correlations between gene sets and the expression dataset](https://www.gsea-msigdb.org/gsea/doc/GSEAUserGuideTEXT.htm#_Normalized_Enrichment_Score). A positive NES is associated with pathway activation, and a negative NES is associated with pathway suppression.
 
@@ -163,15 +165,18 @@ dotplot(ego_gsea, showCategory=30) + ggtitle("dotplot for GSEA")
 
 ![](images/gsea_dotplot.png){width="562"}
 
-## Enrichment Maps 
+## Enrichment Maps
 
-The `emapplot` function supports results obtained from hypergeometric test and *gene set enrichment analysis.*
+The `emapplot` function supports results obtained from hypergeometric test and ***gene set enrichment analysis.***
 
 ``` r
 # calculate termsim 
 library(enrichplot)
 ego_gsea_read <- pairwise_termsim(ego_gsea_read)
+emapplot(ego_gsea_read, showCategory = 50)
 ```
+
+![](images/gsea_emapplot_50cat.png){width="569"}
 
 ## Cnet Plots
 
@@ -185,6 +190,93 @@ ego_gsea_read <- setReadable(ego_gsea, 'org.Hs.eg.db', 'ENSEMBL')
 ## plot
 cnetplot(ego_gsea_read, foldChange=geneList)
 ```
+
+![](images/gsea_cnetplot.png){width="667"}
+
+## Incorporating other gene sets for GSEA
+
+There are other gene sets available for GSEA analysis in clusterProfiler (Disease Ontology, Reactome pathways, etc.). In addition, it is possible to supply your own gene set GMT (Gene Matrix Transposed) file, and use that as input.
+
+The Molecular Signatures Database (also known as [MSigDB](http://software.broadinstitute.org/gsea/msigdb/index.jsp)) is a collection of annotated gene sets. It contains 8 major collections:
+
+-   H: hallmark gene sets
+-   C1: positional gene sets
+-   C2: curated gene sets
+-   C3: motif gene sets
+-   C4: computational gene sets
+-   C5: GO gene sets
+-   C6: oncogenic signatures
+-   C7: immunologic signatures
+
+Users can download GMT files from Broad Institute and use the read.gmt() function to parse the files. Alternatively, there is an R package that already packed the MSigDB gene sets in tidy data format that can be used directly with clusterProfiler. The `msigdbr` package supports several species and some example code is provided below:
+
+``` r
+# DO NOT RUN
+
+library(msigdbr)
+msigdbr_species()
+
+##  [1] "Anolis carolinensis"             "Bos taurus"                     
+##  [3] "Caenorhabditis elegans"          "Canis lupus familiaris"         
+##  [5] "Danio rerio"                     "Drosophila melanogaster"        
+##  [7] "Equus caballus"                  "Felis catus"                    
+##  [9] "Gallus gallus"                   "Homo sapiens"                   
+## [11] "Macaca mulatta"                  "Monodelphis domestica"          
+## [13] "Mus musculus"                    "Ornithorhynchus anatinus"       
+## [15] "Pan troglodytes"                 "Rattus norvegicus"              
+## [17] "Saccharomyces cerevisiae"        "Schizosaccharomyces pombe 972h-"
+## [19] "Sus scrofa"                      "Xenopus tropicalis"
+
+# Use a specific collection; example C6 oncogenic signatures
+m_t2g <- msigdbr(species = "Homo sapiens", category = "C6") %>% 
+  dplyr::select(gs_name, entrez_gene)
+
+# Run GSEA
+msig_GSEA <- GSEA(foldchanges, TERM2GENE = m_t2g, verbose = FALSE)
+```
+
+## Functional analysis: Pathway topology tools
+
+<p align="center">
+
+![](../img/pathway_analysis.png){width="600"}
+
+</p>
+
+The last main type of functional analysis technique is pathway topology analysis. Pathway topology analysis often takes into account gene interaction information along with the fold changes and adjusted p-values from differential expression analysis to identify dysregulated pathways. Depending on the tool, pathway topology tools explore how genes interact with each other (e.g. activation, inhibition, phosphorylation, ubiquitination, etc.) to determine the pathway-level statistics. Pathway topology-based methods utilize the number and type of interactions between gene product (our DE genes) and other gene products to infer gene function or pathway association.
+
+For instance, the [SPIA (Signaling Pathway Impact Analysis)](http://bioconductor.org/packages/release/bioc/html/SPIA.html) tool can be used to integrate the lists of differentially expressed genes, their fold changes, and pathway topology to identify affected pathways. There are step-by-step materials for using SPIA [available](pathway_topology.md).
+
+## Other Tools for Functional Analysis
+
+### Co-expression clustering
+
+Co-expression clustering is often used to identify genes of novel pathways or networks by grouping genes together based on similar trends in expression. These tools are useful in identifying genes in a pathway, when their participation in a pathway and/or the pathway itself is unknown. These tools cluster genes with similar expression patterns to create 'modules' of co-expressed genes which often reflect functionally similar groups of genes. These 'modules' can then be compared across conditions or in a time-course experiment to identify any biologically relevant pathway or network information.
+
+You can visualize co-expression clustering using heatmaps, which should be viewed as suggestive only; serious classification of genes needs better methods.
+
+The way the tools perform clustering is by taking the entire expression matrix and computing pair-wise co-expression values. A network is then generated from which we explore the topology to make inferences on gene co-regulation. The [WGCNA](%5Bhttps://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/%5D(https://web.archive.org/web/20230323144343/horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/)) package (in R) is one example of a more sophisticated method for co-expression clustering (please note however that it is no longer maintained).
+
+We previously used degPatterns for identifying groups of genes based on coxpression clustering, so one option for exploration could be to consider each group of genes from degPatterns in an overrepresentation analysis.
+
+## Resources for functional analysis
+
+There are many web resources for running functional enrichment of various kinds. They may use different algorithms with different assumptions as well as different databases (or similar databases but updated at different times), so you will likely get different answers. They are probably all correct in their own way. There is no one true single answer; remember that the goal of functional enrichment is to get new ideas rather than to have a definitive answer.
+
+-   g:Profiler - <http://biit.cs.ut.ee/gprofiler/index.cgi>
+-   Reactome - <https://reactome.org/>
+-   DAVID - <https://david.ncifcrf.gov>
+-   clusterProfiler - <http://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>
+-   GeneMANIA - <http://www.genemania.org/>
+-   GenePattern - <http://www.broadinstitute.org/cancer/software/genepattern/> (need to register)
+-   WebGestalt - <http://www.webgestalt.org> (need to register)
+-   AmiGO - <http://amigo.geneontology.org/amigo>
+-   ReviGO (visualizing GO analysis, input is GO terms) - <http://revigo.irb.hr/>
+-   GSEA - <http://software.broadinstitute.org/gsea/index.jsp>
+-   SPIA - <https://www.bioconductor.org/packages/release/bioc/html/SPIA.html>
+-   GAGE/Pathview - <http://www.bioconductor.org/packages/release/bioc/html/gage.html>
+
+------------------------------------------------------------------------
 
 ## Optional: GSEA with KEGG (outdated)
 
@@ -318,90 +410,5 @@ You can read more about Pathview output [here](https://pathview.uncc.edu/overvie
 > purrr::map(1:length(gseaKEGG_results$ID), 
 >            get_kegg_plots)
 > ```
-
-### Incorporating other gene sets for GSEA
-
-There are other gene sets available for GSEA analysis in clusterProfiler (Disease Ontology, Reactome pathways, etc.). In addition, it is possible to supply your own gene set GMT (Gene Matrix Transposed) file, and use that as input.
-
-The Molecular Signatures Database (also known as [MSigDB](http://software.broadinstitute.org/gsea/msigdb/index.jsp)) is a collection of annotated gene sets. It contains 8 major collections:
-
--   H: hallmark gene sets
--   C1: positional gene sets
--   C2: curated gene sets
--   C3: motif gene sets
--   C4: computational gene sets
--   C5: GO gene sets
--   C6: oncogenic signatures
--   C7: immunologic signatures
-
-Users can download GMT files from Broad Institute and use the read.gmt() function to parse the files. Alternatively, there is an R package that already packed the MSigDB gene sets in tidy data format that can be used directly with clusterProfiler. The `msigdbr` package supports several species and some example code is provided below:
-
-``` r
-# DO NOT RUN
-
-library(msigdbr)
-msigdbr_species()
-
-##  [1] "Anolis carolinensis"             "Bos taurus"                     
-##  [3] "Caenorhabditis elegans"          "Canis lupus familiaris"         
-##  [5] "Danio rerio"                     "Drosophila melanogaster"        
-##  [7] "Equus caballus"                  "Felis catus"                    
-##  [9] "Gallus gallus"                   "Homo sapiens"                   
-## [11] "Macaca mulatta"                  "Monodelphis domestica"          
-## [13] "Mus musculus"                    "Ornithorhynchus anatinus"       
-## [15] "Pan troglodytes"                 "Rattus norvegicus"              
-## [17] "Saccharomyces cerevisiae"        "Schizosaccharomyces pombe 972h-"
-## [19] "Sus scrofa"                      "Xenopus tropicalis"
-
-# Use a specific collection; example C6 oncogenic signatures
-m_t2g <- msigdbr(species = "Homo sapiens", category = "C6") %>% 
-  dplyr::select(gs_name, entrez_gene)
-
-# Run GSEA
-msig_GSEA <- GSEA(foldchanges, TERM2GENE = m_t2g, verbose = FALSE)
-```
-
-## Functional analysis: Pathway topology tools
-
-<p align="center">
-
-<img src="../img/pathway_analysis.png" width="600"/>
-
-</p>
-
-The last main type of functional analysis technique is pathway topology analysis. Pathway topology analysis often takes into account gene interaction information along with the fold changes and adjusted p-values from differential expression analysis to identify dysregulated pathways. Depending on the tool, pathway topology tools explore how genes interact with each other (e.g. activation, inhibition, phosphorylation, ubiquitination, etc.) to determine the pathway-level statistics. Pathway topology-based methods utilize the number and type of interactions between gene product (our DE genes) and other gene products to infer gene function or pathway association.
-
-For instance, the [SPIA (Signaling Pathway Impact Analysis)](http://bioconductor.org/packages/release/bioc/html/SPIA.html) tool can be used to integrate the lists of differentially expressed genes, their fold changes, and pathway topology to identify affected pathways. We have step-by-step materials for using SPIA [available](pathway_topology.md).
-
-## Other Tools for Functional Analysis
-
-### Co-expression clustering
-
-Co-expression clustering is often used to identify genes of novel pathways or networks by grouping genes together based on similar trends in expression. These tools are useful in identifying genes in a pathway, when their participation in a pathway and/or the pathway itself is unknown. These tools cluster genes with similar expression patterns to create 'modules' of co-expressed genes which often reflect functionally similar groups of genes. These 'modules' can then be compared across conditions or in a time-course experiment to identify any biologically relevant pathway or network information.
-
-You can visualize co-expression clustering using heatmaps, which should be viewed as suggestive only; serious classification of genes needs better methods.
-
-The way the tools perform clustering is by taking the entire expression matrix and computing pair-wise co-expression values. A network is then generated from which we explore the topology to make inferences on gene co-regulation. The [WGCNA](%5Bhttps://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/%5D(https://web.archive.org/web/20230323144343/horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/)) package (in R) is one example of a more sophisticated method for co-expression clustering (please note however that it is no longer maintained).
-
-We previously used degPatterns for identifying groups of genes based on coxpression clustering, so one option for exploration could be to consider each group of genes from degPatterns in an overrepresentation analysis.
-
-## Resources for functional analysis
-
-There are many web resources for running functional enrichment of various kinds. They may use different algorithms with different assumptions as well as different databases (or similar databases but updated at different times), so you will likely get different answers. They are probably all correct in their own way. There is no one true single answer; remember that the goal of functional enrichment is to get new ideas rather than to have a definitive answer.
-
--   g:Profiler - <http://biit.cs.ut.ee/gprofiler/index.cgi>
--   Reactome - <https://reactome.org/>
--   DAVID - <https://david.ncifcrf.gov>
--   clusterProfiler - <http://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>
--   GeneMANIA - <http://www.genemania.org/>
--   GenePattern - <http://www.broadinstitute.org/cancer/software/genepattern/> (need to register)
--   WebGestalt - <http://www.webgestalt.org> (need to register)
--   AmiGO - <http://amigo.geneontology.org/amigo>
--   ReviGO (visualizing GO analysis, input is GO terms) - <http://revigo.irb.hr/>
--   GSEA - <http://software.broadinstitute.org/gsea/index.jsp>
--   SPIA - <https://www.bioconductor.org/packages/release/bioc/html/SPIA.html>
--   GAGE/Pathview - <http://www.bioconductor.org/packages/release/bioc/html/gage.html>
-
-------------------------------------------------------------------------
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
