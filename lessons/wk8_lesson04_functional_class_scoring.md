@@ -264,7 +264,6 @@ We previously used degPatterns for identifying groups of genes based on coxpress
 There are many web resources for running functional enrichment of various kinds. They may use different algorithms with different assumptions as well as different databases (or similar databases but updated at different times), so you will likely get different answers. They are probably all correct in their own way. There is no one true single answer; remember that the goal of functional enrichment is to get new ideas rather than to have a definitive answer.
 
 -   g:Profiler - <http://biit.cs.ut.ee/gprofiler/index.cgi>
--   Reactome - <https://reactome.org/>
 -   DAVID - <https://david.ncifcrf.gov>
 -   clusterProfiler - <http://bioconductor.org/packages/release/bioc/html/clusterProfiler.html>
 -   GeneMANIA - <http://www.genemania.org/>
@@ -275,6 +274,32 @@ There are many web resources for running functional enrichment of various kinds.
 -   GSEA - <http://software.broadinstitute.org/gsea/index.jsp>
 -   SPIA - <https://www.bioconductor.org/packages/release/bioc/html/SPIA.html>
 -   GAGE/Pathview - <http://www.bioconductor.org/packages/release/bioc/html/gage.html>
+
+**We are going to take a look at the websites for the following**:
+
+Reactome - <https://reactome.org/>
+
+> REACTOME is an open-source, open access, manually curated and peer-reviewed pathway database. Our goal is to provide intuitive bioinformatics tools for the visualization, interpretation and analysis of pathway knowledge to support basic and clinical research, genome analysis, modeling, systems biology and education.
+>
+> The Reactome website is designed to literally give the user a graphical map of known biological processes and pathways that is also an interface which the user can ‘click through’ to authoritative detailed information on components and their relations. Reactome pathway, reaction and molecules pages extensively cross-reference to over 100 different online bioinformatics resources, including NCBI Gene, Ensembl and UniProt databases, the UCSC Genome Browser, ChEBI small molecule databases, and the PubMed literature database.
+
+STRING - <https://string-db.org/cgi/about>
+
+> Collaboration between [SIB - Swiss Institute of Bioinformatics](https://www.isb-sib.ch/), [CPR - Novo Nordisk Foundation Center Protein Research](https://www.cpr.ku.dk/) and [EMBL - European Molecular Biology Laboratory](https://www.embl.de/).
+>
+> STRING is a database of known and predicted protein-protein interactions. The interactions include direct (physical) and indirect (functional) associations; they stem from computational prediction, from knowledge transfer between organisms, and from interactions aggregated from other (primary) databases.
+>
+> The STRING database currently covers 59'309'604 proteins from 12'535 organisms. Interactions in STRING are derived from five main sources:
+>
+> -   Genomic context predictions
+>
+> -   High-throughput lab experiments
+>
+> -   (Conserved) co-expression
+>
+> -   Automated text mining
+>
+> -   Previous knowledge in databases
 
 ------------------------------------------------------------------------
 
