@@ -108,7 +108,7 @@ ego_gsea <- gseGO(geneList = foldchanges,
 
 **Why did we pick `pvalueCutoff = 1.0` again?** *NOTE: The results may look slightly different for you.*
 
-<img src="../img/ego_gsea_table-02.png" width="600"/>
+<img src="../lessons/images/ego_gsea_table-02.png" width="600"/>
 
 ``` r
 ## Extract the GSEA results
@@ -153,7 +153,6 @@ Let’s explore the GSEA plot of enrichment of one of the pathways in the ranked
 gseaplot(ego_gsea, geneSetID = 'GO:0022613')
 ```
 
-![](images/gsea_go0022613.png){width="550"}
 <img src="../img/gsea_go0022613.png" width="600"/>
 
 `clusterProfiler` and the associated packages can create the same type of plots so we can compare with our ORA results:
