@@ -108,7 +108,7 @@ ego_gsea <- gseGO(geneList = foldchanges,
 
 **Why did we pick `pvalueCutoff = 1.0` again?** *NOTE: The results may look slightly different for you.*
 
-![](images/ego_gsea_table-02.png)
+<img src="../img/ego_gsea_table-02.png" width="600"/>
 
 ``` r
 ## Extract the GSEA results
@@ -154,6 +154,7 @@ gseaplot(ego_gsea, geneSetID = 'GO:0022613')
 ```
 
 ![](images/gsea_go0022613.png){width="550"}
+<img src="../img/gsea_go0022613.png" width="600"/>
 
 `clusterProfiler` and the associated packages can create the same type of plots so we can compare with our ORA results:
 
@@ -163,7 +164,7 @@ gseaplot(ego_gsea, geneSetID = 'GO:0022613')
 dotplot(ego_gsea, showCategory=30) + ggtitle("dotplot for GSEA")
 ```
 
-![](images/gsea_dotplot.png){width="562"}
+<img src="../img/gsea_dotplot.png" width="562"/>
 
 ## Enrichment Maps
 
@@ -177,6 +178,7 @@ emapplot(ego_gsea_read, showCategory = 50)
 ```
 
 ![](images/gsea_emapplot_50cat.png){width="569"}
+<img src="../img/gsea_emapplot_50cat.png" width="569/>
 
 ## Cnet Plots
 
@@ -190,8 +192,7 @@ ego_gsea_read <- setReadable(ego_gsea, 'org.Hs.eg.db', 'ENSEMBL')
 ## plot
 cnetplot(ego_gsea_read, foldChange=geneList)
 ```
-
-![](images/gsea_cnetplot.png){width="667"}
+<img src="../img/gsea_cnetplot.png" width="667"/>
 
 ## Incorporating other gene sets for GSEA
 
@@ -239,7 +240,7 @@ msig_GSEA <- GSEA(foldchanges, TERM2GENE = m_t2g, verbose = FALSE)
 
 <p align="center">
 
-![](../img/pathway_analysis.png){width="600"}
+<img src="../img/pathway_analysis.png" width="600"/>
 
 </p>
 
