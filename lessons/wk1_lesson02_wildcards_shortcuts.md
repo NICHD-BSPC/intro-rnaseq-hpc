@@ -1,8 +1,11 @@
 ---
 title: "Shell 02: Wildcards and Shortcuts"
 author: "Harvard HPC Staff, modified by E. Sally Chang @NICHD"
-date: "August 7, 2017, edited January 2025"
+date: "August 7, 2017, last edited March 2025"
 ---
+
+### NOTE: 
+To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
