@@ -1,9 +1,12 @@
 ---
 title: "Quality control using FASTQC - script running"
 author: "Harvard HPC Staff, Modified by Sally Chang @ NICHD"
-date: Last edited January 2025
+date: Last edited March 2025
 duration: 45 minutes
 ---
+
+### NOTE: 
+To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives:
 
