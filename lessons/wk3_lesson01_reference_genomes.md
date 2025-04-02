@@ -1,8 +1,11 @@
 ---
 title: "Reference genomes and genome indices"
 author: "Harvard HPC Staff, modified by Sally Chang @ NICHD"
-date: Last modified February 2025
+date: Last modified April 2025
 ---
+
+### NOTE: 
+To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 Approximate time: 50 minutes
 
