@@ -1,8 +1,10 @@
 ---
 title: "Set up and overview for gene-level differential expression analysis"
 author: "Harvard HPC Staff, Adapted for use by Sally Chang @ NICHD"
-date: "Last Modified February 2025"
+date: "Last Modified April 2025"
 ---
+### NOTE: 
+To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 Approximate time: 60 minutes
 
