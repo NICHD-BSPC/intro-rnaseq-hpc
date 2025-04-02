@@ -1,10 +1,13 @@
 ---
 title: "QC with STAR and Qualimap"
 author: "Harvard HPC Staff, Modified by Sally Chang at NICHD"
-date: Last Modifed February 2025
+date: Last Modifed April 2025
 ---
 
 Approximate time: 45 minutes
+
+### NOTE: 
+To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives:
 
