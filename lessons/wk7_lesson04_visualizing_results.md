@@ -1,10 +1,13 @@
 ---
 title: "Advanced visualizations"
 author: "Harvard HPC Staff, adapted by Sally Chang at NICHD"
-date: "Last Modified March 2025"
+date: "Last Modified April 2025"
 ---
 
 Approximate time: 75 minutes
+
+### NOTE: 
+To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
