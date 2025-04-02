@@ -1,10 +1,13 @@
 ---
 title: MultiQC
 authors: Created by Harvard HPC Staff, Modified by Sally Chang @ NICHD
-Date: Last edited February 2025
+Date: Last edited April 2025
 ---
 
 Approximate time: 30 minutes
+
+### NOTE: 
+To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
