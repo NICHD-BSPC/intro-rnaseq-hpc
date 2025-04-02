@@ -1,8 +1,10 @@
 ---
 title: Data Management and Project Organization
 author: Harvard HPC Staff, Modified by E. Sally Chang @ NICHD 
-date: Last edited January 2025
+date: Last edited March 2025
 ---
+### NOTE: 
+To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
