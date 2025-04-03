@@ -13,6 +13,8 @@ Approximate time: 60 minutes
 -   Discuss functional analysis using over-representation analysis, and functional class scoring
 -   Identify popular functional analysis tools for over-representation analysis
 
+Week 8 Slides About ORA Analysis
+
 # Functional analysis
 
 The output of RNA-seq differential expression analysis is a list of significant differentially expressed genes (DEGs). To gain greater biological insight on the differentially expressed genes there are various analyses that can be done:
@@ -43,13 +45,13 @@ To determine whether any categories are over-represented, you can determine the 
 
 <p align="center">
 
-<img src="../img/go_proportions.png" width="600"/>
+<img src="../img/go_proportions.png" width="600" alt="schematic of sampling from background and checking whether something is overrepresented"/>
 
 </p>
 
 <p align="center">
 
-<img src="../img/go_proportions_table3.png" width="600"/>
+<img src="../img/go_proportions_table3.png" width="600" alt="example of ORA table with ratios proportions for categories"/>
 
 </p>
 
