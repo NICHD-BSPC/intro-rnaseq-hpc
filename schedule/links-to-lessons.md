@@ -84,3 +84,7 @@
 - [Annotation databases](../lessons/wk8_lesson02_annotation_dbi.md)
 - [Overrepresentation analysis](../lessons/wk8_lesson03_over-representation_analysis.md)
 - [Functional class scoring](../lessons/wk8_lesson04_functional_class_scoring.md)
+
+# Week 9: 
+- [Functional class scoring](../lessons/wk8_lesson04_functional_class_scoring.md)
+- [Week 9 Summary and Review Slides](https://github.com/NICHD-BSPC/intro-rnaseq-hpc/blob/main/lectures/Week9_Final_Summary.pdf)
