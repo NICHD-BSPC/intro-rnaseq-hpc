@@ -8,6 +8,8 @@ To make names more generalized for the next course, `/data/Bspc-training/shared/
 
 Approximate time: 60 minutes
 
+[Week 6 Slides on DEseq2 workflow](https://github.com/NICHD-BSPC/intro-rnaseq-hpc/blob/main/lectures/week6_intro_deseq2_pipeline.pdf)
+
 ## Learning Objectives
 
 -   Explain the experiment and its objectives
