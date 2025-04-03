@@ -13,7 +13,7 @@ Approximate time: 60 minutes
 -   Discuss functional analysis using over-representation analysis, and functional class scoring
 -   Identify popular functional analysis tools for over-representation analysis
 
-Week 8 Slides About ORA Analysis
+[Week 8 Slides About ORA Analysis](https://github.com/NICHD-BSPC/intro-rnaseq-hpc/blob/main/lectures/Week8_Intro_ORA_GO.pdf)
 
 # Functional analysis
 
