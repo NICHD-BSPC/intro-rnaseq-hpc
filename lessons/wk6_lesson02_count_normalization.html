@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Count normalization with DESeq2 | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Count normalization with DESeq2" />
+<meta name="author" content="Harvard HPC Staff, Adapted by Sally Chang @ NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson02_count_normalization.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson02_count_normalization.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Count normalization with DESeq2" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Adapted by Sally Chang @ NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"Count normalization with DESeq2","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson02_count_normalization.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson02_count_normalization.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=ce00f1093927095c9b455f8d0427b2b3be8f3034">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Count normalization with DESeq2</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <p>Approximate time: 60 minutes</p>
+
+<h3 id="note">NOTE:</h3>
+<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
+
+<h2 id="learning-objectives">Learning Objectives</h2>
+
+<ul>
+  <li>Explore different types of normalization methods</li>
+  <li>Become familiar with the <code class="language-plaintext highlighter-rouge">DESeqDataSet</code> object</li>
+  <li>Understand how to normalize counts using DESeq2</li>
+</ul>
+
+<h3 id="opening-the-project-using-rstudio-hpc-on-demand">Opening the project using RStudio (HPC on Demand)</h3>
+
+<p>Before we get into the details of the analysis, let’s start by:</p>
+
+<ul>
+  <li>
+    <p>Opening up RStudio using <a href="https://hpcondemand.nih.gov/pun/sys/dashboard/">HPC on Demand</a>, using default values except for Starting Directory: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/YOUR_USERNAME/rnaseq</code></p>
+  </li>
+  <li>
+    <p>To check whether or not you are in the correct working directory, use <code class="language-plaintext highlighter-rouge">getwd()</code>. Something like <code class="language-plaintext highlighter-rouge">/vf/users/Bspc-training/changes/rnaseq</code> should come up.</p>
+  </li>
+  <li>
+    <p>Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -&gt; DEanalysis), to navigate to and open <code class="language-plaintext highlighter-rouge">DEanalysis.Rproj</code>, which you set up as an Assignment last week.</p>
+  </li>
+</ul>
+
+<h2 id="normalization">Normalization</h2>
+
+<p>The first step in the DE analysis workflow is count normalization, which is necessary to make accurate comparisons of gene expression between samples.</p>
+
+<p><img src="../img/deseq_workflow_normalization_2018.png" width="400" /></p>
+
+<p>The counts of mapped reads for each gene is proportional to the expression of RNA, which is of primary interest to us, but also includes many other factors which are not interesting and not biologically meaningful. Normalization is the process of scaling raw count values to account for the “uninteresting” factors. In this way the expression levels are more comparable between and/or within samples.</p>
+
+<p>The main factors often considered during normalization are:</p>
+
+<ul>
+  <li>
+    <p><strong>Sequencing depth:</strong> The amount of reads we get in a FASTQ file is related to the amount of cDNA in the library. Due to the small concentrations involved and slight errors in pipetting accuracy, it is difficult to get <em>exactly</em> the same amount of cDNA in each library for sequencing. We need to control for this when comparing between samples. In the example below, each gene appears to have doubled in expression in <em>Sample A</em> relative to <em>Sample B</em>, however this is a consequence of <em>Sample A</em> having double the sequencing depth.</p>
+
+    <p><img src="../img/normalization_methods_depth.png" width="400" /></p>
+
+    <blockquote>
+      <p><em><strong>NOTE:</strong> In the figure above, each pink and green rectangle represents a read aligned to a gene. Reads connected by dashed lines connect a read spanning an intron.</em></p>
+    </blockquote>
+  </li>
+  <li>
+    <p><strong>Gene length:</strong> Accounting for gene length is necessary for comparing expression between different genes within the same sample. In the example, <em>Gene X</em> and <em>Gene Y</em> have similar levels of expression (i.e., the same number of transcript are expressed), but the number of reads mapped to <em>Gene X</em> would be many more than the number mapped to <em>Gene Y</em> simply because <em>Gene X</em> is longer.</p>
+
+    <p><img src="../img/normalization_methods_length.png" width="200" /></p>
+  </li>
+  <li>
+    <p><strong>RNA composition:</strong> A few highly differentially expressed genes between samples, differences in the number of genes expressed between samples, or presence of contamination can skew some types of normalization methods. Accounting for RNA composition is recommended for accurate comparison of expression between samples, and is particularly important when performing differential expression analyses [<a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106">1</a>].</p>
+
+    <p>In the example, if we were to divide each sample by the total number of counts to normalize, the counts would be greatly skewed by the <em>Gene DE</em>, which takes up most of the counts for <em>Sample A</em> – but not <em>Sample B</em>. Most other genes for <em>Sample A</em> would be divided by the larger number of total counts and appear to be less expressed than those same genes in <em>Sample B</em>.</p>
+
+    <p><img src="../img/normalization_methods_composition.png" width="400" /></p>
+  </li>
+</ul>
+
+<p><strong><em>While normalization is essential for differential expression analyses, it is also necessary for exploratory data analysis, visualization of data, and whenever you are exploring or comparing counts between or within samples.</em></strong></p>
+
+<h3 id="common-normalization-methods">Common normalization methods</h3>
+
+<p>Several common normalization methods exist to account for these differences:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Normalization method</th>
+      <th>Description</th>
+      <th>Accounted factors</th>
+      <th>Recommendations for use</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CPM</strong> (counts per million)</td>
+      <td>counts scaled by total number of reads</td>
+      <td>sequencing depth</td>
+      <td>gene count comparisons between replicates of the same samplegroup; <strong>NOT for within sample comparisons or DE analysis</strong></td>
+    </tr>
+    <tr>
+      <td><strong>TPM</strong> (transcripts per kilobase million)</td>
+      <td>counts per length of transcript (kb) per million reads mapped</td>
+      <td>sequencing depth and gene length</td>
+      <td>gene count comparisons within a sample or between samples of the same sample group; <strong>NOT for DE analysis</strong></td>
+    </tr>
+    <tr>
+      <td><strong>RPKM/FPKM</strong> (reads/fragments per kilobase of exon per million reads/fragments mapped)</td>
+      <td>similar to TPM</td>
+      <td>sequencing depth and gene length</td>
+      <td>gene count comparisons between genes within a sample; <strong>NOT for between sample comparisons or DE analysis</strong></td>
+    </tr>
+    <tr>
+      <td>DESeq2’s <strong>median of ratios</strong> [<a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106">1</a>]</td>
+      <td>counts divided by sample-specific size factors determined by median ratio of gene counts relative to geometric mean per gene</td>
+      <td>sequencing depth and RNA composition</td>
+      <td>gene count comparisons between samples and for <strong>DE analysis</strong>; <strong>NOT for within sample comparisons</strong></td>
+    </tr>
+    <tr>
+      <td>EdgeR’s <strong>trimmed mean of M values (TMM)</strong> [<a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25">2</a>]</td>
+      <td>uses a weighted trimmed mean of the log expression ratios between samples</td>
+      <td>sequencing depth, RNA composition</td>
+      <td>gene count comparisons between samples and for <strong>DE analysis</strong>; <strong>NOT for within sample comparisons</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="rpkmfpkm-not-recommended">RPKM/FPKM (not recommended)</h3>
+
+<p>While TPM and RPKM/FPKM normalization methods both account for sequencing depth and gene length, RPKM/FPKM are not recommended. <strong>The reason is that the normalized count values output by the RPKM/FPKM method are not comparable between samples.</strong></p>
+
+<p>Using RPKM/FPKM normalization, the total number of RPKM/FPKM normalized counts for each sample will be different. Therefore, you cannot compare the normalized counts for each gene equally between samples.</p>
+
+<p><strong>RPKM-normalized counts table</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>gene</th>
+      <th style="text-align: center">sampleA</th>
+      <th style="text-align: center">sampleB</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>XCR1</td>
+      <td style="text-align: center">5.5</td>
+      <td style="text-align: center">5.5</td>
+    </tr>
+    <tr>
+      <td>WASHC1</td>
+      <td style="text-align: center">73.4</td>
+      <td style="text-align: center">21.8</td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td style="text-align: center">…</td>
+      <td style="text-align: center">…</td>
+    </tr>
+    <tr>
+      <td>Total RPKM-normalized counts</td>
+      <td style="text-align: center">1,000,000</td>
+      <td style="text-align: center">1,500,000</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For example, in the table above, SampleA has a greater proportion of counts associated with XCR1 (5.5/1,000,000) than does sampleB (5.5/1,500,000) even though the RPKM count values are the same. Therefore, we cannot directly compare the counts for XCR1 (or any other gene) between sampleA and sampleB because the total number of normalized counts are different between samples.</p>
+
+<h3 id="deseq2-normalized-counts-median-of-ratios-method">DESeq2-normalized counts: Median of ratios method</h3>
+
+<p>Since tools for differential expression analysis are comparing the counts between sample groups for the same gene, gene length does not need to be accounted for by the tool. However, <strong>sequencing depth</strong> and <strong>RNA composition</strong> do need to be taken into account.</p>
+
+<p>To normalize for sequencing depth and RNA composition, DESeq2 uses the median of ratios method. On the user-end there is only one step, but on the back-end there are multiple steps involved, as described below.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> The steps below describe in detail some of the steps performed by DESeq2 when you run a single function to get DE genes. Basically, for a typical RNA-seq analysis, <strong>you would not run these steps individually</strong>.</p>
+</blockquote>
+
+<p><strong>Step 1: creates a pseudo-reference sample (row-wise geometric mean)</strong></p>
+
+<p>For each gene, a pseudo-reference sample is created that is equal to the geometric mean across all samples.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>gene</th>
+      <th style="text-align: center">sampleA</th>
+      <th style="text-align: center">sampleB</th>
+      <th style="text-align: center">pseudo-reference sample</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>EF2A</td>
+      <td style="text-align: center">1489</td>
+      <td style="text-align: center">906</td>
+      <td style="text-align: center">sqrt(1489 * 906) = <strong>1161.5</strong></td>
+    </tr>
+    <tr>
+      <td>ABCD1</td>
+      <td style="text-align: center">22</td>
+      <td style="text-align: center">13</td>
+      <td style="text-align: center">sqrt(22 * 13) = <strong>17.7</strong></td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td style="text-align: center">…</td>
+      <td style="text-align: center">…</td>
+      <td style="text-align: center">…</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Step 2: calculates ratio of each sample to the reference</strong></p>
+
+<p>For every gene in a sample, the ratios (sample/ref) are calculated (as shown below). This is performed for each sample in the dataset. Since the majority of genes are not differentially expressed, the majority of genes in each sample should have similar ratios within the sample.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>gene</th>
+      <th style="text-align: center">sampleA</th>
+      <th style="text-align: center">sampleB</th>
+      <th style="text-align: center">pseudo-reference sample</th>
+      <th style="text-align: center">ratio of sampleA/ref</th>
+      <th style="text-align: center">ratio of sampleB/ref</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>EF2A</td>
+      <td style="text-align: center">1489</td>
+      <td style="text-align: center">906</td>
+      <td style="text-align: center">1161.5</td>
+      <td style="text-align: center">1489/1161.5 = <strong>1.28</strong></td>
+      <td style="text-align: center">906/1161.5 = <strong>0.78</strong></td>
+    </tr>
+    <tr>
+      <td>ABCD1</td>
+      <td style="text-align: center">22</td>
+      <td style="text-align: center">13</td>
+      <td style="text-align: center">16.9</td>
+      <td style="text-align: center">22/16.9 = <strong>1.30</strong></td>
+      <td style="text-align: center">13/16.9 = <strong>0.77</strong></td>
+    </tr>
+    <tr>
+      <td>MEFV</td>
+      <td style="text-align: center">793</td>
+      <td style="text-align: center">410</td>
+      <td style="text-align: center">570.2</td>
+      <td style="text-align: center">793/570.2 = <strong>1.39</strong></td>
+      <td style="text-align: center">410/570.2 = <strong>0.72</strong></td>
+    </tr>
+    <tr>
+      <td>BAG1</td>
+      <td style="text-align: center">76</td>
+      <td style="text-align: center">42</td>
+      <td style="text-align: center">56.5</td>
+      <td style="text-align: center">76/56.5 = <strong>1.35</strong></td>
+      <td style="text-align: center">42/56.5 = <strong>0.74</strong></td>
+    </tr>
+    <tr>
+      <td>MOV10</td>
+      <td style="text-align: center">521</td>
+      <td style="text-align: center">1196</td>
+      <td style="text-align: center">883.7</td>
+      <td style="text-align: center">521/883.7 = <strong>0.590</strong></td>
+      <td style="text-align: center">1196/883.7 = <strong>1.35</strong></td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td style="text-align: center">…</td>
+      <td style="text-align: center">…</td>
+      <td style="text-align: center">…</td>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Step 3: calculate the normalization factor for each sample (size factor)</strong></p>
+
+<p>The median value (column-wise for the above table) of all ratios for a given sample is taken as the normalization factor (size factor) for that sample, as calculated below. Notice that the differentially expressed genes should not affect the median value:</p>
+
+<p><code class="language-plaintext highlighter-rouge">normalization_factor_sampleA &lt;- median(c(1.28, 1.3, 1.39, 1.35, 0.59))</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">normalization_factor_sampleB &lt;- median(c(0.78, 0.77, 0.72, 0.74, 1.35))</code></p>
+
+<p>The figure below illustrates the median value for the distribution of all gene ratios for a single sample (frequency is on the y-axis).</p>
+
+<p><img src="../img/deseq_median_of_ratios.png" width="400" /></p>
+
+<p>The median of ratios method makes the assumption that not ALL genes are differentially expressed; therefore, the size factors should account for sequencing depth and RNA composition of the sample (large outlier genes will not represent the median ratio values). <strong>This method is robust to imbalance in up-/down-regulation and large numbers of differentially expressed genes.</strong></p>
+
+<blockquote>
+  <p>Usually these size factors are around 1, if you see large variations between samples it is important to take note since it might indicate the presence of extreme outliers.</p>
+</blockquote>
+
+<p><strong>Step 4: calculate the normalized count values using the size factor</strong></p>
+
+<p>This is performed by dividing each raw count value in a given sample by that sample’s size factor to generate normalized count values. This is performed for all count values (every gene in every sample). For example, if the median ratio for SampleA was 1.3 and the median ratio for SampleB was 0.77, you could calculate normalized counts as follows:</p>
+
+<p>SampleA median ratio = 1.3</p>
+
+<p>SampleB median ratio = 0.77</p>
+
+<p><strong>Raw Counts</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>gene</th>
+      <th style="text-align: center">sampleA</th>
+      <th style="text-align: center">sampleB</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>EF2A</td>
+      <td style="text-align: center">1489</td>
+      <td style="text-align: center">906</td>
+    </tr>
+    <tr>
+      <td>ABCD1</td>
+      <td style="text-align: center">22</td>
+      <td style="text-align: center">13</td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td style="text-align: center">…</td>
+      <td style="text-align: center">…</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Normalized Counts</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>gene</th>
+      <th style="text-align: center">sampleA</th>
+      <th style="text-align: center">sampleB</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>EF2A</td>
+      <td style="text-align: center">1489 / 1.3 = <strong>1145.39</strong></td>
+      <td style="text-align: center">906 / 0.77 = <strong>1176.62</strong></td>
+    </tr>
+    <tr>
+      <td>ABCD1</td>
+      <td style="text-align: center">22 / 1.3 = <strong>16.92</strong></td>
+      <td style="text-align: center">13 / 0.77 = <strong>16.88</strong></td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td style="text-align: center">…</td>
+      <td style="text-align: center">…</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>Please note that normalized count values are not whole numbers.</p>
+</blockquote>
+
+<hr />
+
+<p><strong>Exercise</strong></p>
+
+<p>Determine the normalized counts for your gene of interest, PD1, given the raw counts and size factors below.</p>
+
+<p>NOTE: You will need to run the code below to generate the raw counts dataframe (PD1) and the size factor vector (size_factors), then use these objects to determine the normalized counts values:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w">
+</span><span class="c1"># Raw counts for PD1 - this is standard notation for creating a vector in R</span><span class="w">
+</span><span class="n">PD1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">21</span><span class="p">,</span><span class="w"> </span><span class="m">58</span><span class="p">,</span><span class="w"> </span><span class="m">17</span><span class="p">,</span><span class="w"> </span><span class="m">97</span><span class="p">,</span><span class="w"> </span><span class="m">83</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">)</span><span class="w">
+</span><span class="nf">names</span><span class="p">(</span><span class="n">PD1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">paste0</span><span class="p">(</span><span class="s2">"Sample"</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">)</span><span class="w">
+</span><span class="n">PD1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">data.frame</span><span class="p">(</span><span class="n">PD1</span><span class="p">)</span><span class="w">
+</span><span class="n">PD1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">PD1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Size factors for each sample</span><span class="w">
+</span><span class="n">size_factors</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">1.32</span><span class="p">,</span><span class="w"> </span><span class="m">0.70</span><span class="p">,</span><span class="w"> </span><span class="m">1.04</span><span class="p">,</span><span class="w"> </span><span class="m">1.27</span><span class="p">,</span><span class="w"> </span><span class="m">1.11</span><span class="p">,</span><span class="w"> </span><span class="m">0.85</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="count-normalization-of-mov10-dataset-using-deseq2">Count normalization of Mov10 dataset using DESeq2</h2>
+
+<p>Now that we know the theory of count normalization, we will normalize the counts for the Mov10 dataset using DESeq2. This requires a few steps:</p>
+
+<ol>
+  <li>Ensure the row names of the metadata dataframe are present and in the same order as the column names of the counts dataframe.</li>
+  <li>Create a <code class="language-plaintext highlighter-rouge">DESeqDataSet</code> object</li>
+  <li>Generate the normalized counts</li>
+</ol>
+
+<h3 id="1-match-the-metadata-and-counts-data">1. Match the metadata and counts data</h3>
+
+<p>We should always make sure that we have sample names that match between the two files, and that the samples are in the right order. DESeq2 will output an error if this is not the case.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Check that sample names match in both files</span><span class="w">
+</span><span class="nf">all</span><span class="p">(</span><span class="n">colnames</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">rownames</span><span class="p">(</span><span class="n">meta</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If your data did not match you could use the <code class="language-plaintext highlighter-rouge">match()</code> function to rearrange them to be matching.</p>
+
+<hr />
+
+<h3 id="2-create-deseq2-object">2. Create DESEq2 object</h3>
+
+<p>Bioconductor software packages often define and use a custom class within R for storing data (input data, intermediate data and also results). These custom data structures are similar to <em>lists</em> in that they can contain multiple different data types/structures within them. But, unlike lists they have pre-specified <em>slots</em>, which hold specific types/classes of data. The data stored in these pre-specified slots can be accessed by using specific package-defined functions.</p>
+
+<p>Let’s start by creating the <code class="language-plaintext highlighter-rouge">DESeqDataSet</code> object and then we can talk a bit more about what is stored inside it. To create the object we will need the <strong>count matrix</strong> and the <strong>metadata</strong> table as input. We will also need to specify a <strong>design formula</strong>. The design formula specifies the column(s) in the metadata table and how they should be used in the analysis. For our dataset we only have one column we are interested in, that is <code class="language-plaintext highlighter-rouge">~sampletype</code>. This column has three factor levels, which tells DESeq2 that for each gene we want to evaluate gene expression change with respect to these different levels.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeqDataSetFromMatrix</span><span class="p">(</span><span class="n">countData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">colData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">sampletype</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/intro-rnaseq-hpc/img/deseq_obj1.png" alt="" /></p>
+
+<p>You can use DESeq-specific functions to access the different slots and retrieve information, if you wish. For example, suppose we wanted the original count matrix we would use <code class="language-plaintext highlighter-rouge">counts()</code> (<em>Note: we nested it within the <code class="language-plaintext highlighter-rouge">View()</code> function so that rather than getting printed in the console we can see it in the script editor</em>) :</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">View</span><span class="p">(</span><span class="n">counts</span><span class="p">(</span><span class="n">dds</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>As we go through the workflow we will use the relevant functions to check what information gets stored inside our object. It’s good practice to do this any time you are learning a new software package.</p>
+
+<h3 id="3-generate-the-mov10-normalized-counts">3. Generate the Mov10 normalized counts</h3>
+
+<p>The next step is to normalize the count data in order to be able to make fair gene comparisons between samples.</p>
+
+<p><img src="../img/deseq_workflow_normalization_2018.png" width="400" /></p>
+
+<p>To perform the <strong>median of ratios method</strong> of normalization, DESeq2 has a single <code class="language-plaintext highlighter-rouge">estimateSizeFactors()</code> function that will generate size factors for us. We will use the function in the example below, but <strong>in a typical RNA-seq analysis this step is automatically performed by the <code class="language-plaintext highlighter-rouge">DESeq()</code> function</strong>, which we will see later.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">estimateSizeFactors</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>By assigning the results back to the <code class="language-plaintext highlighter-rouge">dds</code> object we are filling in the slots of the <code class="language-plaintext highlighter-rouge">DESeqDataSet</code> object with the appropriate information. We can take a look at the normalization factor applied to each sample using:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sizeFactors</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now, to retrieve the normalized counts matrix from <code class="language-plaintext highlighter-rouge">dds</code>, we use the <code class="language-plaintext highlighter-rouge">counts()</code> function and add the argument <code class="language-plaintext highlighter-rouge">normalized=TRUE</code>.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">normalized_counts</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">counts</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">normalized</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We can save this normalized data matrix to file for later use:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">write.table</span><span class="p">(</span><span class="n">normalized_counts</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"data/normalized_counts.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="o">=</span><span class="s2">"\t"</span><span class="p">,</span><span class="w"> </span><span class="n">quote</span><span class="o">=</span><span class="nb">F</span><span class="p">,</span><span class="w"> </span><span class="n">col.names</span><span class="o">=</span><span class="kc">NA</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<blockquote>
+  <p><strong>NOTE:</strong> DESeq2 doesn’t actually use normalized counts, rather it uses the raw counts and models the normalization inside the Generalized Linear Model (GLM). These normalized counts will be useful for downstream visualization of results, but cannot be used as input to DESeq2 or any other tools that peform differential expression analysis which use the negative binomial model.</p>
+</blockquote>
+
+<hr />
+
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>

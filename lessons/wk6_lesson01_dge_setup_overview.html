@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Set up and overview for gene-level differential expression analysis | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Set up and overview for gene-level differential expression analysis" />
+<meta name="author" content="Harvard HPC Staff, Adapted for use by Sally Chang @ NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson01_dge_setup_overview.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson01_dge_setup_overview.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Set up and overview for gene-level differential expression analysis" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Adapted for use by Sally Chang @ NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"Set up and overview for gene-level differential expression analysis","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson01_dge_setup_overview.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson01_dge_setup_overview.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=ce00f1093927095c9b455f8d0427b2b3be8f3034">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Set up and overview for gene-level differential expression analysis</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h3 id="note">NOTE:</h3>
+<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
+
+<p>Approximate time: 60 minutes</p>
+
+<p><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc/blob/main/lectures/week6_intro_deseq2_pipeline.pdf">Week 6 Slides on DEseq2 workflow</a></p>
+
+<h2 id="learning-objectives">Learning Objectives</h2>
+
+<ul>
+  <li>Explain the experiment and its objectives</li>
+  <li>Describe how to set up an RNA-seq project in R</li>
+  <li>Describe the RNA-seq and the differential gene expression analysis workflow</li>
+  <li>Explain why negative binomial distribution is used to model RNA-seq count data</li>
+</ul>
+
+<h1 id="differential-gene-expression-dge-analysis-overview">Differential gene expression (DGE) analysis overview</h1>
+
+<p>The goal of RNA-seq is often to perform differential expression testing to determine which genes are expressed at different levels between conditions. These genes can offer biological insight into the processes affected by the condition(s) of interest.</p>
+
+<p>To determine the expression levels of genes, our RNA-seq workflow followed the steps detailed in the image below. All steps were performed on the command line (Linux/Unix) through the generation of the read counts per gene. The differential expression analysis and any downstream functional analysis are generally performed in R using R packages specifically designed for the complex statistical analyses required to determine whether genes are differentially expressed.</p>
+
+<p><img src="../img/rnaseq_full_workflow.png" width="400" /></p>
+
+<p>In the next few lessons, we will walk you through an <strong>end-to-end gene-level RNA-seq differential expression workflow</strong> using various R packages. We will start with the count matrix, perform exploratory data analysis for quality assessment and to explore the relationship between samples, perform differential expression analysis, and visually explore the results prior to performing downstream functional analysis.</p>
+
+<h2 id="review-of-the-dataset">Review of the dataset</h2>
+
+<p>We will be using the full count matrix from the RNA-Seq dataset that is part of a larger study described in <a href="http://www.ncbi.nlm.nih.gov/pubmed/25464849">Kenny PJ et al, Cell Rep 2014</a>.</p>
+
+<p>The RNA-Seq was performed on HEK293F cells that were either transfected with a MOV10 transgene, or siRNA to knock down Mov10 expression, or non-specific (irrelevant) siRNA. This resulted in 3 conditions <strong>Mov10 oe</strong> (over expression), <strong>Mov10 kd</strong> (knock down) and <strong>Irrelevant kd</strong>, respectively. The number of replicates is as shown below.</p>
+
+<p>Using these data, we will evaluate transcriptional patterns associated with perturbation of MOV10 expression. Please note that the irrelevant siRNA will be treated as our control condition.</p>
+
+<p><img src="../img/dataset.png" width="400" /></p>
+
+<p><strong><em>What is the purpose of these datasets? What does Mov10 do?</em></strong></p>
+
+<p>The authors are investigating interactions between various genes involved in Fragile X syndrome, a disease in which there is aberrant production of the FMRP protein.</p>
+
+<blockquote>
+  <p><strong>FMRP</strong> is “most commonly found in the brain, is essential for normal cognitive development and female reproductive function. Mutations of this gene can lead to fragile X syndrome, mental retardation, premature ovarian failure, autism, Parkinson’s disease, developmental delays and other cognitive deficits.” - from <a href="https://en.wikipedia.org/wiki/FMR1">wikipedia</a></p>
+</blockquote>
+
+<blockquote>
+  <p><strong>MOV10</strong>, is a putative RNA helicase that is also associated with <strong>FMRP</strong> in the context of the microRNA pathway.</p>
+</blockquote>
+
+<p>The hypothesis <a href="http://www.ncbi.nlm.nih.gov/pubmed/25464849">the paper</a> is testing is that FMRP and MOV10 associate with and participate in miRNA-mediated regulation of the translation of a subset of RNAs. One part of the study identified mRNAs bound to MOV10; the RNA-seq part we are working with here explores the effect of knockdown or overexpression of MOV10 on steady-state mRNA as a result of this miRNA-mediated regulation.</p>
+
+<p><img src="../img/mov10-model.png" width="400" /></p>
+
+<p><strong>Our questions:</strong></p>
+
+<ul>
+  <li>What patterns of expression can we identify with the loss or gain of MOV10?</li>
+  <li>Are there any genes shared between the two conditions?</li>
+</ul>
+
+<h2 id="setting-up">Setting up</h2>
+
+<h3 id="opening-the-project-using-rstudio-hpc-on-demand">Opening the project using RStudio (HPC on Demand)</h3>
+
+<p>Before we get into the details of the analysis, let’s start by:</p>
+
+<ul>
+  <li>
+    <p>Opening up RStudio using <a href="https://hpcondemand.nih.gov/pun/sys/dashboard/">HPC on Demand</a>, using default values except for Starting Directory: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/YOUR_USERNAME/rnaseq</code></p>
+  </li>
+  <li>
+    <p>To check whether or not you are in the correct working directory, use <code class="language-plaintext highlighter-rouge">getwd()</code>. Something like <code class="language-plaintext highlighter-rouge">/vf/users/Bspc-training/changes/rnaseq</code> should come up.</p>
+  </li>
+  <li>
+    <p>Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -&gt; DEanalysis), to navigate to and open <code class="language-plaintext highlighter-rouge">DEanalysis.Rproj</code>, which you set up as an Assignment last week.</p>
+  </li>
+  <li>
+    <p>Go to the <code class="language-plaintext highlighter-rouge">File</code> menu and select <code class="language-plaintext highlighter-rouge">New File</code>, then select <code class="language-plaintext highlighter-rouge">R Script</code>. This should open up a script editor in the top left hand corner. This is where we will be typing and saving all commands required for this analysis. In the script editor type in header lines:</p>
+  </li>
+</ul>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Gene-level differential expression analysis using DESeq2</span><span class="w">
+</span></code></pre></div></div>
+
+<ul>
+  <li>Now save the file as <code class="language-plaintext highlighter-rouge">de_script.R</code>.</li>
+</ul>
+
+<h2 id="loading-and-installing-libraries">Loading and Installing libraries</h2>
+
+<p>For this analysis we will be using several R packages, some which have been installed from CRAN and others from Bioconductor. To use these packages (and the functions contained within them), we need to <strong>load the libraries.</strong> Add the following to your script and don’t forget to comment liberally!</p>
+
+<p>It’s good practice to load all needed libraries at the top of your script. Often, you don’t know ahead of time which you may need, so as you develop code you’ll often incrementally add more libraries to the top of the script.</p>
+
+<p>Note that these package names are all case sensitive, and you can load packages interactively in the <strong>Packages</strong> tab of our Files Pane window. However, it is best practice to have your code load the libraries so that it is clearly documented.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Setup</span><span class="w">
+</span><span class="c1"># Bioconductor and CRAN libraries used - already installed on Biowulf</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">RColorBrewer</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DESeq2</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pheatmap</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>There is one package we need, <code class="language-plaintext highlighter-rouge">DEGreport</code>, that is likely not installed for you here. To install it, load <code class="language-plaintext highlighter-rouge">BiocManager</code> (part of BioConductor), then run BiocManager’s <code class="language-plaintext highlighter-rouge">install()</code> function for the only package not already installed by default in our interactive RStudio session:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># You don't need to add this to your script.</span><span class="w">
+</span><span class="c1"># It only needs to be done once.</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">BiocManager</span><span class="p">)</span><span class="w">
+</span><span class="n">install</span><span class="p">(</span><span class="s2">"DEGreport"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>On Biowulf, this installs to your user data directory, specifically in <code class="language-plaintext highlighter-rouge">/data/$USER/rhel8/$R_VERSION</code>, which you can find by running <code class="language-plaintext highlighter-rouge">find.package("DEGreport")</code>. Once it is installed there (and for this version of R that you’re using, currently 4.4), you don’t need to do this again.</p>
+
+<p>Then, add this line in your script to load the package we just installed:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="n">DEGreport</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="loading-data">Loading data</h2>
+
+<p>To load the data into our current environment, we will be using the <code class="language-plaintext highlighter-rouge">read.table</code> function. We need to provide the path to each file and also specify arguments to let R know that we have a header (<code class="language-plaintext highlighter-rouge">header = T</code>) and the first column is our row names (<code class="language-plaintext highlighter-rouge">row.names=1</code>). By default, the function expects tab-delimited files, which is what we have.</p>
+
+<p>We will load in the featureCounts matrix and the metadata table into data frames (technically, R <code class="language-plaintext highlighter-rouge">data.frame</code> objects but we’ll call them data frames here).</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Load in data</span><span class="w">
+</span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_featurecounts.Rmatrix.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="n">meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_metadata.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Use <code class="language-plaintext highlighter-rouge">class()</code> to inspect our data and make sure we are working with data frames:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Check classes of the data we just brought in</span><span class="w">
+</span><span class="nf">class</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span><span class="w">
+</span><span class="nf">class</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Exercise</strong>: What are some other commands we can do to make sure <code class="language-plaintext highlighter-rouge">meta</code> and <code class="language-plaintext highlighter-rouge">data</code> are the expected structure and dimensions?</p>
+
+<h3 id="viewing-data">Viewing data</h3>
+
+<p>Make sure your datasets contain the expected samples / information before proceeding to perfom any type of analysis.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">View</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span><span class="w">
+</span><span class="n">View</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Note: if you’re using command-line R, <code class="language-plaintext highlighter-rouge">View</code> won’t work because it’s graphical. Instead, use <code class="language-plaintext highlighter-rouge">head</code>, <code class="language-plaintext highlighter-rouge">str</code>, or <code class="language-plaintext highlighter-rouge">glimpse</code>.</p>
+
+<h2 id="differential-gene-expression-analysis-overview">Differential gene expression analysis overview</h2>
+
+<p>So what does this count data actually represent? The count data used for differential expression analysis represents the number of sequence reads that originated from a particular gene. The higher the number of counts, the more reads associated with that gene, and the assumption that there was a higher level of expression of that gene in the sample compared to other samples.</p>
+
+<p><img src="../img/deseq_counts_overview.png" width="600" /></p>
+
+<p>With differential expression analysis, we are looking for genes that change in expression between two or more groups (defined in the metadata) - case vs. control - or correlation of expression with some variable or clinical outcome</p>
+
+<p><strong>Why does it not work to identify differentially expressed genes simply by ranking the genes by how different they are between the two groups (based on fold change values)?</strong></p>
+
+<p><img src="../img/foldchange_heatmap.png" width="200" /></p>
+
+<p>More often than not, there is much more going on with your data than what you are anticipating. Genes that vary in expression level between samples is a consequence of not only the experimental variables of interest but also due to extraneous sources. The goal of differential expression analysis to determine the relative role of these effects, and to separate the “interesting” from the “uninteresting”.</p>
+
+<p><img src="../img/de_variation.png" width="500" /></p>
+
+<p>The “uninteresting” presents as sources of variation in your data, and so even though the mean expression levels between sample groups may appear to be quite different, it is possible that the difference is not actually significant. This is illustrated for ‘GeneA’ expression between ‘untreated’ and ‘treated’ groups in the figure below. The mean expression level of geneA for the ‘treated’ group is twice as large as for the ‘untreated’ group, but the variation between replicates indicates that this may not be a significant difference. <strong>We need to take into account the variation in the data (and where it might be coming from) when determining whether genes are differentially expressed.</strong></p>
+
+<p><img src="../img/de_norm_counts_var.png" width="400" /></p>
+
+<p>The goal of differential expression analysis is to determine, for each gene, whether the differences in expression (counts) <strong>between groups</strong> is significant given the amount of variation observed <strong>within groups</strong> (replicates). To test for significance, we need an appropriate statistical model that accurately performs normalization (to account for differences in sequencing depth, etc.) and variance modeling (to account for few numbers of replicates and large dynamic expression range).</p>
+
+<h3 id="rna-seq-count-distribution">RNA-seq count distribution</h3>
+
+<p>To determine the appropriate statistical model, we need information about the distribution of counts. To get an idea about how RNA-seq counts are distributed, let’s plot the counts for a single sample, ‘Mov10_oe_1’. To do so, we are going to be using a REALLY useful visualization package called <code class="language-plaintext highlighter-rouge">ggplot2</code> (see <a href="https://ggplot2.tidyverse.org/">landing page for ggplot2</a>).</p>
+
+<p><strong>Discussion</strong>: Although we aren’t going to talk about ggplot commands <em>in depth</em> in this course, you can probably figure out what some parts of this command are doing. What is <code class="language-plaintext highlighter-rouge">x = Mov10_oe_1</code> doing? What about <code class="language-plaintext highlighter-rouge">xlab</code> and <code class="language-plaintext highlighter-rouge">ylab</code>?</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_histogram</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mov10_oe_1</span><span class="p">),</span><span class="w"> </span><span class="n">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"bin"</span><span class="p">,</span><span class="w"> </span><span class="n">bins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">200</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">xlab</span><span class="p">(</span><span class="s2">"Raw expression counts"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">ylab</span><span class="p">(</span><span class="s2">"Number of genes"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/intro-rnaseq-hpc/lessons/images/raw_expression_counts.png" alt="" /></p>
+
+<p>If we zoom in close to zero, we can see a large number of genes with counts of zero:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+   </span><span class="n">geom_histogram</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mov10_oe_1</span><span class="p">),</span><span class="w"> </span><span class="n">stat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"bin"</span><span class="p">,</span><span class="w"> </span><span class="n">bins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">200</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+   </span><span class="n">xlim</span><span class="p">(</span><span class="m">-5</span><span class="p">,</span><span class="w"> </span><span class="m">500</span><span class="p">)</span><span class="w">  </span><span class="o">+</span><span class="w">
+   </span><span class="n">xlab</span><span class="p">(</span><span class="s2">"Raw expression counts"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+   </span><span class="n">ylab</span><span class="p">(</span><span class="s2">"Number of genes"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/intro-rnaseq-hpc/lessons/images/zoomed_expression_counts.png" alt="" /></p>
+
+<p>These images illustrate some common features of RNA-seq count data, including a <strong>low number of counts associated with a large proportion of genes</strong>, and a long right tail due to the <strong>lack of any upper limit for expression</strong>. Unlike microarray data, which has a dynamic range maximum limited due to when the probes max out, there is no limit of maximum expression for RNA-seq data. Due to the differences in these technologies, the statistical models used to fit the data are different between the two methods.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> The log intensities of the microarray data approximate a normal distribution. However, due to the different properties of the of RNA-seq count data, such as integer counts instead of continuous measurements and non-normally distributed data, the normal distribution does not accurately model RNA-seq counts [<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3541212/">1</a>].</p>
+</blockquote>
+
+<h3 id="modeling-count-data">Modeling count data</h3>
+
+<p>Count data is often modeled using the <strong>binomial distribution</strong>, which can give you the <strong>probability of getting a number of heads upon tossing a coin a number of times</strong>. However, not all count data can be fit with the binomial distribution. The binomial is based on discrete events and used in situations when you have a certain number of cases.</p>
+
+<p>When <strong>the number of cases is very large (i.e. people who buy lottery tickets), but the probability of an event is very small (probability of winning)</strong>, the <strong>Poisson distribution</strong> is used to model these types of count data. The Poisson is similar to the binomial, but where the binomial is restricted to a number of trials, the Poisson is used when any number of trials can occur. <a href="https://youtu.be/fxtB8c3u6l8">Details provided by Rafael Irizarry in the EdX class.</a></p>
+
+<p><strong>With RNA-Seq data, a very large number of RNAs are represented and the probability of pulling out a particular transcript is very small</strong>. Thus, it would be an appropriate situation to use the Poisson distribution. However, a unique property of the Poisson distribution is that the mean == variance. Realistically, with RNA-Seq data there is always some biological variation present across the replicates (within a sample class). Genes with larger average expression levels will tend to have larger observed variances across replicates.</p>
+
+<p>If the proportions of mRNA stayed exactly constant between the biological replicates for each sample class, we could expect Poisson distribution (where mean == variance). <a href="https://youtu.be/HK7WKsL3c2w">A nice description of this concept is presented by Rafael Irizarry in the EdX class</a>. But when we look at <em>actual</em> RNA-seq counts, this doesn’t happen. In fact, we see <em>more</em> variance than we would expect if RNA-seq counts truly followed a Poisson distribution.</p>
+
+<p>It turns out that the distribution that that fits best, given this type of variability between replicates, is the Negative Binomial (NB) distribution. Essentially, <strong>the NB model is a good approximation for data where the mean &lt; variance</strong>, as is the case with RNA-Seq count data.</p>
+
+<p>Technically, a Poisson is the same as a NB with zero dispersion. As you increase the dispersion parameter for an NB, it describes an increasingly variable distribution. A big part of differential expression involves figuring out what dispersion parameter to use for a gene so that we can get this underlying distribution.</p>
+
+<p><img src="../img/deseq_nb.png" width="400" /></p>
+
+<blockquote>
+  <p><strong>NOTE:</strong></p>
+
+  <ul>
+    <li><strong>Biological replicates</strong> represent multiple samples (i.e. RNA from different mice) representing the same sample class</li>
+    <li><strong>Technical replicates</strong> represent the same sample (i.e. RNA from the same mouse) but with technical steps replicated</li>
+    <li>Usually biological variance is much greater than technical variance, so we do not need to account for technical variance to identify biological differences in expression</li>
+    <li><strong>Don’t spend money on technical replicates - biological replicates are much more useful</strong></li>
+  </ul>
+</blockquote>
+
+<blockquote>
+  <p><strong>NOTE:</strong> If you are using <strong>cell lines</strong> and are unsure whether or not you have prepared biological or technical replicates, take a look at <a href="https://web.archive.org/web/20170807192514/http://www.labstats.net:80/articles/cell_culture_n.html">this link</a>. This is a useful resource in helping you determine how best to set up your <em>in-vitro</em> experiment.</p>
+</blockquote>
+
+<h4 id="how-do-i-know-if-my-data-should-be-modeled-using-the-poisson-distribution-or-negative-binomial-distribution">How do I know if my data should be modeled using the Poisson distribution or Negative Binomial distribution?</h4>
+
+<p>If it is count data, it should fit the negative binomial, as discussed previously. However, it can be helpful to plot the <em>mean versus the variance</em> of your data. <em>Remember for the Poisson model, mean = variance, but for NB, mean &lt; variance.</em></p>
+
+<p>Run the following code to plot the <em>mean versus variance</em> for the ‘Mov10 overexpression’ replicates:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mean_counts</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="n">data</span><span class="p">[,</span><span class="w"> </span><span class="m">6</span><span class="o">:</span><span class="m">8</span><span class="p">],</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">mean</span><span class="p">)</span><span class="w">
+</span><span class="n">variance_counts</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">apply</span><span class="p">(</span><span class="n">data</span><span class="p">[,</span><span class="w"> </span><span class="m">6</span><span class="o">:</span><span class="m">8</span><span class="p">],</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">var</span><span class="p">)</span><span class="w">
+</span><span class="n">df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">data.frame</span><span class="p">(</span><span class="n">mean_counts</span><span class="p">,</span><span class="w"> </span><span class="n">variance_counts</span><span class="p">)</span><span class="w">
+
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+        </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">mean_counts</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">variance_counts</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+        </span><span class="n">geom_abline</span><span class="p">(</span><span class="n">slope</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">intercept</span><span class="o">=</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+        </span><span class="n">scale_y_log10</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
+        </span><span class="n">scale_x_log10</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<blockquote>
+  <p><strong>DISCUSSION:</strong> why <code class="language-plaintext highlighter-rouge">6:8</code> in the above code?</p>
+</blockquote>
+
+<p><img src="/intro-rnaseq-hpc/lessons/images/variance_mean.png" alt="mean vs variance" /></p>
+
+<p>Note that in the above figure, the variance across replicates tends to be greater than the mean (red line), especially for genes with large mean expression levels. <em>This is a good indication that our data do not fit the Poisson distribution and we need to account for this increase in variance using the Negative Binomial model (i.e. Poisson will underestimate variability leading to an increase in false positive DE genes).</em></p>
+
+<h3 id="improving-mean-estimates-ie-reducing-variance-with-biological-replicates">Improving mean estimates (i.e. reducing variance) with biological replicates</h3>
+
+<p>The variance tends to reduce as we increase the number of biological replicates (<em>the distribution will approach the Poisson distribution with increasing numbers of replicates</em>), since standard deviations of averages are smaller than standard deviations of individual observations. <strong>The value of additional replicates is that as you add more data (replicates), you get increasingly precise estimates of group means, and ultimately greater confidence in the ability to distinguish differences between sample classes (i.e. more DE genes).</strong></p>
+
+<p>The figure below illustrates the relationship between sequencing depth and number of replicates on the number of differentially expressed genes identified [<a href="https://academic.oup.com/bioinformatics/article/30/3/301/228651/RNA-seq-differential-expression-studies-more">1</a>]. Note that an <strong>increase in the number of replicates tends to return more DE genes than increasing the sequencing depth</strong>. Therefore, generally more replicates are better than higher sequencing depth, with the caveat that higher depth is required for detection of lowly expressed DE genes and for performing isoform-level differential expression. Generally, the minimum sequencing depth recommended is 20-30 million reads per sample, but we have seen good RNA-seq experiments with 10 million reads if there are a good number of replicates.</p>
+
+<p><img src="../img/de_replicates_img.png" width="500" /></p>
+
+<h3 id="differential-expression-analysis-workflow">Differential expression analysis workflow</h3>
+
+<p>To model counts appropriately when performing a differential expression analysis, there are a number of software packages that have been developed for differential expression analysis of RNA-seq data. Even as new methods are continuously being developed a few tools are generally recommended as best practice, e.g. <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html"><strong>DESeq2</strong></a> and <a href="https://bioconductor.org/packages/release/bioc/html/edgeR.html"><strong>EdgeR</strong></a>. Both these tools use the negative binomial model, employ similar methods, and typically, yield similar results. They are pretty stringent, and have a good balance between sensitivity and specificity (reducing both false positives and false negatives).</p>
+
+<p><a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2014-15-2-r29"><strong>Limma-Voom</strong></a> is another set of tools often used together for DE analysis, but this method may be less sensitive for small sample sizes. This method is recommended when the number of biological replicates per group grows large (&gt; 20).</p>
+
+<p>Many studies describing comparisons between these methods show that while there is some agreement, there is also much variability between tools. <strong>Additionally, there is no one method that performs optimally under all conditions (<a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-91">Soneson and Dleorenzi, 2013</a>).</strong></p>
+
+<p>This multi-way Venn diagram shows that the four methods assessed do have substantially overlapping differential expression calls, but some methods disagree. This is also using the original DESeq algorithm (as opposed to the DESeq2 version we’ll be using), but it gives a good flavor of the variability across methods.</p>
+
+<blockquote>
+  <p><strong>DISCUSSION:</strong> Which one is correct? How can we tell?</p>
+</blockquote>
+
+<p><img src="/intro-rnaseq-hpc/img/deg_methods1.png" alt="DEG methods venn" /></p>
+
+<p><strong>We will be using <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8">DESeq2</a> for the DE analysis, and the analysis steps with DESeq2 are shown in the flowchart below in blue</strong>. DESeq2 first normalizes the count data to account for differences in library sizes and RNA composition between samples. Then, we will use the normalized counts to make some plots for QC at the gene and sample level. The final step is to use the appropriate functions from the DESeq2 package to perform the differential expression analysis.</p>
+
+<p><img src="../img/deseq_workflow_full_2018.png" width="500" /></p>
+
+<p>We will go in-depth into each of these steps in the following lessons, but additional details and helpful suggestions regarding DESeq2 can be found in the <a href="http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html">DESeq2 vignette</a>. As you go through this workflow and questions arise, you can reference the vignette from within RStudio:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vignette("DESeq2")
+</code></pre></div></div>
+
+<p>This is very convenient, as it provides a wealth of information at your fingertips! Be sure to use this as you need during the workshop.</p>
+
+<h2 id="assignment">Assignment</h2>
+
+<p>Create another R script (also saved to this <code class="language-plaintext highlighter-rouge">DEanalysis</code> directory) where you modify the three plots we made for the <code class="language-plaintext highlighter-rouge">Mov10_oe_1</code> samples to look a the count distribution for the sample <code class="language-plaintext highlighter-rouge">Irrel_kd_3</code>. Save these images to <code class="language-plaintext highlighter-rouge">figures/</code> as PNG files.</p>
+
+<hr />
+
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
