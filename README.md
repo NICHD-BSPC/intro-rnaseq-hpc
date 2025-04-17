@@ -1,4 +1,4 @@
-# Introduction to RNA-seq using high-performance computing at NICHD
+# Introduction to RNA-seq using high-performance computing at NICHD: January 2025
 ### Description
 
 This repository has materials for an introduction to RNA-sequencing data analysis course. This workshop focuses on teaching basic computational skills to enable the effective use of an high-performance computing environment to implement an RNA-seq data analysis workflow. The first half of the course includes an introduction to shell (bash) and shell scripting, running the RNA-seq workflow from FASTQ files to count data and covers best practice guidelines for RNA-seq experimental design and data organization/management. The latter half covers differential expression analyses using DEseq2 and downstream analyses of those results. 
