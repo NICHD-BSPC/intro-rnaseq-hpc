@@ -3,7 +3,9 @@
 
 ### Description
 
-This repository has materials for an introduction to bulk RNAseq data analysis course held at NICHD from January-March 2025. **Note: This repository is no longer being updated and reflects the status of the materials at the end of the course. For the most recent version of these materials, please see the main [NICHD bulk RNAseq training page](https://nichd-bspc.github.io/intro-rnaseq-hpc/), which is still being updated**
+This repository has materials for an introduction to bulk RNAseq data analysis course held at NICHD from January-March 2025. 
+
+**Note: This repository is no longer being updated and reflects the status of the materials at the end of the course. For the most recent version of these materials, please see the main [NICHD bulk RNAseq training page](https://nichd-bspc.github.io/intro-rnaseq-hpc/), which is still being updated**
 
 This workshop focuses on teaching basic computational skills to enable the effective use of an high-performance computing environment to implement an RNA-seq data analysis workflow. The first half of the course includes an introduction to shell (bash) and shell scripting, running the RNA-seq workflow from FASTQ files to count data and covers best practice guidelines for RNA-seq experimental design and data organization/management. The latter half covers differential expression analyses using DEseq2 and downstream analyses of those results. 
 
