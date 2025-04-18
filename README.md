@@ -1,7 +1,11 @@
-# Introduction to RNA-seq using high-performance computing at NICHD: January 2025
+
+# Introduction to RNA-seq using high-performance computing at NICHD: January 2025 (Deprecated)
+
 ### Description
 
-This repository has materials for an introduction to RNA-sequencing data analysis course. This workshop focuses on teaching basic computational skills to enable the effective use of an high-performance computing environment to implement an RNA-seq data analysis workflow. The first half of the course includes an introduction to shell (bash) and shell scripting, running the RNA-seq workflow from FASTQ files to count data and covers best practice guidelines for RNA-seq experimental design and data organization/management. The latter half covers differential expression analyses using DEseq2 and downstream analyses of those results. 
+This repository has materials for an introduction to bulk RNAseq data analysis course held at NICHD from January-March 2025. **Note: This repository is no longer being updated and reflects the status of the materials at the end of the course. For the most recent version of these materials, please see the main [NICHD bulk RNAseq training page](https://nichd-bspc.github.io/intro-rnaseq-hpc/), which is still being updated**
+
+This workshop focuses on teaching basic computational skills to enable the effective use of an high-performance computing environment to implement an RNA-seq data analysis workflow. The first half of the course includes an introduction to shell (bash) and shell scripting, running the RNA-seq workflow from FASTQ files to count data and covers best practice guidelines for RNA-seq experimental design and data organization/management. The latter half covers differential expression analyses using DEseq2 and downstream analyses of those results. 
 
 ### Learning Objectives
 
@@ -10,6 +14,12 @@ This repository has materials for an introduction to RNA-sequencing data analysi
 * Work with real data sets and real bioinformatics environments on NIH’s high-performance compute cluster (Biowulf)
 * Apply what you learn to your own bulk RNAseq data
 
+### Weekly Course Components
+ 
+ *	**In-person lecture and hands on demonstrations**: Tuesdays, 10am-12pm starting January 28th
+ *	**In-person practice sessions**: Fridays at 10am-12pm starting on January 31st
+     - This is a chance to review material from Tuesday and work on the weekly assignments (see below) with help from Dr. Chang, BSPC staff as well as fellow students. You are strongly encouraged to attend these sessions to get the most out of this course.
+ * **Asynchronous Practice**: 3-4 hours of asynchronous practice and reading. This will prepare you for the following week and allow you to apply knowledge to new examples. You will submit small weekly assignment to me so I can check your progress and adjust content if needed
 
 ### Topics and Links to weekly materials
 
@@ -24,6 +34,10 @@ This repository has materials for an introduction to RNA-sequencing data analysi
 | [Week 7](schedule/links-to-lessons.md#week-7) | Hypothesis testing in DESeq2, summarizing and visualizing results |
 | [Week 8](schedule/links-to-lessons.md#week-8) | Likelihood ratio test results, overenrichment analyses, functional class scoring | 
 | [Week 9](schedule/links-to-lessons.md#week-9) | Any material left from Week 8, course wrap-up, review of requested topics | 
+
+### Course communication: 
+ * For any content questions: We will be using the `rnaseq_jan2025` Slack channel under the Bioinformatics @NICHD workspace. Posting your questions in this channel is great, as multiple staff and fellow students will be able to respond. Also, you probably aren't the only one with that question!
+ * For scheduling/personal concerns: Contact Dr. Chang by e-mail. 
 
 ### Software Requirements
 
