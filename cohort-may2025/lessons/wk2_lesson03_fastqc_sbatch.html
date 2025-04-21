@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Quality control using FASTQC - script running | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Quality control using FASTQC - script running" />
+<meta name="author" content="Harvard HPC Staff, Modified by Sally Chang @ NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk2_lesson03_fastqc_sbatch.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk2_lesson03_fastqc_sbatch.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-03-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Quality control using FASTQC - script running" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Modified by Sally Chang @ NICHD"},"dateModified":"2025-03-01T00:00:00+00:00","datePublished":"2025-03-01T00:00:00+00:00","headline":"Quality control using FASTQC - script running","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk2_lesson03_fastqc_sbatch.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk2_lesson03_fastqc_sbatch.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=fa747d00dce79e2e8e5212f7b356ef1077a3b116">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Quality control using FASTQC - script running</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h3 id="note">NOTE:</h3>
+<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
+
+<h2 id="learning-objectives">Learning Objectives:</h2>
+
+<ul>
+  <li>Modify a template SLURM job submission script</li>
+  <li>Run a SLURM job submission script to perform quality assessment for a full-sized FASTQ file</li>
+</ul>
+
+<h2 id="preparing-slurm-directives">Preparing SLURM Directives</h2>
+
+<h3 id="performing-quality-assessment-using-job-submission-scripts">Performing quality assessment using job submission scripts</h3>
+
+<p>So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. <code class="language-plaintext highlighter-rouge">fastqc -o ../results/fastqc/ -t 6 *.fq</code>). However, we can submit a command or series of commands to these partitions using job submission scripts. This is extremely useful when we want to run a job that will take longer than we want to wait around for in an interactive job or will take more memory that we can use during an interactive job. <em>In this case, we will be running the analysis on the full-sized FASTQ file for one of our samples, which is 10x larger than the subset files we have thus far been working with.</em></p>
+
+<p>We didn’t talk about it yet, but a shell script is simply a text file containing commands that are run consecutively.</p>
+
+<p>For example, the following 2-line script would change to your directory and print the <code class="language-plaintext highlighter-rouge">tree</code> output to a file in that directory:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/
+tree <span class="o">&gt;</span> mytree.txt
+</code></pre></div></div>
+
+<p>If this script is called <code class="language-plaintext highlighter-rouge">myscript.bash</code> you could run it like this:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash myscript.bash
+</code></pre></div></div>
+
+<p>and then you would get the <code class="language-plaintext highlighter-rouge">tree</code> output in <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code>.</p>
+
+<blockquote>
+  <p>NOTE:
+It doesn’t matter where you save this example script, and it will still work correctly. Why?</p>
+</blockquote>
+
+<p><strong>Job submission scripts</strong> for Biowulf are regular shell scripts, but contain the Slurm <strong>options/directives</strong> for our job submission. These directives define the various resources we are requesting for our job (i.e <em>number of cores, name of partition, runtime limit</em> ).</p>
+
+<p>Submission of the script using the <code class="language-plaintext highlighter-rouge">sbatch</code> command allows Slurm to run your job when its your turn. Let’s create a job submission script to automate what we have done in the previous lesson.</p>
+
+<p>Our script will do the following:</p>
+
+<ol>
+  <li>Specify important details to the SLURM scheduler</li>
+  <li>Load the FastQC module</li>
+  <li>Run FastQC on the full-sized <code class="language-plaintext highlighter-rouge">Mov10_oe_1</code> FASTQ file</li>
+</ol>
+
+<p>Let’s first change the directory to <code class="language-plaintext highlighter-rouge">/rnaseq/scripts</code>, and copy a template that already has some SLURM parameters listed and re-name this file something informative:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>rnaseq/scripts
+<span class="nv">$ </span><span class="nb">cp</span> /data/Bspc-training/shared/rnaseq_jan2025/slurm_template.sh <span class="nb">.</span>
+<span class="nv">$ </span><span class="nb">mv </span>slurm_template.sh mov10_fastqc_full.sh
+</code></pre></div></div>
+
+<p>Open the renamed file with Vim and take a look at the components.The first thing needed in a SLURM script is the <strong>shebang line</strong>. This tells the command line to interpret this file as a BASH script:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+</code></pre></div></div>
+
+<p>Following the shebang line are the Slurm directives. These are directives that your instructor finds particularly informative. If you are using these instructions without access to the course directory, you could also copy and paste this into a text editor :</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#SBATCH --job-name=</span>
+<span class="c">#SBATCH --partition=</span>
+<span class="c">#SBATCH --mail-type=       # Mail events </span>
+<span class="c">#SBATCH --ntasks=          # Run a single task     </span>
+<span class="c">#SBATCH --cpus-per-task=   # Number of CPU cores per task</span>
+<span class="c">#SBATCH --mem=             # Job memory request</span>
+<span class="c">#SBATCH --time=            # Time limit hrs:min:sec</span>
+<span class="c">#SBATCH --output=          # Standard output log</span>
+<span class="c">#SBATCH --error=           #error log</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">--job-name=</code> name of the job (ex. mov10_fastqc_full)</li>
+  <li><code class="language-plaintext highlighter-rouge">--partition=</code> : name of compute partition (ex. norm, largemem, quick) <a href="https://hpc.nih.gov/docs/userguide.html#partitions">Biowulf partitions</a></li>
+  <li><code class="language-plaintext highlighter-rouge">--time=</code> : how much time to allocate to job (ex. 08:00:00 for 8 hours) <a href="https://hpc.nih.gov/docs/userguide.html#wall">Walltime limits for partitions</a></li>
+  <li><code class="language-plaintext highlighter-rouge">--cpus-per-task=</code>: Number of CPUs required (ex. ‘8’ for 8 CPUS that can be used for multithreading.</li>
+  <li><code class="language-plaintext highlighter-rouge">--mem=</code>: maximum memory, i.e. 8g (8 gigabytes - note the <code class="language-plaintext highlighter-rouge">g</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">--mail-type=</code>: send an email to your NIH account when job starts, ends or quits with an error (ex. END, ALL)</li>
+  <li><code class="language-plaintext highlighter-rouge">--output=</code>: The name of a log file to send output that would normally be printed to screen (ex. mov10_fastqc.log)</li>
+  <li><code class="language-plaintext highlighter-rouge">--error=</code>: The name of a log file specifically to capture error messages</li>
+</ul>
+
+<p>More about these options and many others can found in the <a href="https://hpc.nih.gov/docs/userguide.html">Biowulf User Guide</a>.</p>
+
+<p>Use Vim in insert mode (<code class="language-plaintext highlighter-rouge">i</code>) to modify your copied file to use 1 task that makes use of 6 CPUs, which will run on the <code class="language-plaintext highlighter-rouge">quick</code> partition for one hour and use 6 gigabytes of memory. Make sure to also give your job and output/error logs informative names!</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="c">#SBATCH --job-name=mov10_oe1_full_fastqc</span>
+<span class="c">#SBATCH --partition=quick</span>
+<span class="c">#SBATCH --mail-type=ALL     # Mail events </span>
+<span class="c">#SBATCH --ntasks=1          # Run a single task     </span>
+<span class="c">#SBATCH --cpus-per-task=6   # Number of CPU cores per task</span>
+<span class="c">#SBATCH --mem=6g            # Job memory request</span>
+<span class="c">#SBATCH --time=01:00:00     # Time limit hrs:min:sec</span>
+<span class="c">#SBATCH --output=%j.out     # Use job ID as a variable</span>
+<span class="c">#SBATCH --error=%j.err      # Use job ID as a variable</span>
+</code></pre></div></div>
+
+<h2 id="modify-the-body-of-the-script">Modify the body of the script</h2>
+
+<p>Now in the body of the script, we can include any commands we want to run, specifying that our input file is now a file in the shared class directory. In this case, it will be the following:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">## Load modules required for script commands</span>
+module load fastqc/0.12.1
+
+<span class="c">## Run FASTQC on the compressed full-sized file in the class shared directory</span>
+fastqc <span class="nt">-o</span> /data/Bspc-training/<span class="nv">$USER</span>/rnaseq/results/fastqc /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>NOTE:</strong> These are the same commands we used when running FASTQC in the interactive session. Since we are writing them in a script, the <code class="language-plaintext highlighter-rouge">tab</code> completion function will <strong>not work</strong>, so please make sure you don’t have any typos when writing the script!</p>
+</blockquote>
+
+<p>Once done with your script, click <code class="language-plaintext highlighter-rouge">esc</code> to exit INSERT mode. Then save and quit the script by typing <code class="language-plaintext highlighter-rouge">:wq</code>. You may double check your script by typing <code class="language-plaintext highlighter-rouge">less mov10_fastqc.run</code>.</p>
+
+<h2 id="submit-the-job-script">Submit the job script</h2>
+
+<p>Now, if everything looks good submit the job!</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sbatch mov10_fastqc_full.sh
+</code></pre></div></div>
+
+<p>You should immediately see a number pop up. Your job is assigned with that unique identifier <code class="language-plaintext highlighter-rouge">JobID</code>. You can check on the status of your job with:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>squeue <span class="nt">-u</span> <span class="nv">$USER</span>
+</code></pre></div></div>
+
+<p>Look for the row that corresponds to your <code class="language-plaintext highlighter-rouge">JobID</code>. The third column indicates the state of your job. Possible states include <code class="language-plaintext highlighter-rouge">PENDING (PD)</code>, <code class="language-plaintext highlighter-rouge">RUNNING (R)</code>, <code class="language-plaintext highlighter-rouge">COMPLETING (CG)</code>. <strong>NOTE:</strong> Here is a <a href="https://hpc.nih.gov/docs/userguide.html#states">table of Job State Codes</a> from the Biowulf User Guide.</p>
+
+<p>Once your job is <code class="language-plaintext highlighter-rouge">RUNNING</code>, you should also get an e-mail with a subject line like: <code class="language-plaintext highlighter-rouge">Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Began, Queued time 00:01:09</code>.</p>
+
+<h2 id="after-the-job-has-run">After the job has run</h2>
+
+<p>Once the job is running, it will take just about 4 minutes to run. Hopefully, you will get another e-mail with a subject like <code class="language-plaintext highlighter-rouge">Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Ended, Run time 00:02:45, COMPLETED, ExitCode 0</code> . Generally speaking, ExitCode 0 is what we want!</p>
+
+<p>More info about SLURM exit codes can be found in the <a href="https://slurm.schedmd.com/job_exit_code.html">SLURM manual</a>, but it is also useful to search for codes on the Internet when they actually come up in your analysis. By convention, exit code 0 means “everything’s OK”. A non-zero exit code indicates a problem.</p>
+
+<p>Check out the output files in your directory:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-lh</span> ../results/fastqc/
+</code></pre></div></div>
+
+<p>There should also be one standard error (<code class="language-plaintext highlighter-rouge">.err</code>) and one standard out (<code class="language-plaintext highlighter-rouge">.out</code>) files from the job found in <code class="language-plaintext highlighter-rouge">/rnaseq/scripts</code>. They are named after the job ID. You can move these over to your <code class="language-plaintext highlighter-rouge">logs</code> directory and give them more intuitive names:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mv</span> <span class="k">*</span>.err ../logs/fastqc.err
+<span class="nv">$ </span><span class="nb">mv</span> <span class="k">*</span>.out ../logs/fastqc.out
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>NOTE:</strong> The <code class="language-plaintext highlighter-rouge">.err</code> and <code class="language-plaintext highlighter-rouge">.out</code> files store log information during the script running. They are helpful resources, especially when your script does not run as expected and you need to troubleshoot the script.</p>
+</blockquote>
+
+<p>Finally, copy over the HTML output file to your /data/$USER directory so we can open it on a locally mounted drive too:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cp </span>Mov10_oe_1_fastqc.html /data/<span class="nv">$USER</span>/
+</code></pre></div></div>
+
+<hr />
+
+<p><strong>Exercise</strong></p>
+
+<ol>
+  <li>
+    <p>Take a look at what’s inside the <code class="language-plaintext highlighter-rouge">.err</code> and <code class="language-plaintext highlighter-rouge">.out</code> files. What do you observe? Do you remember where you see those information when using the interactive session?</p>
+  </li>
+  <li>
+    <p>How would you change your script to analyze the 6 files we used in the last episode?</p>
+  </li>
+</ol>
+
+<h2 id="assignment">Assignment</h2>
+
+<p>Write a SLURM job script in your <code class="language-plaintext highlighter-rouge">/script</code> directory called <code class="language-plaintext highlighter-rouge">mov10_oe_2_fastqc_full.sh</code> (you can start by copying the template or the script we just ran) that does the following:</p>
+
+<ul>
+  <li>
+    <p>Uses <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_2.fq.gz</code> as input</p>
+  </li>
+  <li>
+    <p>Puts the output file in the same <code class="language-plaintext highlighter-rouge">/results/fastq</code> we’ve been using</p>
+  </li>
+  <li>
+    <p>Only requests 30 minutes of walltime - recall how our job only ended up taking a few minutes to run</p>
+  </li>
+  <li>
+    <p>Comes up with more informative names for the output and error files instead of the Job ID variable (use part of the input filename, perhaps?). Likewise, make any other changes to this script that reference the old file</p>
+  </li>
+  <li>
+    <p>Ask your instructor to look at the script before submitting (I can look into your <code class="language-plaintext highlighter-rouge">/script</code> directory). Then, go ahead and submit the script using <code class="language-plaintext highlighter-rouge">sbatch</code>!</p>
+  </li>
+</ul>
+
+<hr />
+
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+<ul>
+  <li><em>The materials used in this lesson was derived from work that is Copyright © Data Carpentry (<a href="http://datacarpentry.org/">http://datacarpentry.org/</a>). All Data Carpentry instructional material is made available under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0).</em></li>
+</ul>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>

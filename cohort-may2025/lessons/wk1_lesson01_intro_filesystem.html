@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>The Shell | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="The Shell" />
+<meta name="author" content="Harvard HPC Staff, Modified by Sally Chang at NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk1_lesson01_intro_filesystem.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk1_lesson01_intro_filesystem.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-01-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="The Shell" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Modified by Sally Chang at NICHD"},"dateModified":"2025-01-01T00:00:00+00:00","datePublished":"2025-01-01T00:00:00+00:00","headline":"The Shell","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk1_lesson01_intro_filesystem.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk1_lesson01_intro_filesystem.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=fa747d00dce79e2e8e5212f7b356ef1077a3b116">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">The Shell</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h3 id="note">NOTE:</h3>
+<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
+
+<h3 id="learning-objectives">Learning Objectives</h3>
+
+<ul>
+  <li>Understand why we need to use the command line</li>
+  <li>Log in to a high-performance computing cluster</li>
+  <li>Navigate around the Unix file system</li>
+  <li>Differentiate between full and relative paths</li>
+  <li>List files in a directory</li>
+  <li>Copy, remove and move files</li>
+</ul>
+
+<h3 id="links-to-sections-of-this-lesson">Links to sections of this lesson:</h3>
+
+<ul>
+  <li><a href="#why-the-command-line">Why the Command Line?</a></li>
+  <li><a href="#setting-up-and-logging-into-biowulf">Logging Into Biowulf</a></li>
+  <li><a href="#moving-to-a-biowulf-compute-node">Moving to a compute node</a></li>
+  <li><a href="#working-with-directories-on-biwoulf">Directories on Biowulf and first commands: pwd and cd</a></li>
+  <li><a href="#looking-into-and-moving-into-directories">Looking into and moving into Directories</a></li>
+  <li><a href="#command-line-arguments">Command line arguments</a></li>
+  <li><a href="#unix-directory-file-structure">Unix directory structure</a></li>
+  <li><a href="#working-with-full-paths">Full Paths</a></li>
+  <li><a href="#tab-completion">Tab completion</a></li>
+  <li><a href="#copying-creating-moving-and-removing-data">Copying, creating, moving and removing data</a></li>
+  <li><a href="#exiting-from-the-cluster">Exiting from the cluster</a></li>
+</ul>
+
+<hr />
+
+<h2 id="why-the-command-line"><strong>Why the Command Line?</strong></h2>
+
+<h3 id="what-is-the-command-line-anyway">What is the command line, anyway?</h3>
+
+<p>To put it simply, the command line interface (CLI), is a text-based way of interacting with the operating system of a computer and the files and applications therein. This is in contrast with using a Graphical User Interface (GUI), which may involve the more familiar buttons and menus you are used to.</p>
+
+<h3 id="why-use-the-command-line">Why use the command line?</h3>
+
+<ul>
+  <li>
+    <p>More direct interface between you and the computer - more streamlined, less tabs and windows open etc. </p>
+  </li>
+  <li>
+    <p><strong>Interacting with remote/cloud computer</strong></p>
+  </li>
+  <li>
+    <p>Many bioinformatics tools are only available, or have more full options, in a command line environment</p>
+  </li>
+  <li>
+    <p>Reusability of your work - can build up to writing scripts that can automate things, or retrieve different things with small modifications </p>
+  </li>
+  <li>
+    <p>More opportunities in general for batch processing and automations</p>
+  </li>
+</ul>
+
+<p><strong>Side note:</strong> There are technically mutiple languages with which one could “talk” to their computer on the command line. We are going to use the <strong>Bash</strong> scripting language today, which is extremely common, comes default on most computing systems, and relies on the same principles and highly similar command structure to other command line languages you might encounter. Just an FYI in case I mention “Bash” or if you have heard this term before.</p>
+<hr />
+
+<h2 id="setting-up-and-logging-into-biowulf"><strong>Setting up and logging into Biowulf</strong></h2>
+
+<p>We will spend most of our time learning about the basics of the shell command-line interface (CLI) by exploring experimental data on the <strong>NIH’s Biowulf</strong> cluster. So, we will need to log in to this remote compute cluster first before we can start with the basics.</p>
+
+<p>Let’s take a quick look at the basic architecture of a cluster environment and some cluster-specific jargon prior to logging in.</p>
+
+<p align="center">
+
+<img src="../img/compute_cluster.png" alt="schematic of compute cluster with single login node and many connected compute nodes" width="500" />
+
+</p>
+
+<p>The above image reflects the many computers that make up a <strong>“cluster”</strong> of computers. Each individual computer in the cluster is usually a lot more powerful than any laptop or desktop computer we are used to working with, and is referred to as a <strong>“node”</strong> (instead of computer). Each node has a designated role, either for logging in or for performing computational analysis/work. <strong>A given cluster will usually have a few login nodes and many compute nodes.</strong></p>
+
+<p>The data on a cluster is also stored differently than what we are used to with our laptops and desktops, in that it is not computer- or node-specific storage, but all of the data is available to all the nodes in a cluster. This ensures that you don’t have to worry about which node is working on your analysis. <strong><em>We will be going into more depth about best practices for working on a cluster next week.</em></strong></p>
+
+<h3 id="biowulf-accounts"><strong>Biowulf accounts</strong></h3>
+
+<p>For this workshop we will be using your personal Biowulf accounts, which you can log into using your <strong>NIH password</strong>.</p>
+
+<h3 id="tools-to-access-remote-computersclusters"><strong>Tool(s) to access remote computers/clusters</strong></h3>
+
+<p><strong>With Mac OS</strong></p>
+
+<p>Macs have a utility application called “<strong>Terminal</strong>” for performing tasks on the command line (shell), both locally and on remote machines. We will be using it to log into Biowulf.</p>
+
+<p>Please find and open the Terminal utility on your computers using the <em>Spotlight Search</em> at the top right hand corner of your screen.</p>
+
+<p><strong>With Windows OS</strong></p>
+
+<p>By default, there is no built-in Terminal that uses the bash shell on the Windows OS. So, we will be using a downloaded program called “<strong>Git BASH</strong>” which is part of the <a href="https://git-for-windows.github.io/">Git for Windows</a> tool set. <strong>Git BASH is a shell/bash emulator.</strong> What this means is that it shows you a very similar interface to, and provides you the functionality of, the Terminal utility found on the Mac and Linux Operating systems.</p>
+
+<p>If necessary, you should have installed Git BASH prior to the course. Please find and open Git BASH.</p>
+
+<p><strong>Let’s log in!</strong></p>
+
+<p>Everyone should have their Terminal (or Git BASH Terminal) window open. Using this Terminal window, you can interact with your own computer using bash commands!</p>
+
+<p>You see the “$” symbol? That is where you write the commands that will be executed by shell (bash in this case) and your computer’s kernel. The “$” is called the <strong>“command prompt”</strong>.</p>
+
+<p><strong><em>Please note that from this point on in the workshop anything we want you to type next to the command prompt will be preceded by the <code class="language-plaintext highlighter-rouge">$</code> (see below). Please make sure you do not type out (or copy and paste) the <code class="language-plaintext highlighter-rouge">$</code> at the beginning of a command into the Terminal.</em></strong></p>
+
+<p><img src="../img/default_shell_prompt.png" alt="typical command shell prompt for a user on a NICHD mac as an example" width="700" /></p>
+
+<p>To connect to the login node on Biowulf:</p>
+
+<ol>
+  <li>Type in the <code class="language-plaintext highlighter-rouge">ssh</code> command at the command prompt followed by a space, and then type your username (usually some combo of surname and first name - mine is <code class="language-plaintext highlighter-rouge">changes</code>) plus the address of the cluster <code class="language-plaintext highlighter-rouge">@biowulf.nih.gov</code>. There is no space between the username and the <code class="language-plaintext highlighter-rouge">@</code> symbol (see below).</li>
+</ol>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh username@biowulf.nih.gov
+</code></pre></div></div>
+
+<ol>
+  <li>
+    <p>Press the return/enter key and you should receive a prompt for your password. Type in your password and note that <strong>the cursor will not move as you type</strong> it in! This is normal and know that the computer is receiving and transmitting your typed password to the remote system. When you are done typing your password, press Enter again.</p>
+  </li>
+  <li>
+    <p>If this is the first time you are connecting to the cluster, <strong>a warning will pop up</strong> and will ask you if you are sure you want to do this; <strong>type <code class="language-plaintext highlighter-rouge">Yes</code> or <code class="language-plaintext highlighter-rouge">Y</code></strong>. Once logged in, you should see a bunch of somewhat intimidating information.</p>
+  </li>
+</ol>
+
+<p>And our familiar $ symbol will return, but this time with your Biowulf username before the prompt. <em>This is a great way to tell that you are NOT working on your local machine anymore.</em></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>username@biowulf:~<span class="nv">$ </span>
+</code></pre></div></div>
+<hr />
+
+<h2 id="moving-to-a-biowulf-compute-node"><strong>Moving to a Biowulf compute node</strong></h2>
+
+<p>The first command we will run on Biowulf will start a “interactive session”. This command will connect us to a compute node, so that all of the commands we run will be processed by a computer designated to do analysis (and not designated to log in users). <strong>Copy and paste the command below.</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sinteractive
+</code></pre></div></div>
+
+<p>Press enter, you should see a couple of messages similar to the following:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>salloc: Pending job allocation 44889555
+salloc: job 44889555 queued and waiting for resources
+salloc: job 44889555 has been allocated resources
+salloc: Granted job allocation 44889555
+salloc: Nodes cn0011 are ready for job
+</code></pre></div></div>
+
+<p>In a few seconds you should get back the command prompt <code class="language-plaintext highlighter-rouge">$</code>. Now the string of characters before the command prompt will be different. They should say something like <code class="language-plaintext highlighter-rouge">[changes@cn0011:~]</code>. This is telling you that you are using one of the compute nodes/computer on the cluster now and it is specifying the name of that compute node (<code class="language-plaintext highlighter-rouge">cn</code> = compute node).</p>
+
+<p>Let’s consider the difference between the Login node and a compute node:</p>
+
+<p><strong>The login node</strong> The login node (biowulf.nih.gov) is used to submit jobs to the cluster, and is a single system shared by all users. No compute intensive, data transfer or large file manipulation processes should be run on the login node. <em>This system is for submitting jobs only</em>.</p>
+
+<p><strong>The Biowulf cluster (compute nodes)</strong> The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. <code class="language-plaintext highlighter-rouge">sinteractive</code> requests a node that we can interact with in real-time, as opposed to running those commands as a job.</p>
+
+<p><strong>Make sure that your command prompt now contains “cn” followed by some numbers. Once it does, we are ready to copy over some data to work with!</strong></p>
+<hr />
+
+<h2 id="working-with-directories-on-biwoulf"><strong>Working with Directories on Biwoulf</strong></h2>
+
+<p>Let’s see where we’ve “landed” on Biowulf - That is, figure out what directory we are in. This is important because Bash commands (and indeed, most programming) requires you to know where you are in relation to the files you want to manipulate (more on referring to files later!).</p>
+
+<p>To find out your current position in the Biowulf file system, we can use the <code class="language-plaintext highlighter-rouge">pwd</code> or <strong>Print Working Directory</strong> command. The term “working directory” is how we refer to the directory we are currently “inside”.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">pwd</span>
+</code></pre></div></div>
+
+<p>You should see that you are in <code class="language-plaintext highlighter-rouge">/home/$USER.</code> This is one of two dedicated spaces that you can access by default anywhere on the HPC system. The other is <code class="language-plaintext highlighter-rouge">/data/$USER</code>.</p>
+
+<p>These two directories have distinct limitations and uses. To quote the <a href="https://hpc.nih.gov/storage/">Biowulf storage page</a>:</p>
+
+<p><strong>/home</strong></p>
+
+<blockquote>
+  <p>Each user has a home directory called /home/username which is accessible from every HPC system. The /home area has a quota of 16 GB which cannot be increased. It is commonly used for config files (aka dotfiles), code, nodes, executables, state files, and caches.</p>
+</blockquote>
+
+<p><strong>/data</strong></p>
+
+<blockquote>
+  <p>This storage offers high performance access, and is exported to Biowulf over a dedicated high-speed network. /data is accessible from all computational nodes as well as Biowulf and Helix, and will be the storage of choice for most users to store their large datasets. Biowulf users are assigned an initial quota of 100 GB on /data.</p>
+</blockquote>
+
+<p><strong>Our course directory</strong>: You will be working in those directories extensively for your own research eventually, but for this course Biowulf staff have set up a shared directory, with a directory for each of you, that gives you access to necessary files and allows the instructor to look into your personal directories for troubleshooting purposes.</p>
+
+<p>For the rest of this lesson, <em>you will need to be in your personal class directory</em>: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code></p>
+
+<p>To move there, we are going to use the <code class="language-plaintext highlighter-rouge">cd</code> or <strong>Change Directories</strong> command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>
+</code></pre></div></div>
+
+<p>A few things about this command:</p>
+
+<ul>
+  <li>
+    <p>We are using the full path (i.e. the specific “GPS coordinates”) of the folder we are moving into</p>
+  </li>
+  <li>
+    <p>Directory names are case sensitive, so make sure “B” is capitalized</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">$USER</code> is a built-in variable in bash that will automatically be interpreted as the currently logged in user (i.e. your username)!</p>
+  </li>
+  <li>
+    <p>To check if you successfully moved into the intended directory, you should run <code class="language-plaintext highlighter-rouge">pwd</code> again.</p>
+  </li>
+</ul>
+
+<p><strong>It will be helpful to start thinking about directories in a hierarchical way</strong>, so here is a diagram of the directories we’ve mentioned so far:</p>
+
+<p><img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500" /></p>
+
+<p>Note the distinct $USER directories with the same name but different locations!</p>
+
+<hr />
+
+<h2 id="looking-into-and-moving-into-directories"><strong>Looking into and moving into directories</strong></h2>
+
+<p>The first thing to do is to check if there are any files in the data folder we are currently in.</p>
+
+<p>Let’s list the contents of our personal class directory using a command called <code class="language-plaintext highlighter-rouge">ls</code> (<strong>list</strong>), which lists the contents of a directory:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span>
+</code></pre></div></div>
+
+<p>It should show you that you have 0 files, or not show you anything at all because you don’t have any data there as of yet!</p>
+
+<p>Let’s bring in a data folder from a different location on the cluster to our designated area by using the <code class="language-plaintext highlighter-rouge">cp</code> (<strong>copy</strong>) command. <strong>Copy and paste the following command</strong> all the way from <code class="language-plaintext highlighter-rouge">cp</code> and including the period symbol at the end <code class="language-plaintext highlighter-rouge">.</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cp</span> <span class="nt">-r</span> /data/Bspc-training/shared/rnaseq_jan2025/unix_lesson <span class="nb">.</span>
+</code></pre></div></div>
+
+<p>To break down this command:</p>
+
+<ul>
+  <li>
+    <p>You had to specify the location of the item you want to copy</p>
+  </li>
+  <li>
+    <p>You specified the location of the destination - <code class="language-plaintext highlighter-rouge">.</code> is a shortcut for “here” or your current Working Directory</p>
+  </li>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">-r</code> is an option that modifies the <strong>cp</strong> command to recursively copy the directory <code class="language-plaintext highlighter-rouge">unix_lesson</code> AND everything inside of it</p>
+  </li>
+</ul>
+
+<p>Now let’s see if we can see this data folder we brought in and if it can be “listed”.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">ls</span>
+</code></pre></div></div>
+
+<p>You should see “unix_lesson” show up as the output of <code class="language-plaintext highlighter-rouge">ls</code>, which is a <em>copy</em> of the directory, in your own space, that you can modify without affecting the original version.</p>
+
+<h3 id="changing-directories">Changing Directories</h3>
+
+<p>Let’s look at what is inside the data folder and explore further. First, instead of clicking on the folder name to open it and look at its contents, we have to change the folder we are in. When working with any programming tools, <strong>folders are called directories</strong>. We will be using folder and directory interchangeably moving forward.</p>
+
+<p>Let’s use the <code class="language-plaintext highlighter-rouge">cd</code> command again to move into the <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>unix_lesson
+</code></pre></div></div>
+
+<p>Did you notice a change in your command prompt? On Biowulf, it by default lists the full path of your current directory, which should now end with <code class="language-plaintext highlighter-rouge">unix_lesson</code>. This means that our <code class="language-plaintext highlighter-rouge">cd</code> command ran successfully and we are now <em>in</em> the new directory. Let’s see what is in here by listing the contents:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span>
+</code></pre></div></div>
+
+<p>You should see:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>genomics_data  other  raw_fastq  README.txt  reference_data
+</code></pre></div></div>
+<hr />
+
+<h2 id="command-line-arguments"><strong>Command Line Arguments</strong></h2>
+
+<p>There are five items listed when you run <code class="language-plaintext highlighter-rouge">ls</code>, but what types of files are they, or are they directories or files?</p>
+
+<p>We can modify the default behavior of <code class="language-plaintext highlighter-rouge">ls</code> with one or more <strong>“arguments”</strong> to get more information.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-F</span>
+
+genomics_data/  other/  raw_fastq/  README.txt  reference_data/
+</code></pre></div></div>
+
+<p>Anything with a “/” after its name is a directory. Things with an asterisk “*” after them are programs. If there are no “decorations” after the name, it’s a normal text file.</p>
+
+<p>You can also use the argument <code class="language-plaintext highlighter-rouge">-l</code> to show the directory contents in a long-listing format that provides a lot more information:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>total 1
+drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 genomics_data
+drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 other
+drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 raw_fastq
+-rw-rw----+ 1 changes Bspc-training  377 Jan 13 15:50 README.txt
+drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 reference_data
+</code></pre></div></div>
+
+<p>Each line of output represents a file or a directory. The directory lines start with <code class="language-plaintext highlighter-rouge">d</code>. If you want to combine the 2 arguments <code class="language-plaintext highlighter-rouge">-l</code> and <code class="language-plaintext highlighter-rouge">-F</code>, you can do so by saying the following:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">ls</span> <span class="nt">-lF</span>
+</code></pre></div></div>
+
+<p>Do you see the modification in the output?</p>
+
+<details>
+
+<summary><i>Explanation</i></summary>
+
+<p>Notice that the listed directories now have / at the end of their names.</p>
+
+</details>
+
+<blockquote>
+  <p><strong>Tip</strong> - <strong>All commands are essentially programs</strong> that are able to perform specific, commonly-used tasks.</p>
+</blockquote>
+
+<p>Most commands will take additional arguments that control their behavior, some of them will take a file or directory name as input. How do we know what the available arguments that go with a particular command are? Most commonly used shell commands have a manual available in the shell. You can access the manual using the <code class="language-plaintext highlighter-rouge">man</code> command. Let’s try this command with <code class="language-plaintext highlighter-rouge">ls</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>man <span class="nb">ls</span>
+</code></pre></div></div>
+
+<p>This will open the manual page for <code class="language-plaintext highlighter-rouge">ls</code> and you will lose the command prompt. It will bring you to a so-called “buffer” page, a page you can navigate with your mouse or if you want to use your keyboard we have listed some basic key strokes:</p>
+
+<ul>
+  <li><em>spacebar</em> to go forward a page</li>
+  <li><em>b</em> to go backward a page</li>
+  <li>Up or down arrows to go forward or backward, respectively</li>
+  <li><em>q</em> to quit</li>
+</ul>
+
+<!-- * */* to get a prompt at the bottom to search. Type a search term, and hit *Enter* -->
+
+<!-- * *n* to go to the next search hit, or *N* for the previous hit -->
+
+<p><strong>To get out of the <code class="language-plaintext highlighter-rouge">man</code> “buffer” page and to be able to type commands again on the command prompt, press the <code class="language-plaintext highlighter-rouge">q</code> key!</strong></p>
+
+<hr />
+
+<p><strong>Exercise 1:</strong></p>
+
+<p>One useful command is <code class="language-plaintext highlighter-rouge">ls -lrt</code>. Looking at the <code class="language-plaintext highlighter-rouge">ls</code> <code class="language-plaintext highlighter-rouge">man</code> page, how does this modify the output of <code class="language-plaintext highlighter-rouge">ls</code>? Why might this version of the command be useful?</p>
+
+<details>
+
+<summary><i>Explanation</i></summary>
+
+<p>`-l`is the same long-format flag as before. `-r` sorts the contents in reverse order, specifically by time `-t`</p>
+
+</details>
+
+<p><strong>Exercise 2:</strong></p>
+
+<ul>
+  <li>Open up the manual page for the <code class="language-plaintext highlighter-rouge">find</code> command. Skim through some of the information.
+    <ul>
+      <li>Do you think you might be able to learn this much information about many commands by heart?</li>
+      <li>Do you think this format of information display is useful for you?</li>
+    </ul>
+  </li>
+  <li>Quit the <code class="language-plaintext highlighter-rouge">man</code> buffer and come back to your command prompt.</li>
+</ul>
+
+<blockquote>
+  <p><strong>Tip</strong> - Shell commands can get extremely complicated. No one can possibly learn all of these arguments, of course. So you will probably find yourself referring to the manual page frequently.</p>
+
+  <p><strong>Tip</strong> - If the manual page within the Terminal is hard to read and traverse, the manual exists online too. Use your web searching powers to get it! In addition to the arguments, you can also find good examples online; <strong><em>Google is your friend.</em></strong></p>
+</blockquote>
+
+<hr />
+
+<h2 id="unix-directory-file-structure"><strong>Unix directory file structure</strong></h2>
+
+<p>Let’s practice moving around a bit. Let’s go into the raw_fastq directory and see what is in there.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>raw_fastq/
+
+<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span>
+</code></pre></div></div>
+
+<p>Great, we have now traversed some sub-directories, but where are we in the context of our pre-designated “home” directory that contains the <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory?!</p>
+
+<h3 id="the-root-directory">The “root” directory</h3>
+
+<p>Like on any computer you have used before, the file structure within a Unix/Linux system is hierarchical, like an upside down tree with the “/” directory, called “root” as the starting point of this tree-like structure:</p>
+
+<p align="center">
+
+<img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500" />
+
+</p>
+
+<blockquote>
+  <p><strong>Tip</strong> - Yes, the root folder’s actual name is just <strong><code class="language-plaintext highlighter-rouge">/</code></strong> (a forward slash).</p>
+</blockquote>
+
+<p>That <code class="language-plaintext highlighter-rouge">/</code> or root is the ‘top’ level.</p>
+
+<p>When you log in to a remote computer you land on one of the branches of that tree, i.e. your pre-designated “home” directory that usually has your login name as its name (e.g. <code class="language-plaintext highlighter-rouge">/home/changes</code>).</p>
+
+<blockquote>
+  <p><strong>Tip</strong> - On mac OS, which is a UNIX-based OS, the root level is also “/”.</p>
+
+  <p><strong>Tip</strong> - On a windows OS, it is drive specific; “C:” is considered the default root, but it changes to “D:/”, if you are on that drive.</p>
+</blockquote>
+<hr />
+
+<h2 id="working-with-full-paths"><strong>Working with Full Paths</strong></h2>
+
+<p>Now let’s learn more about the “addresses” of directories, called <strong>“path”</strong> and move around the file system.</p>
+
+<p>Let’s check to see what directory we are in. The command prompt tells us which directory we are in, but it doesn’t give information about where the <code class="language-plaintext highlighter-rouge">raw_fastq</code> directory is with respect to our “home” directory or the <code class="language-plaintext highlighter-rouge">/</code> directory.</p>
+
+<p>The command to check our current location is <code class="language-plaintext highlighter-rouge">pwd</code>, this command does not take any arguments and it returns the path or address of your <strong>p</strong>resent <strong>w</strong>orking <strong>d</strong>irectory (the folder you are in currently).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">pwd</span>
+</code></pre></div></div>
+
+<p>In the output here, each folder is separated from its “parent” or “child” folder by a “/”, and the output starts with the root <code class="language-plaintext highlighter-rouge">/</code> directory. So, you are now able to determine the location of <code class="language-plaintext highlighter-rouge">raw_fastq</code> directory relative to the root directory!</p>
+
+<p>But which is your pre-designated home folder? No matter where you have navigated to in the file system, just typing in <code class="language-plaintext highlighter-rouge">cd</code> will bring you to your home directory.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span>
+</code></pre></div></div>
+
+<p>What is your present working directory now?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">pwd</span>
+</code></pre></div></div>
+
+<p>This should now display a shorter string of directories starting with root. This is the full address to your home directory, also referred to as “<strong>full path</strong>”. <strong>The “full” here refers to the fact that the path starts with the root, which means you know which branch of the tree you are on in reference to the root.</strong></p>
+
+<h3 id="a-note-about-your-home-directory">A note about your /home directory</h3>
+
+<p>Since we are NOT working from your /home directory, this is not relevant at the moment, but still very useful to know. Take a look at your command prompt now, does it show you the name of this directory (your username?)?</p>
+
+<p><em>No, it doesn’t. Instead of the directory name it shows you a <code class="language-plaintext highlighter-rouge">~</code>.</em></p>
+
+<p>Why is this so?</p>
+
+<p><em>This is because <code class="language-plaintext highlighter-rouge">~</code> = full path to home directory for the user.</em></p>
+
+<p>Can we just type <code class="language-plaintext highlighter-rouge">~</code> instead of <code class="language-plaintext highlighter-rouge">/home/username</code>?</p>
+
+<p><em>Yes, we can!</em></p>
+
+<h3 id="using-full-paths-with-commands">Using full paths with commands</h3>
+
+<p>You can do a lot more with the idea of stringing together <em>parent/child</em> directories. Let’s say we want to look at the contents of the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder, but do it from our main course directory (<code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code> ). We can use the list command and follow it up with the path to the folder we want to list!</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>
+
+<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span> /data/Bspc-training/<span class="nv">$USER</span>/unix_lesson/raw_fastq
+</code></pre></div></div>
+
+<p>Now, what if we wanted to change directories to <code class="language-plaintext highlighter-rouge">raw_fastq</code> in a single step?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/unix_lesson/raw_fastq
+</code></pre></div></div>
+
+<p>Voila! You have moved 2 levels of directories in one command.</p>
+
+<p>What if we want to move back up and out of the <code class="language-plaintext highlighter-rouge">raw_fastq</code> directory? Can we just type <code class="language-plaintext highlighter-rouge">cd unix_lesson</code>? Try it and see what happens.</p>
+
+<p><em>Unfortunately, that won’t work because when you say <code class="language-plaintext highlighter-rouge">cd unix_lesson</code>, shell is looking for a folder called <code class="language-plaintext highlighter-rouge">unix_lesson</code> within your current directory, i.e. <code class="language-plaintext highlighter-rouge">raw_fastq</code>.</em></p>
+
+<p>Can you think of an alternative?</p>
+
+<p><em>You can use the full path to unix_lesson!</em></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/unix_lesson/
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Tip</strong> What if we want to navigate to the previous folder but can’t quite remember the full or relative path, or want to get there quickly without typing a lot? In this case, we can use <code class="language-plaintext highlighter-rouge">cd -</code>. When <code class="language-plaintext highlighter-rouge">-</code> is used in this context it is referring to a special variable called <code class="language-plaintext highlighter-rouge">$OLDPWD</code> that is stored without our having to assign it anything. We’ll learn more about variables in a future lesson, but for now you can see how this command works. Try typing:</p>
+
+  <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> -
+</code></pre></div>  </div>
+
+  <p>This command will move you to the last folder you were in before your current location, then display where you now are! If you followed the steps up until this point it will have moved you back to the <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory.</p>
+</blockquote>
+
+<hr />
+
+<p><strong>Exercises</strong></p>
+
+<ol>
+  <li>From your main course directory, list the contents of the <code class="language-plaintext highlighter-rouge">reference_data</code> directory that is within the <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory. What command did you use?</li>
+</ol>
+
+<hr />
+
+<h2 id="tab-completion-and-up-arrow"><strong>Tab completion and Up-Arrow</strong></h2>
+
+<p>Typing out full directory names can be time-consuming and error-prone. One way to avoid that is to use <strong>tab completion</strong>. The <code class="language-plaintext highlighter-rouge">tab</code> key is located on the left side of your keyboard, right above the <code class="language-plaintext highlighter-rouge">caps lock</code> key. When you start typing out the first few characters of a directory name, then hit the <code class="language-plaintext highlighter-rouge">tab</code> key, bash will try to fill in the rest of the directory name.</p>
+
+<p>For example, change directories to get back to your home directly, then type <code class="language-plaintext highlighter-rouge">cd uni</code>, followed by pressing the <code class="language-plaintext highlighter-rouge">tab</code> key:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/
+<span class="nv">$ </span><span class="nb">cd </span>uni&lt;tab&gt;
+</code></pre></div></div>
+
+<p>The shell will fill in the rest of the directory name for <code class="language-plaintext highlighter-rouge">unix_lesson</code>.</p>
+
+<p>Now, let’s go into <code class="language-plaintext highlighter-rouge">raw_fastq</code>, then type <code class="language-plaintext highlighter-rouge">ls Mov10_oe_</code>, followed by pressing the <code class="language-plaintext highlighter-rouge">tab</code> key once:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>raw_fastq/
+<span class="nv">$ </span><span class="nb">ls </span>Mov10_oe_&lt;tab&gt;
+</code></pre></div></div>
+
+<p><strong>Nothing happens!!</strong></p>
+
+<p>The reason is that there are multiple files in the <code class="language-plaintext highlighter-rouge">raw_fastq</code> directory that start with <code class="language-plaintext highlighter-rouge">Mov10_oe_</code>. As a result, shell does not know which one to fill in. When you hit <code class="language-plaintext highlighter-rouge">tab</code> a second time again, the shell will then list all the possible choices.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls </span>Mov10_oe_&lt;tab&gt;&lt;tab&gt;
+</code></pre></div></div>
+
+<p>Now you can select the one you are interested in listed, and enter additional characters to give it a hint (here, a number) and hit tab again to fill in the complete name of the file.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls </span>Mov10_oe_1&lt;tab&gt;
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>NOTE:</strong> Tab completion can also fill in the names of commands. For example, enter <code class="language-plaintext highlighter-rouge">e&lt;tab&gt;&lt;tab&gt;</code>. You will see the name of every command that starts with an <code class="language-plaintext highlighter-rouge">e</code>. One of those is <code class="language-plaintext highlighter-rouge">echo</code>. If you enter <code class="language-plaintext highlighter-rouge">ech&lt;tab&gt;</code>, you will see that tab completion works.</p>
+</blockquote>
+
+<p><strong>Tab completion is your friend!</strong> It helps prevent spelling mistakes, and speeds up the process of typing in the full command. We encourage you to use this when working on the command line.</p>
+<hr />
+
+<h3 id="using-the-up-arrow-button">Using the up-arrow button</h3>
+<p>One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands.</p>
+
+<h2 id="relative-paths"><strong>Relative paths</strong></h2>
+
+<p>We have talked about <strong>full</strong> paths so far, but there is a way to specify paths to folders and files without having to worry about the root directory. And you have used this before when we were learning about the <code class="language-plaintext highlighter-rouge">cd</code> command.</p>
+
+<p>Let’s change directories back to your course directory, and once more change directories to <code class="language-plaintext highlighter-rouge">raw_fastq</code> in a single step. (<em>Feel free to use your tab-completion to complete your path!</em>)</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>unix_lesson/raw_fastq
+</code></pre></div></div>
+
+<p>This time we are not using the <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code> before <code class="language-plaintext highlighter-rouge">unix_lesson</code>. In this case we are using a relative path, relative to our current location - wherein we know that <code class="language-plaintext highlighter-rouge">unix_lesson</code> is a child folder in our home folder, and the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder is within <code class="language-plaintext highlighter-rouge">unix_lesson</code>.</p>
+
+<p>There is also a handy shortcut for the relative path to a parent directory, 2 periods <code class="language-plaintext highlighter-rouge">..</code>. Let’s say we wanted to move from the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder to its parent folder.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> ..
+</code></pre></div></div>
+
+<p>You should now be in the <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory (check command prompt or run <code class="language-plaintext highlighter-rouge">pwd</code>).</p>
+
+<blockquote>
+  <p>Can you think of an example when this shortcut to the parent directory won’t work?</p>
+
+  <details>
+
+<summary>Answer</summary>
+
+<p>When you are at the root directory, since there is no parent to the root directory!</p>
+
+</details>
+</blockquote>
+
+<p>When using relative paths, you might need to check what the branches are downstream of the folder you are in. There is a really handy command (<code class="language-plaintext highlighter-rouge">tree</code>) that can help you see the structure of any directory.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>tree
+</code></pre></div></div>
+
+<p>For example, the output of <code class="language-plaintext highlighter-rouge">tree</code> from within <code class="language-plaintext highlighter-rouge">unix data</code> looks like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── genomics_data
+│   ├── Encode-hesc-Nanog.bed
+│   └── na12878_q20_annot.vcf
+├── other
+│   ├── Mov10_rnaseq_metadata.txt
+│   └── sequences.fa
+├── raw_fastq
+│   ├── Irrel_kd_1.subset.fq
+│   ├── Irrel_kd_2.subset.fq
+│   ├── Irrel_kd_3.subset.fq
+│   ├── Mov10_oe_1.subset.fq
+│   ├── Mov10_oe_2.subset.fq
+│   └── Mov10_oe_3.subset.fq
+├── README.txt
+└── reference_data
+    ├── chr1.fa
+    └── chr1-hg19_genes.gtf
+
+4 directories, 13 files
+</code></pre></div></div>
+
+<p>If you are aware of the directory structure, you can string together as long a list of directories as you like using either <strong>relative</strong> or <strong>full</strong> paths.</p>
+
+<h3 id="synopsis-of-full-versus-relative-paths">Synopsis of Full versus Relative paths</h3>
+
+<p><strong>A full path always starts with a <code class="language-plaintext highlighter-rouge">/</code>, a relative path does not.</strong></p>
+
+<p>A relative path is like getting directions from someone on the street. They tell you to “go right at the Stop sign, and then turn left on Main Street”. That works great if you’re standing there together, but not so well if you’re trying to tell someone how to get there from another country. A full path is like GPS coordinates. It tells you exactly where something is no matter where you are right now.</p>
+
+<p>You can usually use either a full path or a relative path depending on what is most convenient. If we are in the home directory, it is more convenient to just enter the relative path since it involves less typing.</p>
+
+<p>Over time, it will become easier for you to keep a mental note of the structure of the directories that you are using and how to quickly navigate among them.</p>
+<hr />
+
+<h2 id="copying-creating-moving-and-removing-data"><strong>Copying, creating, moving and removing data</strong></h2>
+
+<p>Now we can move around within the directory structure using the command line. But what if we want to do things like copy files or move them from one directory to another, rename them?</p>
+
+<p>Let’s move into the <code class="language-plaintext highlighter-rouge">raw_fastq</code> directory, this contains some fastq files which are the output of sequencing.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>unix_lesson/raw_fastq
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Tip</strong> - These files are referred to as “raw” data since it has not been changed or analyzed after being generated.</p>
+</blockquote>
+
+<h3 id="copying">Copying</h3>
+
+<p>Let’s use the copy (<code class="language-plaintext highlighter-rouge">cp</code>) command to make a copy of one of the files in this folder, <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code>, and call the copied file <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset-copy.fq</code>. The copy command has the following syntax:</p>
+
+<p><code class="language-plaintext highlighter-rouge">cp  path/to/item-being-copied  path/to/new-copied-item</code></p>
+
+<p>In this case the files are in our current directory, so we just have to specify the name of the file being copied, followed by whatever we want to call the newly copied file.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cp </span>Mov10_oe_1.subset.fq Mov10_oe_1.subset-copy.fq
+
+<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span>
+</code></pre></div></div>
+
+<p>The copy command can also be used for copying over whole directories, but the <code class="language-plaintext highlighter-rouge">-r</code> argument has to be added after the <code class="language-plaintext highlighter-rouge">cp</code> command. The <code class="language-plaintext highlighter-rouge">-r</code> stands for “recursively copy everything from the directory and its sub-directories”. <a href="#copying-example-data-folder">We used it earlier when we copied over the <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory to our home directories</a>.</p>
+
+<h3 id="creating">Creating</h3>
+
+<p>Next, let’s create a directory called <code class="language-plaintext highlighter-rouge">fastq_backup</code> and we can move the copy of the fastq file into that directory.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">mkdir</code> command is used to make a directory, syntax: <code class="language-plaintext highlighter-rouge">mkdir  name-of-folder-to-be-created</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mkdir </span>fastq_backup
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Tip</strong> - File/directory/program names with spaces in them do not work well in Unix, use characters like hyphens or underscores instead. Using underscores instead of spaces is called “snake_case”. Alternatively, some people choose to skip spaces and rather just capitalize the first letter of each new word (i.e. MyNewFile). This alternative technique is called “CamelCase”.</p>
+</blockquote>
+
+<h3 id="moving">Moving</h3>
+
+<p>We can now move our copied fastq file in to the new directory. We can move files around using the move command, <code class="language-plaintext highlighter-rouge">mv</code>, syntax:</p>
+
+<p><code class="language-plaintext highlighter-rouge">mv  path/to/item-being-moved  path/to/destination</code></p>
+
+<p>In this case we can use relative paths and just type the name of the file and folder.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mv  </span>Mov10_oe_1.subset-copy.fq  fastq_backup
+</code></pre></div></div>
+
+<p>Let’s check if the move command worked like we wanted:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span> fastq_backup
+</code></pre></div></div>
+
+<h3 id="renaming">Renaming</h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">mv</code> command has a second functionality, it is what you would use to rename files too. The syntax is identical to when we used <code class="language-plaintext highlighter-rouge">mv</code> for moving, but this time instead of giving a directory as its destination, we just give a new name as its destination.</p>
+
+<p>Let’s try out this functionality!</p>
+
+<p>The name Mov10_oe_1.subset-copy.fq is not very informative, we want to make sure that we have the word “backup” in it so we don’t accidentally delete it.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>fastq_backup
+
+<span class="nv">$ </span><span class="nb">mv  </span>Mov10_oe_1.subset-copy.fq   Mov10_oe_1.subset-backup.fq
+
+<span class="nv">$ </span><span class="nb">ls</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Tip</strong> - You can use move to move a file and rename it at the same time!</p>
+</blockquote>
+
+<p><strong>Important notes about <code class="language-plaintext highlighter-rouge">mv</code></strong>:</p>
+
+<ul>
+  <li>When using <code class="language-plaintext highlighter-rouge">mv</code>, shell will <strong>not</strong> ask if you are sure that you want to “replace existing file” or similar unless you use the -i option.</li>
+  <li>Once replaced, it is not possible to get the replaced file back!</li>
+</ul>
+
+<h3 id="removing">Removing</h3>
+
+<p>We find out that we did not need to create backups of our fastq files manually as backups were generated by our collaborator; in the interest of saving space on the cluster, we want to delete the contents of the <code class="language-plaintext highlighter-rouge">fastq-backup</code> folder and the folder itself.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">rm  </span>Mov10_oe_1.subset-backup.fq
+</code></pre></div></div>
+
+<p>Important notes about <code class="language-plaintext highlighter-rouge">rm</code>:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">rm</code> permanently removes/deletes the file/folder.</li>
+  <li>There is no concept of “Trash” or “Recycle Bin” on the command-line. When you use <code class="language-plaintext highlighter-rouge">rm</code> to remove/delete they’re really gone.</li>
+  <li><strong>Be careful with this command!</strong></li>
+  <li>You can use the <code class="language-plaintext highlighter-rouge">-i</code> argument if you want it to ask before removing, <code class="language-plaintext highlighter-rouge">rm -i file-name</code>.</li>
+</ul>
+
+<p>Let’s delete the fastq_backup folder too. First, we’ll have to navigate our way to the parent directory (we can’t delete the folder we are currently in/using).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> ..
+
+<span class="nv">$ </span><span class="nb">rm  </span>fastq_backup 
+</code></pre></div></div>
+
+<p>Did that work? Did you get an error?</p>
+
+<details>
+
+<summary><i>Explanation</i></summary>
+
+<p>By default, <code>rm</code>, will NOT delete directories, but you use the <code>-r</code> flag if you are sure that you want to delete the directories and everything within them. To be safe, let's use it with the <code>-i</code> flag.</p>
+
+</details>
+
+<p><br /></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">rm</span> <span class="nt">-ri</span> fastq_backup
+</code></pre></div></div>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">-r</code>: recursive, commonly used as an option when working with directories, e.g. with <code class="language-plaintext highlighter-rouge">cp</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">-i</code>: prompt before every removal.</li>
+</ul>
+
+<hr />
+
+<p><strong>Exercise</strong></p>
+
+<ol>
+  <li>Create a new folder in <code class="language-plaintext highlighter-rouge">unix_lesson</code> called <code class="language-plaintext highlighter-rouge">selected_fastq</code></li>
+  <li>Copy over the Irrel_kd_2.subset.fq and Mov10_oe_2.subset.fq from <code class="language-plaintext highlighter-rouge">raw_fastq</code> to the <code class="language-plaintext highlighter-rouge">/unix_lesson/selected_fastq</code> folder</li>
+  <li>Rename the <code class="language-plaintext highlighter-rouge">selected_fastq</code> folder and call it <code class="language-plaintext highlighter-rouge">exercise1</code></li>
+</ol>
+
+<hr />
+
+<h2 id="exiting-from-the-cluster"><strong>Exiting from the cluster</strong></h2>
+
+<p>To close the interactive session on the cluser as well as to disconnect from the cluster, the command is <code class="language-plaintext highlighter-rouge">exit</code>. So, you are going to have to run the exit command twice.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>changes@cn4289:/data/Bspc-training/changes/unix_lesson/raw_fastq/fastq_backup$ exit
+salloc: Relinquishing job allocation 45051688
+
+changes@biowulf:$ exit
+logout
+Connection to biowulf.nih.gov closed.
+changes@nichdm02272470:~$
+</code></pre></div></div>
+
+<h2 id="command-list">Command List</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd          # change directory
+ls          # list contents
+man         # manual for a command
+pwd         # check present working directory
+tree        # prints a tree of the file structure
+cp          # copy
+mkdir       # make new directory
+mv          # move or rename 
+rm          # remove/delete
+</code></pre></div></div>
+
+<h2 id="shortcut-list">Shortcut List</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~           # home directory
+/           # root directory
+.           # current directory
+..          # parent directory
+</code></pre></div></div>
+
+<hr />
+
+<p><em>This lesson was based on materials from the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+<ul>
+  <li><em>The materials used in this lesson were derived from work that is Copyright © Data Carpentry (<a href="http://datacarpentry.org/">http://datacarpentry.org/</a>). All Data Carpentry instructional material is made available under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0).</em></li>
+  <li><em>Adapted from the lesson by Tracy Teal. Original contributors: Paul Wilson, Milad Fatenejad, Sasha Wood and Radhika Khetani for Software Carpentry (<a href="http://software-carpentry.org/">http://software-carpentry.org/</a>)</em></li>
+</ul>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>

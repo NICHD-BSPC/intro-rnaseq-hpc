@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>QC methods for DE analysis using DESeq2 | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="QC methods for DE analysis using DESeq2" />
+<meta name="author" content="Harvard HPC Staff, adapted by Sally Chang at NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk6_lesson03_dge_qc_analysis.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk6_lesson03_dge_qc_analysis.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-03-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="QC methods for DE analysis using DESeq2" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, adapted by Sally Chang at NICHD"},"dateModified":"2025-03-01T00:00:00+00:00","datePublished":"2025-03-01T00:00:00+00:00","headline":"QC methods for DE analysis using DESeq2","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk6_lesson03_dge_qc_analysis.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk6_lesson03_dge_qc_analysis.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=fa747d00dce79e2e8e5212f7b356ef1077a3b116">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">QC methods for DE analysis using DESeq2</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <p>Approximate time: 80 minutes</p>
+
+<h2 id="learning-objectives">Learning Objectives</h2>
+
+<ul>
+  <li>Recognize the importance of methods for count data transformation</li>
+  <li>Describe the PCA (principal component analysis) technique</li>
+  <li>Interpret different examples of PCA plots</li>
+  <li>Evaluate sample quality using PCA and hierachical clustering</li>
+</ul>
+
+<h1 id="quality-control">Quality Control</h1>
+
+<p>The next step in the DESeq2 workflow is QC, which includes sample-level and gene-level steps to perform QC checks on the count data to help us ensure that the samples/replicates look good.</p>
+
+<p align="center">
+
+![](/intro-rnaseq-hpc/cohort-may2025/lessons/images/deseq_workflow_normalization_2018.png){width="398"}
+
+</p>
+
+<h2 id="sample-level-qc">Sample-level QC</h2>
+
+<p>A useful initial step in an RNA-seq analysis is often to assess overall similarity between samples:</p>
+
+<ul>
+  <li>Which samples are similar to each other, which are different?</li>
+  <li>Does this fit to the expectation from the experiment’s design?</li>
+  <li>What are the major sources of variation in the dataset?</li>
+</ul>
+
+<p>To explore the similarity of our samples, we will be performing sample-level QC using Principal Component Analysis (PCA) and hierarchical clustering methods. These methods/tools allow us to check <strong>how well similar the replicates are to each other</strong> (clustering) and <strong>to make sure that the experimental condition is the major source of variation</strong> in the data. Sample-level QC can also help identify any samples behaving like outliers; we can further explore any potential outliers to determine whether they need to be removed prior to DE analysis.</p>
+
+<p align="center">
+
+<img src="../img/sample_qc.png" width="700" />
+
+</p>
+
+<p>These unsupervised clustering methods are run using <strong>log2 transformed normalized counts</strong>. The log2 transformation <strong>improves the distances/clustering for visualization</strong>. Instead of using an ordinary log2 transform, we will be using <strong>regularized log transform</strong> (rlog), to avoid any bias from the abundance of low-count genes; Note1 below explains this in more detail.</p>
+
+<p align="center">
+
+<img src="../img/rlog_transformation_new.png" width="650" />
+
+</p>
+
+<p><em>Image adapted from “<a href="https://bioc.ism.ac.jp/packages/2.14/bioc/vignettes/DESeq2/inst/doc/beginner.pdf">Beginner’s guide to using the DESeq2 package</a>” by Love, Anders and Huber, 2014</em></p>
+
+<blockquote>
+  <p><strong>NOTE1:</strong> <em>“Many common statistical methods for exploratory analysis of multidimensional data, especially methods for clustering and ordination (e. g., principal-component analysis and the like), work best for (at least approximately) homoskedastic data; this means that the variance of an observable quantity (i.e., here, the expression strength of a gene) does not depend on the mean. In RNA-Seq data, however, variance grows with the mean. For example, if one performs PCA directly on a matrix of normalized read counts, the result typically depends only on the few most strongly expressed genes because they show the largest absolute differences between samples. A simple and often used strategy to avoid this is to take the logarithm of the normalized count values plus a small pseudocount; however, now the genes with low counts tend to dominate the results because, due to the strong Poisson noise inherent to small count values, they show the strongest relative differences between samples.</em></p>
+
+  <p><em>As a solution, DESeq2 offers the regularized-logarithm transformation, or rlog for short. For genes with high counts, the rlog transformation differs not much from an ordinary log2 transformation. For genes with lower counts, however, the values are shrunken towards the genes’ averages across all samples. Using an empirical Bayesian prior in the form of a ridge penality, this is done such that the rlog-transformed data are approximately homoskedastic.”</em> - From the “Beginner’s guide to using the DESeq2 package” by Love, Anders and Huber, 2014 (the <a href="http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html">DESeq2 vignette</a> is the updated version of this doc).</p>
+</blockquote>
+
+<blockquote>
+  <p><strong>NOTE2:</strong> The <a href="http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html">DESeq2 vignette</a> suggests large datasets (100s of samples) to use the variance-stabilizing transformation (vst) instead of rlog for transformation of the counts, since the rlog function might take too long to run and the <code class="language-plaintext highlighter-rouge">vst()</code> function is faster with similar properties to rlog.</p>
+</blockquote>
+
+<p>In other words, if you use regular log transformation on typical RNA-seq data, you get lots of variation on the low end. Since PCA (for example) looks at variation, it will pay more attention to low-count genes – which is usually not what we want. Regularlized log takes care of this, making variance more equal across the dynamic range (i.e., it’s a “variance-stabilizing transform”).</p>
+
+<h3 id="principal-component-analysis-pca">Principal Component Analysis (PCA)</h3>
+
+<p>Principal Component Analysis (PCA) is a technique used to emphasize variation and bring out strong patterns in a dataset (dimensionality reduction). This is a very important technique used in the QC and analysis of both bulk and single-cell RNAseq data.</p>
+
+<p>To better understand how it works you can go through <a href="https://www.youtube.com/watch?v=_UVHneBUBW0"><strong>this YouTube video from StatQuest</strong></a> <strong>that explains PCA, or a Harvard HPC lesson on <a href="https://github.com/hbctraining/Intro-to-DGE/blob/master/lessons/principal_component_analysis.md">PCA.</a></strong></p>
+
+<p>To quote from the <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Wikipedia entry on PCA</a>:</p>
+
+<blockquote>
+  <p>The data is <a href="https://en.wikipedia.org/wiki/Linear_map" title="Linear map">linearly transformed</a> onto a new <a href="https://en.wikipedia.org/wiki/Coordinate_system" title="Coordinate system">coordinate system</a> such that the directions (principal components) capturing the largest variation in the data (in our case, gene expression values) can be easily identified.</p>
+</blockquote>
+
+<hr />
+
+<h4 id="interpreting-pca-plots">Interpreting PCA plots</h4>
+
+<p><strong>Essentially, if two samples have similar levels of expression for the genes that contribute significantly to the variation represented by a given PC (Principal Component), they will be plotted close together on the axis that represents that PC.</strong> Therefore, we would expect that biological replicates to have similar scores (because our expectation is that the same genes are changing) and cluster together. This is easiest to understand by visualizing some example PCA plots.</p>
+
+<p>We have an example dataset and a few associated PCA plots below to get a feel for how to interpret them. The metadata for the experiment is displayed below. The main condition of interest is <code class="language-plaintext highlighter-rouge">treatment</code>.</p>
+
+<p align="center">
+
+<img src="../img/example_metadata.png" width="600" />
+
+</p>
+
+<p>When visualizing on PC1 and PC2, we don’t see the samples separate by <code class="language-plaintext highlighter-rouge">treatment</code>, so we decide to explore other sources of variation present in the data. We hope that we have included all possible known sources of variation in our metadata table, and we can use these factors to color the PCA plot.</p>
+
+<p align="center">
+
+<img src="../img/example_PCA_treatmentPC1.png" width="600" />
+
+</p>
+
+<p>We start with the factor <code class="language-plaintext highlighter-rouge">cage</code>, but the <code class="language-plaintext highlighter-rouge">cage</code> factor does not seem to explain the variation on PC1 or PC2.</p>
+
+<p align="center">
+
+<img src="../img/example_PCA_cage.png" width="600" />
+
+</p>
+
+<p>Then, we color by the <code class="language-plaintext highlighter-rouge">sex</code> factor, which appears to separate samples on PC2. This is good information to take note of, as we can use it downstream to account for the variation due to sex in the model and regress it out.</p>
+
+<p align="center">
+
+<img src="../img/example_PCA_sex.png" width="600" />
+
+</p>
+
+<p>Next we explore the <code class="language-plaintext highlighter-rouge">strain</code> factor and find that it explains the variation on PC1.</p>
+
+<p align="center">
+
+<img src="../img/example_PCA_strain.png" width="600" />
+
+</p>
+
+<p>It’s great that we have been able to identify the sources of variation for both PC1 and PC2. By accounting for it in our model, we should be able to detect more genes differentially expressed due to <code class="language-plaintext highlighter-rouge">treatment</code>.</p>
+
+<p>Worrisome about this plot is that we see two samples that do not cluster with the correct strain. This would indicate a likely <strong>sample swap</strong> and should be investigated to determine whether these samples are indeed the labeled strains. If we found there was a switch (say, by cross-referencing a lab notebook, or verifying some other way), we could swap the samples in the metadata.</p>
+
+<p>While it is straightforward to exclude samples (e.g., ignore these two samples), we need to be very careful about removing samples just because we don’t like how they look in the PCA plot (i.e., cherry-picking). What we see here might be true biological variability, and we would want to make sure our results are reproducible by others repeating the same experiment. Removing possible outliers is a judgement call; any removals you make you would want to be able to justify in the methods section.</p>
+
+<p>Still we haven’t found if <code class="language-plaintext highlighter-rouge">treatment</code> is a major source of variation after <code class="language-plaintext highlighter-rouge">strain</code> and <code class="language-plaintext highlighter-rouge">sex</code>. Recall that PCs are ordered by most variance explained in the dataset. PC1 explains the most, and that seems to be explained by <code class="language-plaintext highlighter-rouge">sex</code>. PC2 explains the second most variation, and that seems to be <code class="language-plaintext highlighter-rouge">strain</code>. Let’s explore PC3 and PC4 to see if <code class="language-plaintext highlighter-rouge">treatment</code> is driving the variation represented by either of these PCs.</p>
+
+<p align="center">
+
+<img src="../img/example_PCA_treatmentPC3.png" width="600" />
+
+</p>
+
+<p>We find that the samples separate by <code class="language-plaintext highlighter-rouge">treatment</code> on PC3, and are optimistic about our DE analysis since our condition of interest, <code class="language-plaintext highlighter-rouge">treatment</code>, is separating on PC3 and we can regress out the variation driving PC1 and PC2.</p>
+
+<p>Depending on how much variation is explained by the first few principal components, you <strong>may want to explore more (i.e consider more components and plot pairwise combinations)</strong>. Even if your samples do not separate clearly by the experimental variable, you may still get biologically relevant results from the DE analysis. If you are expecting very small effect sizes, then it’s possible the signal is drowned out by extraneous sources of variation. In situations <strong>where you can identify those sources, it is important to account for these in your model</strong>, as it provides more power to the tool for detecting DE genes.</p>
+
+<p>In this example, strain and sex are clearly introducing variation – in fact, more variation than the treatment. If we don’t control for those differences, we will have low power to detect significantly changing genes due to treatment.</p>
+
+<h3 id="hierarchical-clustering-heatmap">Hierarchical Clustering Heatmap</h3>
+
+<p>Similar to PCA, hierarchical clustering is another, complementary, method for identifying strong patterns in a dataset and potential outliers. The heatmap displays <strong>the correlation of gene expression for all pairwise combinations of samples</strong> in the dataset. Since the majority of genes are not differentially expressed, samples generally have high correlations with each other (values higher than 0.80). Samples below 0.80 may indicate an outlier in your data and/or sample contamination.</p>
+
+<p>The hierarchical tree along the axes indicates which samples are more similar to each other, i.e. cluster together. The color blocks at the top indicate substructure in the data, and you would expect to see your replicates cluster together as a block for each sample group. Our expectation would be that the samples cluster together similar to the groupings we’ve observed in the PCA plot.</p>
+
+<p><strong>In the plot below, we would be quite concerned about ‘Wt_3’ and ‘KD_3’ samples not clustering with the other replicates. We would want to explore the PCA to see if we see the same clustering of samples.</strong></p>
+
+<p align="center">
+
+<img src="../img/heatmap_example.png" width="500" />
+
+</p>
+
+<hr />
+
+<h2 id="mov10-quality-assessment-and-exploratory-analysis-using-deseq2">Mov10 quality assessment and exploratory analysis using DESeq2</h2>
+
+<p>Now that we have a good understanding of the QC steps normally employed for RNA-seq, let’s implement them for the Mov10 dataset we are going to be working with.</p>
+
+<h3 id="setting-up-for-our-analysis">Setting up for our analysis</h3>
+
+<p>1.Get your HPC On Demand session going:</p>
+
+<ul>
+  <li>
+    <p>Opening up RStudio using <a href="https://hpcondemand.nih.gov/pun/sys/dashboard/">HPC on Demand</a>, using default values except for Starting Directory: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/YOUR_USERNAME/rnaseq</code></p>
+  </li>
+  <li>
+    <p>To check whether or not you are in the correct working directory, use <code class="language-plaintext highlighter-rouge">getwd()</code>. Something like <code class="language-plaintext highlighter-rouge">/vf/users/Bspc-training/changes/rnaseq</code> should come up.</p>
+  </li>
+  <li>
+    <p>Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -&gt; DEanalysis), to navigate to and open <code class="language-plaintext highlighter-rouge">DEanalysis.Rproj</code></p>
+  </li>
+</ul>
+
+<ol>
+  <li>
+    <p>We are assuming that you have the <code class="language-plaintext highlighter-rouge">dds</code> object in your environment and your packages are loaded, so you can save the following as <code class="language-plaintext highlighter-rouge">de_setup.R</code> and run it all:</p>
+
+    <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Gene-level differential expression analysis using DESeq2</span><span class="w">
+
+</span><span class="c1"># Setup</span><span class="w">
+</span><span class="c1"># Bioconductor and CRAN libraries used - already installed on Biowulf</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">RColorBrewer</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DESeq2</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pheatmap</span><span class="p">)</span><span class="w">
+
+
+</span><span class="c1"># installing DEGreport</span><span class="w">
+</span><span class="c1"># library(BiocManager)</span><span class="w">
+</span><span class="c1"># install("DEGreport")</span><span class="w">
+
+</span><span class="c1"># load DEGreport into environment</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DEGreport</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Load in data</span><span class="w">
+</span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_featurecounts.Rmatrix.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="n">meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_metadata.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Create DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeqDataSetFromMatrix</span><span class="p">(</span><span class="n">countData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">colData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">sampletype</span><span class="p">)</span><span class="w"> 
+</span></code></pre></div>    </div>
+  </li>
+</ol>
+
+<h2 id="transform-normalized-counts-for-the-mov10-dataset">Transform normalized counts for the MOV10 dataset</h2>
+
+<p><strong>To improve the distances/clustering for the PCA and heirarchical clustering visualization methods</strong>, we need to moderate the variance across the mean by applying the rlog transformation to the normalized counts.</p>
+
+<blockquote>
+  <p>The rlog transformation of the normalized counts is only necessary for these visualization methods during this quality assessment. We will not be using these tranformed counts for determining differential expression.</p>
+</blockquote>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Transform counts for data visualization</span><span class="w">
+</span><span class="n">rld</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rlog</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">blind</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">blind=TRUE</code> argument is to make sure that the <code class="language-plaintext highlighter-rouge">rlog()</code> function does not take our sample groups into account - i.e. does the transformation in an unbiased manner. When performing quality assessment, it is important to include this option. The <a href="http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#blind-dispersion-estimation">DESeq2 vignette</a> has more details about this.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">rlog()</code> function returns a <code class="language-plaintext highlighter-rouge">DESeqTransform</code> object, another type of DESeq-specific object. The reason you don’t just get a matrix of transformed values is because all of the parameters (i.e. size factors) that went into computing the rlog transform are stored in that object. We use this object to plot the PCA and heirarchical clustering figures for quality assessment.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> The <code class="language-plaintext highlighter-rouge">rlog()</code> funtion can be a bit slow when you have e.g. &gt; 20 samples. In these situations the <code class="language-plaintext highlighter-rouge">vst()</code> function is much faster and performs a similar transformation appropriate for use with <code class="language-plaintext highlighter-rouge">plotPCA()</code>. It’s typically just a few seconds with <code class="language-plaintext highlighter-rouge">vst()</code> due to optimizations and the nature of the transformation.</p>
+</blockquote>
+
+<h3 id="principal-component-analysis-pca-for-the-mov10-dataset">Principal component analysis (PCA) for the MOV10 dataset</h3>
+
+<p>We are now ready for the QC steps, let’s start with PCA!</p>
+
+<p>DESeq2 has a built-in function for generating PCA plots using <code class="language-plaintext highlighter-rouge">ggplot2</code> under the hood. This is great because it saves us having to type out lines of code and having to fiddle with the different ggplot2 layers. In addition, it takes the <code class="language-plaintext highlighter-rouge">rlog</code> object as an input directly, hence saving us the trouble of extracting the relevant information from it.</p>
+
+<p>The function <code class="language-plaintext highlighter-rouge">plotPCA()</code> requires two arguments as input: a <code class="language-plaintext highlighter-rouge">DESeqTransform</code> object and the “intgroup” (interesting group), i.e. the name of the column in our metadata that has information about the experimental sample groups.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Plot PCA </span><span class="w">
+</span><span class="n">plotPCA</span><span class="p">(</span><span class="n">rld</span><span class="p">,</span><span class="w"> </span><span class="n">intgroup</span><span class="o">=</span><span class="s2">"sampletype"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p align="center">
+<img src="../img/mov10_pca.png" width="600" alt="mov 10 experiement PCA" />
+</p>
+
+<hr />
+
+<p>Exercise:</p>
+
+<ol>
+  <li>What does the above plot tell you about the similarity of samples?</li>
+  <li>Does it fit the expectation from the experimental design?</li>
+  <li>What do you think the %variance information (in the axes titles) tell you about the data in the context of the PCA?</li>
+  <li>Try plotting a different variable than <code class="language-plaintext highlighter-rouge">sampletype</code> - did you learn anything new?</li>
+</ol>
+
+<hr />
+
+<p>By default <code class="language-plaintext highlighter-rouge">plotPCA()</code> uses the <em>top 500 most variable genes</em>. You can change this by adding the <code class="language-plaintext highlighter-rouge">ntop=</code> argument and specifying how many of the genes you want the function to consider.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> The <code class="language-plaintext highlighter-rouge">plotPCA()</code> function will only return the values for PC1 and PC2. If you would like to explore the additional PCs in your data or if you would like to identify genes that contribute most to the PCs, you can use the <code class="language-plaintext highlighter-rouge">prcomp()</code> function. For example, to plot any of the PCs we could run the following code:</p>
+
+  <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Input is a matrix of log transformed values</span><span class="w">
+</span><span class="n">rld</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rlog</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">blind</span><span class="o">=</span><span class="nb">T</span><span class="p">)</span><span class="w">
+</span><span class="n">rld_mat</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">assay</span><span class="p">(</span><span class="n">rld</span><span class="p">)</span><span class="w">
+</span><span class="n">pca</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">prcomp</span><span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="n">rld_mat</span><span class="p">))</span><span class="w">
+
+</span><span class="c1"># Create data frame with metadata and PC3 and PC4 values for input to ggplot</span><span class="w">
+</span><span class="n">df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cbind</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">pca</span><span class="o">$</span><span class="n">x</span><span class="p">)</span><span class="w">
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">df</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">PC3</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">PC4</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sampletype</span><span class="p">))</span><span class="w">
+</span></code></pre></div>  </div>
+
+  <p><a href="http://www.sthda.com/english/wiki/principal-component-analysis-in-r-prcomp-vs-princomp-r-software-and-data-mining">Resources</a> are available to learn how to do more complex inquiries using the PCs.</p>
+</blockquote>
+
+<h3 id="hierarchical-clustering-for-the-mov10-dataset">Hierarchical Clustering for the MOV10 dataset</h3>
+
+<p>There is no built-in function in DESeq2 for plotting the heatmap for diplaying the pairwise correlation between all the samples and the hierarchical clustering information; we will use the <code class="language-plaintext highlighter-rouge">pheatmap()</code> function from the <code class="language-plaintext highlighter-rouge">pheatmap</code> package. This function cannot use the <code class="language-plaintext highlighter-rouge">DESeqTransform</code> object as input, but requires a matrix or dataframe. So, the first thing to do is retrieve that information from the <code class="language-plaintext highlighter-rouge">rld</code> object using a function called <code class="language-plaintext highlighter-rouge">assay()</code> (from the <code class="language-plaintext highlighter-rouge">SummarizedExperiment</code> package) that converts the data in a <code class="language-plaintext highlighter-rouge">DESeqTransform</code> object to a simple 2-dimensional data structure (a matrix in this case).</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Extract the rlog matrix from the object</span><span class="w">
+</span><span class="n">rld_mat</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">assay</span><span class="p">(</span><span class="n">rld</span><span class="p">)</span><span class="w">    
+
+</span><span class="c1">## "assay()" is part of the "SummarizedExperiment" package which is a DESeq2 dependency and is loaded with the DESeq2 library</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Next, we need to compute the pairwise correlation values for all the samples. We can do this using the <code class="language-plaintext highlighter-rouge">cor()</code> function:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Compute pairwise correlation values</span><span class="w">
+</span><span class="n">rld_cor</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cor</span><span class="p">(</span><span class="n">rld_mat</span><span class="p">)</span><span class="w">    </span><span class="c1">## cor() is a base R function</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Let’s take a look at the column and row names of the correlation matrix.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>## check the output of cor(), make note of the row names and column names
+head(rld_cor)
+
+head(meta)
+</code></pre></div></div>
+
+<p>You will notice that they match the names we have given our samples in the metadata data frame we started with. It is important that these match, so we can use the <code class="language-plaintext highlighter-rouge">annotation</code> argument below to plot a color block across the top. This block enables easy visualization of the hierarchical clustering.</p>
+
+<p>Let’s plot the heatmap!</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Load pheatmap package - it might already be loaded from the last lesson. </span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pheatmap</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">### Plot heatmap using the correlation matrix and the metadata object</span><span class="w">
+</span><span class="n">pheatmap</span><span class="p">(</span><span class="n">rld_cor</span><span class="p">,</span><span class="w"> </span><span class="n">annotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>When you plot using <code class="language-plaintext highlighter-rouge">pheatmap()</code> the hierarchical clustering information is used to place similar samples together and this information is represented by the tree structure along the axes. The <code class="language-plaintext highlighter-rouge">annotation</code> argument accepts a dataframe as input, in our case it is the <code class="language-plaintext highlighter-rouge">meta</code> data frame.</p>
+
+<p align="center">
+<img src="../img/mov10_default_heatmap.png" width="600" alt="mov10 heatmap with default settings" />
+</p>
+
+<p>Overall, we observe pretty high correlations across the board ( &gt; 0.999) suggesting no outlying sample(s). Also, similar to the PCA plot you see the samples clustering together by sample group. Together, these plots suggest to us that the data are of good quality and we have the green light to proceed to differential expression analysis.</p>
+
+<p>If the data were <em>not</em> this clean, then we would try to understand why. If others prepared the libraries, we might consult with them to see if there were known issues. We could collect more metadata to see if we could explain unexpected varation that we see. Even if none of that helps, we could still proceed with differential expression, but we might not expect to get many differentially expressed genes.</p>
+
+<blockquote>
+  <p>NOTE: The <code class="language-plaintext highlighter-rouge">pheatmap</code> function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. If you are curious and want to explore more, try running the code below. <em>How does your plot change?</em> Take a look through the help pages (<code class="language-plaintext highlighter-rouge">?pheatmap</code>) and identify what each of the added arguments is contributing to the plot.</p>
+
+  <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">heat.colors</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">RColorBrewer</span><span class="o">::</span><span class="n">brewer.pal</span><span class="p">(</span><span class="m">6</span><span class="p">,</span><span class="w"> </span><span class="s2">"Blues"</span><span class="p">)</span><span class="w">
+</span><span class="n">pheatmap</span><span class="p">(</span><span class="n">rld_cor</span><span class="p">,</span><span class="w"> </span><span class="n">annotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">heat.colors</span><span class="p">,</span><span class="w"> </span><span class="n">border_color</span><span class="o">=</span><span class="kc">NA</span><span class="p">,</span><span class="w"> </span><span class="n">fontsize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> 
+          </span><span class="n">fontsize_row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">height</span><span class="o">=</span><span class="m">20</span><span class="p">)</span><span class="w">
+</span></code></pre></div>  </div>
+
+  <p>Curious about all of the available <a href="http://www.r-graph-gallery.com/38-rcolorbrewers-palettes/">color palettes offered by the RColorBrewer package</a>? Try typing in your console <code class="language-plaintext highlighter-rouge">display.brewer.all()</code> and see what happens!</p>
+</blockquote>
+
+<p><strong>Discussion</strong>: What other variables would you have collected info for and added to our metadata to look for batch (and other off-target) effects?</p>
+
+<h2 id="assignment"><strong>ASSIGNMENT:</strong></h2>
+
+<ul>
+  <li>Modify three aspects of your heatmap and send me a screenshot and the code snippet that you used to create the plot.</li>
+</ul>
+
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
