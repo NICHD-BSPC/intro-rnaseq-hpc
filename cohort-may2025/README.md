@@ -19,6 +19,7 @@ Please note that this schedule is tentative and subject to change. Materials for
 
 | Link to Materials                      | Topic                                                     |
 |-----------------|-------------------------------------------------------|
+| [Week 0](/schedule/links-to-lessons.md#week-0-pre-reading)| Optional Pre-Reading: Refresher on RNAseq |
 | Week 1 | Introduction to the command line and logging into Biowulf |
 | Week 2 | Scientific software on Biowulf, quality control of sequence data, experimental design|
 | Week 3 | Reference genomes, theory and practice of mapping RNAseq reads to a reference |
