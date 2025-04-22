@@ -1,7 +1,7 @@
 ---
 title: "The Shell"
 author: "Harvard HPC Staff, Modified by Sally Chang at NICHD"
-date: "Last modified January 2025"
+date: "Last modified April 2025"
 ---
 
 ### NOTE: 
@@ -163,27 +163,27 @@ These two directories have distinct limitations and uses. To quote the [Biowulf 
 
 **/home**
 
-> Each user has a home directory called /home/username which is accessible from every HPC system. The /home area has a quota of 16 GB which cannot be increased. It is commonly used for config files (aka dotfiles), code, nodes, executables, state files, and caches.
+> Each user has a home directory called /home/username which is accessible from every HPC system. The /home area has a quota of 16 GB which cannot be increased. It is commonly used for config files (aka dotfiles), code, nodes, executables, state files, and caches. This is where you "land" on the system when you first log in. 
 
 **/data**
 
-> This storage offers high performance access, and is exported to Biowulf over a dedicated high-speed network. /data is accessible from all computational nodes as well as Biowulf and Helix, and will be the storage of choice for most users to store their large datasets. Biowulf users are assigned an initial quota of 100 GB on /data.
+> This storage offers high performance access, and is exported to Biowulf over a dedicated high-speed network. /data is accessible from all computational nodes as well as Biowulf and Helix, and will be the storage of choice for most users to store their large datasets. Biowulf users are assigned an initial quota of 100 GB on /data. *This is where you will work on your lessons for this course.*
 
-**Our course directory**: You will be working in those directories extensively for your own research eventually, but for this course Biowulf staff have set up a shared directory, with a directory for each of you, that gives you access to necessary files and allows the instructor to look into your personal directories for troubleshooting purposes.
+**/data/Bspc-training/shared/** 
 
-For the rest of this lesson, *you will need to be in your personal class directory*: `/data/Bspc-training/$USER`
+> This is where we will share large input and intermediate files that not every student needs a copy of themselves. You should have "read access" to this directory so that you can copy and access files when running commands.
+
+For the rest of this lesson, *you will need to be in your personal data directory*: `/data/$USER`
 
 To move there, we are going to use the `cd` or **Change Directories** command:
 
 ``` bash
-$ cd /data/Bspc-training/$USER
+$ cd /data/$USER
 ```
 
 A few things about this command:
 
 -   We are using the full path (i.e. the specific "GPS coordinates") of the folder we are moving into
-
--   Directory names are case sensitive, so make sure "B" is capitalized
 
 -   `$USER` is a built-in variable in bash that will automatically be interpreted as the currently logged in user (i.e. your username)!
 
@@ -212,7 +212,7 @@ It should show you that you have 0 files, or not show you anything at all becaus
 Let's bring in a data folder from a different location on the cluster to our designated area by using the `cp` (**copy**) command. **Copy and paste the following command** all the way from `cp` and including the period symbol at the end `.`:
 
 ``` bash
-$ cp -r /data/Bspc-training/shared/rnaseq_jan2025/unix_lesson .
+$ cp -r /data/Bspc-training/shared/rnaseq_mov10/unix_lesson .
 ```
 
 To break down this command:
