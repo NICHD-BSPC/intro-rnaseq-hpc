@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=47422d66de16c844ce0c37a3d7f304a82e911cbd">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=57ea3e4d5c552e034fb53fdaa3b7101191a66d04">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -270,7 +270,7 @@ salloc: Nodes cn0011 are ready for job
 
 <p><strong>It will be helpful to start thinking about directories in a hierarchical way</strong>, so here is a diagram of the directories we’ve mentioned so far:</p>
 
-<p><img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500" /></p>
+<p><img src="../img/biowulf_directory_structure1.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500" /></p>
 
 <p>Note the distinct $USER directories with the same name but different locations!</p>
 
@@ -458,7 +458,7 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 
 <p align="center">
 
-<img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500" />
+<img src="../img/biowulf_directory_structure1.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500" />
 
 </p>
 
@@ -520,7 +520,7 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 
 <h3 id="using-full-paths-with-commands">Using full paths with commands</h3>
 
-<p>You can do a lot more with the idea of stringing together <em>parent/child</em> directories. Let’s say we want to look at the contents of the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder, but do it from our main course directory (<code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code> ). We can use the list command and follow it up with the path to the folder we want to list!</p>
+<p>You can do a lot more with the idea of stringing together <em>parent/child</em> directories. Let’s say we want to look at the contents of the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder, but do it from our main directory (<code class="language-plaintext highlighter-rouge">/data/$USER</code> ). We can use the list command and follow it up with the path to the folder we want to list!</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/<span class="nv">$USER</span>
 
@@ -612,7 +612,7 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 
 <p>Let’s change directories back to your course directory, and once more change directories to <code class="language-plaintext highlighter-rouge">raw_fastq</code> in a single step. (<em>Feel free to use your tab-completion to complete your path!</em>)</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/<span class="nv">$USER</span>/
 </code></pre></div></div>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>unix_lesson/raw_fastq
