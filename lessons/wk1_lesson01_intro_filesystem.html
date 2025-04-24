@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=4095e6d5afc5ed458b00da6f994036379dd679c2">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=ef3be696d52cd6206b8afacdedf9eba890989587">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -60,10 +60,7 @@
     </header>
 
     <main id="content" class="main-content" role="main">
-      <h3 id="note">NOTE:</h3>
-<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
-
-<h3 id="learning-objectives">Learning Objectives</h3>
+      <h3 id="learning-objectives">Learning Objectives</h3>
 
 <ul>
   <li>Understand why we need to use the command line</li>
@@ -119,6 +116,7 @@
 </ul>
 
 <p><strong>Side note:</strong> There are technically mutiple languages with which one could “talk” to their computer on the command line. We are going to use the <strong>Bash</strong> scripting language today, which is extremely common, comes default on most computing systems, and relies on the same principles and highly similar command structure to other command line languages you might encounter. Just an FYI in case I mention “Bash” or if you have heard this term before.</p>
+
 <hr />
 
 <h2 id="setting-up-and-logging-into-biowulf"><strong>Setting up and logging into Biowulf</strong></h2>
@@ -187,6 +185,7 @@
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>username@biowulf:~<span class="nv">$ </span>
 </code></pre></div></div>
+
 <hr />
 
 <h2 id="moving-to-a-biowulf-compute-node"><strong>Moving to a Biowulf compute node</strong></h2>
@@ -214,6 +213,7 @@ salloc: Nodes cn0011 are ready for job
 <p><strong>The Biowulf cluster (compute nodes)</strong> The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. <code class="language-plaintext highlighter-rouge">sinteractive</code> requests a node that we can interact with in real-time, as opposed to running those commands as a job.</p>
 
 <p><strong>Make sure that your command prompt now contains “cn” followed by some numbers. Once it does, we are ready to copy over some data to work with!</strong></p>
+
 <hr />
 
 <h2 id="working-with-directories-on-biwoulf"><strong>Working with Directories on Biwoulf</strong></h2>
@@ -285,7 +285,7 @@ salloc: Nodes cn0011 are ready for job
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span>
 </code></pre></div></div>
 
-<p>It should show you that you have 0 files, or not show you anything at all because you don’t have any data there as of yet!</p>
+<p>I have a lot of files in my /data/$USER directory, but this command may not show anything at all if you don’t have any data there as of yet!</p>
 
 <p>Let’s bring in a data folder from a different location on the cluster to our designated area by using the <code class="language-plaintext highlighter-rouge">cp</code> (<strong>copy</strong>) command. <strong>Copy and paste the following command</strong> all the way from <code class="language-plaintext highlighter-rouge">cp</code> and including the period symbol at the end <code class="language-plaintext highlighter-rouge">.</code>:</p>
 
@@ -331,6 +331,7 @@ salloc: Nodes cn0011 are ready for job
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>genomics_data  other  raw_fastq  README.txt  reference_data
 </code></pre></div></div>
+
 <hr />
 
 <h2 id="command-line-arguments"><strong>Command Line Arguments</strong></h2>
@@ -352,14 +353,22 @@ genomics_data/  other/  raw_fastq/  README.txt  reference_data/
 </code></pre></div></div>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>total 1
-drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 genomics_data
-drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 other
-drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 raw_fastq
--rw-rw----+ 1 changes Bspc-training  377 Jan 13 15:50 README.txt
-drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 reference_data
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 genomics_data
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 other
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 raw_fastq
+-rw-rwx---+ 1 changes changes  377 Apr 24 14:28 README.txt
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 </code></pre></div></div>
 
-<p>Each line of output represents a file or a directory. The directory lines start with <code class="language-plaintext highlighter-rouge">d</code>. If you want to combine the 2 arguments <code class="language-plaintext highlighter-rouge">-l</code> and <code class="language-plaintext highlighter-rouge">-F</code>, you can do so by saying the following:</p>
+<p>Each line of output represents a file or a directory.</p>
+
+<blockquote>
+  <p><em>NOTE:</em> When listing the contents of a directory using the <code class="language-plaintext highlighter-rouge">ls -l</code> command, the file size reported for directories do not reflect the size of the data inside it. The number actually represents the size of space on the disk that is used to store the metadata for the directory.</p>
+
+  <p>The command you’ll want to use to get the size of a directory’s contents is <code class="language-plaintext highlighter-rouge">du -sh</code>. <code class="language-plaintext highlighter-rouge">du</code> is short for “<em>d</em>isk <em>u</em>sage”.</p>
+</blockquote>
+
+<p>The directory lines start with <code class="language-plaintext highlighter-rouge">d</code>. If you want to combine the 2 arguments <code class="language-plaintext highlighter-rouge">-l</code> and <code class="language-plaintext highlighter-rouge">-F</code>, you can do so by saying the following:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">ls</span> <span class="nt">-lF</span>
 </code></pre></div></div>
@@ -465,8 +474,10 @@ drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 reference_data
   <p><strong>Tip</strong> - On mac OS, which is a UNIX-based OS, the root level is also “/”.</p>
 
   <p><strong>Tip</strong> - On a windows OS, it is drive specific; “C:” is considered the default root, but it changes to “D:/”, if you are on that drive.</p>
+
+  <hr />
+
 </blockquote>
-<hr />
 
 <h2 id="working-with-full-paths"><strong>Working with Full Paths</strong></h2>
 
@@ -588,9 +599,11 @@ drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 reference_data
 </blockquote>
 
 <p><strong>Tab completion is your friend!</strong> It helps prevent spelling mistakes, and speeds up the process of typing in the full command. We encourage you to use this when working on the command line.</p>
+
 <hr />
 
 <h3 id="using-the-up-arrow-button">Using the up-arrow button</h3>
+
 <p>One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands.</p>
 
 <h2 id="relative-paths"><strong>Relative paths</strong></h2>
@@ -665,6 +678,7 @@ drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 reference_data
 <p>You can usually use either a full path or a relative path depending on what is most convenient. If we are in the home directory, it is more convenient to just enter the relative path since it involves less typing.</p>
 
 <p>Over time, it will become easier for you to keep a mental note of the structure of the directories that you are using and how to quickly navigate among them.</p>
+
 <hr />
 
 <h2 id="copying-creating-moving-and-removing-data"><strong>Copying, creating, moving and removing data</strong></h2>
@@ -802,6 +816,160 @@ drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 reference_data
   <li>Copy over the Irrel_kd_2.subset.fq and Mov10_oe_2.subset.fq from <code class="language-plaintext highlighter-rouge">raw_fastq</code> to the <code class="language-plaintext highlighter-rouge">/unix_lesson/selected_fastq</code> folder</li>
   <li>Rename the <code class="language-plaintext highlighter-rouge">selected_fastq</code> folder and call it <code class="language-plaintext highlighter-rouge">exercise1</code></li>
 </ol>
+
+<hr />
+
+<h2 id="a-little-bit-about-permissions">A little bit about permissions</h2>
+
+<p>Let’s take another look at the output of <code class="language-plaintext highlighter-rouge">ls -l</code> :</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>total 1
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 genomics_data
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 other
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 raw_fastq
+-rw-rwx---+ 1 changes changes  377 Apr 24 14:28 README.txt
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
+</code></pre></div></div>
+
+<p>As we have learned, the <code class="language-plaintext highlighter-rouge">-l</code> flag tells <code class="language-plaintext highlighter-rouge">ls</code> to give us a long-form listing. <strong>Starting from the right side moving left</strong>:</p>
+
+<ol>
+  <li>
+    <p>File/directory names</p>
+  </li>
+  <li>
+    <p>Times and dates last modified. Backup systems and other tools use this information in a variety of ways, but you can use it to tell when you (or anyone else with permission) last changed a file.</p>
+  </li>
+  <li>
+    <p>File size in bytes.</p>
+  </li>
+  <li>
+    <p>Name of the group that owns the file.</p>
+  </li>
+  <li>
+    <p>User name of the file’s owner.</p>
+  </li>
+  <li>
+    <p>File’s number of hard links (not important for this class).</p>
+  </li>
+  <li>
+    <p>Permissions to the file</p>
+  </li>
+</ol>
+
+<p>Who is the owner of the files in this directory? Which group do the files belong to?</p>
+
+<p>Basically, Biowulf has you (your account ID) listed both as an owner and a group, and this is usually the assignment for the files and folders in your personal directory. Essentially, when a new user is created on a Unix system, a group of the same name is created and personal files for that user are also “owned” by that user’s group.</p>
+
+<p>For comparison, here is the listing for the original directory in the <code class="language-plaintext highlighter-rouge">/data/Bspc-shared</code></p>
+
+<h3 id="interpreting-the-permissions-string">Interpreting the permissions string</h3>
+
+<p>Let’s have a closer look at one of those permission strings in the first column for the <code class="language-plaintext highlighter-rouge">README.txt</code> file:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-rw-rwx---+
+</code></pre></div></div>
+
+<p>The first character indicates the type of file. Among the different types, a leading dash (<code class="language-plaintext highlighter-rouge">-</code>) means a regular file, while a <code class="language-plaintext highlighter-rouge">d</code> indicates a directory. In our case, it is <code class="language-plaintext highlighter-rouge">-</code> which means README.txt is a regular file.</p>
+
+<p>The next 9 characters are usually some combination of <code class="language-plaintext highlighter-rouge">r</code>, <code class="language-plaintext highlighter-rouge">w</code> and <code class="language-plaintext highlighter-rouge">x</code>, where:</p>
+
+<p><code class="language-plaintext highlighter-rouge">r</code> = read permission</p>
+
+<p><code class="language-plaintext highlighter-rouge">w</code> = write/edit permission</p>
+
+<p><code class="language-plaintext highlighter-rouge">x</code> = execute permission (run a script/program or traverse a directory).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Position</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">-</code></td>
+      <td>Regular file (not a directory or special file) - as opposed to <code class="language-plaintext highlighter-rouge">d</code> for directory.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rw-</code></td>
+      <td>First triplet: <strong>Owner</strong> (<code class="language-plaintext highlighter-rouge">changes</code>) has read and write permissions</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rwx</code></td>
+      <td>Second triplet: <strong>Group</strong> (<code class="language-plaintext highlighter-rouge">changes</code>) has read, write, and execute permissions</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">---</code></td>
+      <td>Third triplet: <strong>Others</strong> (everyone else) have no permissions</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">+</code></td>
+      <td>Extended ACL (Access Control List) is present — there may be additional permissions not shown here</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="changing-permissions-run-this-command"><strong>Changing permissions: RUN THIS COMMAND</strong></h3>
+
+<p><strong>Let’s make your <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory accessible Dr. Dale and I in case we need to help you troubleshoot:</strong></p>
+
+<p>First, run this command, which modifies the ACL (Access Control List) for the directory <code class="language-plaintext highlighter-rouge">/data/$USER</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>setfacl <span class="nt">--modify</span> u:changes:--x /data/<span class="nv">$USER</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Grants <strong>user</strong> <code class="language-plaintext highlighter-rouge">changes</code> only <strong>execute (<code class="language-plaintext highlighter-rouge">--x</code>)</strong> permission on <code class="language-plaintext highlighter-rouge">/data/$USER</code>.</li>
+</ul>
+
+<pre><code class="language-{=html}">&lt;!-- --&gt;
+</code></pre>
+<ul>
+  <li>This means that that <code class="language-plaintext highlighter-rouge">changes</code> can <strong>traverse</strong> the directory (i.e., enter it or access subdirectories, if they know the name), but <strong>cannot list the contents</strong> or read/write any files directly. Useful when you want someone to access a specific subdirectory, but not see the contents of the parent.</li>
+</ul>
+
+<p>Second, run this command, which modifies the <strong>default ACL</strong> for the directory <code class="language-plaintext highlighter-rouge">/data/$USER/unix_lesson</code>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>setfacl <span class="nt">--modify</span> d:u:changes:rwx /data/<span class="nv">$USER</span>/unix_lesson
+</code></pre></div></div>
+
+<p>This grants <strong>user</strong> <code class="language-plaintext highlighter-rouge">changes</code> default <strong>read, write, and execute (<code class="language-plaintext highlighter-rouge">rwx</code>)</strong> permissions on any <strong>new files or directories</strong> created inside <code class="language-plaintext highlighter-rouge">unix_lesson</code></p>
+
+<p>Default ACLs apply <strong>automatically to new items</strong> created within a directory.</p>
+
+<ul>
+  <li>
+    <p>This ensures that any new content inside <code class="language-plaintext highlighter-rouge">/data/$USER/unix_lesson</code> is accessible to <code class="language-plaintext highlighter-rouge">changes</code> with full permissions.</p>
+  </li>
+  <li>
+    <p>Great for <strong>collaboration</strong>, where you want another user to always have access to newly created files/folders.</p>
+  </li>
+</ul>
+
+<p>Finally, run the same two commands for Dr. Dale’s username <code class="language-plaintext highlighter-rouge">dalerr</code></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>setfacl <span class="nt">--modify</span> u:dalerr:--x /data/<span class="nv">$USER</span>
+setfacl <span class="nt">--modify</span> d:u:dalerr:rwx /data/<span class="nv">$USER</span>/unix_lesson
+</code></pre></div></div>
+
+<p><strong>Side note</strong>:</p>
+
+<blockquote>
+  <p>You may come across another Unix command <code class="language-plaintext highlighter-rouge">chmod</code> , which also modifies permissions. In short, <code class="language-plaintext highlighter-rouge">chmod</code> has a lot of the same functionality for simple cases, but use <strong><code class="language-plaintext highlighter-rouge">setfacl</code></strong> when: You need to grant access to <strong>multiple specific users or groups,</strong> You’re working in a <strong>collaborative</strong> environment with fine-grained access needs. You want to set <strong>default permissions</strong> for new files in a directory.</p>
+</blockquote>
+
+<p>Read more about permissions:</p>
+
+<ul>
+  <li>
+    <p><a href="https://github.com/hbctraining/Shell-for-bioinformatics/blob/master/lessons/07_permissions_and_environment_variables.md">Harvard HPC Permissions and Environmental Variables</a></p>
+  </li>
+  <li>
+    <p><a href="https://hpc.nih.gov/storage/permissions.html">Biowulf: Managing Access Permissions on the NIH HPC System</a>s</p>
+  </li>
+</ul>
 
 <hr />
 
