@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Summarizing results from the Wald test | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Summarizing results from the Wald test" />
+<meta name="author" content="Harvard HPC Staff, adapted by Sally Chang at NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk7_lesson03_summarizing_dge_results.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk7_lesson03_summarizing_dge_results.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Summarizing results from the Wald test" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, adapted by Sally Chang at NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"Summarizing results from the Wald test","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk7_lesson03_summarizing_dge_results.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk7_lesson03_summarizing_dge_results.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=2e53e60942c066d30698d049782a760d5f4a046a">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Summarizing results from the Wald test</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <p>Approximate time: 30 minutes</p>
+
+<h3 id="note">NOTE:</h3>
+<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
+
+<h2 id="learning-objectives">Learning Objectives</h2>
+
+<ul>
+  <li>Evaluate the number of differentially expressed genes produced for each comparison</li>
+  <li>Construct R objects containing significant genes from each comparison</li>
+</ul>
+
+<h2 id="getting-back-up-to-speed"><strong>Getting Back up to Speed</strong></h2>
+
+<p>You need to have the <code class="language-plaintext highlighter-rouge">res_tableOE</code> object in your environment. Assuming that you at least have our <code class="language-plaintext highlighter-rouge">dds</code> object, you can run:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">contrast_oe</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MOV10_overexpression"</span><span class="p">,</span><span class="w"> </span><span class="s2">"control"</span><span class="p">)</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">contrast</span><span class="o">=</span><span class="n">contrast_oe</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="p">)</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lfcShrink</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">coef</span><span class="o">=</span><span class="s2">"sampletype_MOV10_overexpression_vs_control"</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="o">=</span><span class="s2">"apeglm"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="summarizing-results">Summarizing results</h2>
+
+<p>To summarize the results table, a handy function in DESeq2 is <code class="language-plaintext highlighter-rouge">summary()</code>. Confusingly it has the same name as the function used to inspect data frames. This function when called with a DESeq results table as input, will summarize the results using a default threshold of padj &lt; 0.1, which is comparable to the results you would get from BSPC.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Summarize results</span><span class="w">
+</span><span class="n">summary</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.1</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>In addition to the number of genes up- and down-regulated at the default threshold, <strong>the function also reports the number of genes that were tested (genes with non-zero total read count), and the number of genes not included in multiple test correction due to a low mean count</strong>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>out of 43674 with nonzero total read count
+adjusted p-value &lt; 0.05
+LFC &gt; 0 (up)       : 3204, 7.3%
+LFC &lt; 0 (down)     : 4284, 9.8%
+outliers [1]       : 0, 0%
+low counts [2]     : 22701, 52%
+(mean count &lt; 5)
+[1] see 'cooksCutoff' argument of ?results
+[2] see 'independentFiltering' argument of ?results
+</code></pre></div></div>
+
+<p><strong>Based on the contrast we set up - how would you interpret “upregulated”? In which group are those genes upregulated in?</strong></p>
+
+<h2 id="extracting-significant-de-genes-and-adding-gene-symbols">Extracting significant DE genes and adding gene symbols</h2>
+
+<p>Let’s first create variables that contain our threshold criteria. We will only be using the adjusted p-values in our criteria:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Set thresholds</span><span class="w">
+</span><span class="n">padj.cutoff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.1</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We can easily subset the results table to only include those that are significant using the <code class="language-plaintext highlighter-rouge">filter()</code> function, and merge a data frame from the</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a dataframe to simplify the res_tableOE object. What do you think is happening in rownames_to_columns()?</span><span class="w">
+</span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><em>Wouldn’t it be nice if we could have gene symbols associated with each of our genes instead of just the Ensembl gene IDs?</em></p>
+
+<p>First, let’s read in the GTF and extract just the Ensembl Gene IDs and the Gene Symbols so that we can associate those Gene Symbols to your data for better visualizations. <strong>Run readGFF() this time, but in the future and your setup script, just read in the CSV option:</strong></p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Convert our GTF to a large data frame.</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">rtracklayer</span><span class="p">)</span><span class="w">
+</span><span class="n">gtf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">readGFF</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Extract only the columns with ensembl gene names and gene symbols</span><span class="w">
+</span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">gtf</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">dplyr</span><span class="o">::</span><span class="n">select</span><span class="p">(</span><span class="n">gene_id</span><span class="p">,</span><span class="w"> </span><span class="n">gene_name</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">distinct</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">rename</span><span class="p">(</span><span class="n">ensgene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gene_id</span><span class="p">,</span><span class="w"> </span><span class="n">symbol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gene_name</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Next time, just read in this TSV</span><span class="w">
+</span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<blockquote>
+  <p><strong>Discussion</strong>: What are some commands we can use to preview the contents of this table and if it has the ~78k features we expected from our original GTF?</p>
+</blockquote>
+
+<p>Now we merge these two data frames by their columns that each contain Ensembl Gene IDs:</p>
+
+<pre><code class="language-{r}">#merge gene symbols
+res_tableOE_df &lt;- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene")
+</code></pre>
+
+<p>Now we can subset that table to only keep the significant genes using our pre-defined thresholds:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Subset the dataframe to keep only significant genes </span><span class="w">
+</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+        </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Take a quick look at this dataframe</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">sigOE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Discussion</strong>: Do we remember what these columns represent?</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">baseMean</code>: mean of normalized counts for all samples</li>
+  <li><code class="language-plaintext highlighter-rouge">log2FoldChange</code>: log2 fold change</li>
+  <li><code class="language-plaintext highlighter-rouge">lfcSE</code>: standard error</li>
+  <li><code class="language-plaintext highlighter-rouge">stat</code>: Wald statistic</li>
+  <li><code class="language-plaintext highlighter-rouge">pvalue</code>: Wald test p-value</li>
+  <li><code class="language-plaintext highlighter-rouge">padj</code>: BH adjusted p-values</li>
+</ul>
+
+<h2 id="writing-out-our-table">Writing out our table</h2>
+
+<p>Let’s say we wanted to save our <code class="language-plaintext highlighter-rouge">res_tableOE_df</code> object as a table so we could read it in again later. Let’s use the following command:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">write.table</span><span class="p">(</span><span class="n">res_tableOE_df</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"res_tableOE_df.tsv"</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"\t"</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">col.names</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">quote</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Discussion:</strong> What do the different arguments mean? How can we access help documentation about <code class="language-plaintext highlighter-rouge">write.table()</code>?</p>
+
+<hr />
+
+<h2 id="assignment"><strong>ASSIGNMENT:</strong></h2>
+
+<p><strong>MOV10 Differential Expression Analysis: Control versus Knockdown</strong></p>
+
+<ol>
+  <li>Using the same p-adjusted threshold as above (<code class="language-plaintext highlighter-rouge">padj.cutoff &lt; 0.1</code>), subset <code class="language-plaintext highlighter-rouge">res_tableKD</code> to report the number of genes that are up- and down-regulated in Mov10_knockdown compared to control. Save it as an object called <code class="language-plaintext highlighter-rouge">sigKD</code>.</li>
+  <li>How many genes are differentially expressed in the Knockdown compared to Control? How does this compare to the overexpression significant gene list (in terms of numbers)?</li>
+</ol>
+
+<hr />
+
+<h2 id="wrap-up">Wrap-Up</h2>
+
+<p>Now that we have extracted the significant results, we are ready for visualization!</p>
+
+<p>In summary, to help prepare for the <a href="/intro-rnaseq-hpc/cohort-may2025/lessons/wk7_lesson04_visualizing_results.html">next lesson</a>, you can add the following to your script along with the code required to create the <code class="language-plaintext highlighter-rouge">sigKD</code> object:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">padj.cutoff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.1</span><span class="w">
+
+</span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+</span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+</span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">## Next time, just read in this TSV</span><span class="w">
+</span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># merge gene names</span><span class="w">
+</span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">gtf_names</span><span class="p">,</span><span class="n">res_tableOE_df</span><span class="p">,</span><span class="w"> </span><span class="n">by.x</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">by.y</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+<p><em>Some materials and hands-on activities were adapted from <a href="http://www.bioconductor.org/help/workflows/rnaseqGene/#de">RNA-seq workflow</a> on the Bioconductor website</em></p>
+
+<hr />
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
