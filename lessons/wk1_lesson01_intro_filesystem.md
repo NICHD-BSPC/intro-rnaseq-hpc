@@ -4,9 +4,6 @@ author: "Harvard HPC Staff, Modified by Sally Chang at NICHD"
 date: "Last modified April 2025"
 ---
 
-### NOTE: 
-To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
-
 ### Learning Objectives
 
 -   Understand why we need to use the command line
@@ -16,7 +13,7 @@ To make names more generalized for the next course, `/data/Bspc-training/shared/
 -   List files in a directory
 -   Copy, remove and move files
 
-### Links to sections of this lesson: 
+### Links to sections of this lesson:
 
 -   [Why the Command Line?](#why-the-command-line)
 -   [Logging Into Biowulf](#setting-up-and-logging-into-biowulf)
@@ -28,11 +25,11 @@ To make names more generalized for the next course, `/data/Bspc-training/shared/
 -   [Full Paths](#working-with-full-paths)
 -   [Tab completion](#tab-completion)
 -   [Copying, creating, moving and removing data](#copying-creating-moving-and-removing-data)
--   [Exiting from the cluster](#exiting-from-the-cluster) 
+-   [Exiting from the cluster](#exiting-from-the-cluster)
 
-<hr> 
+<hr>
 
-## **Why the Command Line?**
+## **Why the Command Line?** {#why-the-command-line}
 
 ### What is the command line, anyway?
 
@@ -51,10 +48,10 @@ To put it simply, the command line interface (CLI), is a text-based way of inter
 -   More opportunities in general for batch processing and automations
 
 **Side note:** There are technically mutiple languages with which one could "talk" to their computer on the command line. We are going to use the **Bash** scripting language today, which is extremely common, comes default on most computing systems, and relies on the same principles and highly similar command structure to other command line languages you might encounter. Just an FYI in case I mention "Bash" or if you have heard this term before.
-<hr> 
 
+<hr>
 
-## **Setting up and logging into Biowulf**
+## **Setting up and logging into Biowulf** {#setting-up-and-logging-into-biowulf}
 
 We will spend most of our time learning about the basics of the shell command-line interface (CLI) by exploring experimental data on the **NIH's Biowulf** cluster. So, we will need to log in to this remote compute cluster first before we can start with the basics.
 
@@ -115,10 +112,10 @@ And our familiar \$ symbol will return, but this time with your Biowulf username
 ``` bash
 username@biowulf:~$ 
 ```
+
 <hr>
 
-
-## **Moving to a Biowulf compute node**
+## **Moving to a Biowulf compute node** {#moving-to-a-biowulf-compute-node}
 
 The first command we will run on Biowulf will start a "interactive session". This command will connect us to a compute node, so that all of the commands we run will be processed by a computer designated to do analysis (and not designated to log in users). **Copy and paste the command below.**
 
@@ -145,9 +142,10 @@ Let's consider the difference between the Login node and a compute node:
 **The Biowulf cluster (compute nodes)** The Biowulf cluster is a 95,000+ core/40+ PB Linux cluster, organized into a number of compute nodes optimized for large numbers of high-memory, simultaneous jobs common in the biosciences. When you submit a job script (see next week!) CPUs and memory for a job are dedicated to that job during its walltime and do not compete with other users. `sinteractive` requests a node that we can interact with in real-time, as opposed to running those commands as a job.
 
 **Make sure that your command prompt now contains "cn" followed by some numbers. Once it does, we are ready to copy over some data to work with!**
-<hr> 
 
-## **Working with Directories on Biwoulf**
+<hr>
+
+## **Working with Directories on Biwoulf** {#working-with-directories-on-biwoulf}
 
 Let's see where we've "landed" on Biowulf - That is, figure out what directory we are in. This is important because Bash commands (and indeed, most programming) requires you to know where you are in relation to the files you want to manipulate (more on referring to files later!).
 
@@ -163,13 +161,13 @@ These two directories have distinct limitations and uses. To quote the [Biowulf 
 
 **/home**
 
-> Each user has a home directory called /home/username which is accessible from every HPC system. The /home area has a quota of 16 GB which cannot be increased. It is commonly used for config files (aka dotfiles), code, nodes, executables, state files, and caches. This is where you "land" on the system when you first log in. 
+> Each user has a home directory called /home/username which is accessible from every HPC system. The /home area has a quota of 16 GB which cannot be increased. It is commonly used for config files (aka dotfiles), code, nodes, executables, state files, and caches. This is where you "land" on the system when you first log in.
 
 **/data**
 
 > This storage offers high performance access, and is exported to Biowulf over a dedicated high-speed network. /data is accessible from all computational nodes as well as Biowulf and Helix, and will be the storage of choice for most users to store their large datasets. Biowulf users are assigned an initial quota of 100 GB on /data. *This is where you will work on your lessons for this course.*
 
-**/data/Bspc-training/shared/** 
+**/data/Bspc-training/shared/**
 
 > This is where we will share large input and intermediate files that not every student needs a copy of themselves. You should have "read access" to this directory so that you can copy and access files when running commands.
 
@@ -195,9 +193,9 @@ A few things about this command:
 
 Note the distinct \$USER directories with the same name but different locations!
 
-<hr> 
+<hr>
 
-## **Looking into and moving into directories**
+## **Looking into and moving into directories** {#looking-into-and-moving-into-directories}
 
 The first thing to do is to check if there are any files in the data folder we are currently in.
 
@@ -207,7 +205,7 @@ Let's list the contents of our personal class directory using a command called `
 $ ls
 ```
 
-It should show you that you have 0 files, or not show you anything at all because you don't have any data there as of yet!
+I have a lot of files in my /data/\$USER directory, but this command may not show anything at all if you don't have any data there as of yet!
 
 Let's bring in a data folder from a different location on the cluster to our designated area by using the `cp` (**copy**) command. **Copy and paste the following command** all the way from `cp` and including the period symbol at the end `.`:
 
@@ -252,9 +250,10 @@ You should see:
 ```         
 genomics_data  other  raw_fastq  README.txt  reference_data
 ```
-<hr> 
 
-## **Command Line Arguments**
+<hr>
+
+## **Command Line Arguments** {#command-line-arguments}
 
 There are five items listed when you run `ls`, but what types of files are they, or are they directories or files?
 
@@ -276,14 +275,20 @@ $ ls -l
 
 ```         
 total 1
-drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 genomics_data
-drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 other
-drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 raw_fastq
--rw-rw----+ 1 changes Bspc-training  377 Jan 13 15:50 README.txt
-drwxrws---+ 2 changes Bspc-training 4096 Jan 13 15:50 reference_data
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 genomics_data
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 other
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 raw_fastq
+-rw-rwx---+ 1 changes changes  377 Apr 24 14:28 README.txt
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 ```
 
-Each line of output represents a file or a directory. The directory lines start with `d`. If you want to combine the 2 arguments `-l` and `-F`, you can do so by saying the following:
+Each line of output represents a file or a directory.
+
+> *NOTE:* When listing the contents of a directory using the `ls -l` command, the file size reported for directories do not reflect the size of the data inside it. The number actually represents the size of space on the disk that is used to store the metadata for the directory.
+>
+> The command you’ll want to use to get the size of a directory’s contents is `du -sh`. `du` is short for “*d*isk *u*sage”.
+
+The directory lines start with `d`. If you want to combine the 2 arguments `-l` and `-F`, you can do so by saying the following:
 
 ``` bash
 ls -lF
@@ -347,7 +352,7 @@ One useful command is `ls -lrt`. Looking at the `ls` `man` page, how does this m
 
 ------------------------------------------------------------------------
 
-## **Unix directory file structure**
+## **Unix directory file structure** {#unix-directory-file-structure}
 
 Let's practice moving around a bit. Let's go into the raw_fastq directory and see what is in there.
 
@@ -378,9 +383,10 @@ When you log in to a remote computer you land on one of the branches of that tre
 > **Tip** - On mac OS, which is a UNIX-based OS, the root level is also "/".
 >
 > **Tip** - On a windows OS, it is drive specific; "C:" is considered the default root, but it changes to "D:/", if you are on that drive.
-<hr> 
+>
+> <hr>
 
-## **Working with Full Paths**
+## **Working with Full Paths** {#working-with-full-paths}
 
 Now let's learn more about the "addresses" of directories, called **"path"** and move around the file system.
 
@@ -505,10 +511,12 @@ $ ls Mov10_oe_1<tab>
 > **NOTE:** Tab completion can also fill in the names of commands. For example, enter `e<tab><tab>`. You will see the name of every command that starts with an `e`. One of those is `echo`. If you enter `ech<tab>`, you will see that tab completion works.
 
 **Tab completion is your friend!** It helps prevent spelling mistakes, and speeds up the process of typing in the full command. We encourage you to use this when working on the command line.
-<hr> 
 
-### Using the up-arrow button 
-One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands. 
+<hr>
+
+### Using the up-arrow button
+
+One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands.
 
 ## **Relative paths**
 
@@ -585,9 +593,10 @@ A relative path is like getting directions from someone on the street. They tell
 You can usually use either a full path or a relative path depending on what is most convenient. If we are in the home directory, it is more convenient to just enter the relative path since it involves less typing.
 
 Over time, it will become easier for you to keep a mental note of the structure of the directories that you are using and how to quickly navigate among them.
-<hr> 
 
-## **Copying, creating, moving and removing data**
+<hr>
+
+## **Copying, creating, moving and removing data** {#copying-creating-moving-and-removing-data}
 
 Now we can move around within the directory structure using the command line. But what if we want to do things like copy files or move them from one directory to another, rename them?
 
@@ -720,7 +729,118 @@ $ rm -ri fastq_backup
 
 ------------------------------------------------------------------------
 
-## **Exiting from the cluster**
+## A little bit about permissions
+
+Let's take another look at the output of `ls -l` :
+
+```         
+total 1
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 genomics_data
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 other
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 raw_fastq
+-rw-rwx---+ 1 changes changes  377 Apr 24 14:28 README.txt
+drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
+```
+
+As we have learned, the `-l` flag tells `ls` to give us a long-form listing. **Starting from the right side moving left**:
+
+1.  File/directory names
+
+2.  Times and dates last modified. Backup systems and other tools use this information in a variety of ways, but you can use it to tell when you (or anyone else with permission) last changed a file.
+
+3.  File size in bytes.
+
+4.  Name of the group that owns the file.
+
+5.  User name of the file’s owner.
+
+6.  File’s number of hard links (not important for this class).
+
+7.  Permissions to the file
+
+Who is the owner of the files in this directory? Which group do the files belong to?
+
+Basically, Biowulf has you (your account ID) listed both as an owner and a group, and this is usually the assignment for the files and folders in your personal directory. Essentially, when a new user is created on a Unix system, a group of the same name is created and personal files for that user are also “owned” by that user’s group.
+
+For comparison, here is the listing for the original directory in the `/data/Bspc-shared`
+
+### Interpreting the permissions string
+
+Let’s have a closer look at one of those permission strings in the first column for the `README.txt` file:
+
+```         
+-rw-rwx---+
+```
+
+The first character indicates the type of file. Among the different types, a leading dash (`-`) means a regular file, while a `d` indicates a directory. In our case, it is `-` which means README.txt is a regular file.
+
+The next 9 characters are usually some combination of `r`, `w` and `x`, where:
+
+`r` = read permission
+
+`w` = write/edit permission
+
+`x` = execute permission (run a script/program or traverse a directory).
+
+| Position | Meaning                                                                                            |
+|-----------------|-------------------------------------------------------|
+| `-`      | Regular file (not a directory or special file) - as opposed to `d` for directory.                  |
+| `rw-`    | First triplet: **Owner** (`changes`) has read and write permissions                                |
+| `rwx`    | Second triplet: **Group** (`changes`) has read, write, and execute permissions                     |
+| `---`    | Third triplet: **Others** (everyone else) have no permissions                                      |
+| `+`      | Extended ACL (Access Control List) is present — there may be additional permissions not shown here |
+
+### **Changing permissions: RUN THIS COMMAND**
+
+**Let's make your `unix_lesson` directory accessible Dr. Dale and I in case we need to help you troubleshoot:**
+
+First, run this command, which modifies the ACL (Access Control List) for the directory `/data/$USER`.
+
+``` bash
+setfacl --modify u:changes:--x /data/$USER
+```
+
+-   Grants **user** `changes` only **execute (`--x`)** permission on `/data/$USER`.
+
+```{=html}
+<!-- -->
+```
+-   This means that that `changes` can **traverse** the directory (i.e., enter it or access subdirectories, if they know the name), but **cannot list the contents** or read/write any files directly. Useful when you want someone to access a specific subdirectory, but not see the contents of the parent.
+
+Second, run this command, which modifies the **default ACL** for the directory `/data/$USER/unix_lesson`.
+
+``` bash
+setfacl --modify d:u:changes:rwx /data/$USER/unix_lesson
+```
+
+This grants **user** `changes` default **read, write, and execute (`rwx`)** permissions on any **new files or directories** created inside `unix_lesson`
+
+Default ACLs apply **automatically to new items** created within a directory.
+
+-   This ensures that any new content inside `/data/$USER/unix_lesson` is accessible to `changes` with full permissions.
+
+-   Great for **collaboration**, where you want another user to always have access to newly created files/folders.
+
+Finally, run the same two commands for Dr. Dale's username `dalerr`
+
+``` bash
+setfacl --modify u:dalerr:--x /data/$USER
+setfacl --modify d:u:dalerr:rwx /data/$USER/unix_lesson
+```
+
+**Side note**:
+
+> You may come across another Unix command `chmod` , which also modifies permissions. In short, `chmod` has a lot of the same functionality for simple cases, but use **`setfacl`** when: You need to grant access to **multiple specific users or groups,** You're working in a **collaborative** environment with fine-grained access needs. You want to set **default permissions** for new files in a directory.
+
+Read more about permissions:
+
+-   [Harvard HPC Permissions and Environmental Variables](https://github.com/hbctraining/Shell-for-bioinformatics/blob/master/lessons/07_permissions_and_environment_variables.md)
+
+-   [Biowulf: Managing Access Permissions on the NIH HPC System](https://hpc.nih.gov/storage/permissions.html)s
+
+------------------------------------------------------------------------
+
+## **Exiting from the cluster** {#exiting-from-the-cluster}
 
 To close the interactive session on the cluser as well as to disconnect from the cluster, the command is `exit`. So, you are going to have to run the exit command twice.
 
