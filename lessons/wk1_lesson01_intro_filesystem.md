@@ -433,15 +433,15 @@ Can we just type `~` instead of `/home/username`?
 You can do a lot more with the idea of stringing together *parent/child* directories. Let's say we want to look at the contents of the `raw_fastq` folder, but do it from our main course directory (`/data/Bspc-training/$USER` ). We can use the list command and follow it up with the path to the folder we want to list!
 
 ``` bash
-$ cd /data/Bspc-training/$USER
+$ cd /data/$USER
 
-$ ls -l /data/Bspc-training/$USER/unix_lesson/raw_fastq
+$ ls -l /$USER/unix_lesson/raw_fastq
 ```
 
 Now, what if we wanted to change directories to `raw_fastq` in a single step?
 
 ``` bash
-$ cd /data/Bspc-training/$USER/unix_lesson/raw_fastq
+$ cd /data/$USER/unix_lesson/raw_fastq
 ```
 
 Voila! You have moved 2 levels of directories in one command.
@@ -455,7 +455,7 @@ Can you think of an alternative?
 *You can use the full path to unix_lesson!*
 
 ``` bash
-$ cd /data/Bspc-training/$USER/unix_lesson/
+$ cd /data/Bspc-training/unix_lesson/
 ```
 
 > **Tip** What if we want to navigate to the previous folder but can't quite remember the full or relative path, or want to get there quickly without typing a lot? In this case, we can use `cd -`. When `-` is used in this context it is referring to a special variable called `$OLDPWD` that is stored without our having to assign it anything. We'll learn more about variables in a future lesson, but for now you can see how this command works. Try typing:
@@ -470,7 +470,7 @@ $ cd /data/Bspc-training/$USER/unix_lesson/
 
 **Exercises**
 
-1.  From your main course directory, list the contents of the `reference_data` directory that is within the `unix_lesson` directory. What command did you use?
+1.  From your `/data/$USER` directory, list the contents of the `reference_data` directory that is within the `unix_lesson` directory. What command did you use?
 
 ------------------------------------------------------------------------
 
@@ -481,7 +481,7 @@ Typing out full directory names can be time-consuming and error-prone. One way t
 For example, change directories to get back to your home directly, then type `cd uni`, followed by pressing the `tab` key:
 
 ``` bash
-$ cd /data/Bspc-training/$USER/
+$ cd /data/$USER/
 $ cd uni<tab>
 ```
 
@@ -532,7 +532,7 @@ $ cd /data/Bspc-training/$USER/
 $ cd unix_lesson/raw_fastq
 ```
 
-This time we are not using the `/data/Bspc-training/$USER` before `unix_lesson`. In this case we are using a relative path, relative to our current location - wherein we know that `unix_lesson` is a child folder in our home folder, and the `raw_fastq` folder is within `unix_lesson`.
+This time we are not using the `/data/$USER` before `unix_lesson`. In this case we are using a relative path, relative to our current location - wherein we know that `unix_lesson` is a child folder in our home folder, and the `raw_fastq` folder is within `unix_lesson`.
 
 There is also a handy shortcut for the relative path to a parent directory, 2 periods `..`. Let's say we wanted to move from the `raw_fastq` folder to its parent folder.
 
