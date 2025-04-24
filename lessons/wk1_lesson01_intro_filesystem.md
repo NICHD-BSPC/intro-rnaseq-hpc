@@ -189,7 +189,7 @@ A few things about this command:
 
 **It will be helpful to start thinking about directories in a hierarchical way**, so here is a diagram of the directories we've mentioned so far:
 
-<img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500"/>
+<img src="../img/biowulf_directory_structure1.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500"/>
 
 Note the distinct \$USER directories with the same name but different locations!
 
@@ -370,7 +370,7 @@ Like on any computer you have used before, the file structure within a Unix/Linu
 
 <p align="center">
 
-<img src="../img/biowulf_directory_structure.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500"/>
+<img src="../img/biowulf_directory_structure1.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500"/>
 
 </p>
 
@@ -430,7 +430,7 @@ Can we just type `~` instead of `/home/username`?
 
 ### Using full paths with commands
 
-You can do a lot more with the idea of stringing together *parent/child* directories. Let's say we want to look at the contents of the `raw_fastq` folder, but do it from our main course directory (`/data/Bspc-training/$USER` ). We can use the list command and follow it up with the path to the folder we want to list!
+You can do a lot more with the idea of stringing together *parent/child* directories. Let's say we want to look at the contents of the `raw_fastq` folder, but do it from our main directory (`/data/$USER` ). We can use the list command and follow it up with the path to the folder we want to list!
 
 ``` bash
 $ cd /data/$USER
@@ -525,7 +525,7 @@ We have talked about **full** paths so far, but there is a way to specify paths 
 Let's change directories back to your course directory, and once more change directories to `raw_fastq` in a single step. (*Feel free to use your tab-completion to complete your path!*)
 
 ``` bash
-$ cd /data/Bspc-training/$USER/
+$ cd /data/$USER/
 ```
 
 ``` bash
