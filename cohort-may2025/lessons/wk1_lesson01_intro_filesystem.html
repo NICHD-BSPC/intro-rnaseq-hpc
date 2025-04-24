@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=8eb1c9a33f12c467aec625057c7e6031f038c623">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=47422d66de16c844ce0c37a3d7f304a82e911cbd">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -522,14 +522,14 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 
 <p>You can do a lot more with the idea of stringing together <em>parent/child</em> directories. Let’s say we want to look at the contents of the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder, but do it from our main course directory (<code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code> ). We can use the list command and follow it up with the path to the folder we want to list!</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/<span class="nv">$USER</span>
 
-<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span> /data/Bspc-training/<span class="nv">$USER</span>/unix_lesson/raw_fastq
+<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span> /<span class="nv">$USER</span>/unix_lesson/raw_fastq
 </code></pre></div></div>
 
 <p>Now, what if we wanted to change directories to <code class="language-plaintext highlighter-rouge">raw_fastq</code> in a single step?</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/unix_lesson/raw_fastq
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/<span class="nv">$USER</span>/unix_lesson/raw_fastq
 </code></pre></div></div>
 
 <p>Voila! You have moved 2 levels of directories in one command.</p>
@@ -542,7 +542,7 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 
 <p><em>You can use the full path to unix_lesson!</em></p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/unix_lesson/
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/unix_lesson/
 </code></pre></div></div>
 
 <blockquote>
@@ -559,7 +559,7 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 <p><strong>Exercises</strong></p>
 
 <ol>
-  <li>From your main course directory, list the contents of the <code class="language-plaintext highlighter-rouge">reference_data</code> directory that is within the <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory. What command did you use?</li>
+  <li>From your <code class="language-plaintext highlighter-rouge">/data/$USER</code> directory, list the contents of the <code class="language-plaintext highlighter-rouge">reference_data</code> directory that is within the <code class="language-plaintext highlighter-rouge">unix_lesson</code> directory. What command did you use?</li>
 </ol>
 
 <hr />
@@ -570,7 +570,7 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 
 <p>For example, change directories to get back to your home directly, then type <code class="language-plaintext highlighter-rouge">cd uni</code>, followed by pressing the <code class="language-plaintext highlighter-rouge">tab</code> key:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/<span class="nv">$USER</span>/
 <span class="nv">$ </span><span class="nb">cd </span>uni&lt;tab&gt;
 </code></pre></div></div>
 
@@ -618,7 +618,7 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>unix_lesson/raw_fastq
 </code></pre></div></div>
 
-<p>This time we are not using the <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code> before <code class="language-plaintext highlighter-rouge">unix_lesson</code>. In this case we are using a relative path, relative to our current location - wherein we know that <code class="language-plaintext highlighter-rouge">unix_lesson</code> is a child folder in our home folder, and the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder is within <code class="language-plaintext highlighter-rouge">unix_lesson</code>.</p>
+<p>This time we are not using the <code class="language-plaintext highlighter-rouge">/data/$USER</code> before <code class="language-plaintext highlighter-rouge">unix_lesson</code>. In this case we are using a relative path, relative to our current location - wherein we know that <code class="language-plaintext highlighter-rouge">unix_lesson</code> is a child folder in our home folder, and the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder is within <code class="language-plaintext highlighter-rouge">unix_lesson</code>.</p>
 
 <p>There is also a handy shortcut for the relative path to a parent directory, 2 periods <code class="language-plaintext highlighter-rouge">..</code>. Let’s say we wanted to move from the <code class="language-plaintext highlighter-rouge">raw_fastq</code> folder to its parent folder.</p>
 
