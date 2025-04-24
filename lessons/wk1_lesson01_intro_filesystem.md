@@ -191,8 +191,6 @@ A few things about this command:
 
 <img src="../img/biowulf_directory_structure1.png" alt="branching diagram of directory structure on Biowulf from /home and /data to the individual user directories for our course" width="500"/>
 
-Note the distinct \$USER directories with the same name but different locations!
-
 <hr>
 
 ## **Looking into and moving into directories** {#looking-into-and-moving-into-directories}
