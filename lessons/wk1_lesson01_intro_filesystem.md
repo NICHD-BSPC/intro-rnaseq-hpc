@@ -813,9 +813,7 @@ Second, run this command, which modifies the **default ACL** for the directory `
 setfacl --modify d:u:changes:rwx /data/$USER/unix_lesson
 ```
 
-This grants **user** `changes` default **read, write, and execute (`rwx`)** permissions on any **new files or directories** created inside `unix_lesson`
-
-Default ACLs apply **automatically to new items** created within a directory.
+This grants **user** `changes` **default** **(`rwx`)** permissions on any **new files or directories** created inside `unix_lesson.` Default ACLs apply **automatically to new items** created within a directory.
 
 -   This ensures that any new content inside `/data/$USER/unix_lesson` is accessible to `changes` with full permissions.
 
