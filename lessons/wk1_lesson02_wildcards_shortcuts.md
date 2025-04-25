@@ -1,11 +1,8 @@
 ---
 title: "Shell 02: Wildcards and Shortcuts"
 author: "Harvard HPC Staff, modified by E. Sally Chang @NICHD"
-date: "August 7, 2017, last edited March 2025"
+date: "Last Modified April 2025"
 ---
-
-### NOTE: 
-To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
@@ -22,7 +19,7 @@ If you are not logged into Biowulf or are not on a compute node, please follow t
 1.  Log in using `ssh username@biowulf.nih.gov` and enter your NIH password.
 2.  Once you are on the login node, use `sinteractive` to get on a compute node.
 3.  Proceed to the next section once your command prompt has `cnXXXX` in it.
-4.  Change directories into your course space: `cd /data/Bspc-training/$USER`
+4.  Change directories into your data space: `cd /data/$USER`
 
 ## Saving time with wildcards and other shortcuts
 
@@ -96,7 +93,7 @@ Do each of the following using a single `ls` command without navigating to a dif
 
     <summary><i>Question 1</i></summary>
 
-    <code>ls /bin/c*</code>
+    <code>ls /bin/c\*</code>
 
     </details>
 
@@ -112,7 +109,7 @@ Do each of the following using a single `ls` command without navigating to a dif
 
     <summary><i>Question 3</i></summary>
 
-    <code>ls /bin/*o</code>
+    <code>ls /bin/\*o</code>
 
     </details>
 
@@ -150,7 +147,7 @@ The shortcut `..` always refers to the parent directory of whatever directory yo
 $ ls ../..
 ```
 
-This prints the contents of `/data/Bspc_training/$USER`, which is two levels above your current directory `raw_fastq`.
+This prints the contents of `/data/$USER`, which is two levels above your current directory `raw_fastq`.
 
 #### Current directory or "."
 
@@ -184,12 +181,21 @@ $ # Type some random words into the command prompt, then hit "Ctrl + C". Observe
 
 **Other handy command-related shortcuts**
 
--   <button>Ctrl</button><button>A</button> will bring you to the start of the command you are writing.
+-   <button>Ctrl</button>
 
--   <button>Ctrl</button><button>E</button> will bring you to the end of the command.
+    <button>A</button>
 
-#### Using the up-arrow button 
-One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands. 
+    will bring you to the start of the command you are writing.
+
+-   <button>Ctrl</button>
+
+    <button>E</button>
+
+    will bring you to the end of the command.
+
+#### Using the up-arrow button
+
+One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands.
 
 ------------------------------------------------------------------------
 
