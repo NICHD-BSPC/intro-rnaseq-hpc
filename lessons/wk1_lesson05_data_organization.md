@@ -1,10 +1,8 @@
 ---
 title: Data Management and Project Organization
 author: Harvard HPC Staff, Modified by E. Sally Chang @ NICHD 
-date: Last edited March 2025
+date: Last edited April 2025
 ---
-### NOTE: 
-To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
@@ -15,20 +13,15 @@ To make names more generalized for the next course, `/data/Bspc-training/shared/
 
 ## What is data management?
 
-In this course we teach you how to independently analyze your own sequencing data, so naturally we should begin with what what to do once you get the raw data back from the sequencing facility.
-Obviously, we begin with the analysis!
-Right?
+In this course we teach you how to independently analyze your own sequencing data, so naturally we should begin with what what to do once you get the raw data back from the sequencing facility. Obviously, we begin with the analysis! Right?
 
 Wrong.
 
-One of the most important parts of research that involves large amounts of data is how best to manage it.
-Once data is generated we tend to prioritize the analysis.
-**In the excitement to get a first look at new data, there are many important aspects that are often overlooked.**
+One of the most important parts of research that involves large amounts of data is how best to manage it. Once data is generated we tend to prioritize the analysis. **In the excitement to get a first look at new data, there are many important aspects that are often overlooked.**
 
 Wait, don't leave this page just yet!
 
-We know that data management can be hard to get excited about.
-However, **ignoring it can be detrimental to your research.** Here are just a few reasons **why data management should matter to you**:
+We know that data management can be hard to get excited about. However, **ignoring it can be detrimental to your research.** Here are just a few reasons **why data management should matter to you**:
 
 -   It will make your life easier. It's easier to analyze organized, and well documented data.
 -   Your future self will thank you. Managing well from the get-go means it's easier to retrieve at a later date.
@@ -37,8 +30,7 @@ However, **ignoring it can be detrimental to your research.** Here are just a fe
 
 ### Data Lifecycle
 
-The data lifecycle displayed below, courtesy of the [HMS Data Management Working Group](https://datamanagement.hms.harvard.edu/), illustrates some things to consider beyond data creation and analysis.
-Below, we discuss components of the lifecycle and how they apply to any NGS experiment.
+The data lifecycle displayed below, courtesy of the [HMS Data Management Working Group](https://datamanagement.hms.harvard.edu/), illustrates some things to consider beyond data creation and analysis. Below, we discuss components of the lifecycle and how they apply to any NGS experiment.
 
 <p align="center">
 
@@ -50,47 +42,33 @@ Below, we discuss components of the lifecycle and how they apply to any NGS expe
 
 ### Plan and Design
 
-You should approach your sequencing project in a very similar way you do with any biological experiment, and ideally, begins with a good **experimental design**.
-You want to think about experiment at the outset and collect appropriate samples such that you have enough statistical power to make the comparisons you need.
-**In a later lesson, we delve more into the details of planning and the experimental design considerations.**
+You should approach your sequencing project in a very similar way you do with any biological experiment, and ideally, begins with a good **experimental design**. You want to think about experiment at the outset and collect appropriate samples such that you have enough statistical power to make the comparisons you need. **In a later lesson, we delve more into the details of planning and the experimental design considerations.**
 
-Planning for your computational work is just as important as planning when working on the bench.
-Every computational analysis you do is going to spawn many files and you will want to think about short-term storage options for your data and computational resources for analyzing it.
+Planning for your computational work is just as important as planning when working on the bench. Every computational analysis you do is going to spawn many files and you will want to think about short-term storage options for your data and computational resources for analyzing it.
 
 ### Collect and Create
 
-The next step is preparing samples as required.
-During this stage it is important to keep track of how the experiment was performed, making sure to clearly document the source of starting materials and kits used.
-It is also best practice to include any information about any small variations within the experiment (across the different samples being prepared) or any changes relative to standard experiment protocols.
-This collection of information serves as the **metadata of the experiment** which will prove to be very useful during the analysis stage.
+The next step is preparing samples as required. During this stage it is important to keep track of how the experiment was performed, making sure to clearly document the source of starting materials and kits used. It is also best practice to include any information about any small variations within the experiment (across the different samples being prepared) or any changes relative to standard experiment protocols. This collection of information serves as the **metadata of the experiment** which will prove to be very useful during the analysis stage.
 
 ### Analyze and Collaborate - our course will mostly focus on this portion of the life cycle!
 
-Once you have the sequencing data back from the sequencing facility, it's time to analyze it.
-The process of data analysis should be well documented to ensure reproducibility and also for ease of collaboration.
-We will spend some more time on this component of the lifecycle later in class, as it applies to our dataset.
+Once you have the sequencing data back from the sequencing facility, it's time to analyze it. The process of data analysis should be well documented to ensure reproducibility and also for ease of collaboration. We will spend some more time on this component of the lifecycle later in class, as it applies to our dataset.
 
 ### Evaluate and Archive
 
-When the analysis is complete you will want to think about which files are most pertinent to keep.
-Consider long-term storage options for your data that meet requirements of NIH, other funding agencies, and any guidelines from your institution.
+When the analysis is complete you will want to think about which files are most pertinent to keep. Consider long-term storage options for your data that meet requirements of NIH, other funding agencies, and any guidelines from your institution.
 
 ### Disseminate and share
 
-The results of your analysis will hopefully generate some exciting findings that will be beneficial to the scientific community.
-At this stage in the lifecycle you rely on your previous steps of documentation to turn those notes into a clear and concise methods section of your manuscript.
+The results of your analysis will hopefully generate some exciting findings that will be beneficial to the scientific community. At this stage in the lifecycle you rely on your previous steps of documentation to turn those notes into a clear and concise methods section of your manuscript.
 
 ### Access and Reuse
 
-In addition to sharing information on the analysis, you should plan for sharing the data.
-It has become increasingly common for researchers to make their data available to others when they complete a study.
-While a major reason for sharing is compliance (with journals or research funding organizations), there are also important research benefits including reproducibility and data sharing and reuse.
+In addition to sharing information on the analysis, you should plan for sharing the data. It has become increasingly common for researchers to make their data available to others when they complete a study. While a major reason for sharing is compliance (with journals or research funding organizations), there are also important research benefits including reproducibility and data sharing and reuse.
 
 ## The Dataset
 
-The dataset we are using for this workshop is part of a larger study described in [Kenny PJ et al., *Cell Rep* 2014](http://www.ncbi.nlm.nih.gov/pubmed/25464849).
-The authors are investigating interactions between various genes involved in Fragile X syndrome, a disease of aberrant protein production, which results in cognitive impairment and autistic-like features.
-**The authors sought to show that RNA helicase MOV10 regulates the translation of RNAs involved in Fragile X syndrome.**
+The dataset we are using for this workshop is part of a larger study described in [Kenny PJ et al., *Cell Rep* 2014](http://www.ncbi.nlm.nih.gov/pubmed/25464849). The authors are investigating interactions between various genes involved in Fragile X syndrome, a disease of aberrant protein production, which results in cognitive impairment and autistic-like features. **The authors sought to show that RNA helicase MOV10 regulates the translation of RNAs involved in Fragile X syndrome.**
 
 ### Raw data
 
@@ -100,8 +78,7 @@ From this study we are using the [RNA-seq](http://www.ncbi.nlm.nih.gov/geo/query
 
 ### Metadata
 
-In addition to the raw sequence data we also need to collect **information about the data**, also known as **metadata**.
-We are usually quick to want to begin analysis of the sequence data (FASTQ files), but how useful is it if we know nothing about the samples that this sequence data originated from?
+In addition to the raw sequence data we also need to collect **information about the data**, also known as **metadata**. We are usually quick to want to begin analysis of the sequence data (FASTQ files), but how useful is it if we know nothing about the samples that this sequence data originated from?
 
 Some relevant metadata for our dataset is provided below:
 
@@ -123,30 +100,22 @@ Here, we implement some of those strategies to get ourselves setup before we beg
 
 ### Are you logged into Biowulf, on a compute node, and in your course directory?
 
-If not, first do that before proceeding!
-As a reminder, the course directory is: `/data/Bspc-training/$USER`
+If not, first do that before proceeding, and then navigate to `/data/$USER` .
 
 ### Planning and organization
 
-For each experiment you work on and analyze data for, it is considered best practice to get organized by creating a planned storage space (directory structure).
-We will start by creating a directory that we can use for the rest of the workshop.
-First, make sure that you are in your home directory.
+For each experiment you work on and analyze data for, it is considered best practice to get organized by creating a planned storage space (directory structure). We will start by creating a directory that we can use for the rest of the workshop. Assuming you are in `/data/$USER` :
 
 ``` bash
-$ cd /data/Bspc-training/$USER
-```
-
-From here, create the directory `rnaseq` and move into it.
-
-``` bash
-$ mkdir rnaseq
-$ cd rnaseq
+$ mkdir rnaseq_course
+$ cd rnaseq_course
 ```
 
 Next, we will create a project directory and set up the following structure to keep our files organized.
 
 ``` bash
 rnaseq
+  ├── assignments
   ├── logs
   ├── meta
   ├── raw_data  
@@ -161,42 +130,35 @@ rnaseq
 -   `raw_data`: for any **unmodified** (raw) data obtained prior to computational analysis here, e.g. FASTQ files from the sequencing center. We strongly recommend leaving this directory unmodified through the analysis.
 -   `results`: for output from the different tools you implement in your workflow. Create sub-folders specific to each tool/step of the workflow within this folder.
 -   `scripts`: for scripts that you write and use to run analyses/workflow.
+-   `assignments` : you will copy your weekly assignments here so I can find them easily.
 
 ``` bash
-$ mkdir logs meta raw_data results scripts
+$ mkdir assignments logs meta raw_data results scripts
 ```
 
 > #### File naming conventions
 >
-> Another aspect of staying organized is making sure that all the directories and filenames for an analysis are as consistent as possible.
-> You want to avoid names like `alignment1.bam`, and rather have names like `20170823_kd_rep1_gmap-1.4.bam` which provide a basic level of information about the file.
-> [This link](https://datamanagement.hms.harvard.edu/file-naming-conventions) and [this slideshow](http://www2.stat.duke.edu/~rcs46/lectures_2015/01-markdown-git/slides/naming-slides/naming-slides.pdf) provided by Harvard HPC have some good guidelines for file naming dos and don'ts.
+> Another aspect of staying organized is making sure that all the directories and filenames for an analysis are as consistent as possible. You want to avoid names like `alignment1.bam`, and rather have names like `20170823_kd_rep1_gmap-1.4.bam` which provide a basic level of information about the file. [This link](https://datamanagement.hms.harvard.edu/file-naming-conventions) and [this slideshow](http://www2.stat.duke.edu/~rcs46/lectures_2015/01-markdown-git/slides/naming-slides/naming-slides.pdf) provided by Harvard HPC have some good guidelines for file naming dos and don'ts.
 
 ### Documentation: Worklog and README files
 
-In your lab notebook, you likely keep track of the different reagents and kits used for a specific protocol.
-Similarly, recording information about the tools used in the workflow is important for documenting your computational experiments.
+In your lab notebook, you likely keep track of the different reagents and kits used for a specific protocol. Similarly, recording information about the tools used in the workflow is important for documenting your computational experiments.
 
 Here are some things you might want to make a note of:
 
--   **Make note of the software you use.** Do your research and find out what tools are best for the data you are working with.
-    Don't just work with tools that you are able to easily install.
+-   **Make note of the software you use.** Do your research and find out what tools are best for the data you are working with. Don't just work with tools that you are able to easily install.
 
 -   **Keep track of software versions.** Keep up with the literature and make sure you are using the most up-to-date versions.
 
 -   **Record information on parameters used and summary statistics** at every step (e.g., how many adapters were removed, how many reads did not align)
 
--   **Test datasets:** A general rule of thumb is to test on a single sample or a subset of the data before running your entire dataset through.
-    This will allow you to debug quicker and give you a chance to also get a feel for the tool and the different parameters.
+-   **Test datasets:** A general rule of thumb is to test on a single sample or a subset of the data before running your entire dataset through. This will allow you to debug quicker and give you a chance to also get a feel for the tool and the different parameters.
 
--   **Error and log messages**: Different tools have different ways of reporting log messages to the terminal.
-    You might have to experiment a bit to figure out what output to capture.
-    You can redirect standard output with the `>` symbol which is equivalent to `1> (standard out)`; other tools might require you to use `2>` to re-direct the `standard error` instead.
+-   **Error and log messages**: Different tools have different ways of reporting log messages to the terminal. You might have to experiment a bit to figure out what output to capture. You can redirect standard output with the `>` symbol which is equivalent to `1> (standard out)`; other tools might require you to use `2>` to re-direct the `standard error` instead.
 
 #### Creating a Worklog
 
-The BSPC uses a *Work Log* for each project that they work on.
-This is a file that lives in the top directory for a project (i.e. `rnaseq` in our case), and has the following attributes:
+The BSPC uses a *Work Log* for each project that they work on. This is a file that lives in the top directory for a project (i.e. `rnaseq` in our case), and has the following attributes:
 
 -   Named `WORKLOG.rst` to make it easy to find across projects
 -   Use ReStructured Text format (`.rst` files), because this allows for more flexible documentation and parsing down the line
@@ -217,21 +179,13 @@ For example, the top of my Work Log for the `rnaseq` project looks like:
 - Created directory structure, README, and Work Log
 ```
 
-The audience is you (or another lab member) 2 years from now when everyone has forgotten about the project and now needs to start working on it again.
-As you are writing, it will feel like you are writing too much or adding way too much detail.
-You are not.
-**The future you will thank you.**
+The audience is you (or another lab member) 2 years from now when everyone has forgotten about the project and now needs to start working on it again. As you are writing, it will feel like you are writing too much or adding way too much detail. You are not. **The future you will thank you.**
 
-Feel free to keep an informal, conversational tone.
-This is not a public document.
-*But do get in the habit of adding a note each time you work on a project!*
+Feel free to keep an informal, conversational tone. This is not a public document. *But do get in the habit of adding a note each time you work on a project!*
 
 #### README files
 
-After setting up the directory structure it is useful to have a [**README file**](https://datamanagement.hms.harvard.edu/readme-files) **within your project directory**.
-This is a plain text file containing a short summary about the project and a description of the files/directories found within it.
-An example README is shown below.
-It can also be helpful to include a README within each sub-directory with any information pertaining to the analysis.
+After setting up the directory structure it is useful to have a [**README file**](https://datamanagement.hms.harvard.edu/readme-files) **within your project directory**. This is a plain text file containing a short summary about the project and a description of the files/directories found within it. An example README is shown below. It can also be helpful to include a README within each sub-directory with any information pertaining to the analysis.
 
 ```         
 ## README ##
@@ -249,38 +203,34 @@ scripts:
 
 ### Moving data into our new raw_data folder
 
-Let's populate the `rnaseq/` project with some data.
-We actually have the required files that we were manipulating in our previous few lessons.
-Let's `mv` these files into our raw_data directory.
+Let's populate the `rnaseq_course/` project with some data. We actually have the required files that we were manipulating in our previous few lessons. Let's `mv` these files into our raw_data directory.
 
 ``` bash
-$ mv unix_lesson/raw_fastq/*subset.fq raw_data/
+$ mv ../unix_lesson/raw_fastq/*subset.fq raw_data/
 ```
 
 If you were to run the `tree` command from inside the `rnaseq` directory it should now look like this:
 
 ``` bash
-rnaseq
-  ├── logs
-  ├── meta
-  ├── raw_data
-  │   ├── Irrel_kd_1.subset.fq
-  │   ├── Irrel_kd_2.subset.fq
-  │   ├── Irrel_kd_3.subset.fq
-  │   ├── Mov10_oe_1.subset.fq
-  │   ├── Mov10_oe_2.subset.fq
-  │   └── Mov10_oe_3.subset.fq
-  ├── README.txt
-  ├── results
-  └── scripts
+├── assignments
+├── logs
+├── meta
+├── raw_data
+│   ├── Irrel_kd_1.subset.fq
+│   ├── Irrel_kd_2.subset.fq
+│   ├── Irrel_kd_3.subset.fq
+│   ├── Mov10_oe_1.subset.fq
+│   ├── Mov10_oe_2.subset.fq
+│   └── Mov10_oe_3.subset.fq
+├── results
+└── scripts
 ```
 
-### **Assignment:** 
+### **Assignment:**
 
-1.  Take a moment to create a README for the `rnaseq/` folder (hint: use `vim` to create the file). Give a short description of the project and brief descriptions of the types of files you will be storing within each of the sub-directories.
+1.  Take a moment to create a README for the `rnaseq_course/` directory (hint: use `vim` to create the file). Give a short description of the project and brief descriptions of the types of files you will be storing within each of the sub-directories.
 2.  Use the same strategy to create a `WORKLOG.rst file` and add your first entry about what you just accomplished.
-
-**Note**: Message me on Slack when you've finished this lesson. I'll look into your `/rnaseq` directory to see that you created the assigned directory structure and these two text files!
+3.  I'll look into your `/rnaseq_directory` directory to see that you created the assigned directory structure and these two text files, and that your `spiders.txt` assignment from Lesson 04 is in the `assignments` directory.
 
 ------------------------------------------------------------------------
 
