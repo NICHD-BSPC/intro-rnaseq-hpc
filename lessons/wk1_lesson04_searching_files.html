@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=54c48710026e38784ddac6f56243a93607296096">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=7354b87e501468c7cc4ec20dc2a98b1e5663291d">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -65,40 +65,26 @@
 <h2 id="learning-objectives">Learning objectives</h2>
 
 <ul>
-  <li>Search for characters or patterns in a text file using the <code class="language-plaintext highlighter-rouge">grep</code>
-command</li>
+  <li>Search for characters or patterns in a text file using the <code class="language-plaintext highlighter-rouge">grep</code> command</li>
   <li>Write to and append a file using output redirection</li>
   <li>Use the pipe (<code class="language-plaintext highlighter-rouge">|</code>) character to chain together commands</li>
 </ul>
 
 <h2 id="are-you-logged-into-biowulf-on-a-compute-node-and-in-your-course-directory">Are you logged into Biowulf, on a compute node, and in your course directory?</h2>
 
-<p>If not, first do that before proceeding! As a reminder, the course
-directory is: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code></p>
+<p>If not, first do that before proceeding! As a reminder, the course directory is: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code></p>
 
 <h2 id="searching-files-with-grep-command">Searching files with <code class="language-plaintext highlighter-rouge">grep</code> command</h2>
 
-<p>We went over how to search within a file using <code class="language-plaintext highlighter-rouge">less</code>. We can also
-search within files without even opening them, using <code class="language-plaintext highlighter-rouge">grep</code>. Simply put
-<code class="language-plaintext highlighter-rouge">grep</code> is a command-line utility for searching plain-text data sets for
-lines matching a pattern or <strong>reg</strong>ular <strong>ex</strong>pression (regex).</p>
+<p>We went over how to search within a file using <code class="language-plaintext highlighter-rouge">less</code>. We can also search within files without even opening them, using <code class="language-plaintext highlighter-rouge">grep</code>. Simply put <code class="language-plaintext highlighter-rouge">grep</code> is a command-line utility for searching plain-text data sets for lines matching a pattern or <strong>reg</strong>ular <strong>ex</strong>pression (regex).</p>
 
 <blockquote>
-  <p>Why the word “grep”? It is a shortened form of <strong>g</strong>lobally search for
-a <strong>r</strong>egular <strong>e</strong>xpression and <strong>p</strong>rint matching lines (g/re/p).</p>
+  <p>Why the word “grep”? It is a shortened form of <strong>g</strong>lobally search for a <strong>r</strong>egular <strong>e</strong>xpression and <strong>p</strong>rint matching lines (g/re/p).</p>
 </blockquote>
 
-<p>The syntax for <code class="language-plaintext highlighter-rouge">grep</code> is as follows: <code class="language-plaintext highlighter-rouge">grep  search_term  filename</code>. The
-pattern that we want to search is specified in <code class="language-plaintext highlighter-rouge">search_term</code> slot, and
-the file we want to search within is specified in the <code class="language-plaintext highlighter-rouge">filename</code> slot.
-Let’s give it a try by searching the FASTQ files in the <code class="language-plaintext highlighter-rouge">raw_fastq</code>
-directory.</p>
+<p>The syntax for <code class="language-plaintext highlighter-rouge">grep</code> is as follows: <code class="language-plaintext highlighter-rouge">grep  search_term  filename</code>. The pattern that we want to search is specified in <code class="language-plaintext highlighter-rouge">search_term</code> slot, and the file we want to search within is specified in the <code class="language-plaintext highlighter-rouge">filename</code> slot. Let’s give it a try by searching the FASTQ files in the <code class="language-plaintext highlighter-rouge">raw_fastq</code> directory.</p>
 
-<p>FASTQ files contain the sequencing reads (nucleotide sequences) output
-from a sequencing facility. Each sequencing read in a FASTQ file is
-associated with four lines, with the first line (header line) always
-starting with an <code class="language-plaintext highlighter-rouge">@</code> symbol. A whole FASTQ record for a single read
-should appear similar to the following:</p>
+<p>FASTQ files contain the sequencing reads (nucleotide sequences) output from a sequencing facility. Each sequencing read in a FASTQ file is associated with four lines, with the first line (header line) always starting with an <code class="language-plaintext highlighter-rouge">@</code> symbol. A whole FASTQ record for a single read should appear similar to the following:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@HWI-ST330:304:H045HADXX:1:1101:1111:61397
 CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNNNNNNNNNNNNNNGATCTTGG
@@ -139,30 +125,21 @@ B?@DDDDDDHHH?GH:?FCBGGB@C?DBEGIIIIAEF;FCGGI#####################################
   <p>You’ll learn more about this file format in our lesson next week!</p>
 </blockquote>
 
-<p>Suppose we want to see how many reads in our file <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code>
-contain “bad” data, i.e. reads with 10 consecutive Ns (<code class="language-plaintext highlighter-rouge">NNNNNNNNNN</code>).</p>
+<p>Suppose we want to see how many reads in our file <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code> contain “bad” data, i.e. reads with 10 consecutive Ns (<code class="language-plaintext highlighter-rouge">NNNNNNNNNN</code>).</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> ~/unix_lesson/raw_fastq
 
 <span class="nv">$ </span><span class="nb">grep </span>NNNNNNNNNN Mov10_oe_1.subset.fq
 </code></pre></div></div>
 
-<p>We get back a lot of reads or lines of text! You can add the <code class="language-plaintext highlighter-rouge">-c</code> option
-to count the number:</p>
+<p>We get back a lot of reads or lines of text! You can add the <code class="language-plaintext highlighter-rouge">-c</code> option to count the number:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-c</span> NNNNNNNNNN Mov10_oe_1.subset.fq
 </code></pre></div></div>
 
-<p>What if we wanted to see the whole FASTQ record for each of these reads?
-We would need to modify the default behavior of <code class="language-plaintext highlighter-rouge">grep</code> and specify some
-argument/options. To look for all available options for the <code class="language-plaintext highlighter-rouge">grep</code>
-command, we can type <code class="language-plaintext highlighter-rouge">grep --help</code> (or <code class="language-plaintext highlighter-rouge">man grep</code>).</p>
+<p>What if we wanted to see the whole FASTQ record for each of these reads? We would need to modify the default behavior of <code class="language-plaintext highlighter-rouge">grep</code> and specify some argument/options. To look for all available options for the <code class="language-plaintext highlighter-rouge">grep</code> command, we can type <code class="language-plaintext highlighter-rouge">grep --help</code> (or <code class="language-plaintext highlighter-rouge">man grep</code>).</p>
 
-<p>Looks like the <code class="language-plaintext highlighter-rouge">-B</code> and <code class="language-plaintext highlighter-rouge">-A</code> arguments for grep will be useful to return
-the matched line plus one before (<code class="language-plaintext highlighter-rouge">-B 1</code>) and two lines after (<code class="language-plaintext highlighter-rouge">-A 2</code>).
-Since each record is four lines, using these arguments will return the
-whole record. Within the whole record, the second line will be the
-actual sequence that has the pattern we searched for.</p>
+<p>Looks like the <code class="language-plaintext highlighter-rouge">-B</code> and <code class="language-plaintext highlighter-rouge">-A</code> arguments for grep will be useful to return the matched line plus one before (<code class="language-plaintext highlighter-rouge">-B 1</code>) and two lines after (<code class="language-plaintext highlighter-rouge">-A 2</code>). Since each record is four lines, using these arguments will return the whole record. Within the whole record, the second line will be the actual sequence that has the pattern we searched for.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 NNNNNNNNNN Mov10_oe_1.subset.fq
 </code></pre></div></div>
@@ -184,30 +161,23 @@ CACAAATCGGCTCAGGAGGCTTGTAGAAAAGCTCAGCTTGACANNNNNNNNNNNNNNNNNGNGNACGAAACNNNNGNNNN
 
 <ol>
   <li>
-    <p>Search for the sequence CTCAATGAGCCA in <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code>. How
-many sequences do you find?</p>
+    <p>Search for the sequence CTCAATGAGCCA in <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code>. How many sequences do you find?</p>
   </li>
   <li>
-    <p>In addition to finding the sequence, how can you modify the command
-so that your search also returns the name of the sequence?</p>
+    <p>In addition to finding the sequence, how can you modify the command so that your search also returns the name of the sequence?</p>
   </li>
   <li>
-    <p>If you want to search for that sequence in <strong>all</strong> Mov10 replicate
-fastq files, what command would you use?</p>
+    <p>If you want to search for that sequence in <strong>all</strong> Mov10 replicate fastq files, what command would you use?</p>
 
     <details>
 
 <summary><b><i>Answers</i></b></summary>
 
-<p><i>Question 1</i><br /> <code>grep CTCAATGAGCCA
-Mov10_oe_1.subset.fq</code><br /> The output returns 5 sequences.</p>
+<p><i>Question 1</i><br /> <code>grep CTCAATGAGCCA Mov10_oe_1.subset.fq</code><br /> The output returns 5 sequences.</p>
 
-<p><i>Question 2</i><br /> <code>grep -B 1 CTCAATGAGCCA
-Mov10_oe_1.subset.fq</code></p>
+<p><i>Question 2</i><br /> <code>grep -B 1 CTCAATGAGCCA Mov10_oe_1.subset.fq</code></p>
 
-<p><i>Question 3</i><br /> <code>grep CTCAATGAGCCA Mov10\*</code><br />
-The output returns 5 sequences for Mov10_oe_1 and 3 sequences for
-Mov10_oe_2.</p>
+<p><i>Question 3</i><br /> <code>grep CTCAATGAGCCA Mov10\*</code><br /> The output returns 5 sequences for Mov10_oe_1 and 3 sequences for Mov10_oe_2.</p>
 
 </details>
   </li>
@@ -219,13 +189,7 @@ Mov10_oe_2.</p>
 
 <h4 id="group-separators----and-how-to-remove-them">Group separators (<code class="language-plaintext highlighter-rouge">--</code>), and how to remove them</h4>
 
-<p>You will notice that when we use the <code class="language-plaintext highlighter-rouge">-B</code> and/or <code class="language-plaintext highlighter-rouge">-A</code> arguments with the
-<code class="language-plaintext highlighter-rouge">grep</code> command, the output has some additional lines with dashes (<code class="language-plaintext highlighter-rouge">--</code>),
-these dashes work to separate your returned “groups” of lines and are
-referred to as “group separators”. This might be problematic if you are
-trying to maintain the FASTQ file structure or if you simply do not want
-them in your output. Using the argument <code class="language-plaintext highlighter-rouge">--no-group-separator</code> with
-<code class="language-plaintext highlighter-rouge">grep</code> will disable this behavior:</p>
+<p>You will notice that when we use the <code class="language-plaintext highlighter-rouge">-B</code> and/or <code class="language-plaintext highlighter-rouge">-A</code> arguments with the <code class="language-plaintext highlighter-rouge">grep</code> command, the output has some additional lines with dashes (<code class="language-plaintext highlighter-rouge">--</code>), these dashes work to separate your returned “groups” of lines and are referred to as “group separators”. This might be problematic if you are trying to maintain the FASTQ file structure or if you simply do not want them in your output. Using the argument <code class="language-plaintext highlighter-rouge">--no-group-separator</code> with <code class="language-plaintext highlighter-rouge">grep</code> will disable this behavior:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 <span class="nt">--no-group-separator</span> NNNNNNNNNN Mov10_oe_1.subset.fq
 </code></pre></div></div>
@@ -244,9 +208,7 @@ CACAAATCGGCTCAGGAGGCTTGTAGAAAAGCTCAGCTTGACANNNNNNNNNNNNNNNNNGNGNACGAAACNNNNGNNNN
 
 <h4 id="which-line-number-has-a-match">Which line number has a match?</h4>
 
-<p>Another useful option when using <code class="language-plaintext highlighter-rouge">grep</code> is the <code class="language-plaintext highlighter-rouge">-n</code> option, which will
-print out the line number from the file for the match. Adding this
-option to our previous command would work like this:</p>
+<p>Another useful option when using <code class="language-plaintext highlighter-rouge">grep</code> is the <code class="language-plaintext highlighter-rouge">-n</code> option, which will print out the line number from the file for the match. Adding this option to our previous command would work like this:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 <span class="nt">--no-group-separator</span> <span class="nt">-n</span> NNNNNNNNNN Mov10_oe_1.subset.fq
 </code></pre></div></div>
@@ -263,26 +225,16 @@ option to our previous command would work like this:</p>
 861956-?@@DDDDDB1@?:E?;3A:1?9?E9?&lt;?DGCDGBBDBF@;8DF#########################################################
 </code></pre></div></div>
 
-<p>A small thing you should note is that when using the <code class="language-plaintext highlighter-rouge">-n</code> option, lines
-that have a <code class="language-plaintext highlighter-rouge">:</code> after the line number correspond to the lines with the
-match (e.g
-<code class="language-plaintext highlighter-rouge">861214:CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNN...</code>),
-while lines with a <code class="language-plaintext highlighter-rouge">-</code> after the line number are the surrounding lines
-retrieved when using the <code class="language-plaintext highlighter-rouge">-A</code> and/or <code class="language-plaintext highlighter-rouge">-B</code> options (e.g.
-<code class="language-plaintext highlighter-rouge">861213-@HWI-ST330:304:H045HADXX:1:1101:1111:61397</code>).</p>
+<p>A small thing you should note is that when using the <code class="language-plaintext highlighter-rouge">-n</code> option, lines that have a <code class="language-plaintext highlighter-rouge">:</code> after the line number correspond to the lines with the match (e.g <code class="language-plaintext highlighter-rouge">861214:CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNN...</code>), while lines with a <code class="language-plaintext highlighter-rouge">-</code> after the line number are the surrounding lines retrieved when using the <code class="language-plaintext highlighter-rouge">-A</code> and/or <code class="language-plaintext highlighter-rouge">-B</code> options (e.g. <code class="language-plaintext highlighter-rouge">861213-@HWI-ST330:304:H045HADXX:1:1101:1111:61397</code>).</p>
 
 <h4 id="only-returning-lines-that-do-not-match">Only returning lines that <strong>DO NOT</strong> match</h4>
 
-<p>One last <code class="language-plaintext highlighter-rouge">grep</code> option you might find quite useful is the <code class="language-plaintext highlighter-rouge">-v</code> option,
-which does an inverted match. This will return everything that does
-<strong><em>not</em></strong> match the pattern. In order to demonstrate this let’s first
-view a smaller file that you have.</p>
+<p>One last <code class="language-plaintext highlighter-rouge">grep</code> option you might find quite useful is the <code class="language-plaintext highlighter-rouge">-v</code> option, which does an inverted match. This will return everything that does <strong><em>not</em></strong> match the pattern. In order to demonstrate this let’s first view a smaller file that you have.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> ~/unix_lesson/other/Mov10_rnaseq_metadata.txt 
 </code></pre></div></div>
 
-<p>This is the metadata file for the FASTQ data we are looking at. This
-should return:</p>
+<p>This is the metadata file for the FASTQ data we are looking at. This should return:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sample  celltype
 OE.1    Mov10_oe
@@ -293,8 +245,7 @@ IR.2    normal
 IR.3    normal
 </code></pre></div></div>
 
-<p>Now, let’s consider the case that we didn’t want to output the “normal”
-cell type. We can use the <code class="language-plaintext highlighter-rouge">-v</code> option in <code class="language-plaintext highlighter-rouge">grep</code> like this:</p>
+<p>Now, let’s consider the case that we didn’t want to output the “normal” cell type. We can use the <code class="language-plaintext highlighter-rouge">-v</code> option in <code class="language-plaintext highlighter-rouge">grep</code> like this:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-v</span> normal ~/unix_lesson/other/Mov10_rnaseq_metadata.txt 
 </code></pre></div></div>
@@ -309,32 +260,20 @@ OE.3    Mov10_oe
 
 <h2 id="redirection">Redirection</h2>
 
-<p>When we use <code class="language-plaintext highlighter-rouge">grep</code>, the matching lines print to the Terminal (also
-called Standard Output or “stdout”). If the result of the <code class="language-plaintext highlighter-rouge">grep</code> search
-is a few lines, we can view them easily, but if the output is very long,
-the lines will just keep printing and we won’t be able to see anything
-except the last few lines. You have experienced this when you searched
-for the pattern <code class="language-plaintext highlighter-rouge">NNNNNNNNNN</code>. How can we capture them instead?</p>
+<p>When we use <code class="language-plaintext highlighter-rouge">grep</code>, the matching lines print to the Terminal (also called Standard Output or “stdout”). If the result of the <code class="language-plaintext highlighter-rouge">grep</code> search is a few lines, we can view them easily, but if the output is very long, the lines will just keep printing and we won’t be able to see anything except the last few lines. You have experienced this when you searched for the pattern <code class="language-plaintext highlighter-rouge">NNNNNNNNNN</code>. How can we capture them instead?</p>
 
-<p>We can do that with something called “redirection”. The idea is that
-we’re redirecting the output from the Terminal (all the stuff that went
-whizzing by) to something else. In this case, we want to save it to a
-file, so that we can look at it later.</p>
+<p>We can do that with something called “redirection”. The idea is that we’re redirecting the output from the Terminal (all the stuff that went whizzing by) to something else. In this case, we want to save it to a file, so that we can look at it later.</p>
 
 <h3 id="redirecting-with-">Redirecting with “&gt;”</h3>
 
 <p><strong>The redirection command for writing something to file is <code class="language-plaintext highlighter-rouge">&gt;</code>.</strong></p>
 
-<p>Let’s try it out and put all the sequences that contain ‘NNNNNNNNNN’
-from the <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code> into another file called
-<code class="language-plaintext highlighter-rouge">bad_reads.txt</code>.</p>
+<p>Let’s try it out and put all the sequences that contain ‘NNNNNNNNNN’ from the <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code> into another file called <code class="language-plaintext highlighter-rouge">bad_reads.txt</code>.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 NNNNNNNNNN Mov10_oe_1.subset.fq <span class="o">&gt;</span> bad_reads.txt
 </code></pre></div></div>
 
-<p>The prompt will go away for a little bit and then you will get it back,
-but nothing will be printed on the Terminal. But, you should have a new
-file called <code class="language-plaintext highlighter-rouge">bad_reads.txt</code>!</p>
+<p>The prompt will go away for a little bit and then you will get it back, but nothing will be printed on the Terminal. But, you should have a new file called <code class="language-plaintext highlighter-rouge">bad_reads.txt</code>!</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span>
 </code></pre></div></div>
@@ -342,19 +281,14 @@ file called <code class="language-plaintext highlighter-rouge">bad_reads.txt</co
 <p>Take a look at the file and see if it contains what you think it should.</p>
 
 <blockquote>
-  <p>NOTE: If we already had a file named <code class="language-plaintext highlighter-rouge">bad_reads.txt</code> in our directory,
-it would have overwritten it without any warning!</p>
+  <p>NOTE: If we already had a file named <code class="language-plaintext highlighter-rouge">bad_reads.txt</code> in our directory, it would have overwritten it without any warning!</p>
 </blockquote>
 
 <h3 id="redirecting-and-appending-with-">Redirecting (and appending) with “&gt;&gt;”</h3>
 
-<p><strong>The redirection command for appending something to an existing file is
-<code class="language-plaintext highlighter-rouge">&gt;&gt;</code>.</strong></p>
+<p><strong>The redirection command for appending something to an existing file is <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>.</strong></p>
 
-<p>If we use <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, it will append to the existing content in a file, rather
-than overwrite it. This can be useful for saving more than one search.
-For example, the following command will append the bad reads from
-Mov10_oe_2 to the bad_reads.txt file that we just generated.</p>
+<p>If we use <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, it will append to the existing content in a file, rather than overwrite it. This can be useful for saving more than one search. For example, the following command will append the bad reads from Mov10_oe_2 to the bad_reads.txt file that we just generated.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 NNNNNNNNNN Mov10_oe_2.subset.fq <span class="o">&gt;&gt;</span> bad_reads.txt
 
@@ -363,29 +297,18 @@ Mov10_oe_2 to the bad_reads.txt file that we just generated.</p>
 
 <p>Did the size of the <code class="language-plaintext highlighter-rouge">bad_reads.txt</code> file change?</p>
 
-<p>Since our <code class="language-plaintext highlighter-rouge">bad_reads.txt</code> file isn’t a raw_fastq file, we should move it
-to a different location within our directory. Let’s move it to the
-<code class="language-plaintext highlighter-rouge">other</code> folder using the command <code class="language-plaintext highlighter-rouge">mv</code>.</p>
+<p>Since our <code class="language-plaintext highlighter-rouge">bad_reads.txt</code> file isn’t a raw_fastq file, we should move it to a different location within our directory. Let’s move it to the <code class="language-plaintext highlighter-rouge">other</code> folder using the command <code class="language-plaintext highlighter-rouge">mv</code>.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mv </span>bad_reads.txt ../other/
 </code></pre></div></div>
 
 <h3 id="redirecting-with-pipes--or-piping">Redirecting with pipes “|” (or piping)</h3>
 
-<p><strong>The redirection command for using the output of a command as input for
-a different command is <code class="language-plaintext highlighter-rouge">|</code>.</strong></p>
+<p><strong>The redirection command for using the output of a command as input for a different command is <code class="language-plaintext highlighter-rouge">|</code>.</strong></p>
 
-<p><strong>The pipe key</strong> (<kbd>|</kbd>) is very likely not something you use
-very often (it is on the same key as the back slash (<kbd>\</kbd>),
-right above the <button>Enter/Return</button> key).</p>
+<p><strong>The pipe key</strong> (<kbd>\|</kbd>) is very likely not something you use very often (it is on the same key as the back slash (<kbd>\&lt;/kbd\&gt;), right above the <button>Enter/Return</button> key).</kbd></p>
 
-<p>What <code class="language-plaintext highlighter-rouge">|</code> does is take the output from one command, e.g. the output from
-<code class="language-plaintext highlighter-rouge">grep</code> that went whizzing by and runs it through the command specified
-after it. When it was all whizzing by before, we wished we could just
-take a look at it! Maybe we could use <code class="language-plaintext highlighter-rouge">less</code> instead of the rapid
-scroll. Well, it turns out that we can! We can <strong>pipe the output <code class="language-plaintext highlighter-rouge">grep</code>
-command</strong> to <code class="language-plaintext highlighter-rouge">less</code> to slowly scroll through, or to <code class="language-plaintext highlighter-rouge">head</code> to just see
-the first few lines.</p>
+<p>What <code class="language-plaintext highlighter-rouge">|</code> does is take the output from one command, e.g. the output from <code class="language-plaintext highlighter-rouge">grep</code> that went whizzing by and runs it through the command specified after it. When it was all whizzing by before, we wished we could just take a look at it! Maybe we could use <code class="language-plaintext highlighter-rouge">less</code> instead of the rapid scroll. Well, it turns out that we can! We can <strong>pipe the output <code class="language-plaintext highlighter-rouge">grep</code> command</strong> to <code class="language-plaintext highlighter-rouge">less</code> to slowly scroll through, or to <code class="language-plaintext highlighter-rouge">head</code> to just see the first few lines.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 NNNNNNNNNN Mov10_oe_1.subset.fq | less
 </code></pre></div></div>
@@ -397,15 +320,9 @@ the first few lines.</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 NNNNNNNNNN Mov10_oe_1.subset.fq | <span class="nb">head</span> <span class="nt">-n</span> 5
 </code></pre></div></div>
 
-<p>Another thing we can also do is count the number of lines output by
-<code class="language-plaintext highlighter-rouge">grep</code>.</p>
+<p>Another thing we can also do is count the number of lines output by <code class="language-plaintext highlighter-rouge">grep</code>.</p>
 
-<p>The <code class="language-plaintext highlighter-rouge">wc</code> command stands for <em><strong>w</strong>ord <strong>c</strong>ount</em>. This command counts
-the number of lines, words and characters in the text input given to it.
-The <code class="language-plaintext highlighter-rouge">-l</code> argument will only count the number of lines instead of
-counting everything. <em>You will notice this output should be the same in
-this case as <code class="language-plaintext highlighter-rouge">grep -c</code> but <code class="language-plaintext highlighter-rouge">wc</code> is still a useful command for other
-applications!</em></p>
+<p>The <code class="language-plaintext highlighter-rouge">wc</code> command stands for <em><strong>w</strong>ord <strong>c</strong>ount</em>. This command counts the number of lines, words and characters in the text input given to it. The <code class="language-plaintext highlighter-rouge">-l</code> argument will only count the number of lines instead of counting everything. <em>You will notice this output should be the same in this case as <code class="language-plaintext highlighter-rouge">grep -c</code> but <code class="language-plaintext highlighter-rouge">wc</code> is still a useful command for other applications!</em></p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep </span>NNNNNNNNNN Mov10_oe_1.subset.fq | <span class="nb">wc</span> <span class="nt">-l</span>
 </code></pre></div></div>
@@ -413,35 +330,25 @@ applications!</em></p>
 <p><em>Try it out without the <code class="language-plaintext highlighter-rouge">-l</code> to see the full output.</em></p>
 
 <blockquote>
-  <p><strong>Tip</strong> - Similar to <code class="language-plaintext highlighter-rouge">grep</code>, you can type <code class="language-plaintext highlighter-rouge">wc --help</code> or <code class="language-plaintext highlighter-rouge">man wc</code> to
-see all options.</p>
+  <p><strong>Tip</strong> - Similar to <code class="language-plaintext highlighter-rouge">grep</code>, you can type <code class="language-plaintext highlighter-rouge">wc --help</code> or <code class="language-plaintext highlighter-rouge">man wc</code> to see all options.</p>
 </blockquote>
 
-<p><strong>About Pipes:</strong> * The pipe is a very important/powerful concept in
-Shell * You can string along as many commands together as you like</p>
+<p><strong>About Pipes:</strong> * The pipe is a very important/powerful concept in Shell * You can string along as many commands together as you like</p>
 
-<p>The philosophy behind the three redirection operators (<code class="language-plaintext highlighter-rouge">&gt;</code>, <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, <code class="language-plaintext highlighter-rouge">|</code>)
-you have learned so far is that none of them by themselves do a lot. BUT
-when you start chaining them together, you can do some really powerful
-things really efficiently.</p>
+<p>The philosophy behind the three redirection operators (<code class="language-plaintext highlighter-rouge">&gt;</code>, <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, <code class="language-plaintext highlighter-rouge">|</code>) you have learned so far is that none of them by themselves do a lot. BUT when you start chaining them together, you can do some really powerful things really efficiently.</p>
 
-<p><strong>To be able to use the shell effectively, becoming proficient in the
-use of the pipe and redirection operators is essential.</strong></p>
+<p><strong>To be able to use the shell effectively, becoming proficient in the use of the pipe and redirection operators is essential.</strong></p>
 
 <h2 id="optional-practice-with-searching-and-pipingredirection-and-gtf-files">Optional: Practice with searching and piping/redirection and GTF files</h2>
 
-<p>Let’s use the new commands in our toolkit and a few new ones to examine
-the “gene annotation” file, <strong>chr1-hg19_genes.gtf</strong>. We will be using
-this file to find the genomic coordinates of all known exons on
-chromosome 1.</p>
+<p>Let’s use the new commands in our toolkit and a few new ones to examine the “gene annotation” file, <strong>chr1-hg19_genes.gtf</strong>. We will be using this file to find the genomic coordinates of all known exons on chromosome 1.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> ~/unix_lesson/reference_data/
 </code></pre></div></div>
 
 <h3 id="introduction-to-the-gtf-file-format">Introduction to the GTF file format</h3>
 
-<p>Let’s explore our <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code> file a bit. What information
-does it contain?</p>
+<p>Let’s explore our <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code> file a bit. What information does it contain?</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>less chr1-hg19_genes.gtf
 </code></pre></div></div>
@@ -454,29 +361,19 @@ chr1    unknown exon    16858   17055   .       -       .       gene_id "WASH7P"
 </code></pre></div></div>
 
 <blockquote>
-  <p><strong>The GTF (Gene Transfer Format) file</strong> is a tab-delimited file with
-information arranged in a very specific manner, usually for NGS
-analysis. That information is specifically about all the various
-entities or features found in a genome; in this case, on chromosome 1.</p>
+  <p><strong>The GTF (Gene Transfer Format) file</strong> is a tab-delimited file with information arranged in a very specific manner, usually for NGS analysis. That information is specifically about all the various entities or features found in a genome; in this case, on chromosome 1.</p>
 
-  <p>For more information on this file format, check out the <a href="http://useast.ensembl.org/info/website/upload/gff.html">Ensembl
-site</a>.</p>
+  <p>For more information on this file format, check out the <a href="http://useast.ensembl.org/info/website/upload/gff.html">Ensembl site</a>.</p>
 </blockquote>
 
-<p>The columns in the <strong>GTF file contain the genomic coordinates (location)
-of gene features (exon, start_codon, stop_codon, CDS) along with the
-associated gene_names, transcript_ids and protein_ids (p_id)</strong>.</p>
+<p>The columns in the <strong>GTF file contain the genomic coordinates (location) of gene features (exon, start_codon, stop_codon, CDS) along with the associated gene_names, transcript_ids and protein_ids (p_id)</strong>.</p>
 
-<p>Given our understanding of splice isoforms, we know that a given exon
-can be part of 2 or more different transcripts generated from the same
-gene. In a GTF file, this exon will be represented multiple times, once
-for each transcript (or splice isoform). For example,</p>
+<p>Given our understanding of splice isoforms, we know that a given exon can be part of 2 or more different transcripts generated from the same gene. In a GTF file, this exon will be represented multiple times, once for each transcript (or splice isoform). For example,</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep </span>PLEKHN1 chr1-hg19_genes.gtf | <span class="nb">head</span> <span class="nt">-n</span> 5
 </code></pre></div></div>
 
-<p>This search returns two different transcripts of the same gene,
-NM_001160184 and NM_032129, that contain the same exon.</p>
+<p>This search returns two different transcripts of the same gene, NM_001160184 and NM_032129, that contain the same exon.</p>
 
 <h3 id="two-new-commands">Two new commands!</h3>
 
@@ -486,34 +383,20 @@ NM_001160184 and NM_032129, that contain the same exon.</p>
   <li><strong><code class="language-plaintext highlighter-rouge">cut</code> is a command that extracts columns from files.</strong></li>
 </ul>
 
-<p>We will use <code class="language-plaintext highlighter-rouge">cut</code> with the <code class="language-plaintext highlighter-rouge">-f</code> argument to specify which specific
-fields or columns from the dataset we want to extract. Let’s say we want
-to get the 1st column (chromosome number) and the 4th column (starting
-genomic position) from <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code> file, we can say:</p>
+<p>We will use <code class="language-plaintext highlighter-rouge">cut</code> with the <code class="language-plaintext highlighter-rouge">-f</code> argument to specify which specific fields or columns from the dataset we want to extract. Let’s say we want to get the 1st column (chromosome number) and the 4th column (starting genomic position) from <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code> file, we can say:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cut</span> <span class="nt">-f</span> 1,4 chr1-hg19_genes.gtf  | <span class="nb">head</span>
 </code></pre></div></div>
 
 <blockquote>
-  <p>The <code class="language-plaintext highlighter-rouge">cut</code> command assumes our data columns are separated by tabs (i.e.
-tab-delimited). The <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code> is a tab-delimited file, so
-the default <code class="language-plaintext highlighter-rouge">cut</code> command works for us. However, data can be separated
-by other types of delimiters like “,” or “;”. If your data is not tab
-delimited, there is an argument you can add to your <code class="language-plaintext highlighter-rouge">cut</code> command,
-<code class="language-plaintext highlighter-rouge">-d</code> to specify the delimiter (e.g. <code class="language-plaintext highlighter-rouge">-d ","</code> with a .csv file).</p>
+  <p>The <code class="language-plaintext highlighter-rouge">cut</code> command assumes our data columns are separated by tabs (i.e. tab-delimited). The <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code> is a tab-delimited file, so the default <code class="language-plaintext highlighter-rouge">cut</code> command works for us. However, data can be separated by other types of delimiters like “,” or “;”. If your data is not tab delimited, there is an argument you can add to your <code class="language-plaintext highlighter-rouge">cut</code> command, <code class="language-plaintext highlighter-rouge">-d</code> to specify the delimiter (e.g. <code class="language-plaintext highlighter-rouge">-d ","</code> with a .csv file).</p>
 </blockquote>
 
 <ul>
-  <li><strong><code class="language-plaintext highlighter-rouge">sort</code> is a command used to sort the contents of a file in a
-particular order.</strong> It has arguments that let you pick which column
-to sort by (<code class="language-plaintext highlighter-rouge">-k</code>), what kind of sorting you want to do (numeric <code class="language-plaintext highlighter-rouge">n</code>)
-and also if the result of the sorting should only return unique
-(<code class="language-plaintext highlighter-rouge">-u</code>) values. These are just 2 of the many features of the sort
-command.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">sort</code> is a command used to sort the contents of a file in a particular order.</strong> It has arguments that let you pick which column to sort by (<code class="language-plaintext highlighter-rouge">-k</code>), what kind of sorting you want to do (numeric <code class="language-plaintext highlighter-rouge">n</code>) and also if the result of the sorting should only return unique (<code class="language-plaintext highlighter-rouge">-u</code>) values. These are just 2 of the many features of the sort command.</li>
 </ul>
 
-<p>Let’s do a quick test of how the <code class="language-plaintext highlighter-rouge">-u</code> argument returns only unique lines
-(and remove duplicates).</p>
+<p>Let’s do a quick test of how the <code class="language-plaintext highlighter-rouge">-u</code> argument returns only unique lines (and remove duplicates).</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cut</span> <span class="nt">-f</span> 1,4 chr1-hg19_genes.gtf | <span class="nb">wc</span> <span class="nt">-l</span>
 </code></pre></div></div>
@@ -547,14 +430,9 @@ command.</li>
 
 <p><strong>Exercises</strong></p>
 
-<p>Now that we know what type of information is inside the GTF file, let’s
-use the commands we have learned so far to answer a simple question
-about our data: <strong>how many unique exons are present on chromosome 1
-using <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code>?</strong></p>
+<p>Now that we know what type of information is inside the GTF file, let’s use the commands we have learned so far to answer a simple question about our data: <strong>how many unique exons are present on chromosome 1 using <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code>?</strong></p>
 
-<p>To determine the number of unique exons on chromosome 1, we are going to
-perform a series of steps as shown below. In this exercise, you need to
-figure out the command line for each step.</p>
+<p>To determine the number of unique exons on chromosome 1, we are going to perform a series of steps as shown below. In this exercise, you need to figure out the command line for each step.</p>
 
 <ol>
   <li>Extract only the genomic coordinates of exon features</li>
@@ -563,26 +441,17 @@ figure out the command line for each step.</p>
   <li>Count the total number of exons</li>
 </ol>
 
-<p>Your end goal is to have a single line of code, wherein you have strung
-together multiple commands using the pipe operator. But, we recommend
-that you do it in a stepwise manner as detailed below.</p>
+<p>Your end goal is to have a single line of code, wherein you have strung together multiple commands using the pipe operator. But, we recommend that you do it in a stepwise manner as detailed below.</p>
 
 <h4 id="1-extract-only-the-genomic-coordinates-of-exon-features">1. Extract only the genomic coordinates of exon features</h4>
 
-<p>We only want the exons (not CDS or start_codon features), so let’s use
-<code class="language-plaintext highlighter-rouge">grep</code> to search for the word “exon”. You should do sanity check on the
-first few lines of the output of <code class="language-plaintext highlighter-rouge">grep</code> by piping the result to the
-<code class="language-plaintext highlighter-rouge">head</code> command. <strong><em>Report the command you have at this stage.</em></strong></p>
+<p>We only want the exons (not CDS or start_codon features), so let’s use <code class="language-plaintext highlighter-rouge">grep</code> to search for the word “exon”. You should do sanity check on the first few lines of the output of <code class="language-plaintext highlighter-rouge">grep</code> by piping the result to the <code class="language-plaintext highlighter-rouge">head</code> command. <strong><em>Report the command you have at this stage.</em></strong></p>
 
 <h4 id="2-subset-the-extracted-information-from-step-1-to-only-keep-genomic-coordinates">2. Subset the extracted information from step 1 to only keep genomic coordinates</h4>
 
-<p>We will define the uniqueness of an exon by its genomic coordinates,
-both start and end. Therefore, from the step 1 output, we need to keep 4
-columns (chr, start, stop, and strand) to find the total number of
-unique exons. The column numbers you want are 1, 4, 5, and 7.</p>
+<p>We will define the uniqueness of an exon by its genomic coordinates, both start and end. Therefore, from the step 1 output, we need to keep 4 columns (chr, start, stop, and strand) to find the total number of unique exons. The column numbers you want are 1, 4, 5, and 7.</p>
 
-<p>You can use <code class="language-plaintext highlighter-rouge">cut</code> to extract those columns from the output of step 1.
-<strong><em>Report the command you have at this stage.</em></strong></p>
+<p>You can use <code class="language-plaintext highlighter-rouge">cut</code> to extract those columns from the output of step 1. <strong><em>Report the command you have at this stage.</em></strong></p>
 
 <p>At this point, the first few lines should look like this:</p>
 
@@ -595,44 +464,29 @@ chr1    16858   17055   -
 
 <h4 id="3-remove-duplicate-exons">3. Remove duplicate exons</h4>
 
-<p>Now, we need to remove those exons that show up multiple times for
-different transcripts. We can use the <code class="language-plaintext highlighter-rouge">sort</code> command with the <code class="language-plaintext highlighter-rouge">-u</code>
-option. <strong><em>Report the command you have at this stage.</em></strong></p>
+<p>Now, we need to remove those exons that show up multiple times for different transcripts. We can use the <code class="language-plaintext highlighter-rouge">sort</code> command with the <code class="language-plaintext highlighter-rouge">-u</code> option. <strong><em>Report the command you have at this stage.</em></strong></p>
 
-<p>Do you see a change in how the sorting has changed? By default the
-<code class="language-plaintext highlighter-rouge">sort</code> command will sort and what you can’t see here is that it has
-removed the duplicates. We will use step 4 to check if this step worked.</p>
+<p>Do you see a change in how the sorting has changed? By default the <code class="language-plaintext highlighter-rouge">sort</code> command will sort and what you can’t see here is that it has removed the duplicates. We will use step 4 to check if this step worked.</p>
 
 <h4 id="4-count-the-total-number-of-exons">4. Count the total number of exons</h4>
 
-<p>First, check how many lines we would have without using <code class="language-plaintext highlighter-rouge">sort -u</code> by
-piping the output to <code class="language-plaintext highlighter-rouge">wc -l</code>.</p>
+<p>First, check how many lines we would have without using <code class="language-plaintext highlighter-rouge">sort -u</code> by piping the output to <code class="language-plaintext highlighter-rouge">wc -l</code>.</p>
 
-<p>Now, to count how many unique exons are on chromosome 1, we will add
-back the <code class="language-plaintext highlighter-rouge">sort -u</code> and pipe the output to <code class="language-plaintext highlighter-rouge">wc -l</code>. Do you observe a
-difference in number of lines?</p>
+<p>Now, to count how many unique exons are on chromosome 1, we will add back the <code class="language-plaintext highlighter-rouge">sort -u</code> and pipe the output to <code class="language-plaintext highlighter-rouge">wc -l</code>. Do you observe a difference in number of lines?</p>
 
-<p><strong><em>Report the command you have at this stage and the number of lines you
-see with and without the <code class="language-plaintext highlighter-rouge">sort -u</code>.</em></strong></p>
+<p><strong><em>Report the command you have at this stage and the number of lines you see with and without the <code class="language-plaintext highlighter-rouge">sort -u</code>.</em></strong></p>
 
 <details>
 
 <summary><b><i>Answers</i></b></summary>
 
-<p><i>Question 1</i><br /> <code>grep exon chr1-hg19_genes.gtf \|
-head</code><br /></p>
+<p><i>Question 1</i><br /> <code>grep exon chr1-hg19_genes.gtf \| head</code><br /></p>
 
-<p><i>Question 2</i><br /> <code>grep exon chr1-hg19_genes.gtf \| cut -f
-1,4,5,7 \| head</code><br /></p>
+<p><i>Question 2</i><br /> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| head</code><br /></p>
 
-<p><i>Question 3</i><br /> <code>grep exon chr1-hg19_genes.gtf \| cut -f
-1,4,5,7 \| sort -u \| head</code><br /></p>
+<p><i>Question 3</i><br /> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| sort -u \| head</code><br /></p>
 
-<p><i>Question 4</i><br /> <code>grep exon chr1-hg19_genes.gtf \| cut -f
-1,4,5,7 \| wc -l</code><br /> The output returns 37,213 lines.<br />
-<code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| sort -u \| wc
--l</code><br /> The output returns 22,769 lines, indicating that
-repetitive lines have been removed.<br /></p>
+<p><i>Question 4</i><br /> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| wc -l</code><br /> The output returns 37,213 lines.<br /> <code>grep exon chr1-hg19_genes.gtf \| cut -f 1,4,5,7 \| sort -u \| wc -l</code><br /> The output returns 22,769 lines, indicating that repetitive lines have been removed.<br /></p>
 
 </details>
 
@@ -640,36 +494,18 @@ repetitive lines have been removed.<br /></p>
 
 <h3 id="summary">Summary!</h3>
 
-<p>For what we did in one line of code in the exercise at the end, we could
-have done it in multiple steps by saving the output of each command to a
-new file. But that would not be as efficient as using pipes! All we
-needed was the number of unique exons, and the intermediate output was
-not useful. Avoiding the storage of the data from each of the
-intermediate steps prevents clutter, and helps us avoid wasting precious
-storage space!</p>
+<p>For what we did in one line of code in the exercise at the end, we could have done it in multiple steps by saving the output of each command to a new file. But that would not be as efficient as using pipes! All we needed was the number of unique exons, and the intermediate output was not useful. Avoiding the storage of the data from each of the intermediate steps prevents clutter, and helps us avoid wasting precious storage space!</p>
 
 <hr />
 
-<p><em>This lesson has been developed by members of the teaching team at the
-<a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core
-(HBC)</a>. These are open access
-materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons
-Attribution license</a> (CC
-BY 4.0), which permits unrestricted use, distribution, and reproduction
-in any medium, provided the original author and source are credited.</em></p>
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
 
 <ul>
   <li>
-    <p><em>The materials used in this lesson were derived from work that is
-Copyright © Data Carpentry (<a href="http://datacarpentry.org/">http://datacarpentry.org/</a>). All Data
-Carpentry instructional material is made available under the
-<a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution
-license</a> (CC BY 4.0).</em></p>
+    <p><em>The materials used in this lesson were derived from work that is Copyright © Data Carpentry (<a href="http://datacarpentry.org/">http://datacarpentry.org/</a>). All Data Carpentry instructional material is made available under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0).</em></p>
   </li>
   <li>
-    <p><em>Adapted from the lesson by Tracy Teal. Contributors: Paul Wilson,
-Milad Fatenejad, Sasha Wood, and Radhika Khetani for Software
-Carpentry (<a href="http://software-carpentry.org/">http://software-carpentry.org/</a>)</em></p>
+    <p><em>Adapted from the lesson by Tracy Teal. Contributors: Paul Wilson, Milad Fatenejad, Sasha Wood, and Radhika Khetani for Software Carpentry (<a href="http://software-carpentry.org/">http://software-carpentry.org/</a>)</em></p>
   </li>
 </ul>
 
