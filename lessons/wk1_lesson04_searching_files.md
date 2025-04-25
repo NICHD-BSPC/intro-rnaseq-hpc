@@ -1,10 +1,10 @@
 ---
 title: "The Shell: Searching and Redirection"
 author: "Harvard HPC staff, modified by E. Sally Chang at NICHD"
-date: "Last Modified January 2025"
+date: "Last Modified April 2025"
 ---
 
-Approximate time: 30 minutes (60 minutes if you do optional exercises)
+Approximate time: 30 minutes (60 minutes if you do final exercises)
 
 ## Learning objectives
 
@@ -14,7 +14,14 @@ Approximate time: 30 minutes (60 minutes if you do optional exercises)
 
 ## Are you logged into Biowulf, on a compute node, and in your course directory?
 
+<<<<<<< HEAD
 If not, first do that before proceeding! As a reminder, the course directory is: `/data/Bspc-training/$USER`
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+If not, first do that before proceeding! As a reminder, the course
+directory is: `/data/Bspc-training/$USER`
+=======
+If not, first do that before proceeding! As a reminder, the course directory is: `/data/$USER`
+>>>>>>> 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
 
 ## Searching files with `grep` command
 
@@ -36,7 +43,13 @@ B?@DDDDDDHHH?GH:?FCBGGB@C?DBEGIIIIAEF;FCGGI#####################################
 > **More information about the FASTQ file format**
 >
 > | Line | Description                                                                                                                        |
+<<<<<<< HEAD
 > |------|------------------------------------------------------------------------------------------------------------------------------------|
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+> |--------------------|----------------------------------------------------|
+=======
+> |---------------------|---------------------------------------------------|
+>>>>>>> 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
 > | 1    | Read name preceded by '\@'                                                                                                         |
 > | 2    | The actual DNA sequence                                                                                                            |
 > | 3    | Read name (same as line 1) preceded by a '+' or just a '+' sign                                                                    |
@@ -213,7 +226,16 @@ Take a look at the file and see if it contains what you think it should.
 
 **The redirection command for appending something to an existing file is `>>`.**
 
+<<<<<<< HEAD
 If we use `>>`, it will append to the existing content in a file, rather than overwrite it. This can be useful for saving more than one search. For example, the following command will append the bad reads from Mov10_oe_2 to the bad_reads.txt file that we just generated.
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+If we use `>>`, it will append to the existing content in a file, rather
+than overwrite it. This can be useful for saving more than one search.
+For example, the following command will append the bad reads from
+Mov10_oe_2 to the bad_reads.txt file that we just generated.
+=======
+If we use `>>`, it will append to the existing content in a file, rather than overwrite it. This can be useful for saving more than one search. For example, the following command will append the bad reads from `Mov10_oe_2` to the `bad_reads.txt` file that we just generated.
+>>>>>>> 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
 
 ``` bash
 $ grep -B 1 -A 2 NNNNNNNNNN Mov10_oe_2.subset.fq >> bad_reads.txt
@@ -261,18 +283,54 @@ $ grep NNNNNNNNNN Mov10_oe_1.subset.fq | wc -l
 
 > **Tip** - Similar to `grep`, you can type `wc --help` or `man wc` to see all options.
 
+<<<<<<< HEAD
 **About Pipes:** \* The pipe is a very important/powerful concept in Shell \* You can string along as many commands together as you like
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+**About Pipes:** \* The pipe is a very important/powerful concept in
+Shell \* You can string along as many commands together as you like
+=======
+**About Pipes:**
+>>>>>>> 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+
+<<<<<<< HEAD
+The philosophy behind the three redirection operators (`>`, `>>`, `|`) you have learned so far is that none of them by themselves do a lot. BUT when you start chaining them together, you can do some really powerful things really efficiently.
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+The philosophy behind the three redirection operators (`>`, `>>`, `|`)
+you have learned so far is that none of them by themselves do a lot. BUT
+when you start chaining them together, you can do some really powerful
+things really efficiently.
+=======
+-   The pipe is a very important/powerful concept in Shell
+>>>>>>> 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+
+<<<<<<< HEAD
+**To be able to use the shell effectively, becoming proficient in the use of the pipe and redirection operators is essential.**
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+**To be able to use the shell effectively, becoming proficient in the
+use of the pipe and redirection operators is essential.**
+=======
+-   You can string along as many commands together as you like
+>>>>>>> 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
 
 The philosophy behind the three redirection operators (`>`, `>>`, `|`) you have learned so far is that none of them by themselves do a lot. BUT when you start chaining them together, you can do some really powerful things really efficiently.
 
+<<<<<<< HEAD
+Let's use the new commands in our toolkit and a few new ones to examine the "gene annotation" file, **chr1-hg19_genes.gtf**. We will be using this file to find the genomic coordinates of all known exons on chromosome 1.
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+Let's use the new commands in our toolkit and a few new ones to examine
+the "gene annotation" file, **chr1-hg19_genes.gtf**. We will be using
+this file to find the genomic coordinates of all known exons on
+chromosome 1.
+=======
 **To be able to use the shell effectively, becoming proficient in the use of the pipe and redirection operators is essential.**
 
-## Optional: Practice with searching and piping/redirection and GTF files
+## Practice with searching and piping/redirection and GTF files
 
 Let's use the new commands in our toolkit and a few new ones to examine the "gene annotation" file, **chr1-hg19_genes.gtf**. We will be using this file to find the genomic coordinates of all known exons on chromosome 1.
+>>>>>>> 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
 
 ``` bash
-$ cd ~/unix_lesson/reference_data/
+$ cd unix_lesson/reference_data/
 ```
 
 ### Introduction to the GTF file format
