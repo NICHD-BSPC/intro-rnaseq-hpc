@@ -4,7 +4,7 @@ author: "Harvard HPC Staff, Modified by E. Sally Chang at NICHD"
 date: "Last Modified April 2025"
 ---
 
-Approximate time: 30 min
+Approximate time: 45 min
 
 ## Learning Objectives
 
@@ -233,7 +233,9 @@ O   → open new line above
 :!<command>  → run shell command (e.g., :!ls)  
 ```
 
-Upon creation of a file, vim is automatically in command mode. Let's *change to insert mode* by typing <kbd>i</kbd>. **Note the `--INSERT--` at the bottom left hand of the screen.** Now type in a few lines of text:
+### Our first entry into Vim
+
+Upon creation of a file, vim is automatically in normal mode. Let's *change to insert mode* by typing <kbd>i</kbd>. **Note the `--INSERT--` at the bottom left hand of the screen.** Now type in a few lines of text:
 
 <p align="center">
 
@@ -245,16 +247,16 @@ After you have finished typing, **press** <kbd>esc</kbd> to enter command mode.
 
 **Note the `--INSERT--` has now disappeared from the bottom of the screen.**
 
-> ### Review of Vim modes
->
-> | key                  | action                                       |
-> |----------------------|----------------------------------------------|
-> | <button>i</button>   | insert mode - to write and edit text         |
-> | <button>esc</button> | command mode - to issue commands / shortcuts |
+**Review of Insert Mode**
+
+| key                  | action                                       |
+|----------------------|----------------------------------------------|
+| <button>i</button>   | insert mode - to write and edit text         |
+| <button>esc</button> | command mode - to issue commands / shortcuts |
 
 ### Saving and Quitting
 
-To **"write to file"** or save the modifications made to the file, **type** <kbd>:w</kbd> when in command mode. You can see the commands you type in the bottom left-hand corner of the screen.
+To **"write to file"** or save the modifications made to the file, **type** <kbd>:</kbd> to enter command mode, then immediately type <kbd>w</kbd> to use the **write** (save) command. You can see the commands you type in the bottom left-hand corner of the screen.
 
 <p align="center">
 
@@ -317,20 +319,20 @@ Once you have finished typing, you can display line numbers by changing to *comm
 
 **Navigating around the file**
 
-| key (in command mode) | action                       |
-|-----------------------|------------------------------|
-| <button>gg</button>   | to move to top of file       |
-| <button>G</button>    | to move to bottom of file    |
-| <button>\$</button>   | to move to end of line       |
-| <button>0</button>    | to move to beginning of line |
-| <button>w</button>    | to move to next word         |
-| <button>b</button>    | to move to previous word     |
+| key (in normal mode) | action                       |
+|----------------------|------------------------------|
+| <button>gg</button>  | to move to top of file       |
+| <button>G</button>   | to move to bottom of file    |
+| <button>\$</button>  | to move to end of line       |
+| <button>0</button>   | to move to beginning of line |
+| <button>w</button>   | to move to next word         |
+| <button>b</button>   | to move to previous word     |
 
 Practice some of the editing shortcuts, then **quit the document without saving any changes**.
 
 **Editing the file**
 
-| key (in command mode)                     | action                                                         |
+| key (in normal mode)                      | action                                                         |
 |-------------------------------|-----------------------------------------|
 | <button>dw</button>                       | to delete word                                                 |
 | <button>dd</button>                       | to delete line                                                 |
@@ -339,11 +341,23 @@ Practice some of the editing shortcuts, then **quit the document without saving 
 | <button>/*pattern*</button>               | to search for a pattern (*n/N* to move to next/previous match) |
 | <button>:%s/*search*/*replace*/g</button> | to search for a pattern and replace for all occurrences        |
 
-|                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-|------------------------------------------------------------------------|
-| **More VIM resources**: The [BSPC training page](https://nichd-bspc.github.io/training/vim.html) has a number of resources and cheatsheets for solidifying these Vim skills!                                                                                                                                                                                                                                                                                      |
-| \### **Assignment**                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let's practice what we just learned in a brief challenge.                                                                                                                                                                                                                                                                                               |
-| 1\. Open `spider.txt`, and delete the word "water" from line #2. 2. Quit without saving. 3. Open `spider.txt` again, and replace every occurrence of "spider" with "unicorn". 4. Delete: "Down came the rain." 5. Save the file. 6. Undo your previous deletion. 7. Redo your previous deletion. 8. Delete the first and last words from each of the lines. 9. Save the file. 10. **Let your instructor now when you have done this and they'll check your work** |
+\|------------------------------------------------------------------------\|-------\|
 
-*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
+**More VIM resources**: The [BSPC training page](https://nichd-bspc.github.io/training/vim.html) has a number of resources and cheatsheets for solidifying these Vim skills!
+
+# **Assignment**
+
+We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let's practice what we just learned in a brief challenge.
+
+1.  Open `spider.txt`, and delete the word "water" from line #2.
+2.  Quit without saving.
+3.  Open `spider.txt` again, and replace every occurrence of "spider" with "unicorn".
+4.  Delete: "Down came the rain."
+5.  Save the file.
+6.  Undo your previous deletion.
+7.  Redo your previous deletion.
+8.  Delete the first and last words from each of the lines.
+9.  Save the file.
+10. **After completing the assignment in [Lesson 05](../wk1_lesson05_data_organization.md)**, copy to the `/assignments` directory you created.
+
+> *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
