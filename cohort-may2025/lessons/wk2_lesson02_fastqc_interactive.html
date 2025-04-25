@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Quality control using FASTQC | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Quality control using FASTQC" />
+<meta name="author" content="Modified by Sally Chang @ NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk2_lesson02_fastqc_interactive.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk2_lesson02_fastqc_interactive.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-01-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Quality control using FASTQC" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Modified by Sally Chang @ NICHD"},"dateModified":"2025-01-01T00:00:00+00:00","datePublished":"2025-01-01T00:00:00+00:00","headline":"Quality control using FASTQC","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk2_lesson02_fastqc_interactive.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk2_lesson02_fastqc_interactive.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=0cca73e3f539e6c191c549eead1d517f62d38a82">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Quality control using FASTQC</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h2 id="learning-objectives">Learning Objectives:</h2>
+
+<ul>
+  <li>Practice using more features of Biowulf (loading modules, running software, parallelization)</li>
+  <li>Describe the contents and format of a FASTQ file</li>
+  <li>Create a quality report using FASTQC</li>
+  <li>Open and look at the report(s) you generated using</li>
+  <li>Optionally, transfer one of the HTML files to your local computer using <code class="language-plaintext highlighter-rouge">scp</code></li>
+</ul>
+
+<p>Slides from the Tuesday lecture are available <a href="/intro-rnaseq-hpc/cohort-may2025/lectures/NICHD_RNASeq_week2_intro.pdf">here</a></p>
+
+<h2 id="quality-control-of-fastq-files">Quality Control of FASTQ files</h2>
+
+<p>The first step in the RNA-Seq workflow is to take the FASTQ files received from the sequencing facility and assess the quality of the sequence reads.</p>
+
+<p align="center">
+
+<img src="../img/rnaseq_salmon_workflow.png" width="400" />
+
+</p>
+
+<h3 id="unmapped-read-data-fastq">Unmapped read data (FASTQ)</h3>
+
+<p>The <a href="https://en.wikipedia.org/wiki/FASTQ_format">FASTQ</a> file format is the <em>de facto</em> file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information.</p>
+
+<p>The sequencer self-reports how good of a job it thinks it did calling each base correctly. If you need a refresher on how sequencing works, you can watch <a href="https://www.youtube.com/watch?v=fCd6B5HRaZ8">this youtube video from Illumina</a>. One way to think of the quality score is by how blurry the image is or how well it can be aligned to the previous image – see <a href="https://youtu.be/fCd6B5HRaZ8?t=184">this timestamp within the video</a>.</p>
+
+<p>Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a <code class="language-plaintext highlighter-rouge">@</code> character. For a single record (sequence read), there are four lines, each of which are described below:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Line</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Always begins with <code class="language-plaintext highlighter-rouge">@</code>, followed by information about the read</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>The actual DNA sequence</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Always begins with a <code class="language-plaintext highlighter-rouge">+</code>, and sometimes the same info as in line 1</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Has a string of characters representing the quality scores; must have same number of characters as line 2</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Let’s use the following read as an example:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@HWI-ST330:304:H045HADXX:1:1101:1111:61397
+CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNNNNNNNNNNNNNNGATCTTGG
++
+@?@DDDDDDHHH?GH:?FCBGGB@C?DBEGIIIIAEF;FCGGI#########################################################
+</code></pre></div></div>
+
+<p>The line 4 has characters encoding the quality of each nucleotide in the read. The legend below provides the mapping of quality scores (Phred-33) to the quality encoding characters. <em>Different quality encoding scales exist (differing by offset in the ASCII table), but note the most commonly used one is fastqsanger, which is the scale output by Illumina since mid-2011.</em></p>
+
+<p><code class="language-plaintext highlighter-rouge">Quality encoding: !"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHI``|         |         |         |         |</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">Quality score:    0........10........20........30........40</code></p>
+
+<p>Using the quality encoding character legend, the first nucelotide in the read (C) is called with a quality score of 31 (corresponding to encoding character <code class="language-plaintext highlighter-rouge">@</code>), and our Ns are called with a score of 2 (corresponding to encoding character <code class="language-plaintext highlighter-rouge">#</code>). <strong>As you can tell by now, this is a bad read.</strong></p>
+
+<p>Each quality score represents the probability that the corresponding nucleotide call is incorrect. This quality score is logarithmically based and is calculated as:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Q = -10 x log10(P), where P is the probability that a base call is erroneous
+</code></pre></div></div>
+
+<p>These probability values are the results from the base calling algorithm and dependent on how much signal was captured for the base incorporation. The score values can be interpreted as follows:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Phred Quality Score</th>
+      <th style="text-align: center">Probability of incorrect base call</th>
+      <th style="text-align: center">Base call accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">10</td>
+      <td style="text-align: center">1 in 10</td>
+      <td style="text-align: center">90%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">20</td>
+      <td style="text-align: center">1 in 100</td>
+      <td style="text-align: center">99%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">30</td>
+      <td style="text-align: center">1 in 1000</td>
+      <td style="text-align: center">99.9%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">40</td>
+      <td style="text-align: center">1 in 10,000</td>
+      <td style="text-align: center">99.99%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.</p>
+
+<blockquote>
+  <p>NOTE:
+What other ways can you think of for recording a quality score that corresponds to each base? What are the advantages/disadvantages?</p>
+</blockquote>
+
+<h2 id="finding-bad-reads-in-a-fastq-using-grep">Finding “bad reads” in a FASTQ using <code class="language-plaintext highlighter-rouge">grep</code></h2>
+
+<p>Suppose we want to see how many reads in our file <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code> contain “bad” data, i.e. reads with 10 consecutive Ns (<code class="language-plaintext highlighter-rouge">NNNNNNNNNN</code>), and capture these reads in a file for future analyses.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/rnaseq/raw_fastq
+
+<span class="nv">$ </span><span class="nb">grep </span>NNNNNNNNNN Mov10_oe_1.subset.fq
+</code></pre></div></div>
+
+<p>We get back a lot of reads or lines of text! You can add the <code class="language-plaintext highlighter-rouge">-c</code> option to count the number.</p>
+
+<blockquote>
+  <p>NOTE:
+What’s another way of counting lines?</p>
+</blockquote>
+
+<h4 id="extracting-the-full-fastq-reads">Extracting the full FASTQ Reads</h4>
+
+<p>As we just learned, one read in a FASTQ file is actually represented by 4 lines. We would need to modify the default behavior of <code class="language-plaintext highlighter-rouge">grep</code> and specify some argument/options. To look for all available options for the <code class="language-plaintext highlighter-rouge">grep</code> command, we can type <code class="language-plaintext highlighter-rouge">grep --help</code> (or <code class="language-plaintext highlighter-rouge">man grep</code>).</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">-B</code> and <code class="language-plaintext highlighter-rouge">-A</code> arguments for grep will be useful to return the matched line plus one before (<code class="language-plaintext highlighter-rouge">-B 1</code>) and two lines after (<code class="language-plaintext highlighter-rouge">-A 2</code>). Since each record is four lines, using these arguments will return the whole record.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@HWI-ST330:304:H045HADXX:1:1101:1111:61397
+CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNNNNNNNNNNNNNNGATCTTGG
++
+@?@DDDDDDHHH?GH:?FCBGGB@C?DBEGIIIIAEF;FCGGI#########################################################
+--
+@HWI-ST330:304:H045HADXX:1:1101:1106:89824
+CACAAATCGGCTCAGGAGGCTTGTAGAAAAGCTCAGCTTGACANNNNNNNNNNNNNNNNNGNGNACGAAACNNNNGNNNNNNNNNNNNNNNNNNNGTTGG
++
+?@@DDDDDB1@?:E?;3A:1?9?E9?&lt;?DGCDGBBDBF@;8DF#########################################################
+</code></pre></div></div>
+
+<h4 id="group-separators----and-how-to-remove-them">Group separators (<code class="language-plaintext highlighter-rouge">--</code>), and how to remove them</h4>
+
+<p>You will notice that when we use the <code class="language-plaintext highlighter-rouge">-B</code> and/or <code class="language-plaintext highlighter-rouge">-A</code> arguments with the <code class="language-plaintext highlighter-rouge">grep</code> command, the output has some additional lines with dashes (<code class="language-plaintext highlighter-rouge">--</code>), these dashes work to separate your returned “groups” of lines and are referred to as “group separators”. This might be problematic if you are trying to maintain the FASTQ file structure or if you simply do not want them in your output. Using the argument <code class="language-plaintext highlighter-rouge">--no-group-separator</code> with <code class="language-plaintext highlighter-rouge">grep</code> will disable this behavior.</p>
+
+<blockquote>
+  <p>NOTE:
+What’s another way of getting rid of those <code class="language-plaintext highlighter-rouge">---</code> lines?</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 <span class="nt">--no-group-separator</span> NNNNNNNNNN Mov10_oe_1.subset.fq
+</code></pre></div></div>
+
+<p>We can take this a step further and use <code class="language-plaintext highlighter-rouge">&gt;</code> to direct our output to a file.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ grep -B 1 -A 2 --no-group-separator NNNNNNNNNN Mov10_oe_1.subset.fq &gt; bad_reads.fq 
+</code></pre></div></div>
+
+<p>Looking at individual reads in a small FASTQ file is nice, but what about getting the whole picture for much bigger FASTQ files? <em>This is where a program like FASTQC will be useful!</em></p>
+
+<h2 id="working-with-compressed-files">Working with Compressed Files</h2>
+
+<p>Sequencing data files can be huge - from a few megabytes to gigabytes. And with even more sequencing at decreasing price points, it’s not hard to run out of storage space. As a result, most sequencing facilities will give you compressed sequencing data files, and <strong>Biowulf recommends that you keep your FASTQ files compressed when at all possible</strong>.</p>
+
+<p>The most common compression program used for individual files is <code class="language-plaintext highlighter-rouge">gzip</code> whose compressed files have the <code class="language-plaintext highlighter-rouge">.gz</code> extension. The tar and zip programs are most commonly used for compressing directories. Let’s take a look at the size difference between uncompressed and compressed files. We use the <code class="language-plaintext highlighter-rouge">-l</code> option of <code class="language-plaintext highlighter-rouge">ls</code> to get a long listing that includes the file size, and <code class="language-plaintext highlighter-rouge">-h</code> to have that size displayed in “human readable” form.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq
+$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz
+</code></pre></div></div>
+<p>To extract the file again, you could run <code class="language-plaintext highlighter-rouge">gunzip filename.gz</code>. However, there are many options for working with compressed files directly without extracting them to their full size again. <strong>Luckily for us, current versions of FASTQC can read <code class="language-plaintext highlighter-rouge">.gz</code> files directly.</strong> Another example is <code class="language-plaintext highlighter-rouge">zcat</code> – which is like <code class="language-plaintext highlighter-rouge">cat</code> except that it works on <code class="language-plaintext highlighter-rouge">gzip</code>-compressed (.gz) files! This is often paired with using pipe <code class="language-plaintext highlighter-rouge">|</code> into another command like below:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ zcat /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz | head
+</code></pre></div></div>
+<p>Check out <a href="https://cloud.wikis.utexas.edu/wiki/spaces/CoreNGSTools/pages/54069228/Working+with+FASTQ+files">this page from the University of Texas at Austin</a> for more info and a longer tutorial about <code class="language-plaintext highlighter-rouge">gzip</code>.</p>
+
+<hr />
+
+<h2 id="loading-the-fastqc-module"><strong>Loading the FASTQC module</strong></h2>
+
+<p>Now that we understand what information is stored in a FASTQ file, the next step is to examine quality metrics for our data. Rather than use built-in Bash tools though, we’ll use a specialized tool mde for this.</p>
+
+<p><a href="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/">FastQC</a> provides a simple way to do some quality checks on raw sequence data coming from high throughput sequencing. It provides a modular set of analyses, which you can use to obtain an impression of whether your data has any problems that you should be aware of before moving on to the next analysis.</p>
+
+<p>FastQC does the following:</p>
+
+<ul>
+  <li>
+    <p>accepts FASTQ files (or BAM files) as input</p>
+  </li>
+  <li>
+    <p>generates summary graphs and tables to help assess your data</p>
+  </li>
+  <li>
+    <p>generates an easy-to-view HTML-based report with the graphs and tables</p>
+  </li>
+</ul>
+
+<hr />
+
+<blockquote>
+  <p>NOTE: &gt; NOTE: Before we run FastQC, <strong>you should be on a compute node</strong> in an interactive session. We will start with the default <code class="language-plaintext highlighter-rouge">sinteractive</code> allocation which is 1 core (2 CPUs) and 768 MB/CPU (0.75 GB) of memory, which should be just fine for our purposes. See this <a href="https://hpc.nih.gov/docs/userguide.html#int">Biowulf page</a> for more information.</p>
+
+  <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sinteractive
+</code></pre></div>  </div>
+
+  <p><strong><em>And we should be in our rnaseq/ directory from within student directories:</em></strong></p>
+
+  <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/rnaseq
+</code></pre></div>  </div>
+</blockquote>
+
+<h3 id="load-the-fastqc-module">Load the FastQC module</h3>
+
+<p>Before we start using software, we have to load the module for each tool. On Biowulf, this is done using an <strong>LMOD</strong> system. It enables users to access software installed on Biwoulf easily, and manages every software’s dependencies. The LMOD system adds directory paths of software executables and their dependencies (if any) into the <code class="language-plaintext highlighter-rouge">$PATH</code> variable.</p>
+
+<p>Biowulf staff members have done the hard work of installing the software and all of its dependencies so that we don’t need to worry about that.</p>
+
+<p>If we check which modules we currently have loaded, we should not see FastQC.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>module list
+</code></pre></div></div>
+
+<p>If we try to run FastQC:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastqc
+</code></pre></div></div>
+
+<p>We’ll get <code class="language-plaintext highlighter-rouge">fastqc: command not found</code>. This is because the FastQC program is not in our <code class="language-plaintext highlighter-rouge">$PATH</code> (i.e. it’s not in a directory that shell will automatically check to run commands/programs).</p>
+
+<blockquote>
+  <p>NOTE: 
+How to check your $PATH?</p>
+</blockquote>
+
+<p>To run the FastQC program, we first need to load the appropriate module, so it puts the program into our path. To find the FastQC module to load we need to search the versions available:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>module spider fastqc
+</code></pre></div></div>
+
+<p>Once we know which version we want to use (often the most recent version), we can load the FastQC module.</p>
+
+<blockquote>
+  <p><strong>Discussion point</strong>: What are some reasons we might NOT want to use the most updated version of a tool in certain cases?</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>module load fastqc/0.12.1
+</code></pre></div></div>
+
+<p>Once a module for a tool is loaded, you have essentially made it directly available to you to use like any other basic shell command (for example, <code class="language-plaintext highlighter-rouge">ls</code>). Now what happens when you list the modules?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>module list
+</code></pre></div></div>
+
+<blockquote>
+  <p>NOTE:
+How do you expect your PATH to change? Check to see if you were right!</p>
+</blockquote>
+
+<p><strong>As a reminder - some LMOD commands are listed below</strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">LMOD command</th>
+      <th style="text-align: center">description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">module spider</code></td>
+      <td style="text-align: center">List all possible modules on the cluster</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">module spider modulename</code></td>
+      <td style="text-align: center">List all possible versions of that module</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">module avail</code></td>
+      <td style="text-align: center">List available modules available on the cluster</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">module avail string</code></td>
+      <td style="text-align: center">List available modules containing that string</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">module load modulename/version</code></td>
+      <td style="text-align: center">Add the full path to the tool to <code class="language-plaintext highlighter-rouge">$PATH</code> (and modify other environment variables)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">module list</code></td>
+      <td style="text-align: center">List loaded modules</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">module unload modulename/version</code></td>
+      <td style="text-align: center">Unload a specific module</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">module purge</code></td>
+      <td style="text-align: center">Unload all loaded modules</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="running-fastqc-on-our-samples"><strong>Running FASTQC on our samples</strong></h2>
+
+<p>Now, let’s create a directory to store the output of FastQC inside of the <code class="language-plaintext highlighter-rouge">results</code> directory you set up last week:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mkdir </span>results/fastqc
+</code></pre></div></div>
+
+<p>We will need to specify this directory in the command to run FastQC. How do we know which argument to use?</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>fastqc <span class="nt">--help</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>NOTE:
+When to use <code class="language-plaintext highlighter-rouge">man</code>, when to use <code class="language-plaintext highlighter-rouge">--help</code> or <code class="language-plaintext highlighter-rouge">-h</code>?</p>
+
+  <p>Use <code class="language-plaintext highlighter-rouge">man</code> for built-in Bash commands. Use <code class="language-plaintext highlighter-rouge">--help</code> or <code class="language-plaintext highlighter-rouge">-h</code> for other tools. Sometimes you can run the tool with no arguments and it will print the help. Sometimes it might need another command. It depends, but <code class="language-plaintext highlighter-rouge">-h</code> seems to be fairly standard.</p>
+</blockquote>
+
+<p>From the help manual, we know that <code class="language-plaintext highlighter-rouge">-o</code> (or <code class="language-plaintext highlighter-rouge">--outdir</code>) will create all output files in the specified output directory.</p>
+
+<blockquote>
+  <p><strong>You can always check out the Biowulf page for more information about running specific modules in the context of our specific cluster! See the</strong> <a href="https://hpc.nih.gov/apps/fastqc.html">fastqc page</a> <strong>as an example.</strong></p>
+</blockquote>
+
+<h3 id="specifying-input-and-output-options"><strong>Specifying Input and Output Options</strong>:</h3>
+
+<p><strong>Navigating to where we want to run the program</strong>: To make things simpler, let’s navigate to the directory where our input data is so we don’t need to use full path names for each of the input files.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>raw_data
+</code></pre></div></div>
+
+<p><strong>Specifying output location</strong>: From this directory, how would we specify that we want our output data to end up in the directory we just created? There are a few options based on what we know about full and relative paths. For example:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># don't run these, these are just options</span>
+fastqc <span class="nt">-o</span> ../results/fastqc
+fastqc <span class="nt">-o</span> /data/Bspc-training/<span class="nv">$USER</span>/rnaseq/results/fastqc
+</code></pre></div></div>
+
+<p><strong>Specifying input files</strong>: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FastQC you don’t need to specify an argument before listing input files like we did before specifying the output location.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>raw_data
+<span class="nv">$ </span>fastqc <span class="nt">-o</span> ../results/fastqc file1_1.fq file1_2.fq file2_1.fq file2_2.fq
+</code></pre></div></div>
+
+<p>But we could also use our fancy, space-saving <code class="language-plaintext highlighter-rouge">*.fq</code> wildcard instead.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>raw_data
+<span class="nv">$ </span>fastqc <span class="nt">-o</span> ../results/fastqc <span class="k">*</span>.fq
+</code></pre></div></div>
+
+<p><em>Did you notice how each file was processed pretty much one at a time?</em></p>
+
+<h2 id="using-parallelization"><strong>Using Parallelization</strong></h2>
+
+<p>FastQC has the capability of splitting up a single process to run on multiple cores! To do this, we will need to:</p>
+
+<ul>
+  <li>
+    <p>Exit the current interactive session and start another with more additional CPUs , since we started this interactive session with only the default 2 cores. We cannot have a tool to use more cores than requested on a compute node, or the scheduler (Slurm) will kill our job.</p>
+  </li>
+  <li>
+    <p>Specify an argument in FASTQC itself (-t) to process more than one input file at once</p>
+  </li>
+</ul>
+
+<p>Exit the interactive session and start a new one with 6 cores:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">exit</span>  <span class="c">#exit the current interactive session (you will be back on a login node)</span>
+<span class="nv">$ </span>sinteractive <span class="nt">--cpus-per-task</span><span class="o">=</span>6 <span class="nt">--mem</span><span class="o">=</span>2G
+</code></pre></div></div>
+
+<blockquote>
+  <p>NOTE:
+Why did we choose 6? Why 2G?</p>
+</blockquote>
+
+<p>Once you are on the compute node, check what job(s) you have running and what resources you are using.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>squeue <span class="nt">-u</span> <span class="nv">$USER</span>
+</code></pre></div></div>
+
+<p>Now that we are in a new interactive session with the appropriate resources, we will need to load the module again for this new session.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>module load fastqc/0.12.1  <span class="c">#reload the module for the new (6-core) interactive session</span>
+</code></pre></div></div>
+
+<p>Because we are on a new compute node, get to the <code class="language-plaintext highlighter-rouge">raw_data</code> directory (remember we are on a new compute node now):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/rnaseq/changes/raw_data
+</code></pre></div></div>
+
+<p>Run FastQC and use the multi-threading functionality of FastQC to run 6 jobs at once (with an additional argument <code class="language-plaintext highlighter-rouge">-t</code>):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>fastqc <span class="nt">-o</span> ../results/fastqc <span class="nt">-t</span> 6 <span class="k">*</span>.fq
+<span class="c"># note the extra parameter we specified for 6 threads</span>
+</code></pre></div></div>
+
+<p><strong>Discussion Points:</strong></p>
+
+<p><em>Do you notice a difference? Is there anything in the output that suggests this is no longer running serially?</em> <em>This overwrote our results. What is a way that we could prevent this from happening?</em></p>
+
+<h2 id="viewing-results-from-fastqc"><strong>Viewing results from FastQC</strong></h2>
+
+<p>For each individual FASTQ file that is input to FastQC, there are <strong>two output files that are generated</strong>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-lh</span> ../results/fastqc/
+</code></pre></div></div>
+
+<ol>
+  <li>The first is <strong>an HTML file</strong> which is a self-contained document with various graphs embedded into it. Each of the graphs evaluate different quality aspects of our data, we will discuss in more detail in this lesson.</li>
+  <li>Alongside the HTML file is <strong>a zip file</strong> (with the same name as the HTML file, but with .zip added to the end). This file contains the different plots from the report as separate image files but also contains data files which are designed to be easily parsed to allow for a more detailed and automated evaluation of the raw data on which the QC report is built.</li>
+</ol>
+
+<h2 id="viewing-the-html-report">Viewing the HTML report</h2>
+
+<p>We will only need to look at the HTML report for a given input file. It is not possible to view HTML files directly on the cluster from the command line. We will view the HTML result for <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code> by <a href="https://hpc.nih.gov/docs/hpcdrive.html">locally mounting an HPC System Directory</a> so you can access the HTMLs locally.</p>
+
+<blockquote>
+  <h3 id="what-does-this-do">What does this do?</h3>
+
+  <p>The <a href="https://hpc.nih.gov/storage">HPC System Directories</a>, which include /home, /data, and /scratch, can be mounted to your local workstation if you are on the NIH network or VPN, allowing you to easily drag and drop files between the two places. Note that this is most suitable for transferring small file. Users transferring large amounts of data to and from the HPC systems should continue to use rsync or Globus.</p>
+
+  <p>Mounting your HPC directories to your local system is particularly userful for viewing HTML reports generated in the course of your analyses on the HPC systems. For these cases, you should be able to navigate to and select the desired html file to open them in your local system’s web browser.</p>
+</blockquote>
+
+<p>Right now, this capability only works from your <code class="language-plaintext highlighter-rouge">/data/$USER</code> directory:</p>
+
+<ol>
+  <li>Copy your <code class="language-plaintext highlighter-rouge">/fastqc</code> directory to <code class="language-plaintext highlighter-rouge">/data/$USER</code> using <code class="language-plaintext highlighter-rouge">copy -r</code></li>
+  <li>Follow the instructions on the Biowulf page above for your operating system, and navigate to the <code class="language-plaintext highlighter-rouge">smb://hpcdrive.nih.gov/data/username</code> directory. You will actually need to write out your username here - the <code class="language-plaintext highlighter-rouge">$USER</code> variable will not work in this context. From here, you can click through to navigate to open <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset_fastqc.html</code>. In another lesson this week you will learn more about interpreting this result!</li>
+</ol>
+
+<hr />
+
+<h2 id="bonus-using-secure-copy"><strong>BONUS</strong>: Using secure copy</h2>
+
+<p>Another useful way of viewing the HTML or other output from Biowulf is to actually copy the file from Biowulf to your local computer using the command line.</p>
+
+<p>We will be using the <code class="language-plaintext highlighter-rouge">scp</code> (secure copy) command to get the same HTML report from its location on Biowulf to your Desktop. This command should be available from both GitBash and Terminal.</p>
+
+<p><code class="language-plaintext highlighter-rouge">scp</code> can be used from your local computer to both get a remote file, OR send a local file to a server like Biowulf. The general form of the <code class="language-plaintext highlighter-rouge">scp</code> command for <em>getting</em> a remote file is as follows.</p>
+
+<p>First, specify your login info and the location of the remote file you want to transfer. Then, specify the path where you want your file to end up once copied:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>scp username@helix.nih.gov:/path/to/desired/dir/file   /path/to/local/dir
+</code></pre></div></div>
+
+<p>Interactive Data Transfers should be performed on <strong>helix.nih.gov</strong>, the designated system for interactive data transfers and large-scale file manipulation. It has the same directory structure as Biowulf and access to all of the files.</p>
+
+<ol>
+  <li>
+    <p>Before you run <code class="language-plaintext highlighter-rouge">scp</code>, make sure to open another Terminal/GitBash window, so your first one can stay logged into Biowulf.</p>
+  </li>
+  <li>
+    <p>Then, for consistency, let’s all navigate to our LOCAL computer’s desktop folder. In the window you just opened, something like this command should work (but let us know if the Windows equivalent is different):</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cd ~/Desktop
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Type in the following command to grab an output HTML from Biowulf (let’s use the copy you just placed in your <code class="language-plaintext highlighter-rouge">/data/$USER</code> directory) and put it in your current directory ( <code class="language-plaintext highlighter-rouge">.</code>).</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>scp username@helix.nih.gov:/data/Bspc-training/<span class="nv">$USER</span>/results/fastqc/Mov10_oe_1.subset_fastqc.html <span class="nb">.</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>The file should appear on your Desktop. Click to open!</p>
+  </li>
+</ol>
+
+<p><strong>Note</strong>: When working with bigger files, you will likely want to use the <code class="language-plaintext highlighter-rouge">rsync</code> command, which has many advantages, such as restarting the transfer if your connection drops. There are some good <a href="https://nichd-bspc.github.io/training/rsync.html">BSPC training materials</a> about this.</p>
+
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+<ul>
+  <li><em>The materials used in this lesson was derived from work that is Copyright © Data Carpentry (<a href="http://datacarpentry.org/">http://datacarpentry.org/</a>). All Data Carpentry instructional material is made available under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0).</em></li>
+</ul>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>

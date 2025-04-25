@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>DGE analysis using LRT in DESeq2 | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="DGE analysis using LRT in DESeq2" />
+<meta name="author" content="Harvard HPC Staff, Adapted by Sally Chang at NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk8_lesson01_LRT_results.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk8_lesson01_LRT_results.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-03-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="DGE analysis using LRT in DESeq2" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Adapted by Sally Chang at NICHD"},"dateModified":"2025-03-01T00:00:00+00:00","datePublished":"2025-03-01T00:00:00+00:00","headline":"DGE analysis using LRT in DESeq2","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk8_lesson01_LRT_results.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk8_lesson01_LRT_results.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=0cca73e3f539e6c191c549eead1d517f62d38a82">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">DGE analysis using LRT in DESeq2</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <p>Approximate time: 60 minutes</p>
+
+<h2 id="learning-objectives">Learning Objectives</h2>
+
+<ul>
+  <li>Apply the Likelihood Ratio Test (LRT) for hypothesis testing</li>
+  <li>Compare results generated from the LRT to results obtained using the Wald test</li>
+  <li>Identify shared expression profiles from the LRT significant gene list</li>
+</ul>
+
+<h2 id="exploring-results-from-the-likelihood-ratio-test-lrt">Exploring results from the Likelihood ratio test (LRT)</h2>
+
+<p>DESeq2 also offers the Likelihood Ratio Test as an alternative <strong>when evaluating expression change across more than two levels</strong>. Genes which are identified as significant, are those that are changing in expression in any direction across the different factor levels.</p>
+
+<p>Generally, this test will result in a larger number of genes than the individual pair-wise comparisons. While the LRT is a test of significance for differences of any level(s) of the factor, one should not expect it to be exactly equal to the union of sets of genes using Wald tests (although we do expect a high degree of overlap).</p>
+
+<h2 id="the-results-table">The <code class="language-plaintext highlighter-rouge">results()</code> table</h2>
+
+<p>To extract the results from our <code class="language-plaintext highlighter-rouge">dds_lrt</code> object we can use the same <code class="language-plaintext highlighter-rouge">results()</code> function we had used with the Wald test. <em>There is no need for contrasts since we are not making a pair-wise comparison.</em></p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> In an earlier lesson on hypothesis testing, we had you create the object <code class="language-plaintext highlighter-rouge">dds_lrt</code>.</p>
+
+  <p>If you are <strong>having trouble finding the object</strong>, please run the code: <code class="language-plaintext highlighter-rouge">dds_lrt &lt;- DESeq(dds, test="LRT", reduced = ~ 1 )</code></p>
+</blockquote>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Extract results for LRT</span><span class="w">
+</span><span class="n">res_LRT</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds_lrt</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Let’s take a look at the results table:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># View results for LRT</span><span class="w">
+</span><span class="n">res_LRT</span><span class="w">  
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>log2 fold change (MLE): sampletype MOV10 overexpression vs control 
+LRT p-value: '~ sampletype' vs '~ 1' 
+DataFrame with 78932 rows and 6 columns
+                   baseMean log2FoldChange     lfcSE      stat
+                  &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+ENSG00000290825.2  0.323042       0.877124  3.337510  0.358728
+ENSG00000223972.6  0.000000             NA        NA        NA
+ENSG00000310526.1 88.634809       0.108432  0.197132  0.857979
+ENSG00000227232.6  0.000000             NA        NA        NA
+ENSG00000278267.1  0.000000             NA        NA        NA
+...                     ...            ...       ...       ...
+ENSG00000303867.1   0.00000             NA        NA        NA
+ENSG00000303902.1   0.00000             NA        NA        NA
+ENSG00000306528.1   0.00000             NA        NA        NA
+ENSG00000297844.1   0.00000             NA        NA        NA
+ENSG00000309258.1   7.00007       -2.20108  0.846886   10.3397
+                      pvalue      padj
+                   &lt;numeric&gt; &lt;numeric&gt;
+ENSG00000290825.2   0.835801        NA
+ENSG00000223972.6         NA        NA
+ENSG00000310526.1   0.651167  0.772761
+ENSG00000227232.6         NA        NA
+ENSG00000278267.1         NA        NA
+...                      ...       ...
+ENSG00000303867.1         NA        NA
+ENSG00000303902.1         NA        NA
+ENSG00000306528.1         NA        NA
+ENSG00000297844.1         NA        NA
+ENSG00000309258.1 0.00568548 0.0153827
+</code></pre></div></div>
+
+<p>The results table output looks similar to the Wald test results, with identical columns to what we observed previously.</p>
+
+<h3 id="why-are-fold-changes-reported-for-an-lrt-test">Why are fold changes reported for an LRT test?</h3>
+
+<p>For analyses using the likelihood ratio test, the p-values are determined solely by the difference in deviance between the full and reduced model formula. <strong>A single log2 fold change is printed in the results table for consistency with other results table outputs, but is not associated with the actual test. You should ignore this column in results from LRT.</strong></p>
+
+<p><strong>Columns relevant to the LRT test:</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">baseMean</code>: mean of normalized counts for all samples</li>
+  <li><code class="language-plaintext highlighter-rouge">stat</code>: the difference in deviance between the reduced model and the full model</li>
+  <li><code class="language-plaintext highlighter-rouge">pvalue</code>: the stat value is compared to a chi-squared distribution to generate a pvalue</li>
+  <li><code class="language-plaintext highlighter-rouge">padj</code>: BH adjusted p-values</li>
+</ul>
+
+<p><strong>Additional columns:</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">log2FoldChange</code>: log2 fold change</li>
+  <li><code class="language-plaintext highlighter-rouge">lfcSE</code>: standard error</li>
+</ul>
+
+<blockquote>
+  <p><strong>NOTE:</strong> Printed at the top of the the results table are the two sample groups used to generate the log2 fold change values that we observe in the results table. This can be controlled using the <code class="language-plaintext highlighter-rouge">name</code> argument; the value provided to name must be an element of resultsNames(dds).</p>
+</blockquote>
+
+<h2 id="identifying-significant-genes">Identifying significant genes</h2>
+
+<p>When filtering significant genes from the LRT we put a threshold only the <code class="language-plaintext highlighter-rouge">padj</code> column. <em>How many genes are significant at default p-adj of 0.1?</em></p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># set up cutoff to match DEseq2 and BSPC default</span><span class="w">
+</span><span class="n">padj.cutoff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.1</span><span class="w">
+
+</span><span class="c1"># Create a data frame of these results</span><span class="w">
+</span><span class="n">res_LRT_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_LRT</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># You probably want to also have those gene symbols attached</span><span class="w">
+</span><span class="n">res_LRT_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">gtf_names</span><span class="p">,</span><span class="n">res_LRT_df</span><span class="p">,</span><span class="w"> </span><span class="n">by.x</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">by.y</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w"> 
+
+</span><span class="c1"># Check out what this looks like with `head()`</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">res_LRT_df</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># And now you can write this out for further analysis!</span><span class="w">
+</span><span class="n">write.table</span><span class="p">(</span><span class="n">res_LRT_df</span><span class="p">,</span><span class="s2">"res_LRT_df.tsv"</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="o">=</span><span class="s2">"\t"</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">col.names</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span><span class="n">quote</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Subset to return genes with padj &lt; 0.1 </span><span class="w">
+</span><span class="n">sigLRT_genes</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_LRT_df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
+  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Get number of significant genes</span><span class="w">
+</span><span class="n">nrow</span><span class="p">(</span><span class="n">sigLRT_genes</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Compare to numbers we had from Wald test</span><span class="w">
+</span><span class="n">nrow</span><span class="p">(</span><span class="n">sigOE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The number of significant genes observed from the LRT is quite high. This list includes genes that can be changing in any direction across the three factor levels (control, KO, overexpression). To reduce the number of significant genes, we can increase the stringency of our FDR threshold (<code class="language-plaintext highlighter-rouge">padj.cutoff</code>).</p>
+
+<hr />
+
+<p><strong>In-Class Demo:</strong></p>
+
+<ol>
+  <li>Compare the resulting gene list from the LRT test to the gene lists from the Wald test comparisons.
+    <ol>
+      <li>
+        <p>How many of the <code class="language-plaintext highlighter-rouge">sigLRT_genes</code> overlap with the significant genes in <code class="language-plaintext highlighter-rouge">sigOE</code>?</p>
+
+        <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## But this just prints it out, we want to count </span><span class="w">
+</span><span class="n">intersect</span><span class="p">(</span><span class="n">sigLRT_genes</span><span class="o">$</span><span class="n">symbol</span><span class="p">,</span><span class="w"> </span><span class="n">sigOE</span><span class="o">$</span><span class="n">symbol</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">## count the number of elements</span><span class="w">
+</span><span class="nf">length</span><span class="p">(</span><span class="n">intersect</span><span class="p">(</span><span class="n">sigLRT_genes</span><span class="o">$</span><span class="n">symbol</span><span class="p">,</span><span class="w"> </span><span class="n">sigOE</span><span class="o">$</span><span class="n">symbol</span><span class="p">))</span><span class="w">
+</span></code></pre></div>        </div>
+      </li>
+      <li>
+        <p>How many of the <code class="language-plaintext highlighter-rouge">sigLRT_genes</code> overlap with the significant genes in <code class="language-plaintext highlighter-rouge">sigKD</code>?</p>
+      </li>
+    </ol>
+  </li>
+</ol>
+
+<hr />
+
+<h2 id="identifying-clusters-of-genes-with-shared-expression-profiles">Identifying clusters of genes with shared expression profiles</h2>
+
+<p>We now have this list of ~7K significant genes that we know are changing in some way across the three different sample groups. What do we do next?</p>
+
+<p>A good next step is to identify groups of genes that share a pattern of expression change across the sample groups (levels). To do this we will be using a clustering tool called <code class="language-plaintext highlighter-rouge">degPatterns</code> from the ‘DEGreport’ package. The <code class="language-plaintext highlighter-rouge">degPatterns</code> tool uses a <strong>hierarchical clustering approach based on pair-wise correlations</strong> between genes, then cuts the hierarchical tree to generate groups of genes with similar expression profiles. The tool cuts the tree in a way to optimize the diversity of the clusters, such that the variability inter-cluster &gt; the variability intra-cluster.</p>
+
+<p>Before we begin clustering, we will <strong>first subset our rlog transformed normalized counts</strong> to retain only the differentially expressed genes (padj &lt; 0.1).</p>
+
+<p>In our case, it may take some time to run the clustering on the thousands of significant genes, and so for class demonstration purposes we will subset to keep only the top 1000 genes sorted by p-adjusted value.</p>
+
+<blockquote>
+  <h4 id="where-do-i-get-rlog-transformed-counts">Where do I get rlog transformed counts?</h4>
+
+  <p>This rlog transformation was applied in an <a href="03_DGE_QC_analysis.md#transform-normalized-counts-for-the-mov10-dataset">earlier lesson</a> when we performed QC analysis. If you <strong>do not see this in your environment</strong>, run the following code:</p>
+
+  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>### Transform counts for data visualization
+rld &lt;- rlog(dds, blind=TRUE)
+rld_mat &lt;- assay(rld)
+</code></pre></div>  </div>
+</blockquote>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Subset results to top 1000 for faster cluster finding (for classroom demo purposes)</span><span class="w">
+</span><span class="n">clustering_sig_genes</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sigLRT_genes</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">arrange</span><span class="p">(</span><span class="n">padj</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="m">1000</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Obtain rlog values for those significant genes</span><span class="w">
+</span><span class="n">cluster_rlog</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rld_mat</span><span class="p">[</span><span class="n">clustering_sig_genes</span><span class="o">$</span><span class="n">ensgene</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The rlog transformed counts for the significant genes are input to <code class="language-plaintext highlighter-rouge">degPatterns</code> along with a few additional arguments:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">metadata</code>: the metadata dataframe that corresponds to samples</li>
+  <li><code class="language-plaintext highlighter-rouge">time</code>: character column name in metadata that will be used as variable that changes. Does not necessarily need to be actually <code class="language-plaintext highlighter-rouge">time</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">col</code>: character column name in metadata to separate samples</li>
+</ul>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Use the `degPatterns` function from the 'DEGreport' package to show gene clusters across sample groups</span><span class="w">
+
+</span><span class="c1">#degpatterns expects our meta variables to be factors, not characters</span><span class="w">
+</span><span class="n">meta</span><span class="o">$</span><span class="n">sampletype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">as.factor</span><span class="p">(</span><span class="n">meta</span><span class="o">$</span><span class="n">sampletype</span><span class="p">)</span><span class="w">
+</span><span class="n">clusters</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">degPatterns</span><span class="p">(</span><span class="n">cluster_rlog</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="o">=</span><span class="w"> </span><span class="kc">NULL</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Once the clustering is finished running, you will get your command prompt back in the console and you should see a figure appear in your plot window. The genes have been clustered into four different groups. For each group of genes, we have a boxplot illustrating expression change across the different sample groups. A line graph is overlayed to illustrate the trend in expression change.</p>
+
+<p align="center">
+
+<img src="../img/degPatterns_figure.png" width="800" />
+
+</p>
+
+<p>Suppose we are interested in the genes which show a decreased expression in the knockdown samples and increase in the overexpression. The closest pattern to this might group 1, with 275 genes. However it’s important to note that <strong>the clusters do not have statistical significance.</strong>. That is, just because the pattern seems to have a shape where MOV10 knockdown looks to be less, this does NOT mean that these genes have signficantly decreased expression in MOV10 relative to control. To know that, we’d need to inspect the contrast that specifically compares those two conditions.</p>
+
+<p>But that cluster still seems interesting, so let’s explore the output to see what genes those are. What type of data structure is the <code class="language-plaintext highlighter-rouge">clusters</code> output?</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># What type of data structure is the `clusters` output?</span><span class="w">
+</span><span class="nf">class</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We can see what objects are stored in the list by using <code class="language-plaintext highlighter-rouge">names(clusters)</code>. There is a dataframe stored inside. This is the main result so let’s take a look at it. The first column contains the genes, and the second column contains the cluster number to which they belong.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Let's see what is stored in the `df` component</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">clusters</span><span class="o">$</span><span class="n">df</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Since we are interested in Group 1, we can filter the dataframe to keep only those genes:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Extract the Group 1 genes</span><span class="w">
+</span><span class="n">group1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">clusters</span><span class="o">$</span><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+          </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">cluster</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>After extracting a group of genes, we can also re-attach the <code class="language-plaintext highlighter-rouge">gene symbols</code> and use annotation packages to obtain additional information. We can also use these lists of genes as input to downstream functional analysis tools to obtain more biological insight and see whether the groups of genes share a specific function.</p>
+
+<h2 id="time-course-analyses-with-lrt">Time course analyses with LRT</h2>
+
+<p>Despite the popularity of static measurement of gene expression, time-course capturing of biological processes is essential to reflect their dynamic nature, particularly when patterns are complex and are not simply ascending or descending. When working with this type of data, the Likelihood Ratio Test (LRT) is especially helpful. We can use the LRT to explore whether there are any significant differences across a series of timepoints and further evaluate differences observed between sample classes.</p>
+
+<p>For example, suppose we have an experiment looking at the effect of treatment over time on mice of two different genotypes. We could use a design formula for our ‘full model’ that would include the major sources of variation in our data: <code class="language-plaintext highlighter-rouge">genotype</code>, <code class="language-plaintext highlighter-rouge">treatment</code>, <code class="language-plaintext highlighter-rouge">time</code>, and our main condition of interest, which is the difference in the effect of treatment over time (<code class="language-plaintext highlighter-rouge">treatment:time</code>).</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> This is just example code for our hypothetical experiment. You <strong>should not run this code</strong>.</p>
+</blockquote>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## DO NOT RUN</span><span class="w">
+
+</span><span class="n">full_model</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">genotype</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">treatment</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">treatment</span><span class="o">:</span><span class="n">time</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To perform the LRT test, we also need to provide a reduced model, that is the full model without the <code class="language-plaintext highlighter-rouge">treatment:time</code> term:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## DO NOT RUN</span><span class="w">
+
+</span><span class="n">reduced_model</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">genotype</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">treatment</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">time</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Then, we could run the LRT by using the following code:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## DO NOT RUN</span><span class="w">
+
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeqDataSetFromMatrix</span><span class="p">(</span><span class="n">countData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">raw_counts</span><span class="p">,</span><span class="w"> </span><span class="n">colData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">metadata</span><span class="p">,</span><span class="w"> </span><span class="n">design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">genotype</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">treatment</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">treatment</span><span class="o">:</span><span class="n">time</span><span class="p">)</span><span class="w">
+
+</span><span class="n">dds_lrt_time</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">test</span><span class="o">=</span><span class="s2">"LRT"</span><span class="p">,</span><span class="w"> </span><span class="n">reduced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">genotype</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">treatment</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">time</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To understand what kind of gene expression patterns will be identified as differentially expressed, we have a few examples below. In the plots below we have Time on the x-axis and gene expression on the y-axis. In this dataset there are two samples for each time point, one having undergone some treatment (red) and the other without (blue).</p>
+
+<p>For this figure, we are depicting the type of <strong>genes that will not be identified as differentially expressed.</strong> Here, we observe that GeneX is differentially expressed between the time points, however there is no difference in that expression pattern between the treatment groups.</p>
+
+<p align="center">
+
+<img src="../img/lrt_time_nodiff.png" width="300" />
+
+</p>
+
+<p>The type of <strong>gene expression patterns we do expect</strong> the LRT to return are those that exhibit differences in the effect of treatment over time. In the example below, GeneX displays a different expression pattern over time for the two treatment groups.</p>
+
+<p align="center">
+
+<img src="../img/lrt_time_yesdiff.png" width="300" />
+
+</p>
+
+<p>Continuing with our example dataset, after running the LRT we can determine the set of significant genes using a threshold of <code class="language-plaintext highlighter-rouge">padj</code> &lt; 0.05. The next step would be to sort those genes into groups based on shared expression patterns, and we could do this using <code class="language-plaintext highlighter-rouge">degPatterns()</code>. Here, you will notice that we make use of the <code class="language-plaintext highlighter-rouge">col</code> argument since we have two groups that we are comparing to one another.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clusters</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">degPatterns</span><span class="p">(</span><span class="n">cluster_rlog</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">time</span><span class="o">=</span><span class="s2">"time"</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="o">=</span><span class="s2">"treatment"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Depending on what type of shared expression profiles exist in your data, you can then extract the groups of genes associated with the patterns of interest and move on to functional analysis for each of the gene groups of interest.</p>
+
+<hr />
+
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+<ul>
+  <li><em>Materials and hands-on activities were adapted from <a href="http://www.bioconductor.org/help/workflows/rnaseqGene/#de">RNA-seq workflow</a> on the Bioconductor website</em></li>
+</ul>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>

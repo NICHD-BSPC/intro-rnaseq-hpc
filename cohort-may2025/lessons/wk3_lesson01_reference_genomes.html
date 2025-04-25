@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Reference genomes and genome indices | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Reference genomes and genome indices" />
+<meta name="author" content="Harvard HPC Staff, modified by Sally Chang @ NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk3_lesson01_reference_genomes.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk3_lesson01_reference_genomes.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Reference genomes and genome indices" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, modified by Sally Chang @ NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"Reference genomes and genome indices","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk3_lesson01_reference_genomes.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk3_lesson01_reference_genomes.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=0cca73e3f539e6c191c549eead1d517f62d38a82">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-150953419-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Reference genomes and genome indices</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h3 id="note">NOTE:</h3>
+<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
+
+<p>Approximate time: 50 minutes</p>
+
+<h2 id="learning-objectives">Learning Objectives:</h2>
+
+<ul>
+  <li>Download reference genome files needed for mapping</li>
+  <li>Find an appropriate reference genome for “your” organism</li>
+  <li>Build a genome index that will be used in the next lesson</li>
+  <li>Use Bash commands to summarize aspects of a GTF file</li>
+</ul>
+
+<h2 id="intro-to-read-alignment">Intro to Read Alignment</h2>
+
+<p><img src="../img/RNAseqWorkflow.png" width="400" /></p>
+
+<p>Now that we have explored the quality of our raw reads, we can move on to read alignment. We perform read alignment or mapping to determine where in the genome the reads originated from. The alignment process consists of choosing an appropriate reference genome to map our reads against and performing the read alignment using one of several splice-aware alignment tools. We are going to make use of the <a href="http://bioinformatics.oxfordjournals.org/content/early/2012/10/25/bioinformatics.bts635">STAR</a> aligner.</p>
+
+<p><strong>No matter what aligner you are using steps involved are:</strong></p>
+
+<ol>
+  <li>Creating a genome index (after identifying the appropriate reference for your organism or use case). For STAR, the necessary input is:
+    <ol>
+      <li>The reference sequence in FASTA format</li>
+      <li>Annotations associated with the reference genome in GTF format</li>
+    </ol>
+  </li>
+  <li>Mapping reads to the genome, which needs:
+    <ol>
+      <li>Your quality-checked reads in FASTQ format</li>
+      <li>The output of the genome indexing step, above</li>
+    </ol>
+  </li>
+</ol>
+
+<h2 id="prepping-for-this-lesson">Prepping for this lesson</h2>
+
+<p>To get started with this lesson, start an interactive session:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>sinteractive
+</code></pre></div></div>
+
+<p>You should have a directory tree setup similar to that shown below. It is best practice to have all files you intend on using for your workflow present within the same directory.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rnaseq
+    ├── logs
+    ├── meta
+    ├── raw_data
+    │   ├── Irrel_kd_1.subset.fq
+    │   ├── Irrel_kd_2.subset.fq
+    │   ├── Irrel_kd_3.subset.fq
+    │   ├── Mov10_oe_1.subset.fq
+    │   ├── Mov10_oe_2.subset.fq
+    │   └── Mov10_oe_3.subset.fq
+    ├── results
+    └── scripts
+</code></pre></div></div>
+
+<h2 id="finding-reference-genomes">Finding Reference Genomes</h2>
+
+<p>As mentioned above, we need to identify the relevant reference genome and an associated annotation file.</p>
+
+<h4 id="reference-consortia">Reference Consortia</h4>
+
+<p><a href="https://www.genome.gov/genetics-glossary/Human-Genome-Reference-Sequence">According to NHGRI</a>, a reference genome (or reference assembly) is an accepted representation of the human genome sequence that is used as a standard for comparison to DNA/RNA sequences generated other studies. Having this standard genome assembly allows researchers to “speak the same language” when it comes to genomic locations and features. While this is a great idea in theory, in practice there is disagreement on chromosome nomenclature across provider.</p>
+
+<blockquote>
+  <p><strong>Discussion</strong>: As of February 2025, NCBI hosts <a href="https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=9606">1,831 human genome assemblies</a>. How do we pick a genome to serve as reference for an organism? What qualities make for a good reference genome? Who makes these decisions?</p>
+</blockquote>
+
+<p>For humans and several other model organisms, the research community makes use of a well-vetted and standardized assembly from the <a href="https://www.ncbi.nlm.nih.gov/grc">Reference Genome Consortium</a>. There are other organism-specific consortia doing annotation and assembly such as <a href="https://flybase.org/">FlyBase</a> for Drosophila.</p>
+
+<p>As of this writing, the most recent version of this genome is known as <code class="language-plaintext highlighter-rouge">GRCH38.p14</code>, which is the 38th major “build” (released in 2013) of the assembly, and the 14th update, of this build (released in 2022). These new builds and updates represent corrections and updates to our knowledge of the content and structure of the human genome. This <a href="https://www.youtube.com/watch?v=DeZTPCOKZrg">YouTube video</a> is a nice introduction to some of the genome assembly nomenclature and compares several versions of the human reference.</p>
+
+<p><strong>Not all reference genomes are the same.</strong> In general, the sequences are usually identical but very often the chromosome nomenclature will differ. For example, the UCSC Genome Brower usually has chromosomes prefixed by a <code class="language-plaintext highlighter-rouge">chr</code> (e.g., <code class="language-plaintext highlighter-rouge">chr1</code>) while Ensembl often does not (e.g., <code class="language-plaintext highlighter-rouge">1</code>). Even for human, there is a surprising amount of confusion. See <a href="https://lh3.github.io/2017/11/13/which-human-reference-genome-to-use">this blog post from 2017 by Heng Li</a> (the author of bwa, samtools, seqtk, and others) for the subtleties of different assemblies. Those details matter a lot for variant calling, but for RNA-seq we don’t need to be quite as careful.</p>
+
+<h4 id="sources-of-annotation">Sources of annotation</h4>
+
+<p>Briefly, genome annotation is the process of inferring the identity and location of functional elements, like genes, on an assembled genome. As you can probably imagine, this is crucial for making sense of any sequencing projects!</p>
+
+<p>As is the case for assemblies, major annotation efforts are conducted by research consortia, such as <a href="https://www.encodeproject.org/help/project-overview/">ENCODE</a>, which was started and funded by NHGRI:</p>
+
+<blockquote>
+  <p>The goal of ENCODE is to build a comprehensive parts list of functional elements in the human genome, including elements that act at the protein and RNA levels, and regulatory elements that control cells and circumstances in which a gene is active. The discovery and annotation of gene elements is accomplished primarily by sequencing a diverse range of RNA sources, comparative genomics, integrative bioinformatic methods, and human curation.</p>
+</blockquote>
+
+<p>A look at the landing page for the <a href="https://www.gencodegenes.org/human/">current GENCODE human genome</a> shows us a number of different GTF and FASTA files we could download - <em>which one is most relevant for mapping with STAR?</em></p>
+
+<h4 id="obtaining-reference-genome-files">Obtaining Reference Genome Files</h4>
+
+<p>Luckily for us, the developers of STAR make pretty specific recommendations for us on page 6 of the <a href="https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf">STAR manual</a>:</p>
+
+<blockquote>
+  <p>GENCODE: files marked with PRI (primary) strongly recommended for mouse and human.</p>
+</blockquote>
+
+<p>The PRI files contain the comprehensive gene annotation on the primary assembly (chromosomes and scaffolds) sequence region but not any alternative loci haplotypes, which STAR cannot make use of during mapping.</p>
+
+<p>So, from that page, find the following listings and copy the links for the <code class="language-plaintext highlighter-rouge">PRI</code> GTF file and the FASTA for <code class="language-plaintext highlighter-rouge">Genome sequence, primary assembly</code>.</p>
+
+<p>Once we have those URLS handy, we use <code class="language-plaintext highlighter-rouge">wget</code> , which is a built-in piece of software that downloads files stored at HTTP, HTTPS, FTP and FTPS addresses. These are the commands I used to download these files into our shared space:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># DO NOT RUN - I have already downloaded this file for us</span>
+<span class="nv">$ </span>wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/GRCh38.primary_assembly.genome.fa.gz
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># DO NOT RUN - I have already downloaded this file for us</span>
+<span class="nv">$ </span>wget https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_47/gencode.v47.primary_assembly.annotation.gtf.gz
+</code></pre></div></div>
+
+<p><strong>IMPORTANT NOTE:</strong> Due to differences in formatting and gene/chromosome names between versions and consortia, it is recommended you use GTFs and FASTAs from the SAME version and SAME provider (i.e. ENCODE) for analyses.</p>
+
+<p><strong>OTHER IMPORTANT NOTE:</strong> For organisms not on GENCODE: Ensembl, UCSC or an organism-specific databases, like FlyBase, are another good choice.</p>
+
+<h2 id="a-note-about-the-gtf-format">A note about the GTF Format</h2>
+
+<p><strong>The <a href="https://web.archive.org/web/20031212200757/http://genes.cse.wustl.edu/GTF2.html">GTF</a> (Gene Transfer Format) file</strong> is a <em>tab-delimited</em> file arranged in a very specific manner to store info about gene structure. The ENCODE <a href="https://www.gencodegenes.org/pages/data_format.html">data format page</a> specifies that the columns of a GTF provided by that consortia are as follows:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Column Number</th>
+      <th>Content</th>
+      <th>Format</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>chromosome name</td>
+      <td>chr1, chr2 etc.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>annotation source</td>
+      <td>ENSEMBL, HAVANA</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>feature type</td>
+      <td>gene, transcript, exon etc.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>genomic start location</td>
+      <td>1-based integer</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>genomic end location</td>
+      <td>integer</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>score (not used)</td>
+      <td>.</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>genomic strand</td>
+      <td>+, -</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>genomic phase</td>
+      <td>0, 1, 2, .</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>additional values, stored as key pairs, separated by semicolons. May have spaces and/or quotes</td>
+      <td>For example: gene_type ‘protein_coding’; gene_name “C2CD4C”</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Here is what a few lines of that look like in practice:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>chr19   HAVANA   gene   405438   409170   .   -   .   gene_id "ENSG00000183186.7"; gene_type "protein_coding"; gene_name "C2CD4C"; level 2; havana_gene "OTTHUMG00000180534.3";
+chr19   HAVANA   transcript   405438   409170   .   -   .   gene_id "ENSG00000183186.7"; transcript_id "ENST00000332235.7"; gene_type "protein_coding"; gene_name "C2CD4C"; transcript_type "protein_coding"; transcript_name "C2CD4C-001"; level 2; protein_id "ENSP00000328677.4"; transcript_support_level "2"; tag "basic"; tag "appris_principal_1"; tag "CCDS"; ccdsid "CCDS45890.1"; havana_gene "OTTHUMG00000180534.3"; havana_transcript "OTTHUMT00000451789.3";
+</code></pre></div></div>
+
+<blockquote>
+  <p>NOTE:
+ <a href="https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md">GFF</a> is a similar format, with some subtle differences. If you can only find a GFF, usually the tool will support it (though you may need an additional flag). Also, many GTF files don’t exactly follow the <a href="https://web.archive.org/web/20031212200757/http://genes.cse.wustl.edu/GTF2.html">specification</a>. <a href="https://agat.readthedocs.io/en/latest/gxf.html">This page</a> gives a well-researched historical overview of the subtle differences and how they have changed over time.</p>
+</blockquote>
+
+<h3 id="refresher-about-grep-cut-and-sort">Refresher about, <code class="language-plaintext highlighter-rouge">grep</code> <code class="language-plaintext highlighter-rouge">cut</code> and <code class="language-plaintext highlighter-rouge">sort</code></h3>
+
+<p>Given our understanding of splice isoforms, we know that a given exon can be part of 2 or more different transcripts generated from the same gene. In a GTF file, this exon will be represented multiple times, once for each transcript (or splice isoform).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="s2">"PLEKHN1"</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf | <span class="nb">head</span> <span class="nt">-n</span> 5
+</code></pre></div></div>
+
+<p><strong><code class="language-plaintext highlighter-rouge">cut</code> is a command that extracts columns from files.</strong></p>
+
+<p>We will use <code class="language-plaintext highlighter-rouge">cut</code> with the <code class="language-plaintext highlighter-rouge">-f</code> argument to specify which specific fields or columns from the dataset we want to extract. Let’s say we want to get the 1st column (chromosome number) and the 4th column (starting genomic position) from <code class="language-plaintext highlighter-rouge">chr1-hg19_genes.gtf</code> file, we can say:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cut</span> <span class="nt">-f</span> 1,4 /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf  | <span class="nb">head</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##description: evidence-based annotation of the human genome (GRCh38), version 47 (Ensembl 113)
+##provider: GENCODE
+##contact: gencode-help@ebi.ac.uk
+##format: gtf
+##date: 2024-07-19
+chr1    11121
+chr1    11121
+chr1    11121
+chr1    12010
+chr1    12613
+</code></pre></div></div>
+
+<blockquote>
+  <p>The <code class="language-plaintext highlighter-rouge">cut</code> command assumes our data columns are separated by tabs (i.e. tab-delimited). Since GTFs are a tab-delimited file, so the default <code class="language-plaintext highlighter-rouge">cut</code> command works for us. However, data can be separated by other types of delimiters like “,” or “;”. If your data is not tab delimited, there is an argument you can add to your <code class="language-plaintext highlighter-rouge">cut</code> command, <code class="language-plaintext highlighter-rouge">-d</code> to specify the delimiter (e.g. <code class="language-plaintext highlighter-rouge">-d ","</code> with a .csv file).</p>
+</blockquote>
+
+<p>The output of <code class="language-plaintext highlighter-rouge">cut</code> doesn’t seem very useful yet as you still have the header lines (that start with ##). How do we disregard those?</p>
+
+<h4 id="grep--v--reverse-grep">Grep -v : Reverse grep</h4>
+
+<p>The <code class="language-plaintext highlighter-rouge">-v</code> option is shorthand for <strong><code class="language-plaintext highlighter-rouge">--invert-match</code></strong>, which selects all the lines that DO NOT have matches to your pattern. We can chain it together with the <code class="language-plaintext highlighter-rouge">cut</code> command using a pipe:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-v</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf | <span class="nb">cut</span> <span class="nt">-f</span> 1,4 | <span class="nb">head</span> <span class="nt">-n</span> 5
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>chr1	11121
+chr1	11121
+chr1	11121
+chr1	12010
+chr1	12613
+</code></pre></div></div>
+
+<h4 id="sort">Sort</h4>
+
+<p><strong><code class="language-plaintext highlighter-rouge">sort</code> is a command used to sort the contents of a file in a particular order.</strong> It has arguments that let you pick which column to sort by (<code class="language-plaintext highlighter-rouge">-k</code>), what kind of sorting you want to do (numeric <code class="language-plaintext highlighter-rouge">n</code>) and also if the result of the sorting should only return unique (<code class="language-plaintext highlighter-rouge">-u</code>) values. These are just 2 of the many features of the sort command.</p>
+
+<p>Let’s do a quick test of how the <code class="language-plaintext highlighter-rouge">-u</code> argument returns only unique lines (and remove duplicates).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="s2">"##"</span> <span class="nt">-v</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf | <span class="nb">cut</span> <span class="nt">-f</span> 1,4 | <span class="nb">wc</span> <span class="nt">-l</span> 
+</code></pre></div></div>
+
+<p><em>How many lines are returned to you?</em></p>
+
+<details>
+
+<summary><b><i>Click here to check your output</i></b></summary>
+
+<p>Your command should have returned 4117647 lines</p>
+</details>
+
+<p>Now apply the <code class="language-plaintext highlighter-rouge">sort -u</code> command before counting the lines.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="s2">"##"</span> <span class="nt">-v</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf | <span class="nb">cut</span> <span class="nt">-f</span> 1,4 | <span class="nb">sort</span> <span class="nt">-u</span> | <span class="nb">wc</span> <span class="nt">-l</span> 
+</code></pre></div></div>
+
+<p><em>How many lines do you see now?</em></p>
+
+<details>
+
+<summary><b><i>Click here to check your output</i></b></summary>
+
+<p>Your command should have returned 796,715 lines</p>
+
+</details>
+
+<p>You can practice chaining together these skills in the GTF Exercise in Week 1 Lesson 04 if you haven’t done so already. The assignment for this week also challenges you to put a few of these together.</p>
+
+<hr />
+
+<h2 id="create-a-genome-index-with-star">Create a genome index with STAR</h2>
+
+<p>We will be using STAR for aligning reads to the genome. Aligners like STAR need an <strong>index</strong> in order to align reads efficiently. An index is a computationally-efficient data structure created from a FASTA file – it turns out to be unreasonably computationally expensive to try to match reads to the text FASTA file, so this preparation step is required. It only has to be done once for each FASTA file.</p>
+
+<p>Before we set up a script, let’s explore the possible versions of STAR on Biowulf.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>module spider star
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Versions:
+        STAR/2.5.4a
+        STAR/2.6.1c
+        STAR/2.7.0f
+        STAR/2.7.3a
+        STAR/2.7.6a
+        STAR/2.7.8a
+        STAR/2.7.9a
+        STAR/2.7.10b
+        STAR/2.7.11b
+</code></pre></div></div>
+
+<p>Let’s go ahead and load the default version of STAR, which happens to be the most recent:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ module load STAR
+$ [+] Loading STAR  2.7.11b
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>IMPORTANT NOTE</strong>: This is one of those times where you may not want to always use the most recent version. Newer versions of STAR are not backwards compatible with all genome indices created by older versions. Something to keep in mind if you are trying to re-work old analyses! We’ll look at available indices on Biowulf below.</p>
+</blockquote>
+
+<p>The basic options to <strong>generate genome indices</strong> using STAR are as follows:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">--runThreadN</code>: number of threads, should match the number of CPUS we specify in the SLURM directives</li>
+  <li><code class="language-plaintext highlighter-rouge">--runMode</code>: genomeGenerate mode</li>
+  <li><code class="language-plaintext highlighter-rouge">--genomeDir</code>: /path/to/store/genome_indices</li>
+  <li><code class="language-plaintext highlighter-rouge">--genomeFastaFiles</code>: /path/to/FASTA_file</li>
+  <li><code class="language-plaintext highlighter-rouge">--sjdbGTFfile</code>: /path/to/GTF_file</li>
+  <li><code class="language-plaintext highlighter-rouge">--sjdbOverhang</code>: readlength -1</li>
+</ul>
+
+<blockquote>
+  <p><em>NOTE:</em> In case of reads of varying length, the ideal value for <code class="language-plaintext highlighter-rouge">--sjdbOverhang</code> is max(ReadLength)-1. In most cases, the default value of 100 will work similarly to the ideal value.</p>
+</blockquote>
+
+<p>Now let’s create a job submission script to generate the genome index. <em>We will NOT run this script, as it uses a lot of memory, will take up a bunch of disk space and will take a long time to run! This is the script I used to generate the files we will use in the next lesson.</em></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Since we are not actually going to run this, you can work on this text document from any directory</span>
+<span class="nv">$ </span>vim genome_index.sh
+</code></pre></div></div>
+
+<p>Within <code class="language-plaintext highlighter-rouge">vim</code> we now add our shebang line, the SLURM directives, and our STAR command.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+
+<span class="c">#SBATCH --partition=quick #quick partition</span>
+<span class="c">#SBATCH --time=04:00:00 # time limit</span>
+<span class="c">#SBATCH --cpus-per-task=8 # number of cores</span>
+<span class="c">#SBATCH --mem=48g # requested memory</span>
+<span class="c">#SBATCH --job-name grch38_star_index # Job name</span>
+<span class="c">#SBATCH -o %j.out # File to which standard output will be written</span>
+<span class="c">#SBATCH -e %j.err # File to which standard error will be written</span>
+<span class="c">#SBATCH --mail-type=BEGIN,END</span>
+
+<span class="c"># load most recent STAR module </span>
+module load STAR
+
+<span class="c"># Change directory to where the data is</span>
+<span class="nb">cd</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38
+
+STAR <span class="nt">--runThreadN</span> 8 <span class="nt">--runMode</span> genomeGenerate <span class="nt">--genomeDir</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38 <span class="nt">--genomeFastaFiles</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/GRCh38.primary_assembly.genome.fa <span class="nt">--sjdbGTFfile</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf <span class="nt">--sjdbOverhang</span> 99
+</code></pre></div></div>
+
+<h4 id="results">Results</h4>
+
+<p>For this workshop we have generated the genome indices for you, so that we don’t get held up waiting on the generation of the indices (it takes a while and requires a lot of memory). To see what all the genome index result files are, take a look:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-lh</span> /data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38
+<span class="nv">$ </span><span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 1.2K Feb  6 11:32 chrLength.txt
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 3.2K Feb  6 11:32 chrNameLength.txt
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 2.0K Feb  6 11:32 chrName.txt
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 2.1K Feb  6 11:32 chrStart.txt
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  74M Feb  6 11:32 exonGeTrInfo.tab
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  30M Feb  6 11:32 exonInfo.tab
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 1.7G Feb  6 11:32 gencode.v47.primary_assembly.annotation.gtf <span class="c">#input</span>
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 3.2M Feb  6 11:32 geneInfo.tab
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 3.1G Feb  6 11:32 Genome
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  872 Feb  6 11:32 genomeParameters.txt
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 3.0G Feb  6 11:32 GRCh38.primary_assembly.genome.fa <span class="c">#input</span>
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  33K Feb  6 11:32 Log.out
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  24G Feb  6 11:32 SA
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training 1.5G Feb  6 11:32 SAindex
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  15M Feb  6 11:32 sjdbInfo.txt
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  17M Feb  6 11:32 sjdbList.fromGTF.out.tab
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  14M Feb  6 11:32 sjdbList.out.tab
+<span class="nt">-rw-rw----</span>+ 1 changes Bspc-training  25M Feb  6 11:32 transcriptInfo.tab
+</code></pre></div></div>
+
+<h2 id="genome-indices-on-biowulf">Genome Indices on Biowulf</h2>
+
+<p>Going right to the source to download the GTF and FASTA is a great way of making sure you are using the most up-to-date version.</p>
+
+<p>However, Biowulf also provides centrally-maintained <a href="https://hpc.nih.gov/refdb/index.php">scientific reference databases</a> for users, which includes many pre-generated genome indices for various alignment software.</p>
+
+<p>According to that page, STAR indices are all kept in a directory: <code class="language-plaintext highlighter-rouge">/fdb/STAR_indices</code>, which contains the following files and subdirectories:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>00init.sh  01build.sh       03check_repo.sh  2.6.1c  2.7.10b  2.7.3a  2.7.8a  refdb.yml 00lib.sh   02dedup_existing.sh  2.5.4 2.7.0f  2.7.11b  2.7.6a  2.7.9a  repo
+</code></pre></div></div>
+
+<p>Navigating further into 2.7.11b (indices built using the most recent version of STAR on Biowulf), we can eventually get to the ENCODE human genome versions:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-lh</span> /fdb/STAR_indices/2.7.11b/GENCODE/Gencode_human/
+drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_19
+drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_39
+drwxrwxr-x 2 wresch staff 4.0K Mar 14  2024 release_45
+</code></pre></div></div>
+
+<p><strong>Looking into this <code class="language-plaintext highlighter-rouge">release_45</code> we see a few important things:</strong></p>
+<ul>
+  <li>A number of subdirectories with names like <code class="language-plaintext highlighter-rouge">genes-100/</code>. These are the actual genome index directories, categorized by read length! Remember how we had to set that <code class="language-plaintext highlighter-rouge">--sjdbOverhang 99</code> parameter?</li>
+  <li><code class="language-plaintext highlighter-rouge">genes.gtf</code> and other files used to actually create the indicies</li>
+  <li><code class="language-plaintext highlighter-rouge">slurm-21952863.out</code> and similar. These are logs from when Biowulf staff created these indices. You can check out what actual command they used.</li>
+</ul>
+
+<p><strong>Generally speaking, STAR indices for each version of STAR available on Biowulf are stored in:</strong></p>
+
+<ul>
+  <li>
+    <p><strong><code class="language-plaintext highlighter-rouge">/fdb/STAR_indices/[STAR VERSION]</code></strong></p>
+  </li>
+  <li>
+    <p><strong><code class="language-plaintext highlighter-rouge">/fdb/STAR_current</code></strong><code class="language-plaintext highlighter-rouge">→ /fdb/STAR_indices/[current default STAR version]</code></p>
+  </li>
+</ul>
+
+<p>Keep in mind the lack of backwards compatibility between some versions of STAR!</p>
+
+<h2 id="exercise">Exercise:</h2>
+
+<p>Note that the most recent Gencode annotations they have are for <code class="language-plaintext highlighter-rouge">release_45</code>, whereas the up-to-date version we used earlier are from Release 47.</p>
+
+<ul>
+  <li>Does it look like there is a <code class="language-plaintext highlighter-rouge">STAR 2.7.11b</code> index available for release_47 of GENCODE annotations available on Biowulf somewhere in <code class="language-plaintext highlighter-rouge">/fdb/STAR_indices</code>? You may need to check both in both the Gencode and UCSC subfolders.</li>
+  <li>If not - look in the <code class="language-plaintext highlighter-rouge">/fdb/STAR_indices/2.7.10b</code> directory or other, older directories. This slightly older version of STAR has more pre-prepared indices. If you find a relevant index folder - report the full path to that directory.</li>
+</ul>
+
+<h2 id="assignment">Assignment</h2>
+
+<p>By looking at recent publications, talking to your labmates etc. - what is the most recent major genome build for your organism used by your research community? For example <code class="language-plaintext highlighter-rouge">GRCh38</code> for human - sometimes abbreviated to <code class="language-plaintext highlighter-rouge">hg38</code> by providers such as UCSC.</p>
+
+<ol>
+  <li>Create a <code class="language-plaintext highlighter-rouge">reference_genome</code> subdirectory of your <code class="language-plaintext highlighter-rouge">/Bspc-training/$USER/rnaseq</code> directory. Create a <code class="language-plaintext highlighter-rouge">ref_notes.txt</code> file in there to answer the next questions.</li>
+  <li>Find a <strong>GTF file</strong>, in a Biowulf STAR index directory, that corresponds with your chosen genome version. OR if necessary, use <code class="language-plaintext highlighter-rouge">wget</code> to download the GTF file you identify from a consortium website. <em>Post in the main <code class="language-plaintext highlighter-rouge">rnaseq_jan2025</code> channel if you need help with this!</em></li>
+  <li>In the text file, make note of: the name of your organism, the genone build you would use, and the full Biowulf directory paths or <code class="language-plaintext highlighter-rouge">wget</code> commands you used to download the GTF and FASTA files.</li>
+</ol>
+
+<h2 id="bonus-practice-assignment">BONUS PRACTICE ASSIGNMENT:</h2>
+
+<p>A few Fridays ago, we demonstrated how to create a frequency table of different <strong>feature types</strong> from a GTF file using a combination of commands like <code class="language-plaintext highlighter-rouge">cut</code>, <code class="language-plaintext highlighter-rouge">grep</code> and <code class="language-plaintext highlighter-rouge">uniq</code>. The result ended up looking like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gene  78724
+transcript 4038715
+exon 3651434
+CDS 1872631
+UTR 664938
+start_codon 99382
+stop_codon 93628
+Selenocysteine 130
+</code></pre></div></div>
+
+<p>Using a combination of commands like <code class="language-plaintext highlighter-rouge">cut</code>, <code class="language-plaintext highlighter-rouge">grep</code> and <code class="language-plaintext highlighter-rouge">uniq</code> - can you figure out how to create a table like this for the GTF file you found? <strong>Store the results in another text file along with the command you used!</strong></p>
+
+<p>Hint: The end of <a href="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson04_searching_files.html">Week 1 Lesson 04</a> gives some great examples of how to build more complicated commands from those individual BASH commands.</p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
