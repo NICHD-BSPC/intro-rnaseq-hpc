@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=6202d20354cae8618b4e0833b84f6fb8232975e1">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=54c48710026e38784ddac6f56243a93607296096">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -60,7 +60,7 @@
     </header>
 
     <main id="content" class="main-content" role="main">
-      <p>Approximate time: 30 min</p>
+      <p>Approximate time: 45 min</p>
 
 <h2 id="learning-objectives">Learning Objectives</h2>
 
@@ -314,7 +314,9 @@ O   → open new line above
 :!&lt;command&gt;  → run shell command (e.g., :!ls)  
 </code></pre></div></div>
 
-<p>Upon creation of a file, vim is automatically in command mode. Let’s <em>change to insert mode</em> by typing <kbd>i</kbd>. <strong>Note the <code class="language-plaintext highlighter-rouge">--INSERT--</code> at the bottom left hand of the screen.</strong> Now type in a few lines of text:</p>
+<h3 id="our-first-entry-into-vim">Our first entry into Vim</h3>
+
+<p>Upon creation of a file, vim is automatically in normal mode. Let’s <em>change to insert mode</em> by typing <kbd>i</kbd>. <strong>Note the <code class="language-plaintext highlighter-rouge">--INSERT--</code> at the bottom left hand of the screen.</strong> Now type in a few lines of text:</p>
 
 <p align="center">
 
@@ -326,32 +328,30 @@ O   → open new line above
 
 <p><strong>Note the <code class="language-plaintext highlighter-rouge">--INSERT--</code> has now disappeared from the bottom of the screen.</strong></p>
 
-<blockquote>
-  <h3 id="review-of-vim-modes">Review of Vim modes</h3>
+<p><strong>Review of Insert Mode</strong></p>
 
-  <table>
-    <thead>
-      <tr>
-        <th>key</th>
-        <th>action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><button>i</button></td>
-        <td>insert mode - to write and edit text</td>
-      </tr>
-      <tr>
-        <td><button>esc</button></td>
-        <td>command mode - to issue commands / shortcuts</td>
-      </tr>
-    </tbody>
-  </table>
-</blockquote>
+<table>
+  <thead>
+    <tr>
+      <th>key</th>
+      <th>action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><button>i</button></td>
+      <td>insert mode - to write and edit text</td>
+    </tr>
+    <tr>
+      <td><button>esc</button></td>
+      <td>command mode - to issue commands / shortcuts</td>
+    </tr>
+  </tbody>
+</table>
 
 <h3 id="saving-and-quitting">Saving and Quitting</h3>
 
-<p>To <strong>“write to file”</strong> or save the modifications made to the file, <strong>type</strong> <kbd>:w</kbd> when in command mode. You can see the commands you type in the bottom left-hand corner of the screen.</p>
+<p>To <strong>“write to file”</strong> or save the modifications made to the file, <strong>type</strong> <kbd>:</kbd> to enter command mode, then immediately type <kbd>w</kbd> to use the <strong>write</strong> (save) command. You can see the commands you type in the bottom left-hand corner of the screen.</p>
 
 <p align="center">
 
@@ -450,7 +450,7 @@ O   → open new line above
 <table>
   <thead>
     <tr>
-      <th>key (in command mode)</th>
+      <th>key (in normal mode)</th>
       <th>action</th>
     </tr>
   </thead>
@@ -489,7 +489,7 @@ O   → open new line above
 <table>
   <thead>
     <tr>
-      <th>key (in command mode)</th>
+      <th>key (in normal mode)</th>
       <th>action</th>
     </tr>
   </thead>
@@ -521,29 +521,30 @@ O   → open new line above
   </tbody>
 </table>
 
-<table>
-  <thead>
-    <tr>
-      <th> </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>More VIM resources</strong>: The <a href="https://nichd-bspc.github.io/training/vim.html">BSPC training page</a> has a number of resources and cheatsheets for solidifying these Vim skills!</td>
-    </tr>
-    <tr>
-      <td>### <strong>Assignment</strong></td>
-    </tr>
-    <tr>
-      <td>We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let’s practice what we just learned in a brief challenge.</td>
-    </tr>
-    <tr>
-      <td>1. Open <code class="language-plaintext highlighter-rouge">spider.txt</code>, and delete the word “water” from line #2. 2. Quit without saving. 3. Open <code class="language-plaintext highlighter-rouge">spider.txt</code> again, and replace every occurrence of “spider” with “unicorn”. 4. Delete: “Down came the rain.” 5. Save the file. 6. Undo your previous deletion. 7. Redo your previous deletion. 8. Delete the first and last words from each of the lines. 9. Save the file. 10. <strong>Let your instructor now when you have done this and they’ll check your work</strong></td>
-    </tr>
-  </tbody>
-</table>
+<p>|————————————————————————|——-|</p>
 
-<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+<p><strong>More VIM resources</strong>: The <a href="https://nichd-bspc.github.io/training/vim.html">BSPC training page</a> has a number of resources and cheatsheets for solidifying these Vim skills!</p>
+
+<h1 id="assignment"><strong>Assignment</strong></h1>
+
+<p>We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let’s practice what we just learned in a brief challenge.</p>
+
+<ol>
+  <li>Open <code class="language-plaintext highlighter-rouge">spider.txt</code>, and delete the word “water” from line #2.</li>
+  <li>Quit without saving.</li>
+  <li>Open <code class="language-plaintext highlighter-rouge">spider.txt</code> again, and replace every occurrence of “spider” with “unicorn”.</li>
+  <li>Delete: “Down came the rain.”</li>
+  <li>Save the file.</li>
+  <li>Undo your previous deletion.</li>
+  <li>Redo your previous deletion.</li>
+  <li>Delete the first and last words from each of the lines.</li>
+  <li>Save the file.</li>
+  <li><strong>After completing the assignment in <a href="../wk1_lesson05_data_organization.md">Lesson 05</a></strong>, copy to the <code class="language-plaintext highlighter-rouge">/assignments</code> directory you created.</li>
+</ol>
+
+<blockquote>
+  <p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+</blockquote>
 
 
       <footer class="site-footer">
