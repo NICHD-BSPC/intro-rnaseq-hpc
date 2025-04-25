@@ -1,7 +1,7 @@
 ---
 title: Working with files on the command-line
 author: "Harvard HPC Staff, Modified by E. Sally Chang at NICHD"
-date: "January 2025"
+date: "Last Modified April 2025"
 ---
 
 Approximate time: 30 min
@@ -14,7 +14,7 @@ Approximate time: 30 min
 
 ## Are you logged into Biowulf, on a compute node, and in your course directory?
 
-If not, first do that before proceeding! As a reminder, the course directory is: `cd /data/Bspc-training/$USER`
+If not, first do that before proceeding! As a reminder, the course directory is: `/data/$USER`
 
 ## Examining Files
 
@@ -85,9 +85,31 @@ Rather than printing to screen, the `less` command opens the file in a new buffe
 
 Use the shortcut keys to move through your FASTQ file, we will explore these files in more detail later in the workshop.
 
+#### Customizing your view with less
+
+Something like a FASTA file might be fine to look at with default `less` parameters, but for other types of files, such as a `GTF`, this may need to be adjusted. Look at the output of `less` on this file:
+
+``` bash
+less ../reference_data/chr1-hg19_genes.gtf
+```
+
+Each line of a GTF file (which contains information about genomic features and will be covered in depth later), gets squished onto multiple lines depending on the size of our terminal window.
+
+Let's try adding `-S` which disables line wrapping and activates horizontal scrolling:\
+
+``` bash
+less -S ../reference_data/chr1-hg19_genes.gtf
+```
+
+Now, instead of squishing the text, which makes it hard to figure out which data goes with which columns, the actual spacing is preserved and we can scroll across the each row of data!
+
 #### Searching files with `less`
 
-`less` also gives you a way of searching through files.
+`less` also gives you a way of searching through files. Let's open the FASTQ file again:
+
+``` bash
+less Mov10_oe_1.subset.fq
+```
 
 Just type in <kbd>/</kbd> to begin a search, you will see that the `/` will show up at the bottom of the `less` buffer. Now, enter the name of the string of characters you would like to search for and hit the enter key. The interface will move to show you the location where that string is found, and highlight the string. If you hit <kbd>/</kbd> then <kbd>ENTER</kbd>, `less` will just repeat the previous search.
 
@@ -156,7 +178,7 @@ To write and edit files, we're going to use a text editor called 'Vim'. Vim is a
 >
 > <p align="center">
 >
-> <img src="../img/vim_cheatsheet.png" width="600" alt="screenshot of vim cheatsheet table" />
+> <img src="../img/vim_cheatsheet.png" alt="screenshot of vim cheatsheet table" width="600"/>
 >
 > </p>
 
@@ -174,17 +196,48 @@ $ vim draft.txt
 
 ### Vim Modes
 
-Vim has ***two basic modes*** that will allow you to create documents and edit your text:
+Vim has ***three basic modes*** that will allow you to create documents and edit your text:
 
--   ***command mode (default mode):*** will allow you to save and quit the program (and execute other more advanced commands).
+-   ***normal mode:*** Navigate throughout document, manipulate text, run some commands (like "undo"). You start Vim in this mode, or enter it from another mode with `Esc`.
 
--   ***insert (or edit) mode:*** will allow you to write and edit text
+```         
+# Common commands
+h / j / k / l   → move left / down / up / right  
+dd              → delete a line  
+yy              → copy (yank) a line  
+p               → paste  
+u               → undo  
+Ctrl+r          → redo  
+```
+
+-   ***insert (or edit) mode:*** will allow you to write and edit text. You can enter it from "normal" mode at different spots in the document:
+
+```         
+# starting points for insert mode
+i   → insert before cursor  
+I   → insert at beginning of line  
+a   → append after cursor  
+A   → append at end of line  
+o   → open new line below  
+O   → open new line above  
+```
+
+-   ***command mode:*** will allow you to save and quit the program (and execute other more advanced file/system level commands). Enter from normal mode by typing a colon "`:`".
+
+```         
+# Common things to do in command mode
+:w           → save file  
+:q           → quit  
+:wq / :x     → save and quit  
+:q!          → quit without saving  
+:!<command>  → run shell command (e.g., :!ls)  
+```
 
 Upon creation of a file, vim is automatically in command mode. Let's *change to insert mode* by typing <kbd>i</kbd>. **Note the `--INSERT--` at the bottom left hand of the screen.** Now type in a few lines of text:
 
 <p align="center">
 
-<img src="../img/vim_insert.png" width="600" alt="screenshot of terminal window with vim in insert mode"/>
+<img src="../img/vim_insert.png" alt="screenshot of terminal window with vim in insert mode" width="600"/>
 
 </p>
 
@@ -205,7 +258,7 @@ To **"write to file"** or save the modifications made to the file, **type** <kbd
 
 <p align="center">
 
-<img src="../img/vim_save.png" width="600" alt="terminal window with vim open to save command mode with save command"/>
+<img src="../img/vim_save.png" alt="terminal window with vim open to save command mode with save command" width="600"/>
 
 </p>
 
@@ -213,7 +266,7 @@ After you have saved the file, the total number of lines and characters in the f
 
 <p align="center">
 
-<img src="../img/vim_postsave.png" width="600" alt="terminal with vim open after saving a file reporting total number of lines and characters"/>
+<img src="../img/vim_postsave.png" alt="terminal with vim open after saving a file reporting total number of lines and characters" width="600"/>
 
 </p>
 
@@ -223,7 +276,7 @@ To edit the newly created `draft.txt` file, you can open it again with vim: `vim
 
 <p align="center">
 
-<img src="../img/vim_quit.png" width="600" alt="terminal with vim open in command mode with q for quit typed in"/>
+<img src="../img/vim_quit.png" alt="terminal with vim open in command mode with q for quit typed in" width="600"/>
 
 </p>
 
@@ -243,7 +296,7 @@ Create a new file called `spider.txt` using `vim`. Go into *insert mode* and ent
 
 <p align="center">
 
-<img src="../img/vim_spider.png" width="600" alt="terminal with vim open with the first verse of itsy bitsy spider typed"/>
+<img src="../img/vim_spider.png" alt="terminal with vim open with the first verse of itsy bitsy spider typed" width="600"/>
 
 </p>
 
@@ -251,7 +304,7 @@ Once you have finished typing, you can display line numbers by changing to *comm
 
 <p align="center">
 
-<img src="../img/vim_spider_number.png" width="600" alt="terminal with vim open to same poem as above but with line numbers enabled"/>
+<img src="../img/vim_spider_number.png" alt="terminal with vim open to same poem as above but with line numbers enabled" width="600"/>
 
 </p>
 
@@ -286,23 +339,11 @@ Practice some of the editing shortcuts, then **quit the document without saving 
 | <button>/*pattern*</button>               | to search for a pattern (*n/N* to move to next/previous match) |
 | <button>:%s/*search*/*replace*/g</button> | to search for a pattern and replace for all occurrences        |
 
-------------------------------------------------------------------------
-**More VIM resources**: The [BSPC training page](https://nichd-bspc.github.io/training/vim.html) has a number of resources and cheatsheets for solidifying these Vim skills!
-
-### **Assignment**
-
-We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let's practice what we just learned in a brief challenge.
-
-1.  Open `spider.txt`, and delete the word "water" from line #2.
-2.  Quit without saving.
-3.  Open `spider.txt` again, and replace every occurrence of "spider" with "unicorn".
-4.  Delete: "Down came the rain."
-5.  Save the file.
-6.  Undo your previous deletion.
-7.  Redo your previous deletion.
-8.  Delete the first and last words from each of the lines.
-9.  Save the file.
-10. **Let your instructor now when you have done this and they'll check your work**
-------------------------------------------------------------------------
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+|------------------------------------------------------------------------|
+| **More VIM resources**: The [BSPC training page](https://nichd-bspc.github.io/training/vim.html) has a number of resources and cheatsheets for solidifying these Vim skills!                                                                                                                                                                                                                                                                                      |
+| \### **Assignment**                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| We have covered some basic commands in vim, but practice is key for getting comfortable with the program. Let's practice what we just learned in a brief challenge.                                                                                                                                                                                                                                                                                               |
+| 1\. Open `spider.txt`, and delete the word "water" from line #2. 2. Quit without saving. 3. Open `spider.txt` again, and replace every occurrence of "spider" with "unicorn". 4. Delete: "Down came the rain." 5. Save the file. 6. Undo your previous deletion. 7. Redo your previous deletion. 8. Delete the first and last words from each of the lines. 9. Save the file. 10. **Let your instructor now when you have done this and they'll check your work** |
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
