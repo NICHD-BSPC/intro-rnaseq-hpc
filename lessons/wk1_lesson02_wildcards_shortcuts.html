@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson02_wildcards_shortcuts.html" />
 <meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2017-08-07T00:00:00+00:00" />
+<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Shell 02: Wildcards and Shortcuts" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, modified by E. Sally Chang @NICHD"},"dateModified":"2017-08-07T00:00:00+00:00","datePublished":"2017-08-07T00:00:00+00:00","headline":"Shell 02: Wildcards and Shortcuts","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson02_wildcards_shortcuts.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson02_wildcards_shortcuts.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, modified by E. Sally Chang @NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"Shell 02: Wildcards and Shortcuts","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson02_wildcards_shortcuts.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson02_wildcards_shortcuts.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=1d1397eafb98f879d8d784520607d8099d84407b">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=83f213fc88acb15b56d4ce4e6dc5b331770e3b73">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -60,10 +60,7 @@
     </header>
 
     <main id="content" class="main-content" role="main">
-      <h3 id="note">NOTE:</h3>
-<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
-
-<h2 id="learning-objectives">Learning Objectives</h2>
+      <h2 id="learning-objectives">Learning Objectives</h2>
 
 <ul>
   <li>Implement tab completion when writing paths</li>
@@ -81,7 +78,7 @@
   <li>Log in using <code class="language-plaintext highlighter-rouge">ssh username@biowulf.nih.gov</code> and enter your NIH password.</li>
   <li>Once you are on the login node, use <code class="language-plaintext highlighter-rouge">sinteractive</code> to get on a compute node.</li>
   <li>Proceed to the next section once your command prompt has <code class="language-plaintext highlighter-rouge">cnXXXX</code> in it.</li>
-  <li>Change directories into your course space: <code class="language-plaintext highlighter-rouge">cd /data/Bspc-training/$USER</code></li>
+  <li>Change directories into your data space: <code class="language-plaintext highlighter-rouge">cd /data/$USER</code></li>
 </ol>
 
 <h2 id="saving-time-with-wildcards-and-other-shortcuts">Saving time with wildcards and other shortcuts</h2>
@@ -160,7 +157,7 @@
 
 <summary><i>Question 1</i></summary>
 
-<code>ls /bin/c*</code>
+<code>ls /bin/c\*</code>
 
 </details>
 
@@ -176,7 +173,7 @@
 
 <summary><i>Question 3</i></summary>
 
-<code>ls /bin/*o</code>
+<code>ls /bin/\*o</code>
 
 </details>
 
@@ -213,7 +210,7 @@
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> ../..
 </code></pre></div></div>
 
-<p>This prints the contents of <code class="language-plaintext highlighter-rouge">/data/Bspc_training/$USER</code>, which is two levels above your current directory <code class="language-plaintext highlighter-rouge">raw_fastq</code>.</p>
+<p>This prints the contents of <code class="language-plaintext highlighter-rouge">/data/$USER</code>, which is two levels above your current directory <code class="language-plaintext highlighter-rouge">raw_fastq</code>.</p>
 
 <h4 id="current-directory-or-">Current directory or “.”</h4>
 
@@ -249,14 +246,23 @@
 
 <ul>
   <li>
-    <p><button>Ctrl</button><button>A</button> will bring you to the start of the command you are writing.</p>
+    <p><button>Ctrl</button></p>
+
+    <p><button>A</button></p>
+
+    <p>will bring you to the start of the command you are writing.</p>
   </li>
   <li>
-    <p><button>Ctrl</button><button>E</button> will bring you to the end of the command.</p>
+    <p><button>Ctrl</button></p>
+
+    <p><button>E</button></p>
+
+    <p>will bring you to the end of the command.</p>
   </li>
 </ul>
 
 <h4 id="using-the-up-arrow-button">Using the up-arrow button</h4>
+
 <p>One other useful shortcut is the use of the up-arrow button on your keyboard to scroll through past commands. This can be especially useful once you start typing much longer commands that you may want edit or re-run! Once you are scrolling, you can also use the down-arrow to navigate to more recent commands.</p>
 
 <hr />
