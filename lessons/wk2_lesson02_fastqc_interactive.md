@@ -1,7 +1,7 @@
 ---
 title: "Quality control using FASTQC"
 author: Modified by Sally Chang @ NICHD
-date: Last modifed in January 2025
+update: Last modifed in April 2025
 duration: 45 minutes
 ---
 
@@ -12,8 +12,6 @@ duration: 45 minutes
 -   Create a quality report using FASTQC
 -   Open and look at the report(s) you generated using
 -   Optionally, transfer one of the HTML files to your local computer using `scp`
-
-Slides from the Tuesday lecture are available [here](../lectures/NICHD_RNASeq_week2_intro.pdf)
 
 ## Quality Control of FASTQ files
 
@@ -27,15 +25,15 @@ The first step in the RNA-Seq workflow is to take the FASTQ files received from 
 
 ### Unmapped read data (FASTQ)
 
-The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the *de facto* file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information. 
+The [FASTQ](https://en.wikipedia.org/wiki/FASTQ_format) file format is the *de facto* file format for sequence reads generated from next-generation sequencing technologies. This file format evolved from FASTA in that it contains sequence data, but also contains quality information.
 
 The sequencer self-reports how good of a job it thinks it did calling each base correctly. If you need a refresher on how sequencing works, you can watch [this youtube video from Illumina](https://www.youtube.com/watch?v=fCd6B5HRaZ8). One way to think of the quality score is by how blurry the image is or how well it can be aligned to the previous image -- see [this timestamp within the video](https://youtu.be/fCd6B5HRaZ8?t=184).
 
 Similar to FASTA, the FASTQ file begins with a header line. The difference is that the FASTQ header is denoted by a `@` character. For a single record (sequence read), there are four lines, each of which are described below:
 
 | Line | Description                                                                                               |
-|-------------------|-----------------------------------------------------|
-| 1    | Always begins with `@`, followed by information about the read                                           |
+|--------------------|----------------------------------------------------|
+| 1    | Always begins with `@`, followed by information about the read                                            |
 | 2    | The actual DNA sequence                                                                                   |
 | 3    | Always begins with a `+`, and sometimes the same info as in line 1                                        |
 | 4    | Has a string of characters representing the quality scores; must have same number of characters as line 2 |
@@ -74,23 +72,21 @@ These probability values are the results from the base calling algorithm and dep
 
 Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.
 
-> NOTE:
-> What other ways can you think of for recording a quality score that corresponds to each base? What are the advantages/disadvantages?
+> NOTE: What other ways can you think of for recording a quality score that corresponds to each base? What are the advantages/disadvantages?
 
 ## Finding "bad reads" in a FASTQ using `grep`
 
 Suppose we want to see how many reads in our file `Mov10_oe_1.subset.fq` contain "bad" data, i.e. reads with 10 consecutive Ns (`NNNNNNNNNN`), and capture these reads in a file for future analyses.
 
 ``` bash
-$ cd /data/Bspc-training/$USER/rnaseq/raw_fastq
+$ cd /data/$USER/rnaseq_course/raw_fastq
 
 $ grep NNNNNNNNNN Mov10_oe_1.subset.fq
 ```
 
 We get back a lot of reads or lines of text! You can add the `-c` option to count the number.
 
-> NOTE:
-> What's another way of counting lines?
+> NOTE: What's another way of counting lines?
 
 #### Extracting the full FASTQ Reads
 
@@ -114,8 +110,7 @@ CACAAATCGGCTCAGGAGGCTTGTAGAAAAGCTCAGCTTGACANNNNNNNNNNNNNNNNNGNGNACGAAACNNNNGNNNN
 
 You will notice that when we use the `-B` and/or `-A` arguments with the `grep` command, the output has some additional lines with dashes (`--`), these dashes work to separate your returned "groups" of lines and are referred to as "group separators". This might be problematic if you are trying to maintain the FASTQ file structure or if you simply do not want them in your output. Using the argument `--no-group-separator` with `grep` will disable this behavior.
 
-> NOTE:
-> What's another way of getting rid of those `---` lines?
+> NOTE: What's another way of getting rid of those `---` lines?
 
 ``` bash
 $ grep -B 1 -A 2 --no-group-separator NNNNNNNNNN Mov10_oe_1.subset.fq
@@ -131,22 +126,24 @@ Looking at individual reads in a small FASTQ file is nice, but what about gettin
 
 ## Working with Compressed Files
 
-Sequencing data files can be huge - from a few megabytes to gigabytes. And with even more sequencing at decreasing price points, it's not hard to run out of storage space. As a result, most sequencing facilities will give you compressed sequencing data files, and **Biowulf recommends that you keep your FASTQ files compressed when at all possible**. 
+Sequencing data files can be huge - from a few megabytes to gigabytes. And with even more sequencing at decreasing price points, it's not hard to run out of storage space. As a result, most sequencing facilities will give you compressed sequencing data files, and **Biowulf recommends that you keep your FASTQ files compressed when at all possible**.
 
-The most common compression program used for individual files is `gzip` whose compressed files have the `.gz` extension. The tar and zip programs are most commonly used for compressing directories. Let's take a look at the size difference between uncompressed and compressed files. We use the `-l` option of `ls` to get a long listing that includes the file size, and `-h` to have that size displayed in "human readable" form. 
+The most common compression program used for individual files is `gzip` whose compressed files have the `.gz` extension. The tar and zip programs are most commonly used for compressing directories. Let's take a look at the size difference between uncompressed and compressed files. We use the `-l` option of `ls` to get a long listing that includes the file size, and `-h` to have that size displayed in "human readable" form.
 
+```         
+$ ls -lh /data/Bspc-training/shared/rnaseq_mov10/Mov10_oe_1.fq
+$ ls -lh /data/Bspc-training/shared/rnaseq_mov10/Mov10_oe_1.fq.gz
 ```
-$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq
-$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz
-```
-To extract the file again, you could run `gunzip filename.gz`. However, there are many options for working with compressed files directly without extracting them to their full size again. **Luckily for us, current versions of FASTQC can read `.gz` files directly.** Another example is `zcat` – which is like `cat` except that it works on `gzip`-compressed (.gz) files! This is often paired with using pipe `|` into another command like below: 
 
+To extract the file again, you could run `gunzip filename.gz`. However, there are many options for working with compressed files directly without extracting them to their full size again. **Luckily for us, current versions of FASTQC can read `.gz` files directly.** Another example is `zcat` – which is like `cat` except that it works on `gzip`-compressed (.gz) files! This is often paired with using pipe `|` into another command like below:
+
+```         
+$ zcat /data/Bspc-training/shared/rnaseq_mov10/Mov10_oe_1.fq.gz | head
 ```
-$ zcat /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz | head
-``` 
+
 Check out [this page from the University of Texas at Austin](https://cloud.wikis.utexas.edu/wiki/spaces/CoreNGSTools/pages/54069228/Working+with+FASTQ+files) for more info and a longer tutorial about `gzip`.
 
-<hr> 
+<hr>
 
 ## **Loading the FASTQC module**
 
@@ -164,7 +161,7 @@ FastQC does the following:
 
 ------------------------------------------------------------------------
 
-> NOTE: > NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (0.75 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
+> NOTE: \> NOTE: Before we run FastQC, **you should be on a compute node** in an interactive session. We will start with the default `sinteractive` allocation which is 1 core (2 CPUs) and 768 MB/CPU (0.75 GB) of memory, which should be just fine for our purposes. See this [Biowulf page](https://hpc.nih.gov/docs/userguide.html#int) for more information.
 >
 > ``` bash
 > $ sinteractive
@@ -190,14 +187,13 @@ $ module list
 
 If we try to run FastQC:
 
-```bash
+``` bash
 fastqc
 ```
 
 We'll get `fastqc: command not found`. This is because the FastQC program is not in our `$PATH` (i.e. it's not in a directory that shell will automatically check to run commands/programs).
 
-> NOTE: 
-> How to check your $PATH?
+> NOTE: How to check your \$PATH?
 
 To run the FastQC program, we first need to load the appropriate module, so it puts the program into our path. To find the FastQC module to load we need to search the versions available:
 
@@ -219,8 +215,7 @@ Once a module for a tool is loaded, you have essentially made it directly availa
 $ module list
 ```
 
-> NOTE:
-> How do you expect your PATH to change? Check to see if you were right!
+> NOTE: How do you expect your PATH to change? Check to see if you were right!
 
 **As a reminder - some LMOD commands are listed below**
 
@@ -249,8 +244,7 @@ We will need to specify this directory in the command to run FastQC. How do we k
 $ fastqc --help
 ```
 
-> NOTE:
-> When to use `man`, when to use `--help` or `-h`? 
+> NOTE: When to use `man`, when to use `--help` or `-h`?
 >
 > Use `man` for built-in Bash commands. Use `--help` or `-h` for other tools. Sometimes you can run the tool with no arguments and it will print the help. Sometimes it might need another command. It depends, but `-h` seems to be fairly standard.
 
@@ -271,7 +265,7 @@ cd raw_data
 ``` bash
 # don't run these, these are just options
 fastqc -o ../results/fastqc
-fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc
+fastqc -o /data/$USER/rnaseq/results/fastqc
 ```
 
 **Specifying input files**: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FastQC you don't need to specify an argument before listing input files like we did before specifying the output location.
@@ -305,8 +299,7 @@ $ exit  #exit the current interactive session (you will be back on a login node)
 $ sinteractive --cpus-per-task=6 --mem=2G
 ```
 
-> NOTE:
-> Why did we choose 6? Why 2G?
+> NOTE: Why did we choose 6? Why 2G?
 
 Once you are on the compute node, check what job(s) you have running and what resources you are using.
 
@@ -335,7 +328,9 @@ $ fastqc -o ../results/fastqc -t 6 *.fq
 
 **Discussion Points:**
 
-*Do you notice a difference? Is there anything in the output that suggests this is no longer running serially?* *This overwrote our results. What is a way that we could prevent this from happening?*
+-   *Do you notice a difference? Is there anything in the output that suggests this is no longer running serially?*
+
+-   *This overwrote our results. What is a way that we could prevent this from happening?*
 
 ## **Viewing results from FastQC**
 
@@ -365,7 +360,9 @@ Right now, this capability only works from your `/data/$USER` directory:
 
 ------------------------------------------------------------------------
 
-## **BONUS**: Using secure copy
+## Transferring Files Using the Command Line 
+
+### Secure Copy (SCP) 
 
 Another useful way of viewing the HTML or other output from Biowulf is to actually copy the file from Biowulf to your local computer using the command line.
 
@@ -392,12 +389,45 @@ Interactive Data Transfers should be performed on **helix.nih.gov**, the designa
 3.  Type in the following command to grab an output HTML from Biowulf (let's use the copy you just placed in your `/data/$USER` directory) and put it in your current directory ( `.`).
 
     ``` bash
-    scp username@helix.nih.gov:/data/Bspc-training/$USER/results/fastqc/Mov10_oe_1.subset_fastqc.html .
+    # Note: In some cases you may need to specify the full path to your Desktop directory instead of "." 
+    scp username@helix.nih.gov:/data/$USER/results/fastqc/Mov10_oe_1.subset_fastqc.html .
     ```
 
 4.  The file should appear on your Desktop. Click to open!
 
-**Note**: When working with bigger files, you will likely want to use the `rsync` command, which has many advantages, such as restarting the transfer if your connection drops. There are some good [BSPC training materials](https://nichd-bspc.github.io/training/rsync.html) about this. 
+### RSync for larger files 
+
+When working with bigger files, you will likely want to use the `rsync` command. There are some good [BSPC training materials](https://nichd-bspc.github.io/training/rsync.html) about this. `rsync` has many advantages, such as:
+
+-   Restarting the transfer if your connection drops.
+
+-   It will synchronize a directory, only copying over files that are newer.
+
+-   Can compress data over the wire, resulting in faster transfers
+
+-   Verifies if the file was correctly transferred
+
+**An example of me transferring one of the input FASTQ files to my local computer:**
+
+``` bash
+rsync -av changes@helix.nih.gov:/data/$USER/rnaseq_course/raw_data/Irrel_kd_3.subset.fq /Users/changes/Desktop
+```
+
+-   `-a` = archive mode (preserves permissions, timestamps, etc.)
+
+-   `-v` = verbose (shows progress)
+
+-   Another useful parameter for particularly large files is `-z` , which compresses the file during transfer.
+
+See [explainshell](https://explainshell.com/explain?cmd=rsync+-av+--progress) (which is also just a very cool website) for this command to read more on what those arguments do!
+
+**!! Caution !!** :
+
+One tricky thing about rsync is that **it is sensitive to trailing slashes (/) on the source directory when transferring a directory rather than an individual file:**
+
+-   When we check the contents of `dest`, we see that no trailing slash on `source` put the whole directory *inside* the destination, i.e. in `rsync -r source dest` .
+
+-   If we instead add a trailing slash in the command, i.e. `rsync -r source/ dest` , then the contents of the directory get transferred, but not the overarching directory.
 
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
 
