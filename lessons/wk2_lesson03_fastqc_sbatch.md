@@ -1,49 +1,68 @@
 ---
 title: "Quality control using FASTQC - script running"
 author: "Harvard HPC Staff, Modified by Sally Chang @ NICHD"
-date: Last edited March 2025
+date: Last edited April 2025
 duration: 45 minutes
 ---
-
-### NOTE: 
-To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives:
 
 -   Modify a template SLURM job submission script
 -   Run a SLURM job submission script to perform quality assessment for a full-sized FASTQ file
 
-## Preparing SLURM Directives
+## The SLURM scheduler
 
-### Performing quality assessment using job submission scripts
+So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. `fastqc -o ../results/fastqc/ -t 6 *.fq`). However, we can submit a command or series of commands to these partitions using job submission scripts.
 
-So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. `fastqc -o ../results/fastqc/ -t 6 *.fq`). However, we can submit a command or series of commands to these partitions using job submission scripts. This is extremely useful when we want to run a job that will take longer than we want to wait around for in an interactive job or will take more memory that we can use during an interactive job. *In this case, we will be running the analysis on the full-sized FASTQ file for one of our samples, which is 10x larger than the subset files we have thus far been working with.*
+But what if we want to run something on Biowulf that will take a few hours? *And* we want to make sure it is making the best use of Biowulf resources? That is where a **job scheduler** like SLURM (Simple Linux Utility for Resource Management) comes in.
+
+**Some main benefits of SLURM (and other systems):**
+
+-   **Optimizing resources**: Making sure HPC resources (CPUs, GPUs, nodes, memory etc) are utilized efficiently and avoid conflict
+
+```{=html}
+<!-- -->
+```
+-   **Job scheduling**: Manages a queue of jobs so that they are launched without user intervention when resources are available
+
+-   **Monitoring**: Tracks job states, logs activity, in general helps you troubleshoot and resubmit jobs if needed.
+
+-   **User-Friendly Controls**: Offers powerful tools for job submission, tracking, and customization (`sbatch`, `squeue`, etc.). We'll be learning about those today!
+
+[GenomicsAotearoa](https://genomicsaotearoa.github.io/Workshop-Bash_Scripting_And_HPC_Job_Scheduler/5_working_with_job_scheduler/) has a really great lesson to supplement the material here.
+
+## Using SLURM Directives: Performing quality assessment using job submission scripts
+
+### First shell script
 
 We didn't talk about it yet, but a shell script is simply a text file containing commands that are run consecutively.
 
 For example, the following 2-line script would change to your directory and print the `tree` output to a file in that directory:
 
-```bash
+``` bash
 cd /data/Bspc-training/$USER/
 tree > mytree.txt
 ```
 
 If this script is called `myscript.bash` you could run it like this:
 
-```bash
+``` bash
 bash myscript.bash
 ```
 
 and then you would get the `tree` output in `/data/Bspc-training/$USER`.
 
-> NOTE:
-> It doesn't matter where you save this example script, and it will still work correctly. Why?
+> NOTE: It doesn't matter where you save this example script, and it will still work correctly. Why?
+
+### Elements of a job submission script
 
 **Job submission scripts** for Biowulf are regular shell scripts, but contain the Slurm **options/directives** for our job submission. These directives define the various resources we are requesting for our job (i.e *number of cores, name of partition, runtime limit* ).
 
-Submission of the script using the `sbatch` command allows Slurm to run your job when its your turn. Let's create a job submission script to automate what we have done in the previous lesson.
+Submission of the script using the `sbatch` command allows Slurm to run your job when its your turn. Let's create a job submission script to automate what we have done in the previous lesson. Here is a schematic from [GenomicsAotearoa](https://genomicsaotearoa.github.io/Workshop-Bash_Scripting_And_HPC_Job_Scheduler/5_working_with_job_scheduler/) displaying the requisite pieces of a Biowulf (or other SLURM-scheduled cluster) submission script:
 
-Our script will do the following:
+![](images/anatomy_of_a_slurm_script.png)
+
+Specifically, our script will do the following:
 
 1.  Specify important details to the SLURM scheduler
 2.  Load the FastQC module
@@ -119,7 +138,7 @@ fastqc -o /data/Bspc-training/$USER/rnaseq/results/fastqc /data/Bspc-training/sh
 
 Once done with your script, click `esc` to exit INSERT mode. Then save and quit the script by typing `:wq`. You may double check your script by typing `less mov10_fastqc.run`.
 
-## Submit the job script
+## Submitting the Job Script
 
 Now, if everything looks good submit the job!
 
@@ -137,7 +156,11 @@ Look for the row that corresponds to your `JobID`. The third column indicates th
 
 Once your job is `RUNNING`, you should also get an e-mail with a subject line like: `Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Began, Queued time 00:01:09`.
 
-## After the job has run
+### What happens after job is submitted? 
+
+So, while we wait a few minutes for the job script to run, we can edit these
+
+### After the job has run
 
 Once the job is running, it will take just about 4 minutes to run. Hopefully, you will get another e-mail with a subject like `Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Ended, Run time 00:02:45, COMPLETED, ExitCode 0` . Generally speaking, ExitCode 0 is what we want!
 
@@ -168,9 +191,9 @@ cp Mov10_oe_1_fastqc.html /data/$USER/
 
 **Exercise**
 
-1. Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session?
+1.  Take a look at what's inside the `.err` and `.out` files. What do you observe? Do you remember where you see those information when using the interactive session?
 
-2. How would you change your script to analyze the 6 files we used in the last episode?
+2.  How would you change your script to analyze the 6 files we used in the last episode?
 
 ## Assignment
 
@@ -184,7 +207,7 @@ Write a SLURM job script in your `/script` directory called `mov10_oe_2_fastqc_f
 
 -   Comes up with more informative names for the output and error files instead of the Job ID variable (use part of the input filename, perhaps?). Likewise, make any other changes to this script that reference the old file
 
--   Ask your instructor to look at the script before submitting (I can look into your `/script` directory). Then, go ahead and submit the script using `sbatch`!
+-   Ask your instructor to look at the script before submitting (copy into `/assignments`. Then, go ahead and submit the script using `sbatch`!
 
 ------------------------------------------------------------------------
 
