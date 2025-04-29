@@ -14,22 +14,19 @@ duration: 45 minutes
 
 So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. `fastqc -o ../results/fastqc/ -t 6 *.fq`). However, we can submit a command or series of commands to these partitions using job submission scripts.
 
-But what if we want to run something on Biowulf that will take a few hours? *And* we want to make sure it is making the best use of Biowulf resources? That is where a **job scheduler** like SLURM (Simple Linux Utility for Resource Management) comes in.
+But what if we want to run something on Biowulf that will take a few hours? *And* we want to make sure it is making the best use of Biowulf resources? That's where a **job scheduler** like SLURM (Simple Linux Utility for Resource Management) comes in.
 
 **Some main benefits of SLURM (and other systems):**
 
 -   **Optimizing resources**: Making sure HPC resources (CPUs, GPUs, nodes, memory etc) are utilized efficiently and avoid conflict
 
-```{=html}
-<!-- -->
-```
 -   **Job scheduling**: Manages a queue of jobs so that they are launched without user intervention when resources are available
 
 -   **Monitoring**: Tracks job states, logs activity, in general helps you troubleshoot and resubmit jobs if needed.
 
 -   **User-Friendly Controls**: Offers powerful tools for job submission, tracking, and customization (`sbatch`, `squeue`, etc.). We'll be learning about those today!
 
-[GenomicsAotearoa](https://genomicsaotearoa.github.io/Workshop-Bash_Scripting_And_HPC_Job_Scheduler/5_working_with_job_scheduler/) has a really great lesson to supplement the material here.
+[GenomicsAotearoa](https://genomicsaotearoa.github.io/Workshop-Bash_Scripting_And_HPC_Job_Scheduler/5_working_with_job_scheduler/) has a really great lesson to supplement the material.
 
 ## Using SLURM Directives: Performing quality assessment using job submission scripts
 
@@ -60,7 +57,7 @@ and then you would get the `tree` output in `/data/Bspc-training/$USER`.
 
 Submission of the script using the `sbatch` command allows Slurm to run your job when its your turn. Let's create a job submission script to automate what we have done in the previous lesson. Here is a schematic from [GenomicsAotearoa](https://genomicsaotearoa.github.io/Workshop-Bash_Scripting_And_HPC_Job_Scheduler/5_working_with_job_scheduler/) displaying the requisite pieces of a Biowulf (or other SLURM-scheduled cluster) submission script:
 
-![](images/anatomy_of_a_slurm_script.png)
+<img src="../img/anatomy_of_a_slurm_script.png" alt="simplified diagram of sbatch script showing shebang, directives, and actual commands" width="500"/>
 
 Specifically, our script will do the following:
 
@@ -156,9 +153,28 @@ Look for the row that corresponds to your `JobID`. The third column indicates th
 
 Once your job is `RUNNING`, you should also get an e-mail with a subject line like: `Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Began, Queued time 00:01:09`.
 
-### What happens after job is submitted? 
+### What happens after job is submitted?
 
-So, while we wait a few minutes for the job script to run, we can edit these
+So, while we wait a few minutes for the job script to run, we can think about what actually happens once you submit a script.
+
+1.  SLURM reads job parameters from `#SBATCH` directives in the script.
+
+2.  SLURM Controller checks your job's resource requests, priority, and scheduling policies.
+
+3.  Job Queued or Scheduled
+
+    -   If resources are **not available**, job is marked `PD` (Pending).
+    -   If resources are **available**, job is marked `R` (Running).
+
+4.  SLURM assigns your job to suitable compute nodes based on your request.
+
+5.  SLURM runs the commands in your script, output is sent to `.out` and/or `.err` and/or other files you specify.
+
+6.  Job finishes and is marked `CD` (Completed), or another final state (e.g., `FAILED`, `CANCELLED`), resources are released.
+
+Here is another useful schematic from [GenomicsAotearoa](https://genomicsaotearoa.github.io/Workshop-Bash_Scripting_And_HPC_Job_Scheduler/5_working_with_job_scheduler/) summarizing these steps and opportunities to monitor/modify the job once it is running:
+
+<img src="../img/batch_system_flow.png" alt="schematic of what happens to submitted job after running sbatch and opportunities to modify the running job" width="500"/>
 
 ### After the job has run
 
@@ -186,6 +202,19 @@ Finally, copy over the HTML output file to your /data/\$USER directory so we can
 ``` bash
 cp Mov10_oe_1_fastqc.html /data/$USER/
 ```
+
+### Some useful SLURM commands
+
+To put these all in one place, here are some SLURM commands that you may find useful:
+
+|                             |                                                                                         |
+|:-----------------|:----------------------------------------------------|
+| `sbatch`                    | Submit non-interactive (batch) jobs to the scheduler                                    |
+| `squeue`                    | List all jobs in the queue                                                              |
+| `squeue -u $USER`           | Show only your jobs                                                                     |
+| `scancel <jobid>`           | Cancel a job                                                                            |
+| `scontrol show job <jobid>` | Detailed info on a specific job                                                         |
+| `freen`                     | Biowulf tool: give an instantaneous report of free nodes, CPUs, and GPUs on the cluster |
 
 ------------------------------------------------------------------------
 
