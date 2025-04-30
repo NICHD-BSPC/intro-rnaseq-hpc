@@ -800,9 +800,6 @@ setfacl --modify u:changes:--x /data/$USER
 
 -   Grants **user** `changes` only **execute (`--x`)** permission on `/data/$USER`.
 
-```{=html}
-<!-- -->
-```
 -   This means that that `changes` can **traverse** the directory (i.e., enter it or access subdirectories, if they know the name), but **cannot list the contents** or read/write any files directly. Useful when you want someone to access a specific subdirectory, but not see the contents of the parent.
 
 Second, run this command, which modifies the **default ACL** for the directory `/data/$USER/unix_lesson`.
