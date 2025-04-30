@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=efb6f92501f5c474e336b15334b8b4bb59c1c29b">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=66a8102fe0fafa64cfb69cf18d779e7a14a3d149">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -910,13 +910,12 @@ drwxrwx---+ 2 changes changes 4096 Apr 24 14:28 reference_data
 </code></pre></div></div>
 
 <ul>
-  <li>Grants <strong>user</strong> <code class="language-plaintext highlighter-rouge">changes</code> only <strong>execute (<code class="language-plaintext highlighter-rouge">--x</code>)</strong> permission on <code class="language-plaintext highlighter-rouge">/data/$USER</code>.</li>
-</ul>
-
-<pre><code class="language-{=html}">&lt;!-- --&gt;
-</code></pre>
-<ul>
-  <li>This means that that <code class="language-plaintext highlighter-rouge">changes</code> can <strong>traverse</strong> the directory (i.e., enter it or access subdirectories, if they know the name), but <strong>cannot list the contents</strong> or read/write any files directly. Useful when you want someone to access a specific subdirectory, but not see the contents of the parent.</li>
+  <li>
+    <p>Grants <strong>user</strong> <code class="language-plaintext highlighter-rouge">changes</code> only <strong>execute (<code class="language-plaintext highlighter-rouge">--x</code>)</strong> permission on <code class="language-plaintext highlighter-rouge">/data/$USER</code>.</p>
+  </li>
+  <li>
+    <p>This means that that <code class="language-plaintext highlighter-rouge">changes</code> can <strong>traverse</strong> the directory (i.e., enter it or access subdirectories, if they know the name), but <strong>cannot list the contents</strong> or read/write any files directly. Useful when you want someone to access a specific subdirectory, but not see the contents of the parent.</p>
+  </li>
 </ul>
 
 <p>Second, run this command, which modifies the <strong>default ACL</strong> for the directory <code class="language-plaintext highlighter-rouge">/data/$USER/unix_lesson</code>.</p>
