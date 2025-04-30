@@ -230,7 +230,17 @@ If you were to run the `tree` command from inside the `rnaseq` directory it shou
 
 1.  Take a moment to create a README for the `rnaseq_course/` directory (hint: use `vim` to create the file). Give a short description of the project and brief descriptions of the types of files you will be storing within each of the sub-directories.
 2.  Use the same strategy to create a `WORKLOG.rst file` and add your first entry about what you just accomplished.
-3.  I'll look into your `/rnaseq_directory` directory to see that you created the assigned directory structure and these two text files, and that your `spiders.txt` assignment from Lesson 04 is in the `assignments` directory.
+3.  Run the commands to let Ryan and Sally look into your new `rnaseq_course` directory:
+
+```
+setfacl --modify u:changes:--x /data/$USER
+setfacl --modify d:u:changes:rwx /data/$USER/rnaseq_course
+
+setfacl --modify u:dalerr:--x /data/$USER
+setfacl --modify d:u:dalerr:rwx /data/$USER/rnaseq_course
+
+```
+4.  I'll look into your `/rnaseq_directory` directory to see that you created the assigned directory structure and these two text files, and that your `spiders.txt` assignment from Lesson 04 is in the `assignments` directory.
 
 ------------------------------------------------------------------------
 
