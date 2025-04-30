@@ -435,7 +435,7 @@ You can do a lot more with the idea of stringing together *parent/child* directo
 ``` bash
 $ cd /data/$USER
 
-$ ls -l /$USER/unix_lesson/raw_fastq
+$ ls -l /data/$USER/unix_lesson/raw_fastq
 ```
 
 Now, what if we wanted to change directories to `raw_fastq` in a single step?
