@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson04_searching_files.html" />
 <meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2025-01-01T00:00:00+00:00" />
+<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="The Shell: Searching and Redirection" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC staff, modified by E. Sally Chang at NICHD"},"dateModified":"2025-01-01T00:00:00+00:00","datePublished":"2025-01-01T00:00:00+00:00","headline":"The Shell: Searching and Redirection","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson04_searching_files.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson04_searching_files.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC staff, modified by E. Sally Chang at NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"The Shell: Searching and Redirection","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson04_searching_files.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk1_lesson04_searching_files.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=7354b87e501468c7cc4ec20dc2a98b1e5663291d">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=61839d29b6b74af5575baa5f1fb623e5e8b2ed88">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -60,7 +60,7 @@
     </header>
 
     <main id="content" class="main-content" role="main">
-      <p>Approximate time: 30 minutes (60 minutes if you do optional exercises)</p>
+      <p>Approximate time: 30 minutes (60 minutes if you do final exercises)</p>
 
 <h2 id="learning-objectives">Learning objectives</h2>
 
@@ -72,7 +72,28 @@
 
 <h2 id="are-you-logged-into-biowulf-on-a-compute-node-and-in-your-course-directory">Are you logged into Biowulf, on a compute node, and in your course directory?</h2>
 
-<p>If not, first do that before proceeding! As a reminder, the course directory is: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code></p>
+<p>«««&lt; HEAD
+If not, first do that before proceeding! As a reminder, the course directory is: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code>
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+If not, first do that before proceeding! As a reminder, the course
+directory is: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code>
+=======
+If not, first do that before proceeding! As a reminder, the course directory is: <code class="language-plaintext highlighter-rouge">/data/$USER</code></p>
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <blockquote>
+        <blockquote>
+          <blockquote>
+            <blockquote>
+              <p>2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)</p>
+            </blockquote>
+          </blockquote>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+</blockquote>
 
 <h2 id="searching-files-with-grep-command">Searching files with <code class="language-plaintext highlighter-rouge">grep</code> command</h2>
 
@@ -95,32 +116,30 @@ B?@DDDDDDHHH?GH:?FCBGGB@C?DBEGIIIIAEF;FCGGI#####################################
 <blockquote>
   <p><strong>More information about the FASTQ file format</strong></p>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Line</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>Read name preceded by ‘\@’</td>
-      </tr>
-      <tr>
-        <td>2</td>
-        <td>The actual DNA sequence</td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>Read name (same as line 1) preceded by a ‘+’ or just a ‘+’ sign</td>
-      </tr>
-      <tr>
-        <td>4</td>
-        <td>String of characters which represent the quality score of each nucleotide in line 2; must have same number of characters as line 2</td>
-      </tr>
-    </tbody>
-  </table>
+  <p>| Line | Description                                                                                                                        |
+«««&lt; HEAD
+|——|————————————————————————————————————————————|
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+|——————–|—————————————————-|
+=======
+|———————|—————————————————|</p>
+  <blockquote>
+    <blockquote>
+      <blockquote>
+        <blockquote>
+          <blockquote>
+            <blockquote>
+              <p>2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+| 1    | Read name preceded by ‘\@’                                                                                                         |
+| 2    | The actual DNA sequence                                                                                                            |
+| 3    | Read name (same as line 1) preceded by a ‘+’ or just a ‘+’ sign                                                                    |
+| 4    | String of characters which represent the quality score of each nucleotide in line 2; must have same number of characters as line 2 |</p>
+            </blockquote>
+          </blockquote>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </blockquote>
 
   <p>You’ll learn more about this file format in our lesson next week!</p>
 </blockquote>
@@ -288,7 +307,30 @@ OE.3    Mov10_oe
 
 <p><strong>The redirection command for appending something to an existing file is <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>.</strong></p>
 
-<p>If we use <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, it will append to the existing content in a file, rather than overwrite it. This can be useful for saving more than one search. For example, the following command will append the bad reads from Mov10_oe_2 to the bad_reads.txt file that we just generated.</p>
+<p>«««&lt; HEAD
+If we use <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, it will append to the existing content in a file, rather than overwrite it. This can be useful for saving more than one search. For example, the following command will append the bad reads from Mov10_oe_2 to the bad_reads.txt file that we just generated.
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+If we use <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, it will append to the existing content in a file, rather
+than overwrite it. This can be useful for saving more than one search.
+For example, the following command will append the bad reads from
+Mov10_oe_2 to the bad_reads.txt file that we just generated.
+=======
+If we use <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, it will append to the existing content in a file, rather than overwrite it. This can be useful for saving more than one search. For example, the following command will append the bad reads from <code class="language-plaintext highlighter-rouge">Mov10_oe_2</code> to the <code class="language-plaintext highlighter-rouge">bad_reads.txt</code> file that we just generated.</p>
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <blockquote>
+        <blockquote>
+          <blockquote>
+            <blockquote>
+              <p>2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)</p>
+            </blockquote>
+          </blockquote>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+</blockquote>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 NNNNNNNNNN Mov10_oe_2.subset.fq <span class="o">&gt;&gt;</span> bad_reads.txt
 
@@ -333,17 +375,115 @@ OE.3    Mov10_oe
   <p><strong>Tip</strong> - Similar to <code class="language-plaintext highlighter-rouge">grep</code>, you can type <code class="language-plaintext highlighter-rouge">wc --help</code> or <code class="language-plaintext highlighter-rouge">man wc</code> to see all options.</p>
 </blockquote>
 
-<p><strong>About Pipes:</strong> * The pipe is a very important/powerful concept in Shell * You can string along as many commands together as you like</p>
+<p>«««&lt; HEAD
+<strong>About Pipes:</strong> * The pipe is a very important/powerful concept in Shell * You can string along as many commands together as you like
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+<strong>About Pipes:</strong> * The pipe is a very important/powerful concept in
+Shell * You can string along as many commands together as you like
+=======
+<strong>About Pipes:</strong></p>
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <blockquote>
+        <blockquote>
+          <blockquote>
+            <blockquote>
+              <p>2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)</p>
+            </blockquote>
+          </blockquote>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+</blockquote>
+
+<p>«««&lt; HEAD
+The philosophy behind the three redirection operators (<code class="language-plaintext highlighter-rouge">&gt;</code>, <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, <code class="language-plaintext highlighter-rouge">|</code>) you have learned so far is that none of them by themselves do a lot. BUT when you start chaining them together, you can do some really powerful things really efficiently.
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+The philosophy behind the three redirection operators (<code class="language-plaintext highlighter-rouge">&gt;</code>, <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, <code class="language-plaintext highlighter-rouge">|</code>)
+you have learned so far is that none of them by themselves do a lot. BUT
+when you start chaining them together, you can do some really powerful
+things really efficiently.
+=======</p>
+<ul>
+  <li>The pipe is a very important/powerful concept in Shell
+    <blockquote>
+      <blockquote>
+        <blockquote>
+          <blockquote>
+            <blockquote>
+              <blockquote>
+                <blockquote>
+                  <p>2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)</p>
+                </blockquote>
+              </blockquote>
+            </blockquote>
+          </blockquote>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </li>
+</ul>
+
+<p>«««&lt; HEAD
+<strong>To be able to use the shell effectively, becoming proficient in the use of the pipe and redirection operators is essential.</strong>
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+<strong>To be able to use the shell effectively, becoming proficient in the
+use of the pipe and redirection operators is essential.</strong>
+=======</p>
+<ul>
+  <li>You can string along as many commands together as you like
+    <blockquote>
+      <blockquote>
+        <blockquote>
+          <blockquote>
+            <blockquote>
+              <blockquote>
+                <blockquote>
+                  <p>2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)</p>
+                </blockquote>
+              </blockquote>
+            </blockquote>
+          </blockquote>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </li>
+</ul>
 
 <p>The philosophy behind the three redirection operators (<code class="language-plaintext highlighter-rouge">&gt;</code>, <code class="language-plaintext highlighter-rouge">&gt;&gt;</code>, <code class="language-plaintext highlighter-rouge">|</code>) you have learned so far is that none of them by themselves do a lot. BUT when you start chaining them together, you can do some really powerful things really efficiently.</p>
 
-<p><strong>To be able to use the shell effectively, becoming proficient in the use of the pipe and redirection operators is essential.</strong></p>
+<p>«««&lt; HEAD
+Let’s use the new commands in our toolkit and a few new ones to examine the “gene annotation” file, <strong>chr1-hg19_genes.gtf</strong>. We will be using this file to find the genomic coordinates of all known exons on chromosome 1.
+||||||| parent of 2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)
+Let’s use the new commands in our toolkit and a few new ones to examine
+the “gene annotation” file, <strong>chr1-hg19_genes.gtf</strong>. We will be using
+this file to find the genomic coordinates of all known exons on
+chromosome 1.
+=======
+<strong>To be able to use the shell effectively, becoming proficient in the use of the pipe and redirection operators is essential.</strong></p>
 
-<h2 id="optional-practice-with-searching-and-pipingredirection-and-gtf-files">Optional: Practice with searching and piping/redirection and GTF files</h2>
+<h2 id="practice-with-searching-and-pipingredirection-and-gtf-files">Practice with searching and piping/redirection and GTF files</h2>
 
 <p>Let’s use the new commands in our toolkit and a few new ones to examine the “gene annotation” file, <strong>chr1-hg19_genes.gtf</strong>. We will be using this file to find the genomic coordinates of all known exons on chromosome 1.</p>
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <blockquote>
+        <blockquote>
+          <blockquote>
+            <blockquote>
+              <p>2c0758a (Fix format and outdated directory paths in Week 1 Lesson 04)</p>
+            </blockquote>
+          </blockquote>
+        </blockquote>
+      </blockquote>
+    </blockquote>
+  </blockquote>
+</blockquote>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> ~/unix_lesson/reference_data/
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd </span>unix_lesson/reference_data/
 </code></pre></div></div>
 
 <h3 id="introduction-to-the-gtf-file-format">Introduction to the GTF file format</h3>
