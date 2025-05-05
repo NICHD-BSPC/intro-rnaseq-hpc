@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson03_fastqc_sbatch.html" />
 <meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2025-03-01T00:00:00+00:00" />
+<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Quality control using FASTQC - script running" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Modified by Sally Chang @ NICHD"},"dateModified":"2025-03-01T00:00:00+00:00","datePublished":"2025-03-01T00:00:00+00:00","headline":"Quality control using FASTQC - script running","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson03_fastqc_sbatch.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson03_fastqc_sbatch.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Modified by Sally Chang @ NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"Quality control using FASTQC - script running","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson03_fastqc_sbatch.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson03_fastqc_sbatch.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=3f4479927c7a48d2a37347ab088f6d20bdc893cb">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=21398a85d62ba0f056579190bc95b3b74fc379ec">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -60,21 +60,44 @@
     </header>
 
     <main id="content" class="main-content" role="main">
-      <h3 id="note">NOTE:</h3>
-<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
-
-<h2 id="learning-objectives">Learning Objectives:</h2>
+      <h2 id="learning-objectives">Learning Objectives:</h2>
 
 <ul>
   <li>Modify a template SLURM job submission script</li>
   <li>Run a SLURM job submission script to perform quality assessment for a full-sized FASTQ file</li>
 </ul>
 
-<h2 id="preparing-slurm-directives">Preparing SLURM Directives</h2>
+<h2 id="the-slurm-scheduler">The SLURM scheduler</h2>
 
-<h3 id="performing-quality-assessment-using-job-submission-scripts">Performing quality assessment using job submission scripts</h3>
+<p>So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. <code class="language-plaintext highlighter-rouge">fastqc -o ../results/fastqc/ -t 6 *.fq</code>). However, we can submit a command or series of commands to these partitions using job submission scripts.</p>
 
-<p>So far in our FASTQC analysis, we have been directly submitting commands to Biowulf using an interactive session (ie. <code class="language-plaintext highlighter-rouge">fastqc -o ../results/fastqc/ -t 6 *.fq</code>). However, we can submit a command or series of commands to these partitions using job submission scripts. This is extremely useful when we want to run a job that will take longer than we want to wait around for in an interactive job or will take more memory that we can use during an interactive job. <em>In this case, we will be running the analysis on the full-sized FASTQ file for one of our samples, which is 10x larger than the subset files we have thus far been working with.</em></p>
+<p>But what if we want to run something on Biowulf that will take a few hours? <em>And</em> we want to make sure it is making the best use of Biowulf resources? That is where a <strong>job scheduler</strong> like SLURM (Simple Linux Utility for Resource Management) comes in.</p>
+
+<p><strong>Some main benefits of SLURM (and other systems):</strong></p>
+
+<ul>
+  <li><strong>Optimizing resources</strong>: Making sure HPC resources (CPUs, GPUs, nodes, memory etc) are utilized efficiently and avoid conflict</li>
+</ul>
+
+<pre><code class="language-{=html}">&lt;!-- --&gt;
+</code></pre>
+<ul>
+  <li>
+    <p><strong>Job scheduling</strong>: Manages a queue of jobs so that they are launched without user intervention when resources are available</p>
+  </li>
+  <li>
+    <p><strong>Monitoring</strong>: Tracks job states, logs activity, in general helps you troubleshoot and resubmit jobs if needed.</p>
+  </li>
+  <li>
+    <p><strong>User-Friendly Controls</strong>: Offers powerful tools for job submission, tracking, and customization (<code class="language-plaintext highlighter-rouge">sbatch</code>, <code class="language-plaintext highlighter-rouge">squeue</code>, etc.). We’ll be learning about those today!</p>
+  </li>
+</ul>
+
+<p><a href="https://genomicsaotearoa.github.io/Workshop-Bash_Scripting_And_HPC_Job_Scheduler/5_working_with_job_scheduler/">GenomicsAotearoa</a> has a really great lesson to supplement the material here.</p>
+
+<h2 id="using-slurm-directives-performing-quality-assessment-using-job-submission-scripts">Using SLURM Directives: Performing quality assessment using job submission scripts</h2>
+
+<h3 id="first-shell-script">First shell script</h3>
 
 <p>We didn’t talk about it yet, but a shell script is simply a text file containing commands that are run consecutively.</p>
 
@@ -92,15 +115,18 @@ tree <span class="o">&gt;</span> mytree.txt
 <p>and then you would get the <code class="language-plaintext highlighter-rouge">tree</code> output in <code class="language-plaintext highlighter-rouge">/data/Bspc-training/$USER</code>.</p>
 
 <blockquote>
-  <p>NOTE:
-It doesn’t matter where you save this example script, and it will still work correctly. Why?</p>
+  <p>NOTE: It doesn’t matter where you save this example script, and it will still work correctly. Why?</p>
 </blockquote>
+
+<h3 id="elements-of-a-job-submission-script">Elements of a job submission script</h3>
 
 <p><strong>Job submission scripts</strong> for Biowulf are regular shell scripts, but contain the Slurm <strong>options/directives</strong> for our job submission. These directives define the various resources we are requesting for our job (i.e <em>number of cores, name of partition, runtime limit</em> ).</p>
 
-<p>Submission of the script using the <code class="language-plaintext highlighter-rouge">sbatch</code> command allows Slurm to run your job when its your turn. Let’s create a job submission script to automate what we have done in the previous lesson.</p>
+<p>Submission of the script using the <code class="language-plaintext highlighter-rouge">sbatch</code> command allows Slurm to run your job when its your turn. Let’s create a job submission script to automate what we have done in the previous lesson. Here is a schematic from <a href="https://genomicsaotearoa.github.io/Workshop-Bash_Scripting_And_HPC_Job_Scheduler/5_working_with_job_scheduler/">GenomicsAotearoa</a> displaying the requisite pieces of a Biowulf (or other SLURM-scheduled cluster) submission script:</p>
 
-<p>Our script will do the following:</p>
+<p><img src="/intro-rnaseq-hpc/lessons/images/anatomy_of_a_slurm_script.png" alt="" /></p>
+
+<p>Specifically, our script will do the following:</p>
 
 <ol>
   <li>Specify important details to the SLURM scheduler</li>
@@ -177,7 +203,7 @@ fastqc <span class="nt">-o</span> /data/Bspc-training/<span class="nv">$USER</sp
 
 <p>Once done with your script, click <code class="language-plaintext highlighter-rouge">esc</code> to exit INSERT mode. Then save and quit the script by typing <code class="language-plaintext highlighter-rouge">:wq</code>. You may double check your script by typing <code class="language-plaintext highlighter-rouge">less mov10_fastqc.run</code>.</p>
 
-<h2 id="submit-the-job-script">Submit the job script</h2>
+<h2 id="submitting-the-job-script">Submitting the Job Script</h2>
 
 <p>Now, if everything looks good submit the job!</p>
 
@@ -193,7 +219,11 @@ fastqc <span class="nt">-o</span> /data/Bspc-training/<span class="nv">$USER</sp
 
 <p>Once your job is <code class="language-plaintext highlighter-rouge">RUNNING</code>, you should also get an e-mail with a subject line like: <code class="language-plaintext highlighter-rouge">Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Began, Queued time 00:01:09</code>.</p>
 
-<h2 id="after-the-job-has-run">After the job has run</h2>
+<h3 id="what-happens-after-job-is-submitted">What happens after job is submitted?</h3>
+
+<p>So, while we wait a few minutes for the job script to run, we can edit these</p>
+
+<h3 id="after-the-job-has-run">After the job has run</h3>
 
 <p>Once the job is running, it will take just about 4 minutes to run. Hopefully, you will get another e-mail with a subject like <code class="language-plaintext highlighter-rouge">Slurm Job_id=46252457 Name=mov10_oe1_full_fastqc Ended, Run time 00:02:45, COMPLETED, ExitCode 0</code> . Generally speaking, ExitCode 0 is what we want!</p>
 
@@ -250,7 +280,7 @@ fastqc <span class="nt">-o</span> /data/Bspc-training/<span class="nv">$USER</sp
     <p>Comes up with more informative names for the output and error files instead of the Job ID variable (use part of the input filename, perhaps?). Likewise, make any other changes to this script that reference the old file</p>
   </li>
   <li>
-    <p>Ask your instructor to look at the script before submitting (I can look into your <code class="language-plaintext highlighter-rouge">/script</code> directory). Then, go ahead and submit the script using <code class="language-plaintext highlighter-rouge">sbatch</code>!</p>
+    <p>Ask your instructor to look at the script before submitting (copy into <code class="language-plaintext highlighter-rouge">/assignments</code>. Then, go ahead and submit the script using <code class="language-plaintext highlighter-rouge">sbatch</code>!</p>
   </li>
 </ul>
 
