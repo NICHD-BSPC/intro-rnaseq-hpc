@@ -12,12 +12,11 @@
 <link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson02_fastqc_interactive.html" />
 <meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson02_fastqc_interactive.html" />
 <meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
-<meta property="og:type" content="article" />
-<meta property="article:published_time" content="2025-01-01T00:00:00+00:00" />
+<meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Quality control using FASTQC" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Modified by Sally Chang @ NICHD"},"dateModified":"2025-01-01T00:00:00+00:00","datePublished":"2025-01-01T00:00:00+00:00","headline":"Quality control using FASTQC","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson02_fastqc_interactive.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson02_fastqc_interactive.html"}</script>
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"Modified by Sally Chang @ NICHD"},"headline":"Quality control using FASTQC","url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk2_lesson02_fastqc_interactive.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -25,7 +24,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=6c58fe73252d2447979deed7347b8b261a58628d">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=3f4479927c7a48d2a37347ab088f6d20bdc893cb">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -69,8 +68,6 @@
   <li>Open and look at the report(s) you generated using</li>
   <li>Optionally, transfer one of the HTML files to your local computer using <code class="language-plaintext highlighter-rouge">scp</code></li>
 </ul>
-
-<p>Slides from the Tuesday lecture are available <a href="/intro-rnaseq-hpc/lectures/NICHD_RNASeq_week2_intro.pdf">here</a></p>
 
 <h2 id="quality-control-of-fastq-files">Quality Control of FASTQ files</h2>
 
@@ -175,15 +172,14 @@ CACTTGTAAGGGCAGGCCCCCTTCACCCTCCCGCTCCTGGGGGANNNNNNNNNNANNNCGAGGCCCTGGGGTAGAGGGNN
 <p>Therefore, for the first nucleotide in the read (C), there is less than a 1 in 1000 chance that the base was called incorrectly. Whereas, for the the end of the read there is greater than 50% probability that the base is called incorrectly.</p>
 
 <blockquote>
-  <p>NOTE:
-What other ways can you think of for recording a quality score that corresponds to each base? What are the advantages/disadvantages?</p>
+  <p>NOTE: What other ways can you think of for recording a quality score that corresponds to each base? What are the advantages/disadvantages?</p>
 </blockquote>
 
 <h2 id="finding-bad-reads-in-a-fastq-using-grep">Finding “bad reads” in a FASTQ using <code class="language-plaintext highlighter-rouge">grep</code></h2>
 
 <p>Suppose we want to see how many reads in our file <code class="language-plaintext highlighter-rouge">Mov10_oe_1.subset.fq</code> contain “bad” data, i.e. reads with 10 consecutive Ns (<code class="language-plaintext highlighter-rouge">NNNNNNNNNN</code>), and capture these reads in a file for future analyses.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/Bspc-training/<span class="nv">$USER</span>/rnaseq/raw_fastq
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /data/<span class="nv">$USER</span>/rnaseq_course/raw_fastq
 
 <span class="nv">$ </span><span class="nb">grep </span>NNNNNNNNNN Mov10_oe_1.subset.fq
 </code></pre></div></div>
@@ -191,8 +187,7 @@ What other ways can you think of for recording a quality score that corresponds 
 <p>We get back a lot of reads or lines of text! You can add the <code class="language-plaintext highlighter-rouge">-c</code> option to count the number.</p>
 
 <blockquote>
-  <p>NOTE:
-What’s another way of counting lines?</p>
+  <p>NOTE: What’s another way of counting lines?</p>
 </blockquote>
 
 <h4 id="extracting-the-full-fastq-reads">Extracting the full FASTQ Reads</h4>
@@ -217,8 +212,7 @@ CACAAATCGGCTCAGGAGGCTTGTAGAAAAGCTCAGCTTGACANNNNNNNNNNNNNNNNNGNGNACGAAACNNNNGNNNN
 <p>You will notice that when we use the <code class="language-plaintext highlighter-rouge">-B</code> and/or <code class="language-plaintext highlighter-rouge">-A</code> arguments with the <code class="language-plaintext highlighter-rouge">grep</code> command, the output has some additional lines with dashes (<code class="language-plaintext highlighter-rouge">--</code>), these dashes work to separate your returned “groups” of lines and are referred to as “group separators”. This might be problematic if you are trying to maintain the FASTQ file structure or if you simply do not want them in your output. Using the argument <code class="language-plaintext highlighter-rouge">--no-group-separator</code> with <code class="language-plaintext highlighter-rouge">grep</code> will disable this behavior.</p>
 
 <blockquote>
-  <p>NOTE:
-What’s another way of getting rid of those <code class="language-plaintext highlighter-rouge">---</code> lines?</p>
+  <p>NOTE: What’s another way of getting rid of those <code class="language-plaintext highlighter-rouge">---</code> lines?</p>
 </blockquote>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-B</span> 1 <span class="nt">-A</span> 2 <span class="nt">--no-group-separator</span> NNNNNNNNNN Mov10_oe_1.subset.fq
@@ -237,13 +231,15 @@ What’s another way of getting rid of those <code class="language-plaintext hig
 
 <p>The most common compression program used for individual files is <code class="language-plaintext highlighter-rouge">gzip</code> whose compressed files have the <code class="language-plaintext highlighter-rouge">.gz</code> extension. The tar and zip programs are most commonly used for compressing directories. Let’s take a look at the size difference between uncompressed and compressed files. We use the <code class="language-plaintext highlighter-rouge">-l</code> option of <code class="language-plaintext highlighter-rouge">ls</code> to get a long listing that includes the file size, and <code class="language-plaintext highlighter-rouge">-h</code> to have that size displayed in “human readable” form.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq
-$ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ls -lh /data/Bspc-training/shared/rnaseq_mov10/Mov10_oe_1.fq
+$ ls -lh /data/Bspc-training/shared/rnaseq_mov10/Mov10_oe_1.fq.gz
 </code></pre></div></div>
+
 <p>To extract the file again, you could run <code class="language-plaintext highlighter-rouge">gunzip filename.gz</code>. However, there are many options for working with compressed files directly without extracting them to their full size again. <strong>Luckily for us, current versions of FASTQC can read <code class="language-plaintext highlighter-rouge">.gz</code> files directly.</strong> Another example is <code class="language-plaintext highlighter-rouge">zcat</code> – which is like <code class="language-plaintext highlighter-rouge">cat</code> except that it works on <code class="language-plaintext highlighter-rouge">gzip</code>-compressed (.gz) files! This is often paired with using pipe <code class="language-plaintext highlighter-rouge">|</code> into another command like below:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ zcat /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz | head
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ zcat /data/Bspc-training/shared/rnaseq_mov10/Mov10_oe_1.fq.gz | head
 </code></pre></div></div>
+
 <p>Check out <a href="https://cloud.wikis.utexas.edu/wiki/spaces/CoreNGSTools/pages/54069228/Working+with+FASTQ+files">this page from the University of Texas at Austin</a> for more info and a longer tutorial about <code class="language-plaintext highlighter-rouge">gzip</code>.</p>
 
 <hr />
@@ -301,8 +297,7 @@ $ ls -lh /data/Bspc-training/shared/rnaseq_jan2025/Mov10_oe_1.fq.gz
 <p>We’ll get <code class="language-plaintext highlighter-rouge">fastqc: command not found</code>. This is because the FastQC program is not in our <code class="language-plaintext highlighter-rouge">$PATH</code> (i.e. it’s not in a directory that shell will automatically check to run commands/programs).</p>
 
 <blockquote>
-  <p>NOTE: 
-How to check your $PATH?</p>
+  <p>NOTE: How to check your $PATH?</p>
 </blockquote>
 
 <p>To run the FastQC program, we first need to load the appropriate module, so it puts the program into our path. To find the FastQC module to load we need to search the versions available:</p>
@@ -325,8 +320,7 @@ How to check your $PATH?</p>
 </code></pre></div></div>
 
 <blockquote>
-  <p>NOTE:
-How do you expect your PATH to change? Check to see if you were right!</p>
+  <p>NOTE: How do you expect your PATH to change? Check to see if you were right!</p>
 </blockquote>
 
 <p><strong>As a reminder - some LMOD commands are listed below</strong></p>
@@ -387,8 +381,7 @@ How do you expect your PATH to change? Check to see if you were right!</p>
 </code></pre></div></div>
 
 <blockquote>
-  <p>NOTE:
-When to use <code class="language-plaintext highlighter-rouge">man</code>, when to use <code class="language-plaintext highlighter-rouge">--help</code> or <code class="language-plaintext highlighter-rouge">-h</code>?</p>
+  <p>NOTE: When to use <code class="language-plaintext highlighter-rouge">man</code>, when to use <code class="language-plaintext highlighter-rouge">--help</code> or <code class="language-plaintext highlighter-rouge">-h</code>?</p>
 
   <p>Use <code class="language-plaintext highlighter-rouge">man</code> for built-in Bash commands. Use <code class="language-plaintext highlighter-rouge">--help</code> or <code class="language-plaintext highlighter-rouge">-h</code> for other tools. Sometimes you can run the tool with no arguments and it will print the help. Sometimes it might need another command. It depends, but <code class="language-plaintext highlighter-rouge">-h</code> seems to be fairly standard.</p>
 </blockquote>
@@ -410,7 +403,7 @@ When to use <code class="language-plaintext highlighter-rouge">man</code>, when 
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># don't run these, these are just options</span>
 fastqc <span class="nt">-o</span> ../results/fastqc
-fastqc <span class="nt">-o</span> /data/Bspc-training/<span class="nv">$USER</span>/rnaseq/results/fastqc
+fastqc <span class="nt">-o</span> /data/<span class="nv">$USER</span>/rnaseq/results/fastqc
 </code></pre></div></div>
 
 <p><strong>Specifying input files</strong>: FastQC will accept multiple file names as input, and we could simply list them individually like so. Note that for FastQC you don’t need to specify an argument before listing input files like we did before specifying the output location.</p>
@@ -447,8 +440,7 @@ fastqc <span class="nt">-o</span> /data/Bspc-training/<span class="nv">$USER</sp
 </code></pre></div></div>
 
 <blockquote>
-  <p>NOTE:
-Why did we choose 6? Why 2G?</p>
+  <p>NOTE: Why did we choose 6? Why 2G?</p>
 </blockquote>
 
 <p>Once you are on the compute node, check what job(s) you have running and what resources you are using.</p>
@@ -474,7 +466,14 @@ Why did we choose 6? Why 2G?</p>
 
 <p><strong>Discussion Points:</strong></p>
 
-<p><em>Do you notice a difference? Is there anything in the output that suggests this is no longer running serially?</em> <em>This overwrote our results. What is a way that we could prevent this from happening?</em></p>
+<ul>
+  <li>
+    <p><em>Do you notice a difference? Is there anything in the output that suggests this is no longer running serially?</em></p>
+  </li>
+  <li>
+    <p><em>This overwrote our results. What is a way that we could prevent this from happening?</em></p>
+  </li>
+</ul>
 
 <h2 id="viewing-results-from-fastqc"><strong>Viewing results from FastQC</strong></h2>
 
@@ -509,7 +508,9 @@ Why did we choose 6? Why 2G?</p>
 
 <hr />
 
-<h2 id="bonus-using-secure-copy"><strong>BONUS</strong>: Using secure copy</h2>
+<h2 id="transferring-files-using-the-command-line">Transferring Files Using the Command Line</h2>
+
+<h3 id="secure-copy-scp">Secure Copy (SCP)</h3>
 
 <p>Another useful way of viewing the HTML or other output from Biowulf is to actually copy the file from Biowulf to your local computer using the command line.</p>
 
@@ -537,7 +538,8 @@ Why did we choose 6? Why 2G?</p>
   <li>
     <p>Type in the following command to grab an output HTML from Biowulf (let’s use the copy you just placed in your <code class="language-plaintext highlighter-rouge">/data/$USER</code> directory) and put it in your current directory ( <code class="language-plaintext highlighter-rouge">.</code>).</p>
 
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>scp username@helix.nih.gov:/data/Bspc-training/<span class="nv">$USER</span>/results/fastqc/Mov10_oe_1.subset_fastqc.html <span class="nb">.</span>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Note: In some cases you may need to specify the full path to your Desktop directory instead of "." </span>
+scp username@helix.nih.gov:/data/<span class="nv">$USER</span>/results/fastqc/Mov10_oe_1.subset_fastqc.html <span class="nb">.</span>
 </code></pre></div>    </div>
   </li>
   <li>
@@ -545,7 +547,56 @@ Why did we choose 6? Why 2G?</p>
   </li>
 </ol>
 
-<p><strong>Note</strong>: When working with bigger files, you will likely want to use the <code class="language-plaintext highlighter-rouge">rsync</code> command, which has many advantages, such as restarting the transfer if your connection drops. There are some good <a href="https://nichd-bspc.github.io/training/rsync.html">BSPC training materials</a> about this.</p>
+<h3 id="rsync-for-larger-files">RSync for larger files</h3>
+
+<p>When working with bigger files, you will likely want to use the <code class="language-plaintext highlighter-rouge">rsync</code> command. There are some good <a href="https://nichd-bspc.github.io/training/rsync.html">BSPC training materials</a> about this. <code class="language-plaintext highlighter-rouge">rsync</code> has many advantages, such as:</p>
+
+<ul>
+  <li>
+    <p>Restarting the transfer if your connection drops.</p>
+  </li>
+  <li>
+    <p>It will synchronize a directory, only copying over files that are newer.</p>
+  </li>
+  <li>
+    <p>Can compress data over the wire, resulting in faster transfers</p>
+  </li>
+  <li>
+    <p>Verifies if the file was correctly transferred</p>
+  </li>
+</ul>
+
+<p><strong>An example of me transferring one of the input FASTQ files to my local computer:</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rsync <span class="nt">-av</span> changes@helix.nih.gov:/data/<span class="nv">$USER</span>/rnaseq_course/raw_data/Irrel_kd_3.subset.fq /Users/changes/Desktop
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">-a</code> = archive mode (preserves permissions, timestamps, etc.)</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">-v</code> = verbose (shows progress)</p>
+  </li>
+  <li>
+    <p>Another useful parameter for particularly large files is <code class="language-plaintext highlighter-rouge">-z</code> , which compresses the file during transfer.</p>
+  </li>
+</ul>
+
+<p>See <a href="https://explainshell.com/explain?cmd=rsync+-av+--progress">explainshell</a> (which is also just a very cool website) for this command to read more on what those arguments do!</p>
+
+<p><strong>!! Caution !!</strong> :</p>
+
+<p>One tricky thing about rsync is that <strong>it is sensitive to trailing slashes (/) on the source directory when transferring a directory rather than an individual file:</strong></p>
+
+<ul>
+  <li>
+    <p>When we check the contents of <code class="language-plaintext highlighter-rouge">dest</code>, we see that no trailing slash on <code class="language-plaintext highlighter-rouge">source</code> put the whole directory <em>inside</em> the destination, i.e. in <code class="language-plaintext highlighter-rouge">rsync -r source dest</code> .</p>
+  </li>
+  <li>
+    <p>If we instead add a trailing slash in the command, i.e. <code class="language-plaintext highlighter-rouge">rsync -r source/ dest</code> , then the contents of the directory get transferred, but not the overarching directory.</p>
+  </li>
+</ul>
 
 <p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
 
