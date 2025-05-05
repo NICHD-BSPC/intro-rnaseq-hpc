@@ -208,7 +208,7 @@ cp Mov10_oe_1_fastqc.html /data/$USER/
 To put these all in one place, here are some SLURM commands that you may find useful:
 
 |                             |                                                                                         |
-|:-----------------|:----------------------------------------------------|
+|:----------------------------|:----------------------------------------------------------------------------------------|
 | `sbatch`                    | Submit non-interactive (batch) jobs to the scheduler                                    |
 | `squeue`                    | List all jobs in the queue                                                              |
 | `squeue -u $USER`           | Show only your jobs                                                                     |
