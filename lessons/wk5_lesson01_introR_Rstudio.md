@@ -416,7 +416,10 @@ Since we are on Biowulf, we can simply copy our files into our directory!
 2.  You can `cp` as we have before, so go ahead and run the following commands:
 
     ``` bash
-    $ cp /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mouse_exp_design.csv .
+    # cp metadata
+    $ cp /data/Bspc-training/shared/rnaseq_mov10/downstream_data/mouse_exp_design.csv .
+    # cp read count data
+    $ cp /data/Bspc-training/shared/rnaseq_mov10/downstream_data/counts.rpkm.csv .
     ```
 
 The files should appear in your Files Pane!
@@ -557,13 +560,13 @@ Using HPC on Demand and following the instructions above in the RStudio Project 
     -   Count data:
 
         ``` bash
-        /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mov10_AllSamples_featurecounts.Rmatrix.txt
+        /data/Bspc-training/shared/rnaseq_mov10/downstream_data/mov10_AllSamples_featurecounts.Rmatrix.txt
         ```
 
     -   Experimental metadata:
 
         ``` bash
-        /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mov10_AllSamples_metadata.txt
+        /data/Bspc-training/shared/rnaseq_mov10/downstream_data/mov10_AllSamples_metadata.txt 
         ```
 
 **To submit your assignment**: Message me a screenshot on Slack of your RStudio interface showing that you are in your new `DEanalysis` directory and that the two files are visible in your Files Pane.
