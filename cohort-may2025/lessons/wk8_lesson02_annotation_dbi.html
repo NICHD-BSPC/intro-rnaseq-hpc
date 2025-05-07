@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>AnnotationDbi | Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="AnnotationDbi" />
+<meta name="author" content="Harvard HPC Staff, Adapted by Sally Chang at NICHD" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk8_lesson02_annotation_dbi.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk8_lesson02_annotation_dbi.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-03-01T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="AnnotationDbi" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Adapted by Sally Chang at NICHD"},"dateModified":"2025-03-01T00:00:00+00:00","datePublished":"2025-03-01T00:00:00+00:00","headline":"AnnotationDbi","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk8_lesson02_annotation_dbi.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/wk8_lesson02_annotation_dbi.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=0e44fa48538a2880d5ecfedf65b809e606750f08">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">AnnotationDbi</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h2 id="annotationdbi">AnnotationDbi</h2>
+
+<p>AnnotationDbi is an R package that provides an interface for connecting and querying various annotation databases using SQLite data storage (a convenient and performant flat-file database format). There are AnnotationDbi packages that contain information on gene IDs, Gene Ontology terms, and more. There is helpful <a href="https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf">documentation</a> available to reference when extracting data from any of these databases.</p>
+
+<p>AnnotationDbi is just the interface; you need to get an appropriate annotation package that you can use with AnnotationDbi.</p>
+
+<p>There are a plethora of organism-specific <em>orgDb</em> packages, such as <code class="language-plaintext highlighter-rouge">org.Hs.eg.db</code> for human and <code class="language-plaintext highlighter-rouge">org.Mm.eg.db</code> for mouse. A list of organism databases can be found <a href="https://www.bioconductor.org/packages/release/BiocViews.html#___OrgDb">here</a>. These databases are best for converting gene IDs or obtaining GO information for current genome builds, but not for older genome builds. These packages provide the current builds corresponding to the release date of the package, and update every 6 months. If a package is not available for your organism of interest, advanced users can create their own witn <a href="https://bioconductor.org/packages/release/bioc/html/AnnotationForge.html">AnnotationForge</a>.</p>
+
+<p>Humans and common model organisms have packages that can be installed, like <code class="language-plaintext highlighter-rouge">org.Hs.eg.db</code> for human. However, only a subset of available annotations are available as packages. For anything else, use the <a href="https://bioconductor.org/packages/release/bioc/html/AnnotationHub.html">AnnotationHub</a> package. Model organism annotations are also available through AnnotationHub, so this is the most generic approach.</p>
+
+<h3 id="orghsegdb">org.Hs.eg.db</h3>
+
+<p>For convenience, here we will use the already-installed <code class="language-plaintext highlighter-rouge">org.Hs.eg.db</code> OrgDb:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Load libraries</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">AnnotationDbi</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Check object metadata</span><span class="w">
+</span><span class="n">org.Hs.eg.db</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We can see the metadata for the database by just typing the name of the database, including the species, last updates for the different source information, and the source urls. Note the KEGG data from this database was last updated in 2011. KEGG is under a subscription model so BioConductor can not redistribute the content since this earlier freeze date.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>OrgDb object:
+| DBSCHEMAVERSION: 2.1
+| Db type: OrgDb
+| Supporting package: AnnotationDbi
+| DBSCHEMA: HUMAN_DB
+| ORGANISM: Homo sapiens
+| SPECIES: Human
+| EGSOURCEDATE: 2024-Sep20
+| EGSOURCENAME: Entrez Gene
+| EGSOURCEURL: ftp://ftp.ncbi.nlm.nih.gov/gene/DATA
+| CENTRALID: EG
+| TAXID: 9606
+| GOSOURCENAME: 
+| GOSOURCEURL: 
+| GOSOURCEDATE: 
+| GOEGSOURCEDATE: 2024-Sep20
+| GOEGSOURCENAME: Entrez Gene
+| GOEGSOURCEURL: ftp://ftp.ncbi.nlm.nih.gov/gene/DATA
+| KEGGSOURCENAME: KEGG GENOME
+| KEGGSOURCEURL: ftp://ftp.genome.jp/pub/kegg/genomes
+| KEGGSOURCEDATE: 2011-Mar15
+| GPSOURCENAME: UCSC Genome Bioinformatics (Homo sapiens)
+| GPSOURCEURL: ftp://hgdownload.cse.ucsc.edu/goldenPath/hg38/database
+| GPSOURCEDATE: 2024-Sep22
+| ENSOURCEDATE: 2024-May14
+| ENSOURCENAME: Ensembl
+| ENSOURCEURL: ftp://ftp.ensembl.org/pub/current_fasta
+| UPSOURCENAME: Uniprot
+| UPSOURCEURL: http://www.UniProt.org/
+| UPSOURCEDATE: Mon Sep 23 15:46:45 2024
+</code></pre></div></div>
+
+<p>We can extract information from this database using <em>AnnotationDbi</em> with the methods: <code class="language-plaintext highlighter-rouge">columns</code>, <code class="language-plaintext highlighter-rouge">keys</code>, <code class="language-plaintext highlighter-rouge">keytypes</code>, and <code class="language-plaintext highlighter-rouge">select</code>. Here were are using our <code class="language-plaintext highlighter-rouge">org.Hs.eg.db</code> database to acquire information, but the same methods work for the <em>TxDb</em>, <em>Go.db</em>, <em>EnsDb</em>, and <em>BioMart</em> annotations.</p>
+
+<p>Let’s inspect what we have available in the orgdb:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">columns</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[1] "ACCNUM"       "ALIAS"        "ENSEMBL"      "ENSEMBLPROT"  "ENSEMBLTRANS"
+[6] "ENTREZID"     "ENZYME"       "EVIDENCE"     "EVIDENCEALL"  "GENENAME"
+[11] "GENETYPE"     "GO"           "GOALL"        "IPI"          "MAP"
+[16] "OMIM"         "ONTOLOGY"     "ONTOLOGYALL"  "PATH"         "PFAM"
+[21] "PMID"         "PROSITE"      "REFSEQ"       "SYMBOL"       "UCSCKG"
+</code></pre></div></div>
+
+<p>And let’s see what keys are available for mapping to this database:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">keytypes</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<p>Ideally, all databases would use the same gene identifier, but this is unfortunately not the case. Recall that our featureCounts file that we imported into R has Ensembl identifiers. Let’s check the orgdb’s Ensemble identifiers:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">keys</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">,</span><span class="w"> </span><span class="s2">"ENSEMBL"</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">head</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[1] "ENSG00000121410" "ENSG00000175899" "ENSG00000291190" "ENSG00000171428"
+[5] "ENSG00000156006" "ENSG00000196136"
+</code></pre></div></div>
+
+<p>Recall that our Ensembl IDs had a dotted version number, which will not match anything in this orgdb. So we need to clean those up, e.g., by turning <code class="language-plaintext highlighter-rouge">ENSG00000000003.16</code> into just <code class="language-plaintext highlighter-rouge">ENSG00000000003</code>. This uses a <a href="https://r4ds.had.co.nz/strings.html#matching-patterns-with-regular-expressions">regular expression</a> for the pattern matching:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># use gsub to replace column with stripped gene symbols</span><span class="w">
+</span><span class="n">res_tableOE_df</span><span class="o">$</span><span class="n">ensgene</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">gsub</span><span class="p">(</span><span class="s2">"\\..*"</span><span class="p">,</span><span class="s2">""</span><span class="p">,</span><span class="n">res_tableOE_df</span><span class="o">$</span><span class="n">ensgene</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now we can use that cleaned set of identifiers to select items from the orgdb.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Return the Ensembl IDs for a set of genes</span><span class="w">
+</span><span class="n">annotations_orgDb</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">AnnotationDbi</span><span class="o">::</span><span class="n">select</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">,</span><span class="w"> </span><span class="c1"># database</span><span class="w">
+                                     </span><span class="n">keys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res_tableOE_df</span><span class="o">$</span><span class="n">ensgene</span><span class="p">,</span><span class="w">  </span><span class="c1"># data to use for retrieval</span><span class="w">
+                                     </span><span class="n">columns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"SYMBOL"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ENTREZID"</span><span class="p">,</span><span class="s2">"GENENAME"</span><span class="p">),</span><span class="w"> </span><span class="c1"># information to retreive for given data</span><span class="w">
+                                     </span><span class="n">keytype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"ENSEMBL"</span><span class="p">)</span><span class="w"> </span><span class="c1"># type of data given in 'keys' argument</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We started from at about 79k in our results table, but the results from this are quite a bit longer (83k). This is because there are Ensembl IDs that have multiple entries in other columns. Let’s inspect that:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">multi</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">table</span><span class="p">(</span><span class="n">annotations_orgDb</span><span class="o">$</span><span class="n">ENSEMBL</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">sort</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">tail</span><span class="p">(</span><span class="m">25</span><span class="p">)</span><span class="w">
+</span><span class="n">multi</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ENSG00000258992 ENSG00000199270 ENSG00000199334 ENSG00000199352 ENSG00000199396 
+             36              91              91              91              91 
+ENSG00000199910 ENSG00000200343 ENSG00000200370 ENSG00000200381 ENSG00000200624 
+             91              91              91              91              91 
+ENSG00000201355 ENSG00000201588 ENSG00000201925 ENSG00000202257 ENSG00000202521 
+             91              91              91              91              91 
+ENSG00000202526 ENSG00000199337 ENSG00000273730 ENSG00000275757 ENSG00000274917 
+             91              92             207             207             208 
+ENSG00000275215 ENSG00000276700 ENSG00000277739 ENSG00000278189 ENSG00000278233 
+            208             208             208             208             208 
+</code></pre></div></div>
+
+<p>What genes are those!?</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">annotations_orgDb</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">  </span><span class="n">filter</span><span class="p">(</span><span class="n">ENSEMBL</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="n">multi</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">head</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>          ENSEMBL       SYMBOL  ENTREZID             GENENAME
+1 ENSG00000199270      RNA5S12 100169763 RNA, 5S ribosomal 12
+2 ENSG00000199270 LOC124905422 124905422     5S ribosomal RNA
+3 ENSG00000199270 LOC124905424 124905424     5S ribosomal RNA
+4 ENSG00000199270 LOC124905425 124905425     5S ribosomal RNA
+5 ENSG00000199270 LOC124905426 124905426     5S ribosomal RNA
+6 ENSG00000199270 LOC124905427 124905427     5S ribosomal RNA
+</code></pre></div></div>
+
+<p>So it looks like a single Ensembl ID could refer to multiple different symbols, here for 5S ribosomal RNA.</p>
+
+<h3 id="dealing-with-many-to-one-entries">Dealing with Many-To-One Entries</h3>
+
+<p>You may have also noted the <em>warning</em> returned: <em>‘select()’ returned 1:many mapping between keys and columns</em>. This is always going to happen with converting between different gene IDs (i.e. one geneID can map to more than one identifier in another databse). This is an unfortunate practical issue with gene nomenclature. Unless we would like to keep multiple mappings for a single gene, then we probably want to de-duplicate our data before using it.</p>
+
+<p>How do we deal with the issue of these many to one entries? At this stage, we <em>could</em> use something like the following to just drop all the entries that have duplicates:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Determine the indices for the non-duplicated genes</span><span class="w">
+</span><span class="n">non_duplicates_idx</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">which</span><span class="p">(</span><span class="n">duplicated</span><span class="p">(</span><span class="n">annotations_orgDb</span><span class="o">$</span><span class="n">SYMBOL</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Return only the non-duplicated genes using indices</span><span class="w">
+</span><span class="n">annotations_orgDb</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">annotations_orgDb</span><span class="p">[</span><span class="n">non_duplicates_idx</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>However, we can also explicitly add a parameter called <code class="language-plaintext highlighter-rouge">multiVals</code> to another <code class="language-plaintext highlighter-rouge">annotationDbi</code> function called <code class="language-plaintext highlighter-rouge">mapIds</code>. This parameter can either be <code class="language-plaintext highlighter-rouge">'first'</code>, <code class="language-plaintext highlighter-rouge">'last'</code>, or <code class="language-plaintext highlighter-rouge">'asNA'</code> - what do you think these mean?</p>
+
+<p>We wrote a custom R function to apply the <code class="language-plaintext highlighter-rouge">multiVals = first</code> strategy explicitly to get a results object similar to <code class="language-plaintext highlighter-rouge">annotations_orgDb</code>:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Run this to load this custom function into your environment</span><span class="w">
+</span><span class="n">annotate_results_general</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="w"> </span><span class="n">orgdb</span><span class="p">,</span><span class="w"> </span><span class="n">keytype</span><span class="p">,</span><span class="w"> </span><span class="n">key_column</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">annotation_columns</span><span class="p">,</span><span class="w"> </span><span class="n">multiVals</span><span class="o">=</span><span class="s2">"first"</span><span class="p">){</span><span class="w">
+  </span><span class="n">lst</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">list</span><span class="p">()</span><span class="w">
+  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">col</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">annotation_columns</span><span class="p">){</span><span class="w">
+    </span><span class="n">lst</span><span class="p">[[</span><span class="n">col</span><span class="p">]]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">mapIds</span><span class="p">(</span><span class="w">
+      </span><span class="n">orgdb</span><span class="p">,</span><span class="w">
+      </span><span class="n">keys</span><span class="o">=</span><span class="n">df</span><span class="p">[[</span><span class="n">key_column</span><span class="p">]],</span><span class="w">
+      </span><span class="n">column</span><span class="o">=</span><span class="n">col</span><span class="p">,</span><span class="w">
+      </span><span class="n">keytype</span><span class="o">=</span><span class="n">keytype</span><span class="p">,</span><span class="w">
+      </span><span class="n">multiVals</span><span class="o">=</span><span class="n">multiVals</span><span class="w">
+    </span><span class="p">)</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+  </span><span class="n">annots</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.data.frame</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">key_column</span><span class="p">)</span><span class="w">
+  </span><span class="nf">return</span><span class="p">(</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="w"> </span><span class="n">annots</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="o">=</span><span class="n">key_column</span><span class="p">))</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>And this function can be run like the following:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">annot_orgDb_first</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">annotate_results_general</span><span class="p">(</span><span class="n">res_tableOE_df</span><span class="p">,</span><span class="w"> </span><span class="n">org.Hs.eg.db</span><span class="p">,</span><span class="w"> </span><span class="n">keytype</span><span class="o">=</span><span class="s2">"ENSEMBL"</span><span class="p">,</span><span class="w"> </span><span class="n">annotation_columns</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s2">"GENENAME"</span><span class="p">,</span><span class="w"> </span><span class="s2">"SYMBOL"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ENTREZID"</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>There are now only the expected 79k results! We can double check that we have selected only one mapping per gene:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="w"> </span><span class="n">multi</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">table</span><span class="p">(</span><span class="n">annot_orgDb_first</span><span class="o">$</span><span class="n">ensgene</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">sort</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">tail</span><span class="p">(</span><span class="m">25</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>However, this solution still has pitfalls</strong>: There are many cases where the different possible matches to the same key actually provide other information. For example, someone might notice that <code class="language-plaintext highlighter-rouge">GO</code> is a column in the orgdb, and run <code class="language-plaintext highlighter-rouge">annotate_results()</code> on it. But with <code class="language-plaintext highlighter-rouge">multiVals="first"</code>, only one of the many GO terms will be associated with the gene, which is unhelpful and also wrong.</p>
+
+<p>Here is part of an object I created called <code class="language-plaintext highlighter-rouge">annotations_orgDb_go</code> - we would lose information just be picking the first of these entries for each gene!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ENSEMBL         GO EVIDENCE ONTOLOGY SYMBOL ENTREZID      GENENAME
+1 ENSG00000000003 GO:0005515      IPI       MF TSPAN6     7105 tetraspanin 6
+2 ENSG00000000003 GO:0005886      IBA       CC TSPAN6     7105 tetraspanin 6
+3 ENSG00000000003 GO:0039532      IMP       BP TSPAN6     7105 tetraspanin 6
+4 ENSG00000000003 GO:0043123      HMP       BP TSPAN6     7105 tetraspanin 6
+5 ENSG00000000003 GO:0043124      IDA       BP TSPAN6     7105 tetraspanin 6
+6 ENSG00000000003 GO:0070062      HDA       CC TSPAN6     7105 tetraspanin 6
+</code></pre></div></div>
+
+<h3 id="dealing-with-missing-annotations">Dealing with Missing Annotations</h3>
+
+<p>Let’s take a peek to see if we actually returned annotations for each individual Ensembl gene ID that went in to the query:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">length</span><span class="p">(</span><span class="n">which</span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">annot_orgDb_first</span><span class="o">$</span><span class="n">SYMBOL</span><span class="p">)))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Looks like more than half of the input genes did not return any annotations. This is because the OrgDb family of database are primarily based on mapping using Entrez Gene identifiers. If you look at some of the Ensembl IDs from our query that returned NA, these map to pseudogenes (i.e <a href="https://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=ENSG00000265439;r=6:44209766-44210063;t=ENST00000580735">ENSG00000265439</a>) or non-coding RNAs (i.e. <a href="http://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=ENSG00000265425;r=18:68427030-68436918;t=ENST00000577835">ENSG00000265425</a>). The difference is due to the fact that each database implements different computational approaches for generating the gene builds.</p>
+
+<p>And some databases (notably, Gene Ontology) only have functional information on proteins, which in turn only come from coding genes. Our intention is to use Gene Ontology, so while it’s interesting to know about non-coding genes that are differentially expressed, let’s get rid of those genes from our data that do not have corresponding entries in the orgdb:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Determine the indices for the non-NA genes</span><span class="w">
+</span><span class="n">non_na_idx</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">which</span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">annot_orgDb_first</span><span class="o">$</span><span class="n">SYMBOL</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Return only the genes with annotations using indices</span><span class="w">
+</span><span class="n">annot_orgDb_first</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">annot_orgDb_first</span><span class="p">[</span><span class="n">non_na_idx</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="ensdbhsapiensv86">EnsDb.Hsapiens.v86</h3>
+
+<p>To generate the Ensembl annotations, the <em>EnsDb</em> database can also be easily queried using AnnotationDbi. You will need to decide the release of Ensembl you would like to query. We know that our data is for GRCh38, and the most current <em>EnsDb</em> release for GRCh38 in Bioconductor is release 86, so we can install this database. All Ensembl releases are listed <a href="http://useast.ensembl.org/info/website/archives/index.html">here</a>. <strong>NOTE: this is not the most current release of GRCh38 in the Ensembl database, but it’s as current as we can obtain through AnnotationDbi.</strong></p>
+
+<p>Since we are using <em>AnnotationDbi</em> to query the database, we can use the same functions that we used previously. <strong>We can also use a version of the <code class="language-plaintext highlighter-rouge">annotate_results</code> function we used above - let me know if you are interested!</strong></p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Load the library</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">EnsDb.Hsapiens.v86</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Check object metadata</span><span class="w">
+</span><span class="n">EnsDb.Hsapiens.v86</span><span class="w">
+
+</span><span class="c1"># Explore the fields that can be used as keys</span><span class="w">
+</span><span class="n">keytypes</span><span class="p">(</span><span class="n">EnsDb.Hsapiens.v86</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Explore columns of data that can be used for other analyses</span><span class="w">
+</span><span class="n">columns</span><span class="p">(</span><span class="n">EnsDb.Hsapiens.v86</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now we can return all gene IDs for our gene list:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Return the Ensembl IDs for a set of genes</span><span class="w">
+</span><span class="n">annotations_edb</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">annotate_results_general</span><span class="p">(</span><span class="n">res_tableOE_df</span><span class="p">,</span><span class="w"> </span><span class="n">EnsDb.Hsapiens.v86</span><span class="p">,</span><span class="w"> </span><span class="n">keytype</span><span class="o">=</span><span class="s2">"GENEID"</span><span class="p">,</span><span class="w"> </span><span class="n">annotation_columns</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s2">"SYMBOL"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ENTREZID"</span><span class="p">,</span><span class="w"> </span><span class="s2">"GENEBIOTYPE"</span><span class="p">))</span><span class="w"> 
+</span></code></pre></div></div>
+
+<p>We can check for NA entries, and find that we have fewer of these instances:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">length</span><span class="p">(</span><span class="n">which</span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">annotations_edb</span><span class="o">$</span><span class="n">SYMBOL</span><span class="p">)))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>And we can get rid of them like we did previously, <strong>but we don’t need to right now</strong>.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Determine the indices for the non-NA genes</span><span class="w">
+</span><span class="n">non_na_idx</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">which</span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">annotations_edb</span><span class="o">$</span><span class="n">SYMBOL</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Return only the genes with annotations using indices</span><span class="w">
+</span><span class="n">annotations_edb_rm</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">annotations_edb</span><span class="p">[</span><span class="n">non_na_idx</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<blockquote>
+  <p><strong>NOTE:</strong> In this case we used the same build but a slightly older release, and we found little discrepancy. If your analysis was conducted using an older genome build (i.e hg19), but used a newer build for annotation some genes may be found to be not annotated (NA). Some of the genes have changed names in between versions (due to updates and patches), so may not be present in the newer version of the database.</p>
+</blockquote>
+
+<hr />
+
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>

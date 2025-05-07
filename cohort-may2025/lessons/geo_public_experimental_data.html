@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Introduction to RNA-Seq using high-performance computing</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/geo_public_experimental_data.html" />
+<meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/geo_public_experimental_data.html" />
+<meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Introduction to RNA-Seq using high-performance computing" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Introduction to RNA-Seq using high-performance computing","url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/cohort-may2025/lessons/geo_public_experimental_data.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=0e44fa48538a2880d5ecfedf65b809e606750f08">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/intro-rnaseq-hpc/cohort-may2025/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Introduction to RNA-Seq using high-performance computing</h1>
+      <h2 class="project-tagline"></h2>
+      
+        <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc" class="btn">View on GitHub</a>
+      
+      
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <p>Approximate time: 45 minutes</p>
+
+<h2 id="learning-objectives">Learning Objectives:</h2>
+
+<ul>
+  <li>Understand the type of data that is accessible from Gene Expression Omnibus (GEO)</li>
+  <li>Demonstrate how to navigate the GEO website and FTP server</li>
+  <li>Use the command-line interface to copy over data from GEO</li>
+</ul>
+
+<h1 id="accessing-public-ngs-sequencing-data">Accessing public NGS sequencing data</h1>
+
+<p>All types of next-generation sequencing (NGS) analyses require access to public data, regardless of whether we are analyzing our own data or the data output from someone else’s experiment. Reference data is available online as well as the experimental data from many published (and unpublished) studies. To access this data generally requires the basic knowledge of the <strong>command line</strong> and an understanding about the <strong>associated tools and databases</strong>.</p>
+
+<p>To find and download NGS experimental data and associated reference data, we will explore several different repositories. For <strong>accessing experimental data</strong>, we will explore the <a href="https://www.ncbi.nlm.nih.gov/geo/">Gene Expression Omnibus</a> and the <a href="https://www.ncbi.nlm.nih.gov/sra">Sequence Read Archive</a> repositories. For <strong>finding reference data</strong>, we will navigate the <a href="http://useast.ensembl.org/index.html">Ensembl database</a>, <a href="https://support.illumina.com/sequencing/sequencing_software/igenome.html">iGenomes</a> and <a href="https://wormbase.org">Wormbase</a>. We will focus on these repositories; however, other databases are also useful for exploring and downloading experimental and reference data, including <a href="https://genome.ucsc.edu/cgi-bin/hgTables">UCSC Table Browser</a> and the <a href="https://www.ncbi.nlm.nih.gov/genome/">NCBI Genome</a>, and we encourage you to explore these more on your own.</p>
+
+<h1 id="gene-expression-omnibus">Gene Expression Omnibus</h1>
+
+<p>To find public experimental sequencing data, the NCBI’s Gene Expression Omnibus (GEO) website is a useful place to search. The requirement for many grants is that experimental data be uploaded to GEO and the sequence read archive (SRA); therefore, there are quite a few datasets on GEO available to search. The interface for finding data on GEO is relatively user-friendly and easily searchable.</p>
+
+<h2 id="finding-and-accessing-data-on-geo">Finding and accessing data on GEO</h2>
+
+<h3 id="searching-geo">Searching GEO</h3>
+
+<p>To search GEO for particular types of data is relatively straight forward. Once on the <a href="https://www.ncbi.nlm.nih.gov/geo/">GEO website</a> there are multiple different options for searching datasets.</p>
+
+<p><img src="../img/geo_web.png" width="700" /></p>
+
+<p>The most straight-forward method can be found by clicking on ‘Datasets’ under the ‘Browse Content’ column.</p>
+
+<p><img src="../img/geo_dataset.png" width="400" /></p>
+
+<p>The ‘Datasets’ link will open the GEO Dataset Browser; click on ‘Advanced Search’.</p>
+
+<p><img src="../img/geo_browser.png" width="600" /></p>
+
+<p>All results will appear in a new window with clickable filters on the left-hand side. You can choose the filters, such as ‘Organism’ (human, mouse), ‘Study type’ (Expression profiling by high throughput sequencing), ‘Publication dates’ (1 year), etc. to filter the data for the desired attributes.</p>
+
+<p><img src="../img/geo_filter.png" width="700" /></p>
+
+<h3 id="finding-geo-data-for-a-particular-publication">Finding GEO data for a particular publication</h3>
+
+<p>To find data from a published paper on GEO, the paper will often provide the GEO accession number. For example, let’s find the data associated with the paper, “MOV10 and FRMP regulate AGO2 association with microRNA recognition elements”. First, we can navigate to the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4268400/">article</a>.</p>
+
+<p><img src="../img/mov10_paper.png" width="600" /></p>
+
+<p>Then, we can search for the term <strong>“GEO”</strong>; different papers have different requirements for where this information is located. In this article, it is available in a separate section entitled “Accession Numbers”.</p>
+
+<p><img src="../img/mov10_accession.png" width="600" /></p>
+
+<p>By clicking on the GEO accession number for the experiment of interest, the GEO page for this experiment will open.</p>
+
+<p><img src="../img/mov10_geo.png" width="700" /></p>
+
+<p>The GEO page contains information about the experiment, including:</p>
+
+<ul>
+  <li>an experimental summary</li>
+  <li>literature citation</li>
+  <li>contact information</li>
+  <li>links to the sample GEO pages</li>
+  <li>link to the SRA project containing the raw FASTQ files</li>
+  <li>metadata (matrix file)</li>
+  <li>supplementary data</li>
+</ul>
+
+<p>If we were interested in <strong>downloading the raw counts matrix (<code class="language-plaintext highlighter-rouge">GSE50499_GEO_Ceman_counts.txt.gz</code>)</strong>, which gives the number of reads/sequences aligning to each gene, then we could scroll down to <strong>supplementary data</strong> at the bottom of the page.</p>
+
+<p>We could download this file by clicking on the <code class="language-plaintext highlighter-rouge">ftp</code> link. In addition to the counts matrix file, we would probably also want the metadata for the file to know which sample belongs to which conditions by clicking on the “Series Matrix File(s)” link.</p>
+
+<blockquote>
+  <p><strong>NOTE:</strong> The “Series Matrix” metadata file is a bit congested, and it may be easier accessing the metadata from the SRA instead as discussed later.</p>
+</blockquote>
+
+<p><img src="../img/mov10_download.png" width="600" /></p>
+
+<p>Now that we have these files, if we wanted to perform differential expression analysis, we could bring them into R to perform some data wrangling and analysis.</p>
+
+<h2 id="using-the-command-line-to-download-from-geo">Using the command line to download from GEO</h2>
+
+<p>While navigating the GEO website is a perfectly fine way to download data from GEO, oftentimes you may want to download multiple files at the same time or download large files that you don’t want to store on your personal computer. Generally, the best way to do this is by using a high-performance computing cluster, such as FAS Odyssey or HMS O2.</p>
+
+<h3 id="downloading-on-a-cluster">Downloading on a cluster</h3>
+
+<p>We will demo downloading data to a high-performance computing cluster using the Odyssey cluster.</p>
+
+<p>To access the Odyssey cluster we need to use the secure shell (<code class="language-plaintext highlighter-rouge">ssh</code>) command using the ‘Terminal’ program for Macs or ‘GitBash’ for Windows. In the console from these programs, type:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ssh username@o2.hms.harvard.edu
+</code></pre></div></div>
+
+<p>Odyssey will then ask for the associated password and verification code (2-factor authentication). For more information on 2-factor authentication, please see the <a href="https://www.rc.fas.harvard.edu/resources/odyssey-quickstart-guide/">Odyssey resources</a>.</p>
+
+<p>Now we are logged onto a ‘login’ computer, but to perform any work we should transfer to a ‘compute’ computer by running the <code class="language-plaintext highlighter-rouge">srun</code> command.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>srun <span class="nt">--pty</span> <span class="nt">-p</span> interactive <span class="nt">-t</span> 0-12:00 <span class="nt">--mem</span> 8G /bin/bash
+</code></pre></div></div>
+
+<p>This will transfer us onto a ‘compute’ computer, where we can do our work.</p>
+
+<p>Now, we can download our data to an appropriate directory. Good data management practices will ensure we have an organized project directory for our analysis. We can create and change directories to the folder to which we plan to download the data.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> mov10_rnaseq_project/data/counts
+
+<span class="nv">$ </span><span class="nb">cd </span>mov10_rnaseq_project/data/counts
+</code></pre></div></div>
+
+<p>Now that we are ready on the cluster, we can find the link to transfer the data using GEO’s FTP site. To access the FTP site, return to the <a href="https://www.ncbi.nlm.nih.gov/geo/">GEO home page</a> and under the “Tools” header, click on “FTP site”.</p>
+
+<p><img src="../img/geo_ftp.png" width="350" /></p>
+
+<p>This will take you to the directory to access all GEO data.</p>
+
+<p><img src="../img/geo_dir.png" width="350" /></p>
+
+<p>To download the data associated with the paper, “MOV10 and FMRP Regulate AGO2 Association with MicroRNA Recognition Elements”, use the GEO ID given in the paper, <code class="language-plaintext highlighter-rouge">GSE50499</code>.</p>
+
+<ol>
+  <li>Navigate the FTP site to the <code class="language-plaintext highlighter-rouge">series/</code> folder</li>
+  <li>Find the <code class="language-plaintext highlighter-rouge">GSE50nnn/</code> directory</li>
+  <li>Enter the <code class="language-plaintext highlighter-rouge">GSE50499/</code> folder</li>
+  <li>The data files available are in the <code class="language-plaintext highlighter-rouge">suppl/</code> directory. If we choose to download all associated data, we can download the entire <code class="language-plaintext highlighter-rouge">suppl/</code> directory</li>
+  <li>
+    <p>Use the <code class="language-plaintext highlighter-rouge">wget</code> command followed by the link to the <code class="language-plaintext highlighter-rouge">suppl/</code> directory (right-clicking and choosing ‘Copy Link Address’).</p>
+
+    <p><img src="../img/geo_folder_cp.png" width="500" /></p>
+
+    <p>Using the <code class="language-plaintext highlighter-rouge">wget</code> command to copy this directory requires a few options. Since we are copying a directory, the <code class="language-plaintext highlighter-rouge">-r/--recursive</code> option is required. Also, the <code class="language-plaintext highlighter-rouge">-np/--no-parent</code> option and the <code class="language-plaintext highlighter-rouge">-nd</code> for no directories is used to avoid the <code class="language-plaintext highlighter-rouge">wget</code>’s  default copying of any parent directories.</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>wget <span class="nt">--recursive</span> <span class="nt">--no-parent</span> <span class="nt">-nd</span> ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE50nnn/GSE50499/suppl/
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<blockquote>
+  <p><strong>NOTE:</strong> Sometimes the <code class="language-plaintext highlighter-rouge">wget</code> will result in an extra file called <code class="language-plaintext highlighter-rouge">index.html</code> to be downloaded as well. If you would prefer not to download the automatically generated <code class="language-plaintext highlighter-rouge">index.html</code> file, then another useful flag would be <code class="language-plaintext highlighter-rouge">-R</code>/<code class="language-plaintext highlighter-rouge">--reject</code>.</p>
+
+  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>```bash
+$ wget -r -np -nd -R "index.html*" ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE50nnn/GSE50499/suppl/
+```
+</code></pre></div>  </div>
+</blockquote>
+
+<hr />
+
+<p><strong>Exercises</strong></p>
+
+<ol>
+  <li>
+    <p>What command would we use to download all data for the <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE111889">study</a>:</p>
+
+    <p><img src="../img/study_exercise_head.png" width="500" /></p>
+
+    <blockquote>
+
+      <p><em><strong>NOTE:</strong> If you wanted to unpack the <code class="language-plaintext highlighter-rouge">.tar</code> file and decompress the <code class="language-plaintext highlighter-rouge">.gz</code> files, you could use the following commands:</em></p>
+
+      <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">tar</span> <span class="nt">-xvf</span> GSE111889_RAW.tar 
+
+<span class="nv">$ </span><span class="k">for </span>all <span class="k">in</span> <span class="k">*</span>.gz<span class="p">;</span> <span class="k">do </span><span class="nb">gunzip</span> <span class="nv">$all</span><span class="p">;</span> <span class="k">done</span>
+</code></pre></div>      </div>
+    </blockquote>
+  </li>
+  <li>
+    <p>How would you download the associated metadata?</p>
+  </li>
+</ol>
+
+<hr />
+
+<h3 id="downloading-on-a-local-computer">Downloading on a local computer</h3>
+
+<p>If we are downloading a small file(s) to use on our personal computer, then it makes sense to directly download to our computer. Unfortunately, <code class="language-plaintext highlighter-rouge">wget</code> is not automatically available using the Mac Terminal or using GitBash on Windows. However, the <code class="language-plaintext highlighter-rouge">curl</code> command is available to transfer data from (or to) a server. We can  <strong>download individual files</strong> using <code class="language-plaintext highlighter-rouge">curl</code> by connecting to the FTP:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-O</span> ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE50nnn/GSE50499/suppl/GSE50499_GEO_Ceman_counts.txt.gz
+</code></pre></div></div>
+
+<p>Unfortunately, we cannot download folders with <code class="language-plaintext highlighter-rouge">curl</code>. However, for MacOS, the <a href="https://brew.sh/">Homebrew package manager</a> is a wonderful way to install programs/commands that may not be installed on your operating system, such as <code class="language-plaintext highlighter-rouge">wget</code>.</p>
+
+<p>Also, it’s worth noting that we don’t need to navigate the FTP site to find individual files to download, since the link on the GEO site should list a link to the file. By right-clicking on the <code class="language-plaintext highlighter-rouge">ftp</code> link on GEO, you can copy the ‘ftp address’ to use with the <code class="language-plaintext highlighter-rouge">wget</code> or <code class="language-plaintext highlighter-rouge">curl</code> command.</p>
+
+<p><img src="../img/geo_ftp_cl.png" width="700" /></p>
+
+<hr />
+<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc">intro-rnaseq-hpc</a> is maintained by <a href="https://github.com/NICHD-BSPC">NICHD-BSPC</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
