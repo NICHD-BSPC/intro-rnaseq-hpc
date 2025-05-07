@@ -24,7 +24,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=0e44fa48538a2880d5ecfedf65b809e606750f08">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/cohort-may2025/assets/css/style.css?v=a6d9554c6033cbe24b35c80574e1ce8bded81d74">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -527,7 +527,10 @@
   <li>
     <p>You can <code class="language-plaintext highlighter-rouge">cp</code> as we have before, so go ahead and run the following commands:</p>
 
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cp</span> /data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mouse_exp_design.csv <span class="nb">.</span>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># cp metadata</span>
+<span class="nv">$ </span><span class="nb">cp</span> /data/Bspc-training/shared/rnaseq_mov10/downstream_data/mouse_exp_design.csv <span class="nb">.</span>
+<span class="c"># cp read count data</span>
+<span class="nv">$ </span><span class="nb">cp</span> /data/Bspc-training/shared/rnaseq_mov10/downstream_data/counts.rpkm.csv <span class="nb">.</span>
 </code></pre></div>    </div>
   </li>
 </ol>
@@ -700,13 +703,13 @@
       <li>
         <p>Count data:</p>
 
-        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mov10_AllSamples_featurecounts.Rmatrix.txt
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/data/Bspc-training/shared/rnaseq_mov10/downstream_data/mov10_AllSamples_featurecounts.Rmatrix.txt
 </code></pre></div>        </div>
       </li>
       <li>
         <p>Experimental metadata:</p>
 
-        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/mov10_AllSamples_metadata.txt
+        <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/data/Bspc-training/shared/rnaseq_mov10/downstream_data/mov10_AllSamples_metadata.txt 
 </code></pre></div>        </div>
       </li>
     </ul>
