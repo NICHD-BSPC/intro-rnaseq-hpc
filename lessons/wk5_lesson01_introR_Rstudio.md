@@ -571,6 +571,16 @@ Using HPC on Demand and following the instructions above in the RStudio Project 
 
 **To submit your assignment**: Message me a screenshot on Slack of your RStudio interface showing that you are in your new `DEanalysis` directory and that the two files are visible in your Files Pane.
 
+## Doing these lessons locally
+
+If you want to follow along but do not have access to HPC on Demand, you can download these files at the following links:
+
+[Count Matrix](../data/mov10_AllSamples_featurecounts.Rmatrix.txt) 
+
+[Metadata](../data/mov10_AllSamples_metadata.txt)
+
+For more full instructions about downloading packages and setting up a local RStudio Project, please see [this supplemental lesson on working with R locally](../lessons/supplemental_lesson_Rstudio_offline.md).
+
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
 
 -   *The materials used in this lesson are adapted from work that is Copyright © Data Carpentry (<http://datacarpentry.org/>). All Data Carpentry instructional material is made available under the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0).*
