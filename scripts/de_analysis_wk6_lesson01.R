@@ -11,3 +11,8 @@ data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, 
 
 meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
 
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
