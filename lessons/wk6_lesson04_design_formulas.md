@@ -11,6 +11,28 @@ Approximate time: 30 minutes
 -   Demonstrate the use of the design formula with simple and complex designs
 -   Construct R code to execute the differential expression analysis workflow with DESeq2
 
+## Catch-up Script: 
+
+If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+```
+
 # Differential expression analysis with DESeq2
 
 The final step in the differential expression analysis workflow is **fitting the raw counts to the NB model and performing the statistical test** for differentially expressed genes. In this step we essentially want to determine whether the mean expression levels of different sample groups are significantly different.
@@ -168,3 +190,28 @@ Given the the metadata table you have sent me for your own experiment, do the fo
 
 1.  Write a design formula for your experiment, in the format of `design = ~ sex + age + treatment` . Make sure to include any interaction terms or terms that you want to "regress" out. There are additional recommendations for complex designs in the [DESeq2 vignette](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#interactions).
 2.  Briefly explain (in 1-2 sentences) the reasoning for this design formula.
+
+## Your DE script
+
+In this lesson, we took the additional step of running the actual DESeq2 analysis. Your `de_script.R` should now contain the following commands to re-create necessary data objects (click to show):
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+```
