@@ -1,10 +1,10 @@
 ---
 title: "Set up and overview for gene-level differential expression analysis"
 author: "Harvard HPC Staff, Adapted for use by Sally Chang @ NICHD"
-date: "Last Modified April 2025"
+date: "Last Modified May 2025"
 ---
-### NOTE: 
-To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
+
+### NOTE:
 
 Approximate time: 60 minutes
 
@@ -16,6 +16,28 @@ Approximate time: 60 minutes
 -   Describe how to set up an RNA-seq project in R
 -   Describe the RNA-seq and the differential gene expression analysis workflow
 -   Explain why negative binomial distribution is used to model RNA-seq count data
+
+### From last lesson:
+
+In this lesson we are assuming you have done the following:
+
+-   Created RStudio project under `/data/YOUR_USERNAME/rnaseq_course/`called `DEanalysis`
+
+-   Created `data/`, `results/` and a `figures` directory within your main project directory.
+
+-   Have the following files in your `DEanalysis` directory, in the `data/` subdirectory:
+
+    -   Count data:
+
+        ``` bash
+        mov10_AllSamples_featurecounts.Rmatrix.txt
+        ```
+
+    -   Experimental metadata:
+
+        ``` bash
+        mov10_AllSamples_metadata.txt 
+        ```
 
 # Differential gene expression (DGE) analysis overview
 
@@ -51,8 +73,8 @@ The hypothesis [the paper](http://www.ncbi.nlm.nih.gov/pubmed/25464849) is testi
 
 **Our questions:**
 
-* What patterns of expression can we identify with the loss or gain of MOV10?
-* Are there any genes shared between the two conditions?
+-   What patterns of expression can we identify with the loss or gain of MOV10?
+-   Are there any genes shared between the two conditions?
 
 ## Setting up
 
@@ -60,19 +82,20 @@ The hypothesis [the paper](http://www.ncbi.nlm.nih.gov/pubmed/25464849) is testi
 
 Before we get into the details of the analysis, let's start by:
 
--   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
+-   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/YOUR_USERNAME/rnaseq`
 
--   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
+-   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users /changes/rnaseq` should come up.
 
 -   Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -\> DEanalysis), to navigate to and open `DEanalysis.Rproj`, which you set up as an Assignment last week.
 
--   Go to the `File` menu and select `New File`, then select `R Script`. This should open up a script editor in the top left hand corner. This is where we will be typing and saving all commands required for this analysis. In the script editor type in header lines:
+-   Go to the `File` menu and select `New File`, then select `R Script`. This should open up a script editor in the top left hand corner. This is where we will be typing and saving all commands *required for this analysis*. In the script editor type in header lines:
 
-```r
+``` r
 # Gene-level differential expression analysis using DESeq2
 ```
 
 -   Now save the file as `de_script.R`.
+-   Optionally, follow the same instructions above to create a script called `de_notes.R` to keep track of other commands that are not strictly necessary for catching you up. *This will be a good place to store commands to produce your favorite plots etc.*
 
 ## Loading and Installing libraries
 
@@ -107,7 +130,6 @@ Then, add this line in your script to load the package we just installed:
 ``` r
 library(DEGreport)
 ```
-
 
 ## Loading data
 
@@ -273,7 +295,7 @@ This multi-way Venn diagram shows that the four methods assessed do have substan
 
 We will go in-depth into each of these steps in the following lessons, but additional details and helpful suggestions regarding DESeq2 can be found in the [DESeq2 vignette](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html). As you go through this workflow and questions arise, you can reference the vignette from within RStudio:
 
-```
+```         
 vignette("DESeq2")
 ```
 
@@ -282,6 +304,27 @@ This is very convenient, as it provides a wealth of information at your fingerti
 ## Assignment
 
 Create another R script (also saved to this `DEanalysis` directory) where you modify the three plots we made for the `Mov10_oe_1` samples to look a the count distribution for the sample `Irrel_kd_3`. Save these images to `figures/` as PNG files.
+
+## Catch-up Script
+
+By the end of this lesson, your `DE_script.R` file should contain the following to get you started on the next lesson.
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+```
+
+As a reminder, your `DE_notes.R` script is a good place to store the commands for reproducing the plots from this session as well as
 
 ------------------------------------------------------------------------
 
