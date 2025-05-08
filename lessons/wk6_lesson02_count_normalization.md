@@ -1,13 +1,10 @@
 ---
 title: "Count normalization with DESeq2"
 author: "Harvard HPC Staff, Adapted by Sally Chang @ NICHD"
-date: "Last Modified April 2025"
+date: "Last Modified May 2025"
 ---
 
 Approximate time: 60 minutes
-
-### NOTE: 
-To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
@@ -15,7 +12,7 @@ To make names more generalized for the next course, `/data/Bspc-training/shared/
 -   Become familiar with the `DESeqDataSet` object
 -   Understand how to normalize counts using DESeq2
 
-### Opening the project using RStudio (HPC on Demand)
+### Preparing for this lesson: 
 
 Before we get into the details of the analysis, let's start by:
 
@@ -24,6 +21,23 @@ Before we get into the details of the analysis, let's start by:
 -   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
 
 -   Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -\> DEanalysis), to navigate to and open `DEanalysis.Rproj`, which you set up as an Assignment last week.
+
+If you missed the last lesson, or need to make sure you have the right packages and data loaded, please run the following commands:
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+```
 
 ## Normalization
 
