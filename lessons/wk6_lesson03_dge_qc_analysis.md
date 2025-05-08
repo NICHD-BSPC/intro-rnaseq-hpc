@@ -157,9 +157,9 @@ Now that we have a good understanding of the QC steps normally employed for RNA-
 
 1.Get your HPC On Demand session going:
 
--   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
+-   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/YOUR_USERNAME/rnaseq`
 
--   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
+-   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/changes/rnaseq` should come up.
 
 -   Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -\> DEanalysis), to navigate to and open `DEanalysis.Rproj`
 
@@ -223,7 +223,9 @@ plotPCA(rld, intgroup="sampletype")
 ```
 
 <p align="center">
-<img src="../img/mov10_pca.png" width="600" alt="mov 10 experiement PCA"/>
+
+<img src="../img/mov10_pca.png" alt="mov 10 experiement PCA" width="600"/>
+
 </p>
 
 ------------------------------------------------------------------------
@@ -296,7 +298,9 @@ pheatmap(rld_cor, annotation = meta)
 When you plot using `pheatmap()` the hierarchical clustering information is used to place similar samples together and this information is represented by the tree structure along the axes. The `annotation` argument accepts a dataframe as input, in our case it is the `meta` data frame.
 
 <p align="center">
-<img src="../img/mov10_default_heatmap.png" width="600" alt="mov10 heatmap with default settings"/>
+
+<img src="../img/mov10_default_heatmap.png" alt="mov10 heatmap with default settings" width="600"/>
+
 </p>
 
 Overall, we observe pretty high correlations across the board ( \> 0.999) suggesting no outlying sample(s). Also, similar to the PCA plot you see the samples clustering together by sample group. Together, these plots suggest to us that the data are of good quality and we have the green light to proceed to differential expression analysis.
