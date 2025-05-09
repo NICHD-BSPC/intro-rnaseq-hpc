@@ -1,7 +1,7 @@
 ---
 title: "Hypothesis testing and multiple testing"
 author: "Harvard HPC Staff, Adapted by Sally Chang @ NICHD"
-date: "Last Modified February 2025"
+date: "Last Modified May 2025"
 ---
 
 Approximate time: 60 minutes
@@ -13,13 +13,38 @@ Approximate time: 60 minutes
 -   Recognize the importance of multiple test correction
 -   Identify different methods for multiple test correction
 
+## Catch-Up Script
+
+If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+```
+
 # DESeq2: Model fitting and Hypothesis testing
 
 The final step in the DESeq2 workflow is taking the counts for each gene and fitting it to the model and testing for differential expression.
 
 <p align="center">
 
-<img src="../img/deseq_workflow_full_2018.png" width="385" alt="deseq full workflow"/>
+<img src="../img/deseq_workflow_full_2018.png" alt="deseq full workflow" width="385"/>
 
 </p>
 
@@ -150,6 +175,34 @@ DESeq2 helps reduce the number of genes tested by removing those genes unlikely 
 **So what does FDR \< 0.05 mean?**
 
 By setting the FDR cutoff to \< 0.05, we're saying that the proportion of false positives we expect amongst our differentially expressed genes is 5%. For example, if you call 500 genes as differentially expressed with an FDR cutoff of 0.05, you expect 25 of them to be false positives.
+
+## Your DE script
+
+In this lesson, we took the additional step of running an additional DESeq2 analysis using a Likelihood Ratio Test to create the `dds_lrt` object . Your `de_script.R` should now contain the following commands to re-create necessary data objects (click to show):
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+
+# Likelihood ratio test
+dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1)
+```
 
 ------------------------------------------------------------------------
 
