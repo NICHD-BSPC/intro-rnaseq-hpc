@@ -1,7 +1,7 @@
 ---
 title: "Gene-level differential expression analysis with DESeq2"
 author: "Harvard HPC Staff, Adapted by Sally Chang at NICHD"
-date: "Last Modified March 2025"
+date: "Last Modified May 2025"
 ---
 
 Approximate time: 60 minutes
@@ -12,6 +12,31 @@ Approximate time: 60 minutes
 -   Examine size factors and understand the source of differences
 -   Inspect gene-level dispersion estimates
 -   Recognize the importance of dispersion during differential expression analysis
+
+## Catch-Up Script
+
+If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+```
 
 ## DESeq2 differential gene expression analysis workflow
 
