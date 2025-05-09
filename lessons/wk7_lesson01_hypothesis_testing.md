@@ -38,6 +38,8 @@ dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampl
 dds <- DESeq(dds)
 ```
 
+Remember to get your HPC On Demand session going, if applicable, and open your `DEAnalysis` R project!
+
 # DESeq2: Model fitting and Hypothesis testing
 
 The final step in the DESeq2 workflow is taking the counts for each gene and fitting it to the model and testing for differential expression.

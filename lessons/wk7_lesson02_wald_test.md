@@ -1,7 +1,7 @@
 ---
 title: "Exploring DESeq2 results: Wald test"
 author: "Harvard HPC Staff, adapted by Sally Chang at NICHD"
-edited: "Last Modified March 2025"
+edited: "Last Modified May 2025"
 ---
 
 Approximate time: 60 minutes
@@ -11,6 +11,36 @@ Approximate time: 60 minutes
 -   Discuss the steps required to generate a results table for pairwise comparisons (Wald test)
 -   Summarize the different levels of gene filtering
 -   Explain log fold change shrinkage
+
+## Catch-Up Script
+
+If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+
+# Likelihood ratio test
+dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1)
+```
+
+Remember to get your HPC On Demand session going, if applicable, and open your `DEAnalysis` R project!
 
 # Exploring Results (Wald test)
 
@@ -56,27 +86,13 @@ Alternatively, if you **only had two factor levels you could do nothing** and no
 To start, we want to evaluate **expression changes between the MOV10 overexpression samples and the control samples**. As such we will use the first method for specifying contrasts and create a character vector:
 
 ``` r
-## Define contrasts for MOV10 overexpression
+## Define contrasts for MOV10 overexpression - please run this!
 contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
 ```
 
 > ### Does it matter what I choose to be my base level?
 >
 > Yes, it does matter. **Deciding what level is the base level will determine how to interpret the fold change that is reported.** So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in factor level of interest relative to the base level. Thus, if leaving it up to DESeq2 to decide on the contrasts be sure to check that the alphabetical order coincides with the fold change direction you are anticipating.
-
-## Getting Ready to work in R
-
-1.Get your HPC On Demand session going:
-
--   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
-
--   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
-
--   Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -\> DEanalysis), to navigate to and open `DEanalysis.Rproj`
-
-2.  We are assuming that you have the `dds` object in your environment and your packages are loaded - run your `de_setup.R` script if needed!
-
-3.  Run the actual DESeq2 analysis if needed `dds <- DESeq(dds)`.
 
 ## The results table
 
@@ -329,11 +345,11 @@ Now that we have results for the overexpression results, do the same for the **C
 3.  Shrink the LFC estimates using `lfcShrink()` and assign it back to `res_tableKD`.
 4.  Store the code you used to do the above exercises in an RScript named `control_vs_kd.R` .
 
-## R Script updates: 
+## R Script updates:
 
 Here is what your `de_setup.R` script should look like now to regenerate all the R objects we will need to the next lesson:
 
-```r
+``` r
 # Gene-level differential expression analysis using DESeq2
 
 # Setup
@@ -369,9 +385,7 @@ res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control",
 
 Now, on to [Week 7, lesson 03!](../lessons/wk7_lesson03_summarizing_dge_results.md)
 
-------------------------------------------------------------------------
-*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*
-
-*Some materials and hands-on activities were adapted from [RNA-seq workflow](http://www.bioconductor.org/help/workflows/rnaseqGene/#de) on the Bioconductor website*
-
-------------------------------------------------------------------------
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|------------------------------------------------------------------------|
+| *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.* |
+| *Some materials and hands-on activities were adapted from [RNA-seq workflow](http://www.bioconductor.org/help/workflows/rnaseqGene/#de) on the Bioconductor website*                                                                                                                                                                                                                                                                                               |
