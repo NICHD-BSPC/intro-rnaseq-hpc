@@ -118,16 +118,12 @@ The results table that is returned to us is **a `DESeqResults` object**, which i
 class(res_tableOE)
 ```
 
-Now let's take a look at **what information is stored** in the results:
+Now let's take a look at **what information is stored** in the results, using nested functions that convert `res_table0E` into a data frame that we can then View:
 
 ``` r
 # What is stored in results?
-res_tableOE %>% 
-data.frame() %>% 
-View()
+View(data.frame(res_tableOE))
 ```
-
-> **Discussion:** The `%>%` acts as a pipe symbol in R. This functionality comes as part of the [`dplyr`](https://dplyr.tidyverse.org/) package, which was loaded as part of the `tidyverse` that we loaded at the beginning of our lessons. Knowing this, what exactly is the code above doing?
 
 We have six columns of information reported for each gene (row). We can use the `mcols()` function to extract information on what the values stored in each column represent:
 
@@ -167,13 +163,14 @@ The missing values represent genes that have undergone filtering as part of the 
 If within a row, all samples have zero counts there is no expression information and therefore these genes are not tested.
 
 ``` r
-# Filter genes by zero expression
-res_tableOE[which(res_tableOE$baseMean == 0),] %>% 
-data.frame() %>% 
-View()
+# Filter genes by zero expression and view using the same type of nested command as above
+View(data.frame(res_tableOE[which(res_tableOE$baseMean == 0),]))
+
+# You could also count the number of rows that are left in the filtered data frame
+nrow(data.frame(res_tableOE[which(res_tableOE$baseMean == 0),]))
 ```
 
-> **The baseMean column for these genes will be zero, and the log2 fold change estimates, p-value and adjusted p-value will all be set to NA. *How would you adjust the command above to count the number of rows matching this condition*?**
+> **The baseMean column for these genes will be zero, and the log2 fold change estimates, p-value and adjusted p-value will all be set to NA.**
 
 **2. Genes with an extreme count outlier**
 
@@ -182,11 +179,9 @@ The `DESeq()` function calculates, for every gene and for every sample, a diagno
 ``` r
 # Filter genes that have an extreme outlier by looking for those rows that have a non-zero base mean but no values for p-value and adjusted p-value. Do we actually have any of these?
 
-res_tableOE[which(is.na(res_tableOE$pvalue) & 
+View(data.frame(res_tableOE[which(is.na(res_tableOE$pvalue) & 
                     is.na(res_tableOE$padj) &
-                    res_tableOE$baseMean > 0),] %>% 
-  data.frame() %>% 
-  View()
+                    res_tableOE$baseMean > 0),]))
 ```
 
 > **If a gene contains a sample with an extreme count outlier then the p-value and adjusted p-value will be set to NA.**
@@ -207,11 +202,9 @@ At a user-specified value (`alpha = 0.1`), DESeq2 evaluates the change in the nu
 
 ``` r
 # Filter genes below the low mean threshold
-res_tableOE[which(!is.na(res_tableOE$pvalue) & 
+View(data.frame(res_tableOE[which(!is.na(res_tableOE$pvalue) & 
                     is.na(res_tableOE$padj) & 
-                    res_tableOE$baseMean > 0),] %>% 
-  data.frame() %>% 
-  View()
+                    res_tableOE$baseMean > 0),]))
 ```
 
 > **If a gene is filtered by independent filtering, then only the adjusted p-value will be set to NA.**
@@ -234,23 +227,9 @@ log2 (normalized_counts_group1 / normalized_counts_group2)
 
 The problem is, these fold change estimates are not entirely accurate as they do not account for the large dispersion we observe with low read counts. To address this, the **log2 fold changes need to be adjusted**.
 
-**This is where we stopped on Tuesday of Week 7!**
-
 ------------------------------------------------------------------------
 
-### More accurate LFC estimates: Picking up again from Tuesday
-
-1.Get your HPC On Demand session going:
-
--   Opening up RStudio using [HPC on Demand](https://hpcondemand.nih.gov/pun/sys/dashboard/), using default values except for Starting Directory and **INCREASE MEMORY TO 8G**: `/data/Bspc-training/YOUR_USERNAME/rnaseq`
-
--   To check whether or not you are in the correct working directory, use `getwd()`. Something like `/vf/users/Bspc-training/changes/rnaseq` should come up.
-
--   Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -\> DEanalysis), to navigate to and open `DEanalysis.Rproj`
-
-2.  We are assuming that you have the `dds` object in your environment and your packages are loaded - run your `de_setup.R` script if needed!
-
-3.  Run the actual DESeq2 analysis if needed `dds <- DESeq(dds)`.
+## More accurate LFC estimates
 
 To generate more accurate log2 foldchange (LFC) estimates, DESeq2 allows for the **shrinkage of the LFC estimates toward zero** when the information for a gene is low, which could include:
 
