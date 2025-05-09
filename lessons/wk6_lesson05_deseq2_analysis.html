@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson05_deseq2_analysis.html" />
 <meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2025-03-01T00:00:00+00:00" />
+<meta property="article:published_time" content="2025-05-01T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Gene-level differential expression analysis with DESeq2" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Adapted by Sally Chang at NICHD"},"dateModified":"2025-03-01T00:00:00+00:00","datePublished":"2025-03-01T00:00:00+00:00","headline":"Gene-level differential expression analysis with DESeq2","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson05_deseq2_analysis.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson05_deseq2_analysis.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Adapted by Sally Chang at NICHD"},"dateModified":"2025-05-01T00:00:00+00:00","datePublished":"2025-05-01T00:00:00+00:00","headline":"Gene-level differential expression analysis with DESeq2","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson05_deseq2_analysis.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk6_lesson05_deseq2_analysis.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=1520a2080385b7c5bde4a55e4ca23c3d57a015f4">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=26e0caee14155ed67cce7fd2eb58cc89086563d5">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -70,6 +70,30 @@
   <li>Inspect gene-level dispersion estimates</li>
   <li>Recognize the importance of dispersion during differential expression analysis</li>
 </ul>
+
+<h2 id="catch-up-script">Catch-Up Script</h2>
+
+<p>If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don’t already have the files in your <code class="language-plaintext highlighter-rouge">/data</code> directory, please see <a href="../wk5_lesson01_introR_Rstudio.md">Wk 5 Lesson 01</a> for instructions on where to obtain the input files.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Setup</span><span class="w">
+</span><span class="c1"># Bioconductor and CRAN libraries used - already installed on Biowulf</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">RColorBrewer</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DESeq2</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pheatmap</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">BiocManager</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Load in data</span><span class="w">
+</span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_featurecounts.Rmatrix.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="n">meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_metadata.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Create DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeqDataSetFromMatrix</span><span class="p">(</span><span class="n">countData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">colData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">sampletype</span><span class="p">)</span><span class="w"> 
+
+</span><span class="c1"># Run DESeq2 on DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
 
 <h2 id="deseq2-differential-gene-expression-analysis-workflow">DESeq2 differential gene expression analysis workflow</h2>
 

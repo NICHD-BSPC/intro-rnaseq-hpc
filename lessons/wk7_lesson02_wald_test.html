@@ -24,7 +24,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=1520a2080385b7c5bde4a55e4ca23c3d57a015f4">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=26e0caee14155ed67cce7fd2eb58cc89086563d5">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -68,6 +68,35 @@
   <li>Summarize the different levels of gene filtering</li>
   <li>Explain log fold change shrinkage</li>
 </ul>
+
+<h2 id="catch-up-script">Catch-Up Script</h2>
+
+<p>If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don’t already have the files in your <code class="language-plaintext highlighter-rouge">/data</code> directory, please see <a href="../wk5_lesson01_introR_Rstudio.md">Wk 5 Lesson 01</a> for instructions on where to obtain the input files.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Setup</span><span class="w">
+</span><span class="c1"># Bioconductor and CRAN libraries used - already installed on Biowulf</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">RColorBrewer</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DESeq2</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pheatmap</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">BiocManager</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Load in data</span><span class="w">
+</span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_featurecounts.Rmatrix.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="n">meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_metadata.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Create DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeqDataSetFromMatrix</span><span class="p">(</span><span class="n">countData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">colData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">sampletype</span><span class="p">)</span><span class="w"> 
+
+</span><span class="c1"># Run DESeq2 on DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Likelihood ratio test</span><span class="w">
+</span><span class="n">dds_lrt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">test</span><span class="o">=</span><span class="s2">"LRT"</span><span class="p">,</span><span class="w"> </span><span class="n">reduced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Remember to get your HPC On Demand session going, if applicable, and open your <code class="language-plaintext highlighter-rouge">DEAnalysis</code> R project!</p>
 
 <h1 id="exploring-results-wald-test">Exploring Results (Wald test)</h1>
 
@@ -120,7 +149,7 @@
 
 <p>To start, we want to evaluate <strong>expression changes between the MOV10 overexpression samples and the control samples</strong>. As such we will use the first method for specifying contrasts and create a character vector:</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Define contrasts for MOV10 overexpression</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Define contrasts for MOV10 overexpression - please run this!</span><span class="w">
 </span><span class="n">contrast_oe</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MOV10_overexpression"</span><span class="p">,</span><span class="w"> </span><span class="s2">"control"</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
@@ -129,31 +158,6 @@
 
   <p>Yes, it does matter. <strong>Deciding what level is the base level will determine how to interpret the fold change that is reported.</strong> So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in factor level of interest relative to the base level. Thus, if leaving it up to DESeq2 to decide on the contrasts be sure to check that the alphabetical order coincides with the fold change direction you are anticipating.</p>
 </blockquote>
-
-<h2 id="getting-ready-to-work-in-r">Getting Ready to work in R</h2>
-
-<p>1.Get your HPC On Demand session going:</p>
-
-<ul>
-  <li>
-    <p>Opening up RStudio using <a href="https://hpcondemand.nih.gov/pun/sys/dashboard/">HPC on Demand</a>, using default values except for Starting Directory: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/YOUR_USERNAME/rnaseq</code></p>
-  </li>
-  <li>
-    <p>To check whether or not you are in the correct working directory, use <code class="language-plaintext highlighter-rouge">getwd()</code>. Something like <code class="language-plaintext highlighter-rouge">/vf/users/Bspc-training/changes/rnaseq</code> should come up.</p>
-  </li>
-  <li>
-    <p>Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -&gt; DEanalysis), to navigate to and open <code class="language-plaintext highlighter-rouge">DEanalysis.Rproj</code></p>
-  </li>
-</ul>
-
-<ol>
-  <li>
-    <p>We are assuming that you have the <code class="language-plaintext highlighter-rouge">dds</code> object in your environment and your packages are loaded - run your <code class="language-plaintext highlighter-rouge">de_setup.R</code> script if needed!</p>
-  </li>
-  <li>
-    <p>Run the actual DESeq2 analysis if needed <code class="language-plaintext highlighter-rouge">dds &lt;- DESeq(dds)</code>.</p>
-  </li>
-</ol>
 
 <h2 id="the-results-table">The results table</h2>
 
@@ -178,17 +182,11 @@
 </span><span class="nf">class</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Now let’s take a look at <strong>what information is stored</strong> in the results:</p>
+<p>Now let’s take a look at <strong>what information is stored</strong> in the results, using nested functions that convert <code class="language-plaintext highlighter-rouge">res_table0E</code> into a data frame that we can then View:</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># What is stored in results?</span><span class="w">
-</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-</span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-</span><span class="n">View</span><span class="p">()</span><span class="w">
+</span><span class="n">View</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
-
-<blockquote>
-  <p><strong>Discussion:</strong> The <code class="language-plaintext highlighter-rouge">%&gt;%</code> acts as a pipe symbol in R. This functionality comes as part of the <a href="https://dplyr.tidyverse.org/"><code class="language-plaintext highlighter-rouge">dplyr</code></a> package, which was loaded as part of the <code class="language-plaintext highlighter-rouge">tidyverse</code> that we loaded at the beginning of our lessons. Knowing this, what exactly is the code above doing?</p>
-</blockquote>
 
 <p>We have six columns of information reported for each gene (row). We can use the <code class="language-plaintext highlighter-rouge">mcols()</code> function to extract information on what the values stored in each column represent:</p>
 
@@ -228,14 +226,15 @@
 
 <p>If within a row, all samples have zero counts there is no expression information and therefore these genes are not tested.</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Filter genes by zero expression</span><span class="w">
-</span><span class="n">res_tableOE</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">baseMean</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">),]</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-</span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-</span><span class="n">View</span><span class="p">()</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Filter genes by zero expression and view using the same type of nested command as above</span><span class="w">
+</span><span class="n">View</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">baseMean</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">),]))</span><span class="w">
+
+</span><span class="c1"># You could also count the number of rows that are left in the filtered data frame</span><span class="w">
+</span><span class="n">nrow</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">baseMean</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">),]))</span><span class="w">
 </span></code></pre></div></div>
 
 <blockquote>
-  <p><strong>The baseMean column for these genes will be zero, and the log2 fold change estimates, p-value and adjusted p-value will all be set to NA. <em>How would you adjust the command above to count the number of rows matching this condition</em>?</strong></p>
+  <p><strong>The baseMean column for these genes will be zero, and the log2 fold change estimates, p-value and adjusted p-value will all be set to NA.</strong></p>
 </blockquote>
 
 <p><strong>2. Genes with an extreme count outlier</strong></p>
@@ -244,11 +243,9 @@
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Filter genes that have an extreme outlier by looking for those rows that have a non-zero base mean but no values for p-value and adjusted p-value. Do we actually have any of these?</span><span class="w">
 
-</span><span class="n">res_tableOE</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">pvalue</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> 
+</span><span class="n">View</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="nf">is.na</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">pvalue</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> 
                     </span><span class="nf">is.na</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">padj</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w">
-                    </span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">baseMean</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),]</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-  </span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-  </span><span class="n">View</span><span class="p">()</span><span class="w">
+                    </span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">baseMean</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),]))</span><span class="w">
 </span></code></pre></div></div>
 
 <blockquote>
@@ -270,11 +267,9 @@
 <p>At a user-specified value (<code class="language-plaintext highlighter-rouge">alpha = 0.1</code>), DESeq2 evaluates the change in the number of significant genes as it filters out increasingly bigger portions of genes based on their mean counts, as shown in the figure above. The point at which the number of significant genes reaches a peak is the low mean threshold that is used to filter genes that undergo multiple testing. There is also an argument to turn off the filtering off by setting <code class="language-plaintext highlighter-rouge">independentFiltering = F</code>.</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Filter genes below the low mean threshold</span><span class="w">
-</span><span class="n">res_tableOE</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">pvalue</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> 
+</span><span class="n">View</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="o">!</span><span class="nf">is.na</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">pvalue</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> 
                     </span><span class="nf">is.na</span><span class="p">(</span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">padj</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> 
-                    </span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">baseMean</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),]</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-  </span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-  </span><span class="n">View</span><span class="p">()</span><span class="w">
+                    </span><span class="n">res_tableOE</span><span class="o">$</span><span class="n">baseMean</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),]))</span><span class="w">
 </span></code></pre></div></div>
 
 <blockquote>
@@ -302,34 +297,9 @@
 
 <p>The problem is, these fold change estimates are not entirely accurate as they do not account for the large dispersion we observe with low read counts. To address this, the <strong>log2 fold changes need to be adjusted</strong>.</p>
 
-<p><strong>This is where we stopped on Tuesday of Week 7!</strong></p>
-
 <hr />
 
-<h3 id="more-accurate-lfc-estimates-picking-up-again-from-tuesday">More accurate LFC estimates: Picking up again from Tuesday</h3>
-
-<p>1.Get your HPC On Demand session going:</p>
-
-<ul>
-  <li>
-    <p>Opening up RStudio using <a href="https://hpcondemand.nih.gov/pun/sys/dashboard/">HPC on Demand</a>, using default values except for Starting Directory and <strong>INCREASE MEMORY TO 8G</strong>: <code class="language-plaintext highlighter-rouge">/data/Bspc-training/YOUR_USERNAME/rnaseq</code></p>
-  </li>
-  <li>
-    <p>To check whether or not you are in the correct working directory, use <code class="language-plaintext highlighter-rouge">getwd()</code>. Something like <code class="language-plaintext highlighter-rouge">/vf/users/Bspc-training/changes/rnaseq</code> should come up.</p>
-  </li>
-  <li>
-    <p>Using the Project menu in the top right corner, or the Files Pane window (clicking rnaseq -&gt; DEanalysis), to navigate to and open <code class="language-plaintext highlighter-rouge">DEanalysis.Rproj</code></p>
-  </li>
-</ul>
-
-<ol>
-  <li>
-    <p>We are assuming that you have the <code class="language-plaintext highlighter-rouge">dds</code> object in your environment and your packages are loaded - run your <code class="language-plaintext highlighter-rouge">de_setup.R</code> script if needed!</p>
-  </li>
-  <li>
-    <p>Run the actual DESeq2 analysis if needed <code class="language-plaintext highlighter-rouge">dds &lt;- DESeq(dds)</code>.</p>
-  </li>
-</ol>
+<h2 id="more-accurate-lfc-estimates">More accurate LFC estimates</h2>
 
 <p>To generate more accurate log2 foldchange (LFC) estimates, DESeq2 allows for the <strong>shrinkage of the LFC estimates toward zero</strong> when the information for a gene is low, which could include:</p>
 
@@ -471,12 +441,21 @@
 
 <p>Now, on to <a href="/intro-rnaseq-hpc/lessons/wk7_lesson03_summarizing_dge_results.html">Week 7, lesson 03!</a></p>
 
-<hr />
-<p><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></p>
-
-<p><em>Some materials and hands-on activities were adapted from <a href="http://www.bioconductor.org/help/workflows/rnaseqGene/#de">RNA-seq workflow</a> on the Bioconductor website</em></p>
-
-<hr />
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>This lesson has been developed by members of the teaching team at the <a href="http://bioinformatics.sph.harvard.edu/">Harvard Chan Bioinformatics Core (HBC)</a>. These are open access materials distributed under the terms of the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution license</a> (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.</em></td>
+    </tr>
+    <tr>
+      <td><em>Some materials and hands-on activities were adapted from <a href="http://www.bioconductor.org/help/workflows/rnaseqGene/#de">RNA-seq workflow</a> on the Bioconductor website</em></td>
+    </tr>
+  </tbody>
+</table>
 
 
       <footer class="site-footer">
