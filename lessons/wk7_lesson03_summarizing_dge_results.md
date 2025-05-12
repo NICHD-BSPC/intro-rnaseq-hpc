@@ -1,13 +1,10 @@
 ---
 title: "Summarizing results from the Wald test"
 author: "Harvard HPC Staff, adapted by Sally Chang at NICHD"
-date: "Last Modified April 2025"
+date: "Last Modified May 2025"
 ---
 
 Approximate time: 30 minutes
-
-### NOTE: 
-To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
@@ -16,11 +13,39 @@ To make names more generalized for the next course, `/data/Bspc-training/shared/
 
 ## **Getting Back up to Speed**
 
-You need to have the `res_tableOE` object in your environment. Assuming that you at least have our `dds` object, you can run:
+You need to have the `res_tableOE` object in your environment. If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+Remember to get your HPC On Demand session going, if applicable, and open your `DEAnalysis` R project!
 
 ``` r
+# Gene-level differential expression analysis using DESeq2
+
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(ggrepel)
+library(DEGreport)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
+
+# Run analysis. This does a lot!
+dds <- DESeq(dds)
+
+#Set up control vs. OE contrast
 contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
-res_tableOE <- results(dds, contrast=contrast_oe, alpha)
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.1)
+
+#LFC shrinking
+res_tableOE_unshrunken <- res_tableOE
 res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
 ```
 
@@ -62,9 +87,7 @@ We can easily subset the results table to only include those that are significan
 
 ``` r
 # Create a dataframe to simplify the res_tableOE object. What do you think is happening in rownames_to_columns()?
-res_tableOE_df <- res_tableOE %>%
-  data.frame() %>%
-  rownames_to_column(var="gene")
+res_OE_df <- rownames_to_column(data.frame(res_tableOE), var="gene")
 ```
 
 *Wouldn't it be nice if we could have gene symbols associated with each of our genes instead of just the Ensembl gene IDs?*
@@ -74,7 +97,7 @@ First, let's read in the GTF and extract just the Ensembl Gene IDs and the Gene 
 ``` r
 ## Convert our GTF to a large data frame.
 library(rtracklayer)
-gtf <- readGFF("/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf")
+gtf <- readGFF("/data/Bspc-training/shared/rnaseq_mov10/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf")
 
 # Extract only the columns with ensembl gene names and gene symbols
 gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
@@ -83,8 +106,8 @@ gtf_names <- gtf %>% dplyr::select(gene_id, gene_name) %>%
 ```
 
 ``` r
-## Next time, just read in this TSV
-gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
+## Next time, just read in this tab-separated data file
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt", header=TRUE)
 ```
 
 > **Discussion**: What are some commands we can use to preview the contents of this table and if it has the \~78k features we expected from our original GTF?
@@ -93,15 +116,14 @@ Now we merge these two data frames by their columns that each contain Ensembl Ge
 
 ```{r}
 #merge gene symbols
-res_tableOE_df <- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene")
+res_OE_df <- merge(gtf_names,res_OE_df, by.x="ensgene", by.y="gene")
 ```
 
 Now we can subset that table to only keep the significant genes using our pre-defined thresholds:
 
 ``` r
 # Subset the dataframe to keep only significant genes 
-sigOE <- res_tableOE_df %>%
-        dplyr::filter(padj < padj.cutoff)
+sigOE <- res_OE_df[res_OE_df$padj < padj.cutoff,]
 ```
 
 ``` r
@@ -123,7 +145,7 @@ head(sigOE)
 Let's say we wanted to save our `res_tableOE_df` object as a table so we could read it in again later. Let's use the following command:
 
 ``` r
-write.table(res_tableOE_df, file = "res_tableOE_df.tsv", sep = "\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
+write.table(res_OE_df, file = "res_OE_df.tsv", sep = "\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
 ```
 
 **Discussion:** What do the different arguments mean? How can we access help documentation about `write.table()`?
@@ -146,20 +168,20 @@ Now that we have extracted the significant results, we are ready for visualizati
 In summary, to help prepare for the [next lesson](../lessons/wk7_lesson04_visualizing_results.md), you can add the following to your script along with the code required to create the `sigKD` object:
 
 ``` r
+### Set thresholds
 padj.cutoff <- 0.1
 
-res_tableOE_df <- res_tableOE %>%
-data.frame() %>%
-rownames_to_column(var="gene")
+#formatting res_OE_df 
+res_OE_df <- rownames_to_column(data.frame(res_tableOE), var="gene")
 
-## Next time, just read in this TSV
+#import relevant parts of GTF file
 gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
 
-# merge gene names
-res_tableOE_df <- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene")
+#merge gene symbols
+res_OE_df <- merge(gtf_names,res_OE_df, by.x="ensgene", by.y="gene")
 
-sigOE <- res_tableOE_df %>%
-  dplyr::filter(padj < padj.cutoff)
+# Subset the dataframe to keep only significant genes 
+sigOE <- res_OE_df[res_OE_df$padj < padj.cutoff,]
 ```
 
 ------------------------------------------------------------------------
