@@ -1,13 +1,10 @@
 ---
 title: "Advanced visualizations"
 author: "Harvard HPC Staff, adapted by Sally Chang at NICHD"
-date: "Last Modified April 2025"
+date: "Last Modified May 2025"
 ---
 
 Approximate time: 75 minutes
-
-### NOTE: 
-To make names more generalized for the next course, `/data/Bspc-training/shared/rnaseq_jan2025` is now `/data/Bspc-training/shared/rnaseq_mov10` . Make sure to edit any scripts that refer to the shared data! 
 
 ## Learning Objectives
 
@@ -20,7 +17,66 @@ To make names more generalized for the next course, `/data/Bspc-training/shared/
 
 When we are working with large amounts of data it can be useful to display that information graphically to gain more insight. During this lesson, we will get you started with some basic and more advanced plots commonly used when exploring differential gene expression data, however, many of these plots can be helpful in visualizing other types of data as well.
 
-## Assembling our Data
+## Catch-Up Script
+
+You need to have the `res_tableOE` object in your environment. If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+Remember to get your HPC On Demand session going, if applicable, and open your `DEAnalysis` R project!
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+
+# Likelihood ratio test
+dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1)
+
+## Define overexpression vs. control contrast for Wald Test
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+
+## Extract results for MOV10 overexpression vs control
+res_tableOE <- results(dds, contrast=contrast_oe)
+
+#Set up control vs. OE contrast
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.1)
+
+#LFC shrinking
+res_tableOE_unshrunken <- res_tableOE
+res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
+
+### Set thresholds
+padj.cutoff <- 0.1
+
+#formatting res_OE_df 
+res_OE_df <- rownames_to_column(data.frame(res_tableOE), var="gene")
+
+#import relevant parts of GTF file
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
+
+#merge gene symbols
+res_OE_df <- merge(gtf_names,res_OE_df, by.x="ensgene", by.y="gene")
+
+# Subset the dataframe to keep only significant genes 
+sigOE <- res_OE_df[res_OE_df$padj < padj.cutoff,]
+```
+
+## Assembling Additional Data for Visualization
 
 We will be working with three different data objects we have already created in earlier lessons or will re-create now:
 
@@ -29,8 +85,7 @@ We will be working with three different data objects we have already created in 
 Create a version of our metadata that moves the rownames to a column called `samplename` because some of the visualization software expects that:
 
 ``` r
-mov10_meta <- meta %>% 
-              rownames_to_column(var="samplename")
+mov10_meta <- rownames_to_column(meta, var="samplename")
 ```
 
 **GTF info columns:**
@@ -38,7 +93,7 @@ mov10_meta <- meta %>%
 If you don't already have this, you can read in the file we created in the last lesson:
 
 ``` r
-gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt", header=TRUE)
 ```
 
 **Normalized count data (matrix):** Normalized expression data for every gene in each of our samples (a matrix): `normalized_counts` . Next, let's bring in a column with gene symbols to the `normalized_counts` object, so we can use them to label our plots. Ensembl IDs are great for many things, but the gene symbols are much more recognizable to us, as biologists
@@ -46,9 +101,7 @@ gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_da
 ``` r
 # DESeq2 creates a matrix when you use the counts() function
 ## First convert normalized_counts to a data frame and transfer the row names to a new column called "gene"
-normalized_counts <- counts(dds, normalized=T) %>% 
-                     data.frame() %>%
-                     rownames_to_column(var="gene") 
+normalized_counts <- rownames_to_column(data.frame(counts(dds, normalized=T)), var="gene")
 
 ## This will bring in a column of gene symbols and merge by Ensembl gene names
 normalized_counts <- merge(gtf_names, normalized_counts, by.x="ensgene", by.y="gene")
@@ -56,14 +109,6 @@ normalized_counts <- merge(gtf_names, normalized_counts, by.x="ensgene", by.y="g
 #So we don't need to do this again next time, let's write the normalized counts data frame we just created to a file:
 
 write.table(normalized_counts, file="normalized_counts.txt",  col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
-```
-
-**DESeq2 results dataframe:**
-
-If you don't already have this, you can read in the file we created in the last lesson:
-
-``` r
-res_tableOE_df <- read.table("res_tableOE_df.tsv", header=TRUE)
 ```
 
 ## Plotting significant DE genes
@@ -100,7 +145,7 @@ library(ggrepel)
 mov10_counts <- plotCounts(dds, gene="ENSG00000155363.19", intgroup="sampletype", returnData=TRUE)
 
 # What is the data output of plotCounts()?
-mov10_counts %>% View()
+View(mov10_counts)
 
 # Plot the MOV10 normalized counts, using the samplenames (rownames(d) as labels)
 ggplot(mov10_counts, aes(x = sampletype, y = count, color = sampletype)) + 
@@ -123,19 +168,11 @@ Take the above steps (starting with finding the Ensembl Gene ID) for a gene symb
 
 ### Heatmap
 
-In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`. Remember that `sig0E` is a data object from the previous lessons.
+In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`. Remember that `sig0E` is a data object from the previous lessons (see catch-up script at beginning of lesson)
 
 ``` r
-### If you need to regenerate sigOE
-# Subset the tibble to keep only significant genes 
-sigOE <- res_tableOE_tb %>%
-  dplyr::filter(padj < 0.1)
-```
-
-``` r
-### Extract normalized expression for significant genes from the OE and control samples (3:5 and 8:10)
-norm_OEsig <- normalized_counts[,c(1:5,8:10)] %>% 
-  dplyr::filter(ensgene %in% sigOE$ensgene) 
+### Extract normalized expression for significant genes from the OE and control samples (held in columns 3:5 and 8:10 of our normalized counts)
+norm_OEsig <- normalized_counts[normalized_counts$ensgene %in% sigOE$ensgene,c(1:5,8:10)]
 ```
 
 Now let's draw the heatmap using `pheatmap`:
@@ -165,27 +202,26 @@ pheatmap(norm_OEsig[3:8],
 
 ## Volcano plot
 
-Getting ready:
-* Start HPC on Demand with 8GB of memory
-* If you need to get caught up with your environment, you can use [this script](https://github.com/NICHD-BSPC/intro-rnaseq-hpc/blob/main/scripts/de_setup_Week7_lesson04.R) 
-
 The above plot would be great to look at the expression levels of a good number of genes, but for more of a global view there are other plots we can draw. A commonly used one is a volcano plot; in which you have the log transformed adjusted p-values plotted on the y-axis and log2 fold change values on the x-axis.
 
 To generate a volcano plot, we first need to have a column in our results data indicating whether or not the gene is considered differentially expressed based on p-adjusted values and we will include a log2fold change here.
 
 ``` r
-## Obtain logical vector where TRUE values denote padj values < 0.05 and fold change > 1.5 in either direction
+## Obtain logical vector where TRUE values denote padj values < 0.05 and fold change > 1.5 in either direction (meaning log2FC >= 0.58)
+OE_signif_vector <- res_OE_df$padj < 0.1 & abs(res_OE_df$log2FoldChange) >= 0.58
 
-res_tableOE_plotting <- res_tableOE_df %>% 
-                  dplyr::mutate(threshold_OE = padj < 0.1 & abs(log2FoldChange) >= 0.58)
+## Add this vector as a new column to create version of res_OE_df for custom plots
+res_OE_df_plotting <- cbind(res_OE_df, OE_signif_vector)
 ```
 
 Now we can start plotting. The `geom_point` object is most applicable, as this is essentially a scatter plot:
 
+### Volcano plot with adjusted p-values
+
 ``` r
-## Volcano plot
-ggplot(res_tableOE_plotting) +
-    geom_point(aes(x = log2FoldChange, y = -log10(padj), colour = threshold_OE)) +
+## Volcano plot with adjusted p-values
+ggplot(res_OE_df_plotting) +
+    geom_point(aes(x = log2FoldChange, y = -log10(padj), colour = OE_signif_vector)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
     ylab("-log10 adjusted p-value") +
@@ -196,6 +232,36 @@ ggplot(res_tableOE_plotting) +
 ```
 
 <img src="../img/mov10_oe_unlabeled_volcano.png" width="500"/>
+
+### Volcano Plot with raw p-values
+
+``` r
+ggplot(res_OE_df_plotting) +
+  geom_point(aes(x = log2FoldChange, y = -log10(pvalue), colour = OE_signif_vector)) +
+  ggtitle("Mov10 overexpression") +
+  xlab("log2 fold change") + 
+  ylab("-log10 p-value") +
+  #scale_y_continuous(limits = c(0,50)) +
+  theme(legend.position = "none",
+        plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        axis.title = element_text(size = rel(1.25))) 
+```
+
+### Volcano Plot colored log10(basemean)
+
+``` r
+ggplot(res_OE_df_plotting) +
+  geom_point(aes(x = log2FoldChange, y = -log10(pvalue), colour = log10(baseMean))) +
+  ggtitle("Mov10 overexpression") +
+  xlab("log2 fold change") + 
+  ylab("-log10 p-value") +
+  #scale_y_continuous(limits = c(0,50)) +
+  theme(legend.position = "none",
+        plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        axis.title = element_text(size = rel(1.25)))  
+```
+
+### Volcano plot with custom gene list
 
 This is a great way to get an overall picture of what is going on, but what if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the Volcano plot using `geom_text_repel()`.
 
@@ -302,7 +368,7 @@ If we do this correctly, we should have a something like the following - dependi
 
 ## **ASSIGNMENT OPTION 2**:
 
-Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol(s) of your choice and create a _custom volcano plot or MA plot_. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
+Take the above steps (starting with finding the Ensembl Gene ID) for a gene symbol(s) of your choice and create a *custom volcano plot or MA plot*. If you have trouble thinking of a gene symbol, you can check out this [list of symbols for protein-coding genes](https://www.genenames.org/tools/search/#!/?query=&rows=20&start=0&filter=locus_group:%22Protein-coding%20gene%22) from the Human Gene Nomenclature Consortium.
 
 **Be sure to export your image as a .PNG file and to save the lines of customized code you used in an R Script!**
 
