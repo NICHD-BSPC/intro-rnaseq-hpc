@@ -67,7 +67,7 @@ padj.cutoff <- 0.1
 res_OE_df <- rownames_to_column(data.frame(res_tableOE), var="gene")
 
 #import relevant parts of GTF file
-gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt", header=TRUE)
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt", header=TRUE)
 
 #merge gene symbols
 res_OE_df <- merge(gtf_names,res_OE_df, by.x="ensgene", by.y="gene")
@@ -208,10 +208,10 @@ To generate a volcano plot, we first need to have a column in our results data i
 
 ``` r
 ## Obtain logical vector where TRUE values denote padj values < 0.05 and fold change > 1.5 in either direction (meaning log2FC >= 0.58)
-OE_signif_vector <- res_OE_df$padj < 0.1 & abs(res_OE_df$log2FoldChange) >= 0.58
+significant_OE <- res_OE_df$padj < 0.1 & abs(res_OE_df$log2FoldChange) >= 0.58
 
 ## Add this vector as a new column to create version of res_OE_df for custom plots
-res_OE_df_plotting <- cbind(res_OE_df, OE_signif_vector)
+res_OE_df_plotting <- cbind(res_OE_df, significant_OE)
 ```
 
 Now we can start plotting. The `geom_point` object is most applicable, as this is essentially a scatter plot:
@@ -221,31 +221,31 @@ Now we can start plotting. The `geom_point` object is most applicable, as this i
 ``` r
 ## Volcano plot with adjusted p-values
 ggplot(res_OE_df_plotting) +
-    geom_point(aes(x = log2FoldChange, y = -log10(padj), colour = OE_signif_vector)) +
+    geom_point(aes(x = log2FoldChange, y = -log10(padj), colour = significant_OE)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
     ylab("-log10 adjusted p-value") +
-    #scale_y_continuous(limits = c(0,50)) +
     theme(legend.position = "none",
           plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.title = element_text(size = rel(1.25)))  
 ```
 
-<img src="../img/mov10_oe_unlabeled_volcano.png" width="500"/>
+<img src="../img/volcano_adjusted_pvalue.png" alt="volcano plot using adjusted p-value" width="600"/>
 
 ### Volcano Plot with raw p-values
 
 ``` r
 ggplot(res_OE_df_plotting) +
-  geom_point(aes(x = log2FoldChange, y = -log10(pvalue), colour = OE_signif_vector)) +
+  geom_point(aes(x = log2FoldChange, y = -log10(pvalue), colour = significant_OE)) +
   ggtitle("Mov10 overexpression") +
   xlab("log2 fold change") + 
   ylab("-log10 p-value") +
-  #scale_y_continuous(limits = c(0,50)) +
   theme(legend.position = "none",
         plot.title = element_text(size = rel(1.5), hjust = 0.5),
         axis.title = element_text(size = rel(1.25))) 
 ```
+
+<img src="../img/volcano_raw_pvalue.png" alt="volcano plot using raw p-value" width="600"/>
 
 ### Volcano Plot colored log10(basemean)
 
@@ -255,27 +255,36 @@ ggplot(res_OE_df_plotting) +
   ggtitle("Mov10 overexpression") +
   xlab("log2 fold change") + 
   ylab("-log10 p-value") +
-  #scale_y_continuous(limits = c(0,50)) +
   theme(legend.position = "none",
         plot.title = element_text(size = rel(1.5), hjust = 0.5),
         axis.title = element_text(size = rel(1.25)))  
 ```
 
-### Volcano plot with custom gene list
+<img src="../img/volcano_basemean.png" alt="volcano plot with points colored by log of basemean instead of significance" width="600"/>
 
-This is a great way to get an overall picture of what is going on, but what if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the Volcano plot using `geom_text_repel()`.
+### Volcano plot with ranked gene list
 
-First, we need to order the res_tableOE by `padj`, and add an additional column to it, to include on those gene names we want to use to label the plot.
+This is a great way to get an overall picture of what is going on, but we may also want to know the names of the top 10 most differentially expressed genes (by lowest padj) and where they are located on this plot. It could helpful for us in understanding if there is anything unusual about the relationship between
+
+This same type of labeling technique can also be used to label the top lowest or highest genes sorted by any variable in our results dataframe (e.g. basemean, raw pvalue, log2foldchange etc).
+
+We are going to label those dots with the gene name on the Volcano plot using `geom_text_repel()`. Preparing for this will take a few steps in Base R:
+
+-   Add an additional column to our current plotting dataframe, to put those gene names we want to use to label the plot.
+
+-   We need to order the res_tableOE by `padj`
+
+-   Fill the new empty column with values from the `symbol` column just for the top 10 genes in the sorted dataframe
 
 ``` r
-## Create an empty column to indicate which genes to label
-res_tableOE_plotting <- res_tableOE_plotting %>% dplyr::mutate(genelabels = "")
+# Create an empty column
+res_OE_df_plotting$genelabels <- ""
 
-## Sort by padj values 
-res_tableOE_plotting <- res_tableOE_plotting %>% dplyr::arrange(padj)
+# Sort by padj values
+res_OE_df_plotting <- res_OE_df_plotting[order(res_OE_df_plotting$padj), ]
 
 ## Populate the genelabels column with contents of the gene symbols column for the first 10 rows, i.e. the top 10 most significantly expressed genes
-res_tableOE_plotting$genelabels[1:10] <- as.character(res_tableOE_plotting$symbol[1:10])
+res_OE_df_plotting$genelabels[1:10] <- as.character(res_OE_df_plotting$symbol[1:10])
 
 View(res_tableOE_plotting)
 ```
@@ -283,18 +292,17 @@ View(res_tableOE_plotting)
 Next, we plot it as before with an additional layer for `geom_text_repel()` wherein we can specify the column of gene labels we just created.
 
 ``` r
-ggplot(res_tableOE_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
-    geom_point(aes(colour = threshold_OE)) +
+ggplot(res_OE_df_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
+    geom_point(aes(colour = significant_OE)) +
     geom_text_repel(aes(label = genelabels)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
     ylab("-log10 adjusted p-value") +
-    theme(legend.position = "none",
-          plot.title = element_text(size = rel(1.5), hjust = 0.5),
+    theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.title = element_text(size = rel(1.25))) 
 ```
 
-<img src="../img/mov10_oe_labeled_volcano.png" width="500"/>
+<img src="../img/volcano_top10_labeled.png" alt="volcano plot top 10 genes with lowest adjusted p-values labeled" width="600"/>
 
 ### Selecting Your Own Gene
 
