@@ -236,7 +236,7 @@ ggplot(res_OE_df_plotting) +
 
 ``` r
 ggplot(res_OE_df_plotting) +
-  geom_point(aes(x = log2FoldChange, y = -log10(pvalue), colour = OE_signif_vector)) +
+  geom_point(aes(x = log2FoldChange, y = -log10(pvalue), colour = significant_OE)) +
   ggtitle("Mov10 overexpression") +
   xlab("log2 fold change") + 
   ylab("-log10 p-value") +
@@ -268,25 +268,23 @@ This is a great way to get an overall picture of what is going on, but we may al
 
 This same type of labeling technique can also be used to label the top lowest or highest genes sorted by any variable in our results dataframe (e.g. basemean, raw pvalue, log2foldchange etc).
 
-We are going to label those dots with the gene name on the Volcano plot using `geom_text_repel()`.
+We are going to label those dots with the gene name on the Volcano plot using `geom_text_repel()`. Preparing for this will take a few steps in Base R:
 
-This will take a few steps in Base R:
-
--   Add an additional column to our results dataframe, to put those gene names we want to use to label the plot.
+-   Add an additional column to our current plotting dataframe, to put those gene names we want to use to label the plot.
 
 -   We need to order the res_tableOE by `padj`
 
 -   Fill the new empty column with values from the `symbol` column just for the top 10 genes in the sorted dataframe
 
 ``` r
-## Create an empty column to indicate which genes to label
-res_tableOE_plotting <- res_tableOE_plotting %>% dplyr::mutate(genelabels = "")
+# Create an empty column
+res_OE_df_plotting$genelabels <- ""
 
-## Sort by padj values 
-res_tableOE_plotting <- res_tableOE_plotting %>% dplyr::arrange(padj)
+# Sort by padj values
+res_OE_df_plotting <- res_OE_df_plotting[order(res_OE_df_plotting$padj), ]
 
 ## Populate the genelabels column with contents of the gene symbols column for the first 10 rows, i.e. the top 10 most significantly expressed genes
-res_tableOE_plotting$genelabels[1:10] <- as.character(res_tableOE_plotting$symbol[1:10])
+res_OE_df_plotting$genelabels[1:10] <- as.character(res_OE_df_plotting$symbol[1:10])
 
 View(res_tableOE_plotting)
 ```
@@ -294,18 +292,17 @@ View(res_tableOE_plotting)
 Next, we plot it as before with an additional layer for `geom_text_repel()` wherein we can specify the column of gene labels we just created.
 
 ``` r
-ggplot(res_tableOE_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
-    geom_point(aes(colour = threshold_OE)) +
+ggplot(res_OE_df_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
+    geom_point(aes(colour = significant_OE)) +
     geom_text_repel(aes(label = genelabels)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
     ylab("-log10 adjusted p-value") +
-    theme(legend.position = "none",
-          plot.title = element_text(size = rel(1.5), hjust = 0.5),
+    theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.title = element_text(size = rel(1.25))) 
 ```
 
-<img src="../img/mov10_oe_labeled_volcano.png" width="500"/>
+<img src="../img/volcano_top10_labeled.png" alt="volcano plot top 10 genes with lowest adjusted p-values labeled" width="600"/>
 
 ### Selecting Your Own Gene
 
