@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson03_summarizing_dge_results.html" />
 <meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
+<meta property="article:published_time" content="2025-05-01T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Summarizing results from the Wald test" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, adapted by Sally Chang at NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"Summarizing results from the Wald test","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson03_summarizing_dge_results.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson03_summarizing_dge_results.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, adapted by Sally Chang at NICHD"},"dateModified":"2025-05-01T00:00:00+00:00","datePublished":"2025-05-01T00:00:00+00:00","headline":"Summarizing results from the Wald test","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson03_summarizing_dge_results.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson03_summarizing_dge_results.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=26e0caee14155ed67cce7fd2eb58cc89086563d5">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=8c143c188055d00073380adb35aa58b7a3534df5">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -62,9 +62,6 @@
     <main id="content" class="main-content" role="main">
       <p>Approximate time: 30 minutes</p>
 
-<h3 id="note">NOTE:</h3>
-<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
-
 <h2 id="learning-objectives">Learning Objectives</h2>
 
 <ul>
@@ -74,10 +71,38 @@
 
 <h2 id="getting-back-up-to-speed"><strong>Getting Back up to Speed</strong></h2>
 
-<p>You need to have the <code class="language-plaintext highlighter-rouge">res_tableOE</code> object in your environment. Assuming that you at least have our <code class="language-plaintext highlighter-rouge">dds</code> object, you can run:</p>
+<p>You need to have the <code class="language-plaintext highlighter-rouge">res_tableOE</code> object in your environment. If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don’t already have the files in your <code class="language-plaintext highlighter-rouge">/data</code> directory, please see <a href="../wk5_lesson01_introR_Rstudio.md">Wk 5 Lesson 01</a> for instructions on where to obtain the input files.</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">contrast_oe</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MOV10_overexpression"</span><span class="p">,</span><span class="w"> </span><span class="s2">"control"</span><span class="p">)</span><span class="w">
-</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">contrast</span><span class="o">=</span><span class="n">contrast_oe</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="p">)</span><span class="w">
+<p>Remember to get your HPC On Demand session going, if applicable, and open your <code class="language-plaintext highlighter-rouge">DEAnalysis</code> R project!</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Gene-level differential expression analysis using DESeq2</span><span class="w">
+
+</span><span class="c1"># Setup</span><span class="w">
+</span><span class="c1"># Bioconductor and CRAN libraries used - already installed on Biowulf</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">RColorBrewer</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DESeq2</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pheatmap</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">ggrepel</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DEGreport</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Load in data</span><span class="w">
+</span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_featurecounts.Rmatrix.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="n">meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_metadata.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Create DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeqDataSetFromMatrix</span><span class="p">(</span><span class="n">countData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">colData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">sampletype</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Run analysis. This does a lot!</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#Set up control vs. OE contrast</span><span class="w">
+</span><span class="n">contrast_oe</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MOV10_overexpression"</span><span class="p">,</span><span class="w"> </span><span class="s2">"control"</span><span class="p">)</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">contrast</span><span class="o">=</span><span class="n">contrast_oe</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#LFC shrinking</span><span class="w">
+</span><span class="n">res_tableOE_unshrunken</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE</span><span class="w">
 </span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lfcShrink</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">coef</span><span class="o">=</span><span class="s2">"sampletype_MOV10_overexpression_vs_control"</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="o">=</span><span class="s2">"apeglm"</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
@@ -115,9 +140,7 @@ low counts [2]     : 22701, 52%
 <p>We can easily subset the results table to only include those that are significant using the <code class="language-plaintext highlighter-rouge">filter()</code> function, and merge a data frame from the</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a dataframe to simplify the res_tableOE object. What do you think is happening in rownames_to_columns()?</span><span class="w">
-</span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-  </span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-  </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+</span><span class="n">res_OE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">),</span><span class="w"> </span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
 <p><em>Wouldn’t it be nice if we could have gene symbols associated with each of our genes instead of just the Ensembl gene IDs?</em></p>
@@ -126,7 +149,7 @@ low counts [2]     : 22701, 52%
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Convert our GTF to a large data frame.</span><span class="w">
 </span><span class="n">library</span><span class="p">(</span><span class="n">rtracklayer</span><span class="p">)</span><span class="w">
-</span><span class="n">gtf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">readGFF</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_jan2025/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf"</span><span class="p">)</span><span class="w">
+</span><span class="n">gtf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">readGFF</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_mov10/human_GRCh38/gencode.v47.primary_assembly.annotation.gtf"</span><span class="p">)</span><span class="w">
 
 </span><span class="c1"># Extract only the columns with ensembl gene names and gene symbols</span><span class="w">
 </span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">gtf</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">dplyr</span><span class="o">::</span><span class="n">select</span><span class="p">(</span><span class="n">gene_id</span><span class="p">,</span><span class="w"> </span><span class="n">gene_name</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
@@ -134,8 +157,8 @@ low counts [2]     : 22701, 52%
   </span><span class="n">dplyr</span><span class="o">::</span><span class="n">rename</span><span class="p">(</span><span class="n">ensgene</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gene_id</span><span class="p">,</span><span class="w"> </span><span class="n">symbol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gene_name</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Next time, just read in this TSV</span><span class="w">
-</span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Next time, just read in this tab-separated data file</span><span class="w">
+</span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
 <blockquote>
@@ -145,14 +168,13 @@ low counts [2]     : 22701, 52%
 <p>Now we merge these two data frames by their columns that each contain Ensembl Gene IDs:</p>
 
 <pre><code class="language-{r}">#merge gene symbols
-res_tableOE_df &lt;- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene")
+res_OE_df &lt;- merge(gtf_names,res_OE_df, by.x="ensgene", by.y="gene")
 </code></pre>
 
 <p>Now we can subset that table to only keep the significant genes using our pre-defined thresholds:</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Subset the dataframe to keep only significant genes </span><span class="w">
-</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-        </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">)</span><span class="w">
+</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_OE_df</span><span class="p">[</span><span class="n">res_OE_df</span><span class="o">$</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">,]</span><span class="w">
 </span></code></pre></div></div>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Take a quick look at this dataframe</span><span class="w">
@@ -174,7 +196,7 @@ res_tableOE_df &lt;- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene"
 
 <p>Let’s say we wanted to save our <code class="language-plaintext highlighter-rouge">res_tableOE_df</code> object as a table so we could read it in again later. Let’s use the following command:</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">write.table</span><span class="p">(</span><span class="n">res_tableOE_df</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"res_tableOE_df.tsv"</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"\t"</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">col.names</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">quote</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">write.table</span><span class="p">(</span><span class="n">res_OE_df</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"res_OE_df.tsv"</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"\t"</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">col.names</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">quote</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
 <p><strong>Discussion:</strong> What do the different arguments mean? How can we access help documentation about <code class="language-plaintext highlighter-rouge">write.table()</code>?</p>
@@ -198,20 +220,20 @@ res_tableOE_df &lt;- merge(gtf_names,res_tableOE_df, by.x="ensgene", by.y="gene"
 
 <p>In summary, to help prepare for the <a href="/intro-rnaseq-hpc/lessons/wk7_lesson04_visualizing_results.html">next lesson</a>, you can add the following to your script along with the code required to create the <code class="language-plaintext highlighter-rouge">sigKD</code> object:</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">padj.cutoff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.1</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Set thresholds</span><span class="w">
+</span><span class="n">padj.cutoff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.1</span><span class="w">
 
-</span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-</span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-</span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+</span><span class="c1">#formatting res_OE_df </span><span class="w">
+</span><span class="n">res_OE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">),</span><span class="w"> </span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
 
-</span><span class="c1">## Next time, just read in this TSV</span><span class="w">
+</span><span class="c1">#import relevant parts of GTF file</span><span class="w">
 </span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
 
-</span><span class="c1"># merge gene names</span><span class="w">
-</span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">gtf_names</span><span class="p">,</span><span class="n">res_tableOE_df</span><span class="p">,</span><span class="w"> </span><span class="n">by.x</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">by.y</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+</span><span class="c1">#merge gene symbols</span><span class="w">
+</span><span class="n">res_OE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">gtf_names</span><span class="p">,</span><span class="n">res_OE_df</span><span class="p">,</span><span class="w"> </span><span class="n">by.x</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">by.y</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
 
-</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">)</span><span class="w">
+</span><span class="c1"># Subset the dataframe to keep only significant genes </span><span class="w">
+</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_OE_df</span><span class="p">[</span><span class="n">res_OE_df</span><span class="o">$</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">,]</span><span class="w">
 </span></code></pre></div></div>
 
 <hr />

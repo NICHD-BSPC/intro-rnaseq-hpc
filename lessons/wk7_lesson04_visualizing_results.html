@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson04_visualizing_results.html" />
 <meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2025-04-01T00:00:00+00:00" />
+<meta property="article:published_time" content="2025-05-01T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Advanced visualizations" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, adapted by Sally Chang at NICHD"},"dateModified":"2025-04-01T00:00:00+00:00","datePublished":"2025-04-01T00:00:00+00:00","headline":"Advanced visualizations","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson04_visualizing_results.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson04_visualizing_results.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, adapted by Sally Chang at NICHD"},"dateModified":"2025-05-01T00:00:00+00:00","datePublished":"2025-05-01T00:00:00+00:00","headline":"Advanced visualizations","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson04_visualizing_results.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk7_lesson04_visualizing_results.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=26e0caee14155ed67cce7fd2eb58cc89086563d5">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=8c143c188055d00073380adb35aa58b7a3534df5">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -62,9 +62,6 @@
     <main id="content" class="main-content" role="main">
       <p>Approximate time: 75 minutes</p>
 
-<h3 id="note">NOTE:</h3>
-<p>To make names more generalized for the next course, <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_jan2025</code> is now <code class="language-plaintext highlighter-rouge">/data/Bspc-training/shared/rnaseq_mov10</code> . Make sure to edit any scripts that refer to the shared data!</p>
-
 <h2 id="learning-objectives">Learning Objectives</h2>
 
 <ul>
@@ -78,7 +75,65 @@
 
 <p>When we are working with large amounts of data it can be useful to display that information graphically to gain more insight. During this lesson, we will get you started with some basic and more advanced plots commonly used when exploring differential gene expression data, however, many of these plots can be helpful in visualizing other types of data as well.</p>
 
-<h2 id="assembling-our-data">Assembling our Data</h2>
+<h2 id="catch-up-script">Catch-Up Script</h2>
+
+<p>You need to have the <code class="language-plaintext highlighter-rouge">res_tableOE</code> object in your environment. If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don’t already have the files in your <code class="language-plaintext highlighter-rouge">/data</code> directory, please see <a href="../wk5_lesson01_introR_Rstudio.md">Wk 5 Lesson 01</a> for instructions on where to obtain the input files.</p>
+
+<p>Remember to get your HPC On Demand session going, if applicable, and open your <code class="language-plaintext highlighter-rouge">DEAnalysis</code> R project!</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Setup</span><span class="w">
+</span><span class="c1"># Bioconductor and CRAN libraries used - already installed on Biowulf</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">RColorBrewer</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DESeq2</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pheatmap</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">BiocManager</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Load in data</span><span class="w">
+</span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_featurecounts.Rmatrix.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="n">meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_metadata.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Create DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeqDataSetFromMatrix</span><span class="p">(</span><span class="n">countData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">colData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">sampletype</span><span class="p">)</span><span class="w"> 
+
+</span><span class="c1"># Run DESeq2 on DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Likelihood ratio test</span><span class="w">
+</span><span class="n">dds_lrt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">test</span><span class="o">=</span><span class="s2">"LRT"</span><span class="p">,</span><span class="w"> </span><span class="n">reduced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">## Define overexpression vs. control contrast for Wald Test</span><span class="w">
+</span><span class="n">contrast_oe</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MOV10_overexpression"</span><span class="p">,</span><span class="w"> </span><span class="s2">"control"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">## Extract results for MOV10 overexpression vs control</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">contrast</span><span class="o">=</span><span class="n">contrast_oe</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#Set up control vs. OE contrast</span><span class="w">
+</span><span class="n">contrast_oe</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MOV10_overexpression"</span><span class="p">,</span><span class="w"> </span><span class="s2">"control"</span><span class="p">)</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">contrast</span><span class="o">=</span><span class="n">contrast_oe</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#LFC shrinking</span><span class="w">
+</span><span class="n">res_tableOE_unshrunken</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lfcShrink</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">coef</span><span class="o">=</span><span class="s2">"sampletype_MOV10_overexpression_vs_control"</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="o">=</span><span class="s2">"apeglm"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">### Set thresholds</span><span class="w">
+</span><span class="n">padj.cutoff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.1</span><span class="w">
+
+</span><span class="c1">#formatting res_OE_df </span><span class="w">
+</span><span class="n">res_OE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">),</span><span class="w"> </span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#import relevant parts of GTF file</span><span class="w">
+</span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#merge gene symbols</span><span class="w">
+</span><span class="n">res_OE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">gtf_names</span><span class="p">,</span><span class="n">res_OE_df</span><span class="p">,</span><span class="w"> </span><span class="n">by.x</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">by.y</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Subset the dataframe to keep only significant genes </span><span class="w">
+</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_OE_df</span><span class="p">[</span><span class="n">res_OE_df</span><span class="o">$</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">,]</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="assembling-additional-data-for-visualization">Assembling Additional Data for Visualization</h2>
 
 <p>We will be working with three different data objects we have already created in earlier lessons or will re-create now:</p>
 
@@ -86,24 +141,21 @@
 
 <p>Create a version of our metadata that moves the rownames to a column called <code class="language-plaintext highlighter-rouge">samplename</code> because some of the visualization software expects that:</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mov10_meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-              </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="s2">"samplename"</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mov10_meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">var</span><span class="o">=</span><span class="s2">"samplename"</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
 <p><strong>GTF info columns:</strong></p>
 
 <p>If you don’t already have this, you can read in the file we created in the last lesson:</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_jan2025/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
 <p><strong>Normalized count data (matrix):</strong> Normalized expression data for every gene in each of our samples (a matrix): <code class="language-plaintext highlighter-rouge">normalized_counts</code> . Next, let’s bring in a column with gene symbols to the <code class="language-plaintext highlighter-rouge">normalized_counts</code> object, so we can use them to label our plots. Ensembl IDs are great for many things, but the gene symbols are much more recognizable to us, as biologists</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># DESeq2 creates a matrix when you use the counts() function</span><span class="w">
 </span><span class="c1">## First convert normalized_counts to a data frame and transfer the row names to a new column called "gene"</span><span class="w">
-</span><span class="n">normalized_counts</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">counts</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">normalized</span><span class="o">=</span><span class="nb">T</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-                     </span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-                     </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w"> 
+</span><span class="n">normalized_counts</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">counts</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">normalized</span><span class="o">=</span><span class="nb">T</span><span class="p">)),</span><span class="w"> </span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
 
 </span><span class="c1">## This will bring in a column of gene symbols and merge by Ensembl gene names</span><span class="w">
 </span><span class="n">normalized_counts</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">gtf_names</span><span class="p">,</span><span class="w"> </span><span class="n">normalized_counts</span><span class="p">,</span><span class="w"> </span><span class="n">by.x</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">by.y</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
@@ -111,13 +163,6 @@
 </span><span class="c1">#So we don't need to do this again next time, let's write the normalized counts data frame we just created to a file:</span><span class="w">
 
 </span><span class="n">write.table</span><span class="p">(</span><span class="n">normalized_counts</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="o">=</span><span class="s2">"normalized_counts.txt"</span><span class="p">,</span><span class="w">  </span><span class="n">col.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">quote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"\t"</span><span class="p">)</span><span class="w">
-</span></code></pre></div></div>
-
-<p><strong>DESeq2 results dataframe:</strong></p>
-
-<p>If you don’t already have this, you can read in the file we created in the last lesson:</p>
-
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"res_tableOE_df.tsv"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
 <h2 id="plotting-significant-de-genes">Plotting significant DE genes</h2>
@@ -154,7 +199,7 @@
 </span><span class="n">mov10_counts</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">plotCounts</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">gene</span><span class="o">=</span><span class="s2">"ENSG00000155363.19"</span><span class="p">,</span><span class="w"> </span><span class="n">intgroup</span><span class="o">=</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="n">returnData</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
 
 </span><span class="c1"># What is the data output of plotCounts()?</span><span class="w">
-</span><span class="n">mov10_counts</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">View</span><span class="p">()</span><span class="w">
+</span><span class="n">View</span><span class="p">(</span><span class="n">mov10_counts</span><span class="p">)</span><span class="w">
 
 </span><span class="c1"># Plot the MOV10 normalized counts, using the samplenames (rownames(d) as labels)</span><span class="w">
 </span><span class="n">ggplot</span><span class="p">(</span><span class="n">mov10_counts</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sampletype</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sampletype</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> 
@@ -179,17 +224,10 @@
 
 <h3 id="heatmap">Heatmap</h3>
 
-<p>In addition to plotting subsets, we could also extract the normalized values of <em>all</em> the significant genes and plot a heatmap of their expression using <code class="language-plaintext highlighter-rouge">pheatmap()</code>. Remember that <code class="language-plaintext highlighter-rouge">sig0E</code> is a data object from the previous lessons.</p>
+<p>In addition to plotting subsets, we could also extract the normalized values of <em>all</em> the significant genes and plot a heatmap of their expression using <code class="language-plaintext highlighter-rouge">pheatmap()</code>. Remember that <code class="language-plaintext highlighter-rouge">sig0E</code> is a data object from the previous lessons (see catch-up script at beginning of lesson)</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### If you need to regenerate sigOE</span><span class="w">
-</span><span class="c1"># Subset the tibble to keep only significant genes </span><span class="w">
-</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE_tb</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0.1</span><span class="p">)</span><span class="w">
-</span></code></pre></div></div>
-
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Extract normalized expression for significant genes from the OE and control samples (3:5 and 8:10)</span><span class="w">
-</span><span class="n">norm_OEsig</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">normalized_counts</span><span class="p">[,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">,</span><span class="m">8</span><span class="o">:</span><span class="m">10</span><span class="p">)]</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">ensgene</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">sigOE</span><span class="o">$</span><span class="n">ensgene</span><span class="p">)</span><span class="w"> 
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">### Extract normalized expression for significant genes from the OE and control samples (held in columns 3:5 and 8:10 of our normalized counts)</span><span class="w">
+</span><span class="n">norm_OEsig</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">normalized_counts</span><span class="p">[</span><span class="n">normalized_counts</span><span class="o">$</span><span class="n">ensgene</span><span class="w"> </span><span class="o">%in%</span><span class="w"> </span><span class="n">sigOE</span><span class="o">$</span><span class="n">ensgene</span><span class="p">,</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">,</span><span class="m">8</span><span class="o">:</span><span class="m">10</span><span class="p">)]</span><span class="w">
 </span></code></pre></div></div>
 
 <p>Now let’s draw the heatmap using <code class="language-plaintext highlighter-rouge">pheatmap</code>:</p>
@@ -220,27 +258,24 @@
 
 <h2 id="volcano-plot">Volcano plot</h2>
 
-<p>Getting ready:</p>
-<ul>
-  <li>Start HPC on Demand with 8GB of memory</li>
-  <li>If you need to get caught up with your environment, you can use <a href="https://github.com/NICHD-BSPC/intro-rnaseq-hpc/blob/main/scripts/de_setup_Week7_lesson04.R">this script</a></li>
-</ul>
-
 <p>The above plot would be great to look at the expression levels of a good number of genes, but for more of a global view there are other plots we can draw. A commonly used one is a volcano plot; in which you have the log transformed adjusted p-values plotted on the y-axis and log2 fold change values on the x-axis.</p>
 
 <p>To generate a volcano plot, we first need to have a column in our results data indicating whether or not the gene is considered differentially expressed based on p-adjusted values and we will include a log2fold change here.</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Obtain logical vector where TRUE values denote padj values &lt; 0.05 and fold change &gt; 1.5 in either direction</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Obtain logical vector where TRUE values denote padj values &lt; 0.05 and fold change &gt; 1.5 in either direction (meaning log2FC &gt;= 0.58)</span><span class="w">
+</span><span class="n">OE_signif_vector</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_OE_df</span><span class="o">$</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0.1</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nf">abs</span><span class="p">(</span><span class="n">res_OE_df</span><span class="o">$</span><span class="n">log2FoldChange</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0.58</span><span class="w">
 
-</span><span class="n">res_tableOE_plotting</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-                  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">mutate</span><span class="p">(</span><span class="n">threshold_OE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0.1</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nf">abs</span><span class="p">(</span><span class="n">log2FoldChange</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0.58</span><span class="p">)</span><span class="w">
+</span><span class="c1">## Add this vector as a new column to create version of res_OE_df for custom plots</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cbind</span><span class="p">(</span><span class="n">res_OE_df</span><span class="p">,</span><span class="w"> </span><span class="n">OE_signif_vector</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
 <p>Now we can start plotting. The <code class="language-plaintext highlighter-rouge">geom_point</code> object is most applicable, as this is essentially a scatter plot:</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Volcano plot</span><span class="w">
-</span><span class="n">ggplot</span><span class="p">(</span><span class="n">res_tableOE_plotting</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
-    </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log2FoldChange</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">log10</span><span class="p">(</span><span class="n">padj</span><span class="p">),</span><span class="w"> </span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">threshold_OE</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+<h3 id="volcano-plot-with-adjusted-p-values">Volcano plot with adjusted p-values</h3>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Volcano plot with adjusted p-values</span><span class="w">
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">res_OE_df_plotting</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+    </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log2FoldChange</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">log10</span><span class="p">(</span><span class="n">padj</span><span class="p">),</span><span class="w"> </span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OE_signif_vector</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
     </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Mov10 overexpression"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
     </span><span class="n">xlab</span><span class="p">(</span><span class="s2">"log2 fold change"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> 
     </span><span class="n">ylab</span><span class="p">(</span><span class="s2">"-log10 adjusted p-value"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
@@ -251,6 +286,34 @@
 </span></code></pre></div></div>
 
 <p><img src="../img/mov10_oe_unlabeled_volcano.png" width="500" /></p>
+
+<h3 id="volcano-plot-with-raw-p-values">Volcano Plot with raw p-values</h3>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">res_OE_df_plotting</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log2FoldChange</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">log10</span><span class="p">(</span><span class="n">pvalue</span><span class="p">),</span><span class="w"> </span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OE_signif_vector</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Mov10 overexpression"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">xlab</span><span class="p">(</span><span class="s2">"log2 fold change"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> 
+  </span><span class="n">ylab</span><span class="p">(</span><span class="s2">"-log10 p-value"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="c1">#scale_y_continuous(limits = c(0,50)) +</span><span class="w">
+  </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"none"</span><span class="p">,</span><span class="w">
+        </span><span class="n">plot.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.5</span><span class="p">),</span><span class="w"> </span><span class="n">hjust</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">),</span><span class="w">
+        </span><span class="n">axis.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.25</span><span class="p">)))</span><span class="w"> 
+</span></code></pre></div></div>
+
+<h3 id="volcano-plot-colored-log10basemean">Volcano Plot colored log10(basemean)</h3>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">res_OE_df_plotting</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log2FoldChange</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">log10</span><span class="p">(</span><span class="n">pvalue</span><span class="p">),</span><span class="w"> </span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log10</span><span class="p">(</span><span class="n">baseMean</span><span class="p">)))</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Mov10 overexpression"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">xlab</span><span class="p">(</span><span class="s2">"log2 fold change"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> 
+  </span><span class="n">ylab</span><span class="p">(</span><span class="s2">"-log10 p-value"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="c1">#scale_y_continuous(limits = c(0,50)) +</span><span class="w">
+  </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"none"</span><span class="p">,</span><span class="w">
+        </span><span class="n">plot.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.5</span><span class="p">),</span><span class="w"> </span><span class="n">hjust</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">),</span><span class="w">
+        </span><span class="n">axis.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.25</span><span class="p">)))</span><span class="w">  
+</span></code></pre></div></div>
+
+<h3 id="volcano-plot-with-custom-gene-list">Volcano plot with custom gene list</h3>
 
 <p>This is a great way to get an overall picture of what is going on, but what if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the Volcano plot using <code class="language-plaintext highlighter-rouge">geom_text_repel()</code>.</p>
 
