@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=5a118bb569fcf41f3490d4a70ae5b1bd69db2f00">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=42d3de09715f117c8743fbeef1a0df4a8105d393">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -362,29 +362,35 @@
 
 <h3 id="selecting-your-own-gene">Selecting Your Own Gene</h3>
 
-<p>What if you want to select your own gene of interest? One way is creating a new data frame where you have added a value in the <code class="language-plaintext highlighter-rouge">genelabels</code> column just for that one symbol.</p>
+<p>What if you want to select your own gene of interest? One way is creating a new data frame where you have added a value in the <code class="language-plaintext highlighter-rouge">genelabels</code> column just for that one symbol. In this example, I am using a gene symbol called <code class="language-plaintext highlighter-rouge">HOX3A</code>.</p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">res_tableOE_df</span><span class="p">[</span><span class="n">res_tableOE_tb</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"Mygene"</span><span class="p">,</span><span class="w"> </span><span class="s2">"genelabels"</span><span class="p">]</span><span class="w">
+<p>Preparing for this will take a few steps in Base R:</p>
 
-</span><span class="n">res_tableOE_mygene</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE_df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">mutate</span><span class="p">(</span><span class="n">threshold_OE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0.1</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nf">abs</span><span class="p">(</span><span class="n">log2FoldChange</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0.58</span><span class="p">)</span><span class="w">
+<ul>
+  <li>
+    <p>Add an additional empty column called <code class="language-plaintext highlighter-rouge">my_genelabels</code> to our current plotting dataframe, to put those gene names we want to use to label the plot</p>
+  </li>
+  <li>
+    <p>Assign value just to the one relevant empty <code class="language-plaintext highlighter-rouge">my_genelabel</code> slot! You can use a strategy like this in other data frames and with other genes - or whole custom lists of genes.</p>
+  </li>
+</ul>
 
-</span><span class="n">res_tableOE_mygene</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE_mygene</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">dplyr</span><span class="o">::</span><span class="n">mutate</span><span class="p">(</span><span class="n">genelabels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">""</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a new empty column</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="o">$</span><span class="n">my_genelabels</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">""</span><span class="w">
 
-</span><span class="c1"># Assign value just to that one empty genelabel slot! You can use a strategy like this in other data frames and with other genes - or whole custom lists of genes. </span><span class="w">
-</span><span class="n">res_tableOE_mygene</span><span class="p">[</span><span class="n">res_tableOE_mygene</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"HOXA3"</span><span class="p">,</span><span class="w"> </span><span class="s2">"genelabels"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"HOXA3"</span><span class="w">
+</span><span class="c1"># Assign value just to that one empty genelabel slot where symbol == HOXA3</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="p">[</span><span class="n">res_OE_df_plotting</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"HOXA3"</span><span class="p">,</span><span class="w"> </span><span class="s2">"genelabels"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"HOXA3"</span><span class="w">
 </span></code></pre></div></div>
 
 <p><strong>Now let’s check this out in a volcano plot:</strong></p>
 
-<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">res_tableOE_mygene</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log2FoldChange</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">log10</span><span class="p">(</span><span class="n">padj</span><span class="p">)))</span><span class="w"> </span><span class="o">+</span><span class="w">
-    </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">threshold_OE</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
-    </span><span class="n">geom_text_repel</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">genelabels</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">res_OE_df_plotting</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log2FoldChange</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">log10</span><span class="p">(</span><span class="n">padj</span><span class="p">)))</span><span class="w"> </span><span class="o">+</span><span class="w">
+    </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">significant_OE</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+    </span><span class="n">geom_text_repel</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_genelabels</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
     </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Mov10 overexpression"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
     </span><span class="n">xlab</span><span class="p">(</span><span class="s2">"log2 fold change"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> 
     </span><span class="n">ylab</span><span class="p">(</span><span class="s2">"-log10 adjusted p-value"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
-    </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"none"</span><span class="p">,</span><span class="w">
-          </span><span class="n">plot.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.5</span><span class="p">),</span><span class="w"> </span><span class="n">hjust</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">),</span><span class="w">
+    </span><span class="n">theme</span><span class="p">(</span><span class="n">plot.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.5</span><span class="p">),</span><span class="w"> </span><span class="n">hjust</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">),</span><span class="w">
           </span><span class="n">axis.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.25</span><span class="p">)))</span><span class="w"> 
 </span></code></pre></div></div>
 
@@ -392,15 +398,14 @@
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">options</span><span class="p">(</span><span class="n">ggrepel.max.overlaps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Inf</span><span class="p">)</span><span class="w">
 
-</span><span class="n">ggplot</span><span class="p">(</span><span class="n">res_tableOE_mygene</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log2FoldChange</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">log10</span><span class="p">(</span><span class="n">padj</span><span class="p">)))</span><span class="w"> </span><span class="o">+</span><span class="w">
-    </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">threshold_OE</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
-    </span><span class="n">geom_text_repel</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">genelabels</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">res_OE_df_plotting</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log2FoldChange</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">log10</span><span class="p">(</span><span class="n">padj</span><span class="p">)))</span><span class="w"> </span><span class="o">+</span><span class="w">
+    </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">significant_OE</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+    </span><span class="n">geom_text_repel</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">my_genelabels</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
     </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Mov10 overexpression"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
     </span><span class="n">xlab</span><span class="p">(</span><span class="s2">"log2 fold change"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> 
     </span><span class="n">ylab</span><span class="p">(</span><span class="s2">"-log10 adjusted p-value"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
-    </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"none"</span><span class="p">,</span><span class="w">
-          </span><span class="n">plot.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.5</span><span class="p">),</span><span class="w"> </span><span class="n">hjust</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">),</span><span class="w">
-          </span><span class="n">axis.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.25</span><span class="p">)))</span><span class="w"> 
+    </span><span class="n">theme</span><span class="p">(</span><span class="n">plot.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.5</span><span class="p">),</span><span class="w"> </span><span class="n">hjust</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">),</span><span class="w">
+          </span><span class="n">axis.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.25</span><span class="p">)))</span><span class="w">  
 </span></code></pre></div></div>
 
 <p><img src="../img/hox3a_labeled_volcano.png" width="500" /></p>
@@ -412,19 +417,35 @@
 <p>Switching from a volcano plot to an MA plot is pretty easy! Let’s fill in this script together with the correct X and Y variables, and create axes labels to match:</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">res_tableOE_plotting</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
-  </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">threshold_OE</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_point</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">colour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">significant_OE</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
   </span><span class="n">geom_text_repel</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">genelabels</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
-  </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Mov10 overexpression"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"MA Plot:Mov10 overexpression"</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
   </span><span class="n">xlab</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> 
   </span><span class="n">ylab</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
-  </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"none"</span><span class="p">,</span><span class="w">
-        </span><span class="n">plot.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.5</span><span class="p">),</span><span class="w"> </span><span class="n">hjust</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">),</span><span class="w">
+  </span><span class="n">theme</span><span class="p">(</span><span class="n">plot.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.5</span><span class="p">),</span><span class="w"> </span><span class="n">hjust</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.5</span><span class="p">),</span><span class="w">
         </span><span class="n">axis.title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">element_text</span><span class="p">(</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rel</span><span class="p">(</span><span class="m">1.25</span><span class="p">)))</span><span class="w">
 </span></code></pre></div></div>
 
 <p>If we do this correctly, we should have a something like the following - depending on what you have saved as your <code class="language-plaintext highlighter-rouge">genelabels</code> variable and how big your plot window is:</p>
 
-<p><img src="../img/mov10_ggplot_maplot.png" width="450" /></p>
+<p><img src="../img/maplot_solution.png" alt="MA plot with top 10 DE genes labeled for overexpression comparison" width="600" /></p>
+
+<details>
+
+<summary>Code Solution:</summary>
+
+``` r
+ggplot(res_OE_df_plotting, aes(x = log(baseMean) , y = log2FoldChange)) +
+  geom_point(aes(colour = significant_OE)) +
+  geom_text_repel(aes(label = genelabels)) +
+  ggtitle("MA Plot for Mov10 overexpression contrast") +
+  xlab("log of meant counts") + 
+  ylab("log2FoldChange") +
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        axis.title = element_text(size = rel(1.25)))
+```
+
+</details>
 
 <h2 id="assignment-option-2"><strong>ASSIGNMENT OPTION 2</strong>:</h2>
 
@@ -434,13 +455,13 @@
 
 <hr />
 
+<h3 id="an-r-package-for-visualization-of-dge-results">An R package for visualization of DGE results</h3>
+
+<p>The Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/DEGreport.html"><code class="language-plaintext highlighter-rouge">DEGreport</code></a> can use the DESeq2 results output to make the top20 genes and the volcano plots generated above by writing much fewer lines of code. The caveat of these functions is you lose the ability to customize plots as we have demonstrated above.</p>
+
+<p>If you are interested, the example code below shows how you can use DEGreport to create similar plots. <strong>Note that this is example code, do not run.</strong></p>
+
 <blockquote>
-  <h3 id="an-r-package-for-visualization-of-dge-results">An R package for visualization of DGE results</h3>
-
-  <p>The Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/DEGreport.html"><code class="language-plaintext highlighter-rouge">DEGreport</code></a> can use the DESeq2 results output to make the top20 genes and the volcano plots generated above by writing much fewer lines of code. The caveat of these functions is you lose the ability to customize plots as we have demonstrated above.</p>
-
-  <p>If you are interested, the example code below shows how you can use DEGreport to create similar plots. <strong>Note that this is example code, do not run.</strong></p>
-
   <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## load degreport</span><span class="w">
 </span><span class="n">library</span><span class="p">(</span><span class="n">degreport</span><span class="p">)</span><span class="w">
 </span></code></pre></div>  </div>
@@ -456,6 +477,34 @@
 </span><span class="n">DEGreport</span><span class="o">::</span><span class="n">degPlotWide</span><span class="p">(</span><span class="n">dds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">genes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">row.names</span><span class="p">(</span><span class="n">res</span><span class="p">)[</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">],</span><span class="w"> </span><span class="n">group</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"condition"</span><span class="p">)</span><span class="w">
 </span></code></pre></div>  </div>
 </blockquote>
+
+<h2 id="summary-script-from-this-lesson">Summary script from this lesson</h2>
+
+<p>Today, we didn’t create any new data objects required for the next lesson. However, if you want to save the commands we used to generate the custom data frames for plotting, you can save relevant lines from below:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Obtain logical vector where TRUE values denote padj values &lt; 0.05 and fold change &gt; 1.5 in either direction (meaning log2FC &gt;= 0.58)</span><span class="w">
+</span><span class="n">significant_OE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_OE_df</span><span class="o">$</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0.1</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nf">abs</span><span class="p">(</span><span class="n">res_OE_df</span><span class="o">$</span><span class="n">log2FoldChange</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0.58</span><span class="w">
+
+</span><span class="c1">## Add this vector as a new column to create version of res_OE_df for custom plots</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cbind</span><span class="p">(</span><span class="n">res_OE_df</span><span class="p">,</span><span class="w"> </span><span class="n">significant_OE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Create an empty column</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="o">$</span><span class="n">genelabels</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">""</span><span class="w">
+
+</span><span class="c1"># Sort by padj values</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_OE_df_plotting</span><span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="n">res_OE_df_plotting</span><span class="o">$</span><span class="n">padj</span><span class="p">),</span><span class="w"> </span><span class="p">]</span><span class="w">
+
+</span><span class="c1">## Populate the genelabels column with contents of the gene symbols column for the first 10 rows, i.e. the top 10 most significantly expressed genes</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="o">$</span><span class="n">genelabels</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.character</span><span class="p">(</span><span class="n">res_OE_df_plotting</span><span class="o">$</span><span class="n">symbol</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">10</span><span class="p">])</span><span class="w">
+
+</span><span class="c1"># Create a new empty column</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="o">$</span><span class="n">my_genelabels</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">""</span><span class="w">
+
+</span><span class="c1"># Assign value just to that one empty genelabel slot where symbol == HOXA3</span><span class="w">
+</span><span class="n">res_OE_df_plotting</span><span class="p">[</span><span class="n">res_OE_df_plotting</span><span class="o">$</span><span class="n">symbol</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"HOXA3"</span><span class="p">,</span><span class="w"> </span><span class="s2">"genelabels"</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"HOXA3"</span><span class="w">
+</span></code></pre></div></div>
+
+<p>You may also want to save the commands for creating the plots themselves!</p>
 
 <hr />
 
