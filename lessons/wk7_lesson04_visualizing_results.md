@@ -306,31 +306,32 @@ ggplot(res_OE_df_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
 
 ### Selecting Your Own Gene
 
-What if you want to select your own gene of interest? One way is creating a new data frame where you have added a value in the `genelabels` column just for that one symbol.
+What if you want to select your own gene of interest? One way is creating a new data frame where you have added a value in the `genelabels` column just for that one symbol. In this example, I am using a gene symbol called `HOX3A`.
+
+Preparing for this will take a few steps in Base R:
+
+-   Add an additional empty column called `my_genelabels` to our current plotting dataframe, to put those gene names we want to use to label the plot
+
+-   Assign value just to the one relevant empty `my_genelabel` slot! You can use a strategy like this in other data frames and with other genes - or whole custom lists of genes.
 
 ``` r
-res_tableOE_df[res_tableOE_tb$symbol == "Mygene", "genelabels"]
+# Create a new empty column
+res_OE_df_plotting$my_genelabels <- ""
 
-res_tableOE_mygene <- res_tableOE_df %>% 
-  dplyr::mutate(threshold_OE = padj < 0.1 & abs(log2FoldChange) >= 0.58)
-
-res_tableOE_mygene <- res_tableOE_mygene %>% dplyr::mutate(genelabels = "")
-
-# Assign value just to that one empty genelabel slot! You can use a strategy like this in other data frames and with other genes - or whole custom lists of genes. 
-res_tableOE_mygene[res_tableOE_mygene$symbol == "HOXA3", "genelabels"] = "HOXA3"
+# Assign value just to that one empty genelabel slot where symbol == HOXA3
+res_OE_df_plotting[res_OE_df_plotting$symbol == "HOXA3", "genelabels"] = "HOXA3"
 ```
 
 **Now let's check this out in a volcano plot:**
 
 ``` r
-ggplot(res_tableOE_mygene, aes(x = log2FoldChange, y = -log10(padj))) +
+ggplot(res_OE_df_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
     geom_point(aes(colour = threshold_OE)) +
-    geom_text_repel(aes(label = genelabels)) +
+    geom_text_repel(aes(label = my_genelabels)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
     ylab("-log10 adjusted p-value") +
-    theme(legend.position = "none",
-          plot.title = element_text(size = rel(1.5), hjust = 0.5),
+    theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
           axis.title = element_text(size = rel(1.25))) 
 ```
 
@@ -339,15 +340,14 @@ But where is our gene?? Let's actually increase that overlaps parameter...
 ``` r
 options(ggrepel.max.overlaps = Inf)
 
-ggplot(res_tableOE_mygene, aes(x = log2FoldChange, y = -log10(padj))) +
+ggplot(res_OE_df_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
     geom_point(aes(colour = threshold_OE)) +
-    geom_text_repel(aes(label = genelabels)) +
+    geom_text_repel(aes(label = my_genelabels)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
     ylab("-log10 adjusted p-value") +
-    theme(legend.position = "none",
-          plot.title = element_text(size = rel(1.5), hjust = 0.5),
-          axis.title = element_text(size = rel(1.25))) 
+    theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
+          axis.title = element_text(size = rel(1.25)))  
 ```
 
 <img src="../img/hox3a_labeled_volcano.png" width="500"/>
