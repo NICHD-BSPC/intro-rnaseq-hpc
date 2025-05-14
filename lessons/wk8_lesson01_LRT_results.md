@@ -1,7 +1,7 @@
 ---
 title: "DGE analysis using LRT in DESeq2"
 author: "Harvard HPC Staff, Adapted by Sally Chang at NICHD"
-date: "Last Modified March 2025"
+date: "Last Modified May 2025"
 ---
 
 Approximate time: 60 minutes
@@ -18,13 +18,68 @@ DESeq2 also offers the Likelihood Ratio Test as an alternative **when evaluating
 
 Generally, this test will result in a larger number of genes than the individual pair-wise comparisons. While the LRT is a test of significance for differences of any level(s) of the factor, one should not expect it to be exactly equal to the union of sets of genes using Wald tests (although we do expect a high degree of overlap).
 
+## Catch-Up Script
+
+You need to have the `res_tableOE` object in your environment. If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+Remember to get your HPC On Demand session going, if applicable, and open your `DEAnalysis` R project!
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+
+# Likelihood ratio test
+dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1)
+
+## Define overexpression vs. control contrast for Wald Test
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+
+## Extract results for MOV10 overexpression vs control
+res_tableOE <- results(dds, contrast=contrast_oe)
+
+#Set up control vs. OE contrast
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.1)
+
+#LFC shrinking
+res_tableOE_unshrunken <- res_tableOE
+res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
+
+### Set thresholds
+padj.cutoff <- 0.1
+
+#formatting res_OE_df 
+res_OE_df <- rownames_to_column(data.frame(res_tableOE), var="gene")
+
+#import relevant parts of GTF file
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt", header=TRUE)
+
+#merge gene symbols
+res_OE_df <- merge(gtf_names,res_OE_df, by.x="ensgene", by.y="gene")
+
+# Subset the dataframe to keep only significant genes 
+sigOE <- res_OE_df[res_OE_df$padj < padj.cutoff,]
+```
+
 ## The `results()` table
 
 To extract the results from our `dds_lrt` object we can use the same `results()` function we had used with the Wald test. *There is no need for contrasts since we are not making a pair-wise comparison.*
-
-> **NOTE:** In an earlier lesson on hypothesis testing, we had you create the object `dds_lrt`.
->
-> If you are **having trouble finding the object**, please run the code: `dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1 )`
 
 ``` r
 # Extract results for LRT
@@ -125,7 +180,7 @@ nrow(sigLRT_genes)
 nrow(sigOE)
 ```
 
-The number of significant genes observed from the LRT is quite high. This list includes genes that can be changing in any direction across the three factor levels (control, KO, overexpression). To reduce the number of significant genes, we can increase the stringency of our FDR threshold (`padj.cutoff`).
+This list includes genes that can be changing in any direction across the three factor levels (control, KO, overexpression). To reduce the size of this list (for processing reasons etc.) we can increase the stringency of our FDR threshold (`padj.cutoff`), or subset the top most differentially expressed genes (see below).
 
 ------------------------------------------------------------------------
 
