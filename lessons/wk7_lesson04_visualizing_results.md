@@ -326,7 +326,7 @@ res_OE_df_plotting[res_OE_df_plotting$symbol == "HOXA3", "genelabels"] = "HOXA3"
 
 ``` r
 ggplot(res_OE_df_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
-    geom_point(aes(colour = threshold_OE)) +
+    geom_point(aes(colour = significant_OE)) +
     geom_text_repel(aes(label = my_genelabels)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
@@ -341,7 +341,7 @@ But where is our gene?? Let's actually increase that overlaps parameter...
 options(ggrepel.max.overlaps = Inf)
 
 ggplot(res_OE_df_plotting, aes(x = log2FoldChange, y = -log10(padj))) +
-    geom_point(aes(colour = threshold_OE)) +
+    geom_point(aes(colour = significant_OE)) +
     geom_text_repel(aes(label = my_genelabels)) +
     ggtitle("Mov10 overexpression") +
     xlab("log2 fold change") + 
@@ -360,19 +360,35 @@ Switching from a volcano plot to an MA plot is pretty easy! Let's fill in this s
 
 ``` r
 ggplot(res_tableOE_plotting, aes(x = , y = )) +
-  geom_point(aes(colour = threshold_OE)) +
+  geom_point(aes(colour = significant_OE)) +
   geom_text_repel(aes(label = genelabels)) +
-  ggtitle("Mov10 overexpression") +
+  ggtitle("MA Plot:Mov10 overexpression") +
   xlab("") + 
   ylab("") +
-  theme(legend.position = "none",
-        plot.title = element_text(size = rel(1.5), hjust = 0.5),
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
         axis.title = element_text(size = rel(1.25)))
 ```
 
 If we do this correctly, we should have a something like the following - depending on what you have saved as your `genelabels` variable and how big your plot window is:
 
-<img src="../img/mov10_ggplot_maplot.png" width="450"/>
+<img src="../img/maplot_solution.png" alt="MA plot with top 10 DE genes labeled for overexpression comparison" width="600"/>
+
+<details>
+
+<summary>Code Solution:</summary>
+
+``` r
+ggplot(res_OE_df_plotting, aes(x = log(baseMean) , y = log2FoldChange)) +
+  geom_point(aes(colour = significant_OE)) +
+  geom_text_repel(aes(label = genelabels)) +
+  ggtitle("MA Plot for Mov10 overexpression contrast") +
+  xlab("log of meant counts") + 
+  ylab("log2FoldChange") +
+  theme(plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        axis.title = element_text(size = rel(1.25)))
+```
+
+</details>
 
 ## **ASSIGNMENT OPTION 2**:
 
@@ -382,12 +398,12 @@ Take the above steps (starting with finding the Ensembl Gene ID) for a gene symb
 
 ------------------------------------------------------------------------
 
-> ### An R package for visualization of DGE results
->
-> The Bioconductor package [`DEGreport`](https://bioconductor.org/packages/release/bioc/html/DEGreport.html) can use the DESeq2 results output to make the top20 genes and the volcano plots generated above by writing much fewer lines of code. The caveat of these functions is you lose the ability to customize plots as we have demonstrated above.
->
-> If you are interested, the example code below shows how you can use DEGreport to create similar plots. **Note that this is example code, do not run.**
->
+### An R package for visualization of DGE results
+
+The Bioconductor package [`DEGreport`](https://bioconductor.org/packages/release/bioc/html/DEGreport.html) can use the DESeq2 results output to make the top20 genes and the volcano plots generated above by writing much fewer lines of code. The caveat of these functions is you lose the ability to customize plots as we have demonstrated above.
+
+If you are interested, the example code below shows how you can use DEGreport to create similar plots. **Note that this is example code, do not run.**
+
 > ``` r
 > ## load degreport
 > library(degreport)
@@ -402,6 +418,35 @@ Take the above steps (starting with finding the Ensembl Gene ID) for a gene symb
 >
 > DEGreport::degPlotWide(dds = dds, genes = row.names(res)[1:5], group = "condition")
 > ```
+
+## Summary script from this lesson
+
+Today, we didn't create any new data objects required for the next lesson. However, if you want to save the commands we used to generate the custom data frames for plotting, you can save relevant lines from below:
+
+``` r
+## Obtain logical vector where TRUE values denote padj values < 0.05 and fold change > 1.5 in either direction (meaning log2FC >= 0.58)
+significant_OE <- res_OE_df$padj < 0.1 & abs(res_OE_df$log2FoldChange) >= 0.58
+
+## Add this vector as a new column to create version of res_OE_df for custom plots
+res_OE_df_plotting <- cbind(res_OE_df, significant_OE)
+
+# Create an empty column
+res_OE_df_plotting$genelabels <- ""
+
+# Sort by padj values
+res_OE_df_plotting <- res_OE_df_plotting[order(res_OE_df_plotting$padj), ]
+
+## Populate the genelabels column with contents of the gene symbols column for the first 10 rows, i.e. the top 10 most significantly expressed genes
+res_OE_df_plotting$genelabels[1:10] <- as.character(res_OE_df_plotting$symbol[1:10])
+
+# Create a new empty column
+res_OE_df_plotting$my_genelabels <- ""
+
+# Assign value just to that one empty genelabel slot where symbol == HOXA3
+res_OE_df_plotting[res_OE_df_plotting$symbol == "HOXA3", "genelabels"] = "HOXA3"
+```
+
+You may also want to save the commands for creating the plots themselves!
 
 ------------------------------------------------------------------------
 
