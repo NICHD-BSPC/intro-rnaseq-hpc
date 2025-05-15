@@ -1,7 +1,7 @@
 ---
 title: "DGE analysis using LRT in DESeq2"
 author: "Harvard HPC Staff, Adapted by Sally Chang at NICHD"
-date: "Last Modified March 2025"
+date: "Last Modified May 2025"
 ---
 
 Approximate time: 60 minutes
@@ -18,13 +18,68 @@ DESeq2 also offers the Likelihood Ratio Test as an alternative **when evaluating
 
 Generally, this test will result in a larger number of genes than the individual pair-wise comparisons. While the LRT is a test of significance for differences of any level(s) of the factor, one should not expect it to be exactly equal to the union of sets of genes using Wald tests (although we do expect a high degree of overlap).
 
+## Catch-Up Script
+
+You need to have the `res_tableOE` object in your environment. If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+Remember to get your HPC On Demand session going, if applicable, and open your `DEAnalysis` R project!
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+
+# Likelihood ratio test
+dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1)
+
+## Define overexpression vs. control contrast for Wald Test
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+
+## Extract results for MOV10 overexpression vs control
+res_tableOE <- results(dds, contrast=contrast_oe)
+
+#Set up control vs. OE contrast
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.1)
+
+#LFC shrinking
+res_tableOE_unshrunken <- res_tableOE
+res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
+
+### Set thresholds
+padj.cutoff <- 0.1
+
+#formatting res_OE_df 
+res_OE_df <- rownames_to_column(data.frame(res_tableOE), var="gene")
+
+#import relevant parts of GTF file
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt", header=TRUE)
+
+#merge gene symbols
+res_OE_df <- merge(gtf_names,res_OE_df, by.x="ensgene", by.y="gene")
+
+# Subset the dataframe to keep only significant genes 
+sigOE <- res_OE_df[res_OE_df$padj < padj.cutoff,]
+```
+
 ## The `results()` table
 
 To extract the results from our `dds_lrt` object we can use the same `results()` function we had used with the Wald test. *There is no need for contrasts since we are not making a pair-wise comparison.*
-
-> **NOTE:** In an earlier lesson on hypothesis testing, we had you create the object `dds_lrt`.
->
-> If you are **having trouble finding the object**, please run the code: `dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1 )`
 
 ``` r
 # Extract results for LRT
@@ -74,7 +129,9 @@ The results table output looks similar to the Wald test results, with identical 
 
 ### Why are fold changes reported for an LRT test?
 
-For analyses using the likelihood ratio test, the p-values are determined solely by the difference in deviance between the full and reduced model formula. **A single log2 fold change is printed in the results table for consistency with other results table outputs, but is not associated with the actual test. You should ignore this column in results from LRT.**
+For analyses using the likelihood ratio test, the p-values are determined solely by the difference in deviance between the full and reduced model formula. **A log2 fold change is printed in the results table for consistency with other results table outputs, but is not associated with the actual test. You should ignore this column in results from LRT.**
+
+**In fact, BSCP will convert the \`log2foldchange\` column to NA in their reports to avoid accidentally interpreting these values!**
 
 **Columns relevant to the LRT test:**
 
@@ -85,7 +142,7 @@ For analyses using the likelihood ratio test, the p-values are determined solely
 
 **Additional columns:**
 
--   `log2FoldChange`: log2 fold change
+-   `log2FoldChange`: log2 fold change: Again, not to be interpreted as part of the results!
 -   `lfcSE`: standard error
 
 > **NOTE:** Printed at the top of the the results table are the two sample groups used to generate the log2 fold change values that we observe in the results table. This can be controlled using the `name` argument; the value provided to name must be an element of resultsNames(dds).
@@ -99,9 +156,7 @@ When filtering significant genes from the LRT we put a threshold only the `padj`
 padj.cutoff <- 0.1
 
 # Create a data frame of these results
-res_LRT_df <- res_LRT %>%
-  data.frame() %>%
-  rownames_to_column(var="gene")
+res_LRT_df <- rownames_to_column(data.frame(res_LRT), var="gene")
 
 # You probably want to also have those gene symbols attached
 res_LRT_df <- merge(gtf_names,res_LRT_df, by.x="ensgene", by.y="gene") 
@@ -115,8 +170,7 @@ write.table(res_LRT_df,"res_LRT_df.tsv", sep="\t", row.names=FALSE, col.names=TR
 
 ``` r
 # Subset to return genes with padj < 0.1 
-sigLRT_genes <- res_LRT_df %>% 
-  dplyr::filter(padj < padj.cutoff)
+sigLRT_genes <- res_LRT_df[res_LRT_df$padj < padj.cutoff, ]
 
 # Get number of significant genes
 nrow(sigLRT_genes)
@@ -125,11 +179,11 @@ nrow(sigLRT_genes)
 nrow(sigOE)
 ```
 
-The number of significant genes observed from the LRT is quite high. This list includes genes that can be changing in any direction across the three factor levels (control, KO, overexpression). To reduce the number of significant genes, we can increase the stringency of our FDR threshold (`padj.cutoff`).
+This list includes genes that can be changing in any direction across the three factor levels (control, KO, overexpression). To reduce the size of this list (for processing reasons etc.) we can increase the stringency of our FDR threshold (`padj.cutoff`), or subset the top most differentially expressed genes (see below).
 
 ------------------------------------------------------------------------
 
-**In-Class Demo:**
+**Using Intersect:**
 
 1.  Compare the resulting gene list from the LRT test to the gene lists from the Wald test comparisons.
     1.  How many of the `sigLRT_genes` overlap with the significant genes in `sigOE`?
@@ -168,9 +222,7 @@ In our case, it may take some time to run the clustering on the thousands of sig
 
 ``` r
 # Subset results to top 1000 for faster cluster finding (for classroom demo purposes)
-clustering_sig_genes <- sigLRT_genes %>%
-  arrange(padj) %>%
-  head(n=1000)
+clustering_sig_genes <- head(sigLRT_genes[order(sigLRT_genes$padj), ], 1000)
 
 # Obtain rlog values for those significant genes
 cluster_rlog <- rld_mat[clustering_sig_genes$ensgene, ]
@@ -179,26 +231,27 @@ cluster_rlog <- rld_mat[clustering_sig_genes$ensgene, ]
 The rlog transformed counts for the significant genes are input to `degPatterns` along with a few additional arguments:
 
 -   `metadata`: the metadata dataframe that corresponds to samples
--   `time`: character column name in metadata that will be used as variable that changes. Does not necessarily need to be actually `time`.
--   `col`: character column name in metadata to separate samples
+-   `time`: character column name in metadata that will be used as variable that changes, and will become the x-axis of each plot panel. Does not necessarily need to be actually `time`.
+-   `col`: character column name in metadata to separate samples, and will be used to color the lines. Using `NULL` will
 
 ``` r
 # Use the `degPatterns` function from the 'DEGreport' package to show gene clusters across sample groups
+library(DEGreport)
 
 #degpatterns expects our meta variables to be factors, not characters
 meta$sampletype = as.factor(meta$sampletype)
 clusters <- degPatterns(cluster_rlog, metadata = meta, time = "sampletype", col= NULL)
 ```
 
-Once the clustering is finished running, you will get your command prompt back in the console and you should see a figure appear in your plot window. The genes have been clustered into four different groups. For each group of genes, we have a boxplot illustrating expression change across the different sample groups. A line graph is overlayed to illustrate the trend in expression change.
+Once the clustering is finished running, you will get your command prompt back in the console and you should see a figure appear in your plot window. The genes have been clustered into four different groups.
 
-<p align="center">
+For each group of genes, we have a boxplot illustrating expression change across the different sample groups. A line graph is overlayed to illustrate the trend in expression change.
 
-<img src="../img/degPatterns_figure.png" width="800"/>
+<img src="../img/lrt_boxplots.png" alt="boxplots produced by degPatterns for the four inferred clusters of genes" width="800"/>
 
-</p>
+Suppose we are interested in the genes which show a decreased expression in the knockdown samples and increase in the overexpression. The closest pattern to this might group 1, with 275 genes. However it's important to note that **the clusters do not have statistical significance.**.
 
-Suppose we are interested in the genes which show a decreased expression in the knockdown samples and increase in the overexpression. The closest pattern to this might group 1, with 275 genes. However it's important to note that **the clusters do not have statistical significance.**. That is, just because the pattern seems to have a shape where MOV10 knockdown looks to be less, this does NOT mean that these genes have signficantly decreased expression in MOV10 relative to control. To know that, we'd need to inspect the contrast that specifically compares those two conditions.
+That is, just because the pattern seems to have a shape where MOV10 knockdown looks to be less, **this does NOT mean that these genes have signficantly decreased expression in MOV10 relative to control.** To know that, we'd need to inspect the contrast that specifically compares those two conditions.
 
 But that cluster still seems interesting, so let's explore the output to see what genes those are. What type of data structure is the `clusters` output?
 
@@ -218,8 +271,7 @@ Since we are interested in Group 1, we can filter the dataframe to keep only tho
 
 ``` r
 # Extract the Group 1 genes
-group1 <- clusters$df %>%
-          dplyr::filter(cluster == 1)
+group1 <- clusters$df[clusters$df$cluster == 1, ]
 ```
 
 After extracting a group of genes, we can also re-attach the `gene symbols` and use annotation packages to obtain additional information. We can also use these lists of genes as input to downstream functional analysis tools to obtain more biological insight and see whether the groups of genes share a specific function.
@@ -281,6 +333,53 @@ clusters <- degPatterns(cluster_rlog, metadata = meta, time="time", col="treatme
 ```
 
 Depending on what type of shared expression profiles exist in your data, you can then extract the groups of genes associated with the patterns of interest and move on to functional analysis for each of the gene groups of interest.
+
+## Recap Script
+
+None of the new commands that we ran today are strictly necessary for the remaining lessons, because they focus on the Wald Test results instead of these LRT results. However, you may want to take note of the commands we used today to process your LRT results and produce relevant figures!
+
+<details>
+
+<summary>Processing LRT Results Script</summary>
+
+``` r
+# load DEGreport
+library(DEGreport)
+
+# Extract results for LRT
+res_LRT <- results(dds_lrt)
+
+# set up cutoff to match DEseq2 and BSPC default
+padj.cutoff <- 0.1
+
+# Create a data frame of these results
+res_LRT_df <- rownames_to_column(data.frame(res_LRT), var="gene")
+
+# You probably want to also have those gene symbols attached
+res_LRT_df <- merge(gtf_names,res_LRT_df, by.x="ensgene", by.y="gene") 
+
+# Check out what this looks like with `head()`
+head(res_LRT_df)
+
+# Subset to return genes with padj < 0.1 
+sigLRT_genes <- res_LRT_df[res_LRT_df$padj < padj.cutoff, ]
+
+### Transform counts for data visualization
+rld <- rlog(dds, blind=TRUE)
+rld_mat <- assay(rld)
+
+# Subset results to top 1000 for faster cluster finding (for classroom demo purposes)
+clustering_sig_genes <- head(sigLRT_genes[order(sigLRT_genes$padj), ], 1000)
+
+# Obtain rlog values for those significant genes
+cluster_rlog <- rld_mat[clustering_sig_genes$ensgene, ]
+
+#degpatterns expects our meta variables to be factors, not characters
+meta$sampletype = as.factor(meta$sampletype)
+clusters <- degPatterns(cluster_rlog, metadata = meta, time = "sampletype", col= NULL)
+```
+
+</details>
 
 ------------------------------------------------------------------------
 
