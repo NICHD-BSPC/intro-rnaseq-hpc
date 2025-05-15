@@ -13,11 +13,11 @@
 <meta property="og:url" content="https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk8_lesson01_LRT_results.html" />
 <meta property="og:site_name" content="Introduction to RNA-Seq using high-performance computing" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2025-03-01T00:00:00+00:00" />
+<meta property="article:published_time" content="2025-05-01T00:00:00+00:00" />
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="DGE analysis using LRT in DESeq2" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Adapted by Sally Chang at NICHD"},"dateModified":"2025-03-01T00:00:00+00:00","datePublished":"2025-03-01T00:00:00+00:00","headline":"DGE analysis using LRT in DESeq2","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk8_lesson01_LRT_results.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk8_lesson01_LRT_results.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Harvard HPC Staff, Adapted by Sally Chang at NICHD"},"dateModified":"2025-05-01T00:00:00+00:00","datePublished":"2025-05-01T00:00:00+00:00","headline":"DGE analysis using LRT in DESeq2","mainEntityOfPage":{"@type":"WebPage","@id":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk8_lesson01_LRT_results.html"},"url":"https://nichd-bspc.github.io/intro-rnaseq-hpc/lessons/wk8_lesson01_LRT_results.html"}</script>
 <!-- End Jekyll SEO tag -->
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -25,7 +25,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#157878">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=42d3de09715f117c8743fbeef1a0df4a8105d393">
+    <link rel="stylesheet" href="/intro-rnaseq-hpc/assets/css/style.css?v=67a53259da194e0d38880c7fbaf0ea58a0358e93">
     <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
 
 <!-- Setup Google Analytics -->
@@ -76,15 +76,67 @@
 
 <p>Generally, this test will result in a larger number of genes than the individual pair-wise comparisons. While the LRT is a test of significance for differences of any level(s) of the factor, one should not expect it to be exactly equal to the union of sets of genes using Wald tests (although we do expect a high degree of overlap).</p>
 
+<h2 id="catch-up-script">Catch-Up Script</h2>
+
+<p>You need to have the <code class="language-plaintext highlighter-rouge">res_tableOE</code> object in your environment. If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don’t already have the files in your <code class="language-plaintext highlighter-rouge">/data</code> directory, please see <a href="../wk5_lesson01_introR_Rstudio.md">Wk 5 Lesson 01</a> for instructions on where to obtain the input files.</p>
+
+<p>Remember to get your HPC On Demand session going, if applicable, and open your <code class="language-plaintext highlighter-rouge">DEAnalysis</code> R project!</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Setup</span><span class="w">
+</span><span class="c1"># Bioconductor and CRAN libraries used - already installed on Biowulf</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">RColorBrewer</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DESeq2</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">pheatmap</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">BiocManager</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Load in data</span><span class="w">
+</span><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_featurecounts.Rmatrix.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="n">meta</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"data/mov10_AllSamples_metadata.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="w"> </span><span class="n">row.names</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Create DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeqDataSetFromMatrix</span><span class="p">(</span><span class="n">countData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">colData</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">design</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">sampletype</span><span class="p">)</span><span class="w"> 
+
+</span><span class="c1"># Run DESeq2 on DESeq2Dataset object</span><span class="w">
+</span><span class="n">dds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Likelihood ratio test</span><span class="w">
+</span><span class="n">dds_lrt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">DESeq</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">test</span><span class="o">=</span><span class="s2">"LRT"</span><span class="p">,</span><span class="w"> </span><span class="n">reduced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">## Define overexpression vs. control contrast for Wald Test</span><span class="w">
+</span><span class="n">contrast_oe</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MOV10_overexpression"</span><span class="p">,</span><span class="w"> </span><span class="s2">"control"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">## Extract results for MOV10 overexpression vs control</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">contrast</span><span class="o">=</span><span class="n">contrast_oe</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#Set up control vs. OE contrast</span><span class="w">
+</span><span class="n">contrast_oe</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="s2">"MOV10_overexpression"</span><span class="p">,</span><span class="w"> </span><span class="s2">"control"</span><span class="p">)</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">contrast</span><span class="o">=</span><span class="n">contrast_oe</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.1</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#LFC shrinking</span><span class="w">
+</span><span class="n">res_tableOE_unshrunken</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_tableOE</span><span class="w">
+</span><span class="n">res_tableOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">lfcShrink</span><span class="p">(</span><span class="n">dds</span><span class="p">,</span><span class="w"> </span><span class="n">coef</span><span class="o">=</span><span class="s2">"sampletype_MOV10_overexpression_vs_control"</span><span class="p">,</span><span class="w"> </span><span class="n">type</span><span class="o">=</span><span class="s2">"apeglm"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">### Set thresholds</span><span class="w">
+</span><span class="n">padj.cutoff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.1</span><span class="w">
+
+</span><span class="c1">#formatting res_OE_df </span><span class="w">
+</span><span class="n">res_OE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_tableOE</span><span class="p">),</span><span class="w"> </span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#import relevant parts of GTF file</span><span class="w">
+</span><span class="n">gtf_names</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.table</span><span class="p">(</span><span class="s2">"/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt"</span><span class="p">,</span><span class="w"> </span><span class="n">header</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#merge gene symbols</span><span class="w">
+</span><span class="n">res_OE_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">gtf_names</span><span class="p">,</span><span class="n">res_OE_df</span><span class="p">,</span><span class="w"> </span><span class="n">by.x</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">by.y</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Subset the dataframe to keep only significant genes </span><span class="w">
+</span><span class="n">sigOE</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_OE_df</span><span class="p">[</span><span class="n">res_OE_df</span><span class="o">$</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">,]</span><span class="w">
+</span></code></pre></div></div>
+
 <h2 id="the-results-table">The <code class="language-plaintext highlighter-rouge">results()</code> table</h2>
 
 <p>To extract the results from our <code class="language-plaintext highlighter-rouge">dds_lrt</code> object we can use the same <code class="language-plaintext highlighter-rouge">results()</code> function we had used with the Wald test. <em>There is no need for contrasts since we are not making a pair-wise comparison.</em></p>
-
-<blockquote>
-  <p><strong>NOTE:</strong> In an earlier lesson on hypothesis testing, we had you create the object <code class="language-plaintext highlighter-rouge">dds_lrt</code>.</p>
-
-  <p>If you are <strong>having trouble finding the object</strong>, please run the code: <code class="language-plaintext highlighter-rouge">dds_lrt &lt;- DESeq(dds, test="LRT", reduced = ~ 1 )</code></p>
-</blockquote>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Extract results for LRT</span><span class="w">
 </span><span class="n">res_LRT</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">results</span><span class="p">(</span><span class="n">dds_lrt</span><span class="p">)</span><span class="w">
@@ -131,7 +183,9 @@ ENSG00000309258.1 0.00568548 0.0153827
 
 <h3 id="why-are-fold-changes-reported-for-an-lrt-test">Why are fold changes reported for an LRT test?</h3>
 
-<p>For analyses using the likelihood ratio test, the p-values are determined solely by the difference in deviance between the full and reduced model formula. <strong>A single log2 fold change is printed in the results table for consistency with other results table outputs, but is not associated with the actual test. You should ignore this column in results from LRT.</strong></p>
+<p>For analyses using the likelihood ratio test, the p-values are determined solely by the difference in deviance between the full and reduced model formula. <strong>A log2 fold change is printed in the results table for consistency with other results table outputs, but is not associated with the actual test. You should ignore this column in results from LRT.</strong></p>
+
+<p><strong>In fact, BSCP will convert the `log2foldchange` column to NA in their reports to avoid accidentally interpreting these values!</strong></p>
 
 <p><strong>Columns relevant to the LRT test:</strong></p>
 
@@ -145,7 +199,7 @@ ENSG00000309258.1 0.00568548 0.0153827
 <p><strong>Additional columns:</strong></p>
 
 <ul>
-  <li><code class="language-plaintext highlighter-rouge">log2FoldChange</code>: log2 fold change</li>
+  <li><code class="language-plaintext highlighter-rouge">log2FoldChange</code>: log2 fold change: Again, not to be interpreted as part of the results!</li>
   <li><code class="language-plaintext highlighter-rouge">lfcSE</code>: standard error</li>
 </ul>
 
@@ -161,9 +215,7 @@ ENSG00000309258.1 0.00568548 0.0153827
 </span><span class="n">padj.cutoff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0.1</span><span class="w">
 
 </span><span class="c1"># Create a data frame of these results</span><span class="w">
-</span><span class="n">res_LRT_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_LRT</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-  </span><span class="n">data.frame</span><span class="p">()</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-  </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
+</span><span class="n">res_LRT_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rownames_to_column</span><span class="p">(</span><span class="n">data.frame</span><span class="p">(</span><span class="n">res_LRT</span><span class="p">),</span><span class="w"> </span><span class="n">var</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w">
 
 </span><span class="c1"># You probably want to also have those gene symbols attached</span><span class="w">
 </span><span class="n">res_LRT_df</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">merge</span><span class="p">(</span><span class="n">gtf_names</span><span class="p">,</span><span class="n">res_LRT_df</span><span class="p">,</span><span class="w"> </span><span class="n">by.x</span><span class="o">=</span><span class="s2">"ensgene"</span><span class="p">,</span><span class="w"> </span><span class="n">by.y</span><span class="o">=</span><span class="s2">"gene"</span><span class="p">)</span><span class="w"> 
@@ -176,8 +228,7 @@ ENSG00000309258.1 0.00568548 0.0153827
 </span></code></pre></div></div>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Subset to return genes with padj &lt; 0.1 </span><span class="w">
-</span><span class="n">sigLRT_genes</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_LRT_df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> 
-  </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">)</span><span class="w">
+</span><span class="n">sigLRT_genes</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">res_LRT_df</span><span class="p">[</span><span class="n">res_LRT_df</span><span class="o">$</span><span class="n">padj</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">padj.cutoff</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
 
 </span><span class="c1"># Get number of significant genes</span><span class="w">
 </span><span class="n">nrow</span><span class="p">(</span><span class="n">sigLRT_genes</span><span class="p">)</span><span class="w">
@@ -186,11 +237,11 @@ ENSG00000309258.1 0.00568548 0.0153827
 </span><span class="n">nrow</span><span class="p">(</span><span class="n">sigOE</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p>The number of significant genes observed from the LRT is quite high. This list includes genes that can be changing in any direction across the three factor levels (control, KO, overexpression). To reduce the number of significant genes, we can increase the stringency of our FDR threshold (<code class="language-plaintext highlighter-rouge">padj.cutoff</code>).</p>
+<p>This list includes genes that can be changing in any direction across the three factor levels (control, KO, overexpression). To reduce the size of this list (for processing reasons etc.) we can increase the stringency of our FDR threshold (<code class="language-plaintext highlighter-rouge">padj.cutoff</code>), or subset the top most differentially expressed genes (see below).</p>
 
 <hr />
 
-<p><strong>In-Class Demo:</strong></p>
+<p><strong>Using Intersect:</strong></p>
 
 <ol>
   <li>Compare the resulting gene list from the LRT test to the gene lists from the Wald test comparisons.
@@ -236,9 +287,7 @@ rld_mat &lt;- assay(rld)
 </blockquote>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Subset results to top 1000 for faster cluster finding (for classroom demo purposes)</span><span class="w">
-</span><span class="n">clustering_sig_genes</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sigLRT_genes</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-  </span><span class="n">arrange</span><span class="p">(</span><span class="n">padj</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-  </span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="m">1000</span><span class="p">)</span><span class="w">
+</span><span class="n">clustering_sig_genes</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">head</span><span class="p">(</span><span class="n">sigLRT_genes</span><span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="n">sigLRT_genes</span><span class="o">$</span><span class="n">padj</span><span class="p">),</span><span class="w"> </span><span class="p">],</span><span class="w"> </span><span class="m">1000</span><span class="p">)</span><span class="w">
 
 </span><span class="c1"># Obtain rlog values for those significant genes</span><span class="w">
 </span><span class="n">cluster_rlog</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">rld_mat</span><span class="p">[</span><span class="n">clustering_sig_genes</span><span class="o">$</span><span class="n">ensgene</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
@@ -248,26 +297,27 @@ rld_mat &lt;- assay(rld)
 
 <ul>
   <li><code class="language-plaintext highlighter-rouge">metadata</code>: the metadata dataframe that corresponds to samples</li>
-  <li><code class="language-plaintext highlighter-rouge">time</code>: character column name in metadata that will be used as variable that changes. Does not necessarily need to be actually <code class="language-plaintext highlighter-rouge">time</code>.</li>
-  <li><code class="language-plaintext highlighter-rouge">col</code>: character column name in metadata to separate samples</li>
+  <li><code class="language-plaintext highlighter-rouge">time</code>: character column name in metadata that will be used as variable that changes, and will become the x-axis of each plot panel. Does not necessarily need to be actually <code class="language-plaintext highlighter-rouge">time</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">col</code>: character column name in metadata to separate samples, and will be used to color the lines. Using <code class="language-plaintext highlighter-rouge">NULL</code> will</li>
 </ul>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Use the `degPatterns` function from the 'DEGreport' package to show gene clusters across sample groups</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">DEGreport</span><span class="p">)</span><span class="w">
 
 </span><span class="c1">#degpatterns expects our meta variables to be factors, not characters</span><span class="w">
 </span><span class="n">meta</span><span class="o">$</span><span class="n">sampletype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">as.factor</span><span class="p">(</span><span class="n">meta</span><span class="o">$</span><span class="n">sampletype</span><span class="p">)</span><span class="w">
 </span><span class="n">clusters</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">degPatterns</span><span class="p">(</span><span class="n">cluster_rlog</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">meta</span><span class="p">,</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"sampletype"</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="o">=</span><span class="w"> </span><span class="kc">NULL</span><span class="p">)</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Once the clustering is finished running, you will get your command prompt back in the console and you should see a figure appear in your plot window. The genes have been clustered into four different groups. For each group of genes, we have a boxplot illustrating expression change across the different sample groups. A line graph is overlayed to illustrate the trend in expression change.</p>
+<p>Once the clustering is finished running, you will get your command prompt back in the console and you should see a figure appear in your plot window. The genes have been clustered into four different groups.</p>
 
-<p align="center">
+<p>For each group of genes, we have a boxplot illustrating expression change across the different sample groups. A line graph is overlayed to illustrate the trend in expression change.</p>
 
-<img src="../img/degPatterns_figure.png" width="800" />
+<p><img src="../img/lrt_boxplots.png" alt="boxplots produced by degPatterns for the four inferred clusters of genes" width="800" /></p>
 
-</p>
+<p>Suppose we are interested in the genes which show a decreased expression in the knockdown samples and increase in the overexpression. The closest pattern to this might group 1, with 275 genes. However it’s important to note that <strong>the clusters do not have statistical significance.</strong>.</p>
 
-<p>Suppose we are interested in the genes which show a decreased expression in the knockdown samples and increase in the overexpression. The closest pattern to this might group 1, with 275 genes. However it’s important to note that <strong>the clusters do not have statistical significance.</strong>. That is, just because the pattern seems to have a shape where MOV10 knockdown looks to be less, this does NOT mean that these genes have signficantly decreased expression in MOV10 relative to control. To know that, we’d need to inspect the contrast that specifically compares those two conditions.</p>
+<p>That is, just because the pattern seems to have a shape where MOV10 knockdown looks to be less, <strong>this does NOT mean that these genes have signficantly decreased expression in MOV10 relative to control.</strong> To know that, we’d need to inspect the contrast that specifically compares those two conditions.</p>
 
 <p>But that cluster still seems interesting, so let’s explore the output to see what genes those are. What type of data structure is the <code class="language-plaintext highlighter-rouge">clusters</code> output?</p>
 
@@ -284,8 +334,7 @@ rld_mat &lt;- assay(rld)
 <p>Since we are interested in Group 1, we can filter the dataframe to keep only those genes:</p>
 
 <div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Extract the Group 1 genes</span><span class="w">
-</span><span class="n">group1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">clusters</span><span class="o">$</span><span class="n">df</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
-          </span><span class="n">dplyr</span><span class="o">::</span><span class="n">filter</span><span class="p">(</span><span class="n">cluster</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">
+</span><span class="n">group1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">clusters</span><span class="o">$</span><span class="n">df</span><span class="p">[</span><span class="n">clusters</span><span class="o">$</span><span class="n">df</span><span class="o">$</span><span class="n">cluster</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
 </span></code></pre></div></div>
 
 <p>After extracting a group of genes, we can also re-attach the <code class="language-plaintext highlighter-rouge">gene symbols</code> and use annotation packages to obtain additional information. We can also use these lists of genes as input to downstream functional analysis tools to obtain more biological insight and see whether the groups of genes share a specific function.</p>
@@ -345,6 +394,53 @@ rld_mat &lt;- assay(rld)
 </span></code></pre></div></div>
 
 <p>Depending on what type of shared expression profiles exist in your data, you can then extract the groups of genes associated with the patterns of interest and move on to functional analysis for each of the gene groups of interest.</p>
+
+<h2 id="recap-script">Recap Script</h2>
+
+<p>None of the new commands that we ran today are strictly necessary for the remaining lessons, because they focus on the Wald Test results instead of these LRT results. However, you may want to take note of the commands we used today to process your LRT results and produce relevant figures!</p>
+
+<details>
+
+<summary>Processing LRT Results Script</summary>
+
+``` r
+# load DEGreport
+library(DEGreport)
+
+# Extract results for LRT
+res_LRT &lt;- results(dds_lrt)
+
+# set up cutoff to match DEseq2 and BSPC default
+padj.cutoff &lt;- 0.1
+
+# Create a data frame of these results
+res_LRT_df &lt;- rownames_to_column(data.frame(res_LRT), var="gene")
+
+# You probably want to also have those gene symbols attached
+res_LRT_df &lt;- merge(gtf_names,res_LRT_df, by.x="ensgene", by.y="gene") 
+
+# Check out what this looks like with `head()`
+head(res_LRT_df)
+
+# Subset to return genes with padj &lt; 0.1 
+sigLRT_genes &lt;- res_LRT_df[res_LRT_df$padj &lt; padj.cutoff, ]
+
+### Transform counts for data visualization
+rld &lt;- rlog(dds, blind=TRUE)
+rld_mat &lt;- assay(rld)
+
+# Subset results to top 1000 for faster cluster finding (for classroom demo purposes)
+clustering_sig_genes &lt;- head(sigLRT_genes[order(sigLRT_genes$padj), ], 1000)
+
+# Obtain rlog values for those significant genes
+cluster_rlog &lt;- rld_mat[clustering_sig_genes$ensgene, ]
+
+#degpatterns expects our meta variables to be factors, not characters
+meta$sampletype = as.factor(meta$sampletype)
+clusters &lt;- degPatterns(cluster_rlog, metadata = meta, time = "sampletype", col= NULL)
+```
+
+</details>
 
 <hr />
 
