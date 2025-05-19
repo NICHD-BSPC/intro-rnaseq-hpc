@@ -1,12 +1,72 @@
 ---
 title: "AnnotationDbi"
 author: "Harvard HPC Staff, Adapted by Sally Chang at NICHD"
-date: "Last Modified March 2025"
+date: "Last Modified May 2025"
 ---
+
+## Catch-Up Script
+
+You need to have the DESeq2 results object for the control vs. Overexpression contrast, `res_OE_df` , in your environment, as well as several other important dataframes.
+
+If you need to be completely caught up, you can copy and paste the following into an R Script and run it. If you don't already have the files in your `/data` directory, please see [Wk 5 Lesson 01](../wk5_lesson01_introR_Rstudio.md) for instructions on where to obtain the input files.
+
+Remember to get your HPC On Demand session going, if applicable, and open your `DEAnalysis` R project!
+
+``` r
+# Setup
+# Bioconductor and CRAN libraries used - already installed on Biowulf
+library(tidyverse)
+library(RColorBrewer)
+library(DESeq2)
+library(pheatmap)
+library(BiocManager)
+
+# Load in data
+data <- read.table("data/mov10_AllSamples_featurecounts.Rmatrix.txt", header=T, row.names=1)
+
+meta <- read.table("data/mov10_AllSamples_metadata.txt", header=T, row.names=1)
+
+# Create DESeq2Dataset object
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype) 
+
+# Run DESeq2 on DESeq2Dataset object
+dds <- DESeq(dds)
+
+# Likelihood ratio test
+dds_lrt <- DESeq(dds, test="LRT", reduced = ~ 1)
+
+## Define overexpression vs. control contrast for Wald Test
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+
+## Extract results for MOV10 overexpression vs control
+res_tableOE <- results(dds, contrast=contrast_oe)
+
+#Set up control vs. OE contrast
+contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+res_tableOE <- results(dds, contrast=contrast_oe, alpha = 0.1)
+
+#LFC shrinking
+res_tableOE <- lfcShrink(dds, coef="sampletype_MOV10_overexpression_vs_control", type="apeglm")
+
+### Set thresholds
+padj.cutoff <- 0.1
+
+#formatting res_OE_df 
+res_OE_df <- rownames_to_column(data.frame(res_tableOE), var="gene")
+
+#import relevant parts of GTF file
+gtf_names <- read.table("/data/Bspc-training/shared/rnaseq_mov10/downstream_data/gtf_names.txt", header=TRUE)
+
+#merge gene symbols
+res_OE_df <- merge(gtf_names,res_OE_df, by.x="ensgene", by.y="gene")
+
+# Subset the dataframe to keep only significant genes 
+sigOE <- res_OE_df[res_OE_df$padj < padj.cutoff,]
+```
 
 ## AnnotationDbi
 
-AnnotationDbi is an R package that provides an interface for connecting and querying various annotation databases using SQLite data storage (a convenient and performant flat-file database format). There are AnnotationDbi packages that contain information on gene IDs, Gene Ontology terms, and more. There is helpful [documentation](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf) available to reference when extracting data from any of these databases.
+AnnotationDbi is an R package that provides an interface for connecting and querying various annotation databases using SQLite data storage (a convenient and high-performance flat-file database format). There are AnnotationDbi packages that contain information on gene IDs, Gene Ontology terms, and more. There is helpful [documentation](https://bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf) available to reference when extracting data from any of these databases.
 
 AnnotationDbi is just the interface; you need to get an appropriate annotation package that you can use with AnnotationDbi.
 
@@ -78,11 +138,12 @@ columns(org.Hs.eg.db)
 [21] "PMID"         "PROSITE"      "REFSEQ"       "SYMBOL"       "UCSCKG"
 ```
 
-And let's see what keys are available for mapping to this database: 
+And let's see what keys are available for mapping to this database:
 
 ``` r
 keytypes(org.Hs.eg.db)
 ```
+
 Ideally, all databases would use the same gene identifier, but this is unfortunately not the case. Recall that our featureCounts file that we imported into R has Ensembl identifiers. Let's check the orgdb's Ensemble identifiers:
 
 ``` r
@@ -98,7 +159,7 @@ Recall that our Ensembl IDs had a dotted version number, which will not match an
 
 ``` r
 # use gsub to replace column with stripped gene symbols
-res_tableOE_df$ensgene <- gsub("\\..*","",res_tableOE_df$ensgene)
+res_OE_df$ensgene <- gsub("\\..*","",res_OE_df$ensgene)
 ```
 
 Now we can use that cleaned set of identifiers to select items from the orgdb.
@@ -106,7 +167,7 @@ Now we can use that cleaned set of identifiers to select items from the orgdb.
 ``` r
 # Return the Ensembl IDs for a set of genes
 annotations_orgDb <- AnnotationDbi::select(org.Hs.eg.db, # database
-                                     keys = res_tableOE_df$ensgene,  # data to use for retrieval
+                                     keys = res_OE_df$ensgene,  # data to use for retrieval
                                      columns = c("SYMBOL", "ENTREZID","GENENAME"), # information to retreive for given data
                                      keytype = "ENSEMBL") # type of data given in 'keys' argument
 ```
@@ -114,9 +175,9 @@ annotations_orgDb <- AnnotationDbi::select(org.Hs.eg.db, # database
 We started from at about 79k in our results table, but the results from this are quite a bit longer (83k). This is because there are Ensembl IDs that have multiple entries in other columns. Let's inspect that:
 
 ``` r
-multi <- table(annotations_orgDb$ENSEMBL) %>%
-  sort() %>%
-  tail(25)
+# Takes the last 25 entries using tail, i.e. those with the largest umber of multiple entries
+multi <- tail(sort(table(annotations_orgDb$ENSEMBL)), 25)
+
 multi
 ```
 
@@ -190,13 +251,13 @@ annotate_results_general <- function(df, orgdb, keytype, key_column="ensgene", a
 And this function can be run like the following:
 
 ``` r
-annot_orgDb_first <- annotate_results_general(res_tableOE_df, org.Hs.eg.db, keytype="ENSEMBL", annotation_columns=c("GENENAME", "SYMBOL", "ENTREZID"))
+annot_orgDb_first <- annotate_results_general(res_OE_df, org.Hs.eg.db, keytype="ENSEMBL", annotation_columns=c("GENENAME", "SYMBOL", "ENTREZID"))
 ```
 
 There are now only the expected 79k results! We can double check that we have selected only one mapping per gene:
 
 ``` r
- multi <- table(annot_orgDb_first$ensgene) %>% sort() %>% tail(25)
+multi <- tail(sort(table(annot_orgDb_first$ensgene)), 25)
 ```
 
 **However, this solution still has pitfalls**: There are many cases where the different possible matches to the same key actually provide other information. For example, someone might notice that `GO` is a column in the orgdb, and run `annotate_results()` on it. But with `multiVals="first"`, only one of the many GO terms will be associated with the gene, which is unhelpful and also wrong.
@@ -257,7 +318,7 @@ Now we can return all gene IDs for our gene list:
 
 ``` r
 # Return the Ensembl IDs for a set of genes
-annotations_edb <- annotate_results_general(res_tableOE_df, EnsDb.Hsapiens.v86, keytype="GENEID", annotation_columns=c("SYMBOL", "ENTREZID", "GENEBIOTYPE")) 
+annotations_edb <- annotate_results_general(res_OE_df, EnsDb.Hsapiens.v86, keytype="GENEID", annotation_columns=c("SYMBOL", "ENTREZID", "GENEBIOTYPE")) 
 ```
 
 We can check for NA entries, and find that we have fewer of these instances:
